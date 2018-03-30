@@ -33,12 +33,16 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && isset($_POST['lo
         $_SESSION['color'] = $row['color'];
         //check key pairs
         if(!$row['privatePGPKey']){
-            $keyPair = sodium_crypto_box_keypair();
-            $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
-            $user_public = sodium_crypto_box_publickey($keyPair);
-            $encrypted = simple_encryption($private, $_POST['password']);
-            $conn->query("UPDATE UserData SET publicPGPKey = '".base64_encode($user_public)."', privatePGPKey = '".$encrypted."'  WHERE id = ".$row['id']);
-            $_SESSION['privateKey'] = $private;
+            // if(function_exists("sodium_crypto_box_keypair")){
+                $keyPair = sodium_crypto_box_keypair();
+                $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
+                $user_public = sodium_crypto_box_publickey($keyPair);
+                $encrypted = simple_encryption($private, $_POST['password']);
+                $conn->query("UPDATE UserData SET publicPGPKey = '".base64_encode($user_public)."', privatePGPKey = '".$encrypted."'  WHERE id = ".$row['id']);
+                $_SESSION['privateKey'] = $private;
+            // }else{
+            //     $_SESSION['privateKey'] = "asdfasdf";
+            // }
         } else {
             $_SESSION['privateKey'] = simple_decryption($row['privatePGPKey'], $_POST['password']);
         }

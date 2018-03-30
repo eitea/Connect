@@ -41,34 +41,30 @@ if (!$result || $result->num_rows == 0) {
         $lastdate = $date ?? "";
         $date = date('Y-m-d', strtotime($row["sent"]));
 
-        
-        if(!empty($firstname) && !empty($lastname))
-            $name = $firstname . " " . $lastname;
 
-        if($lastdate != $date){
-            ?>
+        if(!empty($firstname) && !empty($lastname)) $name = $firstname . " " . $lastname;
+
+        if($lastdate != $date):
+        ?>
             <div class="row">
                 <div class="text-center">
                     <?php echo $date; ?>
                 </div>
             </div>
 
-            <?php
-        }
-        
-        ?>
+        <?php endif; ?>
 
             <div class="row">
                 <div class="col-xs-12">
                     <div class="well <?php echo $pull; ?>" style="position:relative">
                         <!-- if -->
-                        <?php if($showseen){ ?>
+                        <?php if($showseen): ?>
                             <i class="fa <?php echo $seen; ?>" style="display:block; top:0px; right:-3px; position:absolute; color:#9d9d9d;"></i>
-                        <?php }elseif(!$showseen){ ?>
+                        <?php elseif(!$showseen): ?>
                             <span class="label label-default" style="display:block; top:-17px; left:0px; position:absolute;"><?php echo $name; ?></span>
-                        <?php }?>
+                        <?php endif; ?>
                         <!-- endif -->
-                        
+
                         <div><?php echo $message; ?></div>
                     </div>
                 </div>
@@ -78,13 +74,10 @@ if (!$result || $result->num_rows == 0) {
     }
 }
 
-function test_input($data)
-{
+function test_input($data){
     require dirname(__DIR__) . "/connection.php";
     $data = $conn->escape_string($data);
     $data = trim($data);
     return $data;
 }
 ?>
-
-

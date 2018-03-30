@@ -2374,7 +2374,87 @@ if($row['version'] < 144){
         echo '<br>Project: Relation Extern';
     }
 }
-//if($row['version'] < 145){}
+
+if($row['version'] < 145){
+    $sql = "CREATE TABLE dsgvo_vv_data_matrix (
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        companyID INT(6) UNSIGNED,
+        FOREIGN KEY (companyID) REFERENCES companyData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    }else{
+        echo '<br>DSGVO: Data Matrix';
+    }
+
+    $sql = "CREATE TABLE dsgvo_vv_data_matrix_settings (
+        id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        matrixID INT(6) UNSIGNED,
+        opt_name VARCHAR(30) NOT NULL,
+        opt_descr VARCHAR(350) NOT NULL,
+        opt_status VARCHAR(15) NOT NULL DEFAULT 'ACTIVE',
+        UNIQUE KEY (matrixID,opt_name),
+        FOREIGN KEY (matrixID) REFERENCES dsgvo_vv_data_matrix(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    }else{
+        echo '<br>DSGVO: Data Matrix Settings';
+    }
+
+    $conn->query("ALTER TABLE dsgvo_vv_settings ADD COLUMN matrix_setting_id INT(10) UNSIGNED");
+    if($conn->error){
+        echo $conn->error;
+    }else{
+        echo '<br>DSGVO: Data Matrix Settings Foreign Key';
+    }
+
+    $conn->query("ALTER TABLE dsgvo_vv_settings ADD FOREIGN KEY (matrix_setting_id) REFERENCES dsgvo_vv_data_matrix_settings(id) ON UPDATE CASCADE ON DELETE SET NULL");
+    if($conn->error){
+        echo $conn->error;
+    }else{
+        echo '<br>DSGVO: Data Matrix Settings Foreign Key';
+    }
+
+    $conn->query("ALTER TABLE dsgvo_vv_settings ADD COLUMN clientID INT(6) UNSIGNED");
+    if($conn->error){
+        echo $conn->error;
+    }else{
+        echo '<br>DSGVO: VV Settings Client';
+    }
+
+    $conn->query("ALTER TABLE dsgvo_vv_settings ADD FOREIGN KEY (clientID) REFERENCES clientData(id) ON UPDATE CASCADE ON DELETE SET NULL");
+    if($conn->error){
+        echo $conn->error;
+    }else{
+        echo '<br>DSGVO: VV Settings Client Foreign Key';
+    }
+
+    $conn->query("CREATE TABLE dsgvo_vv_logs (
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        user_id INT(6) UNSIGNED,
+        log_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        short_description VARCHAR(100) NOT NULL,
+        scope VARCHAR(100),
+        long_description VARCHAR(500),
+        FOREIGN KEY (user_id) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )");
+    if($conn->error){
+        echo $conn->error;
+    }else{
+        echo '<br>DSGVO: Logs';
+    }
+}
+
+//if($row['version'] < 146){}
+//if($row['version'] < 147){}
+//if($row['version'] < 148){}
 
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';

@@ -2,8 +2,8 @@
 session_start();
 $userID = $_SESSION['userid'] or die("no user signed in");
 $trainingID = isset($_POST["trainingID"]) or die("no training id");
-require dirname(__DIR__) . "/connection.php";
-require dirname(__DIR__) . "/language.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "connection.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "language.php";
 $trainingID = intval($_POST["trainingID"]);
 $onLogin = false;
 $doneSurveys = false;
@@ -152,6 +152,7 @@ while($row_question = $result_questions->fetch_assoc()){
                 timeElement.html("Zeit auf der Seite: "+ padZero(hours) + ":" + padZero(minutes) + ":" + padZero(seconds));
             }
             function timerCallback() {
+                setLinkTargets();
                 var page = survey.currentPage;
                 if(!page) return;
                 var valueName = "training;" + page.name; // training id
@@ -164,4 +165,9 @@ while($row_question = $result_questions->fetch_assoc()){
             survey.onCurrentPageChanged.add(timerCallback);
             timerID = window.setInterval(timerCallback, 1000);
             $("#surveyElement").Survey({ model: survey });
+    </script>
+    <script>
+        function setLinkTargets(){
+            $("#surveyElement a").attr("target","_blank");
+        }
     </script>
