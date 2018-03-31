@@ -170,9 +170,6 @@ if (session_status() == PHP_SESSION_NONE) {
                     //scroll
                     $("#messages").scroll(function(){
                         if($("#messages").scrollTop() == 0){
-                            console.log($("#messages").scrollTop());
-                            console.log(messageLimit);
-
                             $("#messages").scrollTop(1);
                             messageLimit += 1
                             getMessages(selectedPartner, selectedSubject, "#messages", false, messageLimit);
