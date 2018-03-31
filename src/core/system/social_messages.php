@@ -125,14 +125,12 @@ if (session_status() == PHP_SESSION_NONE) {
         <div class="col-xs-4">
             <?php
                 //select all subjects
-                $result = $conn->query("SELECT DISTINCT subject, userID, partnerID FROM messages WHERE userID = '$userID' or partnerID = '$userID' GROUP BY partnerID, subject");
+                $result = $conn->query("SELECT subject, userID, partnerID FROM messages WHERE userID = '$userID' or partnerID = '$userID' GROUP BY subject");  //sbdy msgd me
                 if ($result && $result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
                         $subject = $row['subject'];
                         $x = $row['userID'];
                         $partnerID = $row['partnerID'] ;
-
-                        echo $subject . " " . $x . " " . $partnerID;
 
                         $realPartnerID = ($_SESSION['userid'] == $x) ? $partnerID : $x;   // needed, bc if the partner receives the message, the partnerID is the same as the userID -> if the responds, he sends a message to himself
                         echo '<div class="subject"><p style="padding: 10px" onclick="showChat('.$realPartnerID.', \''.$subject.'\')">'.$userID_toName[$realPartnerID].' - '.$subject.'</p></div>';
@@ -148,7 +146,7 @@ if (session_status() == PHP_SESSION_NONE) {
             <div class="pre-scrollable" id="messages" style="display: none; background-color: WhiteSmoke; overflow: auto; overflow-x: hidden; max-height: 60vh"></div>
             
             <div id="chatinput" style="display: none">
-                <form autocomplete="off">
+                <form class="form" autocomplete="off">
                     <div class="input-group">
                         <input required type="text" id="message" placeholder="Type a message" class="form-control">
                         <span class="input-group-btn"><button class="btn" type="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button></span>
@@ -156,18 +154,18 @@ if (session_status() == PHP_SESSION_NONE) {
                 </form>
 
                 <script>
+                    //submit
                     $("#chatinput").submit(function (e) {
                         e.preventDefault()
 
                         // send the message
-                        if(selectedPartner !== -1 && selectedSubject !== "")
-                            sendMessage(selectedPartner, selectedSubject, $("#message").val(), "#messages", 50);    
+                        sendMessage(selectedPartner, selectedSubject, $("#message").val(), "#messages", 50);    
                         
                         // clear the field
                         $("#message").val("")
                         
                         return false;
-                        })
+                    })
                 </script>
             </div>
         </div>
@@ -179,24 +177,39 @@ if (session_status() == PHP_SESSION_NONE) {
 <script>
 var selectedPartner = -1;
 var selectedSubject = "";
+var intervalID = -1;
+var messageLimit = 10;
 
 //Make the div visible, when someone clicks the button
 function showChat(partner, subject) {
+    //reset the limit after a new conversation will be shown
+    messageLimit = 10;
+
+    //Show the messages immediately
+    getMessages(partner, subject, "#messages", true, messageLimit);
+
     selectedPartner = partner;
     selectedSubject = subject;
 
-    //TODO: implement interval, which calls getMessages every x seconds
-
-    getMessages(partner, subject, "#messages", true, 10);
+    // Clear and set the new interval for showing messages
+    if(intervalID != -1) clearInterval(intervalID);
+    intervalID = setInterval(function() {
+        getMessages(partner, subject, "#messages", false, 10);
+    }, 1000);
 
     // make the messages and the response field visible
     var messagesElement = document.getElementById("messages");
-    var responseElement = document.getElementById("chatinput");
     messagesElement.style.display = "block";
+
+    var responseElement = document.getElementById("chatinput");
     responseElement.style.display = "block";
 }
 
 function getMessages(partner, subject, target, scroll = false, limit = 50) {
+    if(partner == -1 || subject.length == 0) {
+        return;
+    }
+    
     $.ajax({
         url: 'ajaxQuery/AJAX_postGetMessage.php',
         data: {
@@ -218,8 +231,8 @@ function getMessages(partner, subject, target, scroll = false, limit = 50) {
 }
 
 function sendMessage(partner, subject, message, target, limit = 50) {
-        if(message.length==0){
-            return
+        if(message.length==0 || partner == -1 || subject.length == 0){
+            return;
         }
 
         $.ajax({
