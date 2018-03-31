@@ -159,7 +159,8 @@ if (session_status() == PHP_SESSION_NONE) {
                         e.preventDefault()
 
                         // send the message
-                        sendMessage(selectedPartner, selectedSubject, $("#message").val(), "#messages", 50);    
+                        messageLimit++;
+                        sendMessage(selectedPartner, selectedSubject, $("#message").val(), "#messages", messageLimit);    
                         
                         // clear the field
                         $("#message").val("")
