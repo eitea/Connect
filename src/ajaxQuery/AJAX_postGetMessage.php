@@ -50,6 +50,7 @@ if (!$result || $result->num_rows == 0) {
 
         if($lastdate != $date):
         ?>
+        
             <div class="row">
                 <div class="text-center">
                     <?php echo $date; ?>

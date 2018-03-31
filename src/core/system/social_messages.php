@@ -166,6 +166,19 @@ if (session_status() == PHP_SESSION_NONE) {
                         
                         return false;
                     })
+
+                    //scroll
+                    $("#messages").scroll(function(){
+                        if($("#messages").scrollTop() == 0){
+                            console.log($("#messages").scrollTop());
+                            console.log(messageLimit);
+
+                            $("#messages").scrollTop(1);
+                            messageLimit += 1
+                            getMessages(selectedPartner, selectedSubject, "#messages", false, messageLimit);
+                        }
+
+                    })
                 </script>
             </div>
         </div>
@@ -194,7 +207,7 @@ function showChat(partner, subject) {
     // Clear and set the new interval for showing messages
     if(intervalID != -1) clearInterval(intervalID);
     intervalID = setInterval(function() {
-        getMessages(partner, subject, "#messages", false, 10);
+        getMessages(partner, subject, "#messages", false, messageLimit);
     }, 1000);
 
     // make the messages and the response field visible
