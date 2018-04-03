@@ -1,11 +1,4 @@
-<?php 
-require dirname(dirname(__DIR__)) . '/header.php'; 
-
-//IMPORTANT: session is needed, bc if the partner receives the message, the partnerID is the same as the userID -> if the responds, he sends a message to himself
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}    
-?>
+<?php require dirname(dirname(__DIR__)) . '/header.php'; ?>
 <style>
 .subject {
     padding: 5px;
@@ -100,7 +93,7 @@ if (session_status() == PHP_SESSION_NONE) {
                         <label for="message"> <?php echo $lang['MESSAGE'] ?></label>
                         <textarea required name="message" class="form-control"></textarea>
                     </div>
-                    
+
                     <!-- modal footer -->
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
@@ -124,27 +117,23 @@ if (session_status() == PHP_SESSION_NONE) {
     <div class="row">
         <div class="col-xs-4">
             <?php
-                //select all subjects
-                $result = $conn->query("SELECT subject, userID, partnerID FROM messages WHERE userID = '$userID' or partnerID = '$userID' GROUP BY subject");  //sbdy msgd me
-                if ($result && $result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                        $subject = $row['subject'];
-                        $x = $row['userID'];
-                        $partnerID = $row['partnerID'] ;
+                $result = $conn->query("SELECT subject, userID, partnerID FROM messages WHERE $userID IN (partnerID, userID) GROUP BY subject, LEAST(userID, partnerID), GREATEST(userID, partnerID) ");
+                while ($result && ($row = $result->fetch_assoc())) {
+                    $subject = $row['subject'];
+                    $sender = $row['userID'];
+                    $receiver = $row['partnerID'];
 
-                        $realPartnerID = ($_SESSION['userid'] == $x) ? $partnerID : $x;   // needed, bc if the partner receives the message, the partnerID is the same as the userID -> if the responds, he sends a message to himself
-                        echo '<div class="subject"><p style="padding: 10px" onclick="showChat('.$realPartnerID.', \''.$subject.'\')">'.$userID_toName[$realPartnerID].' - '.$subject.'</p></div>';
-                    }
-                } else {
-                    echo mysqli_error($conn);
+                    if($userID == $receiver) $receiver = $sender; //sending process must be reversed
+                    echo '<div class="subject"><p style="padding: 10px" onclick="showChat('.$receiver.', \''.$subject.'\')">'.$userID_toName[$receiver].' - '.$subject.'</p></div>';
                 }
+                echo $conn->error;
             ?>
         </div>
 
         <!-- Messages -->
         <div class="col-xs-8">
             <div class="pre-scrollable" id="messages" style="display: none; background-color: WhiteSmoke; overflow: auto; overflow-x: hidden; max-height: 60vh"></div>
-            
+
             <div id="chatinput" style="display: none">
                 <form class="form" autocomplete="off">
                     <div class="input-group">
@@ -160,11 +149,11 @@ if (session_status() == PHP_SESSION_NONE) {
 
                         // send the message
                         messageLimit++;
-                        sendMessage(selectedPartner, selectedSubject, $("#message").val(), "#messages", messageLimit);    
-                        
+                        sendMessage(selectedPartner, selectedSubject, $("#message").val(), "#messages", messageLimit);
+
                         // clear the field
                         $("#message").val("")
-                        
+
                         return false;
                     })
 
@@ -220,7 +209,7 @@ function getMessages(partner, subject, target, scroll = false, limit = 50) {
     if(partner == -1 || subject.length == 0) {
         return;
     }
-    
+
     $.ajax({
         url: 'ajaxQuery/AJAX_postGetMessage.php',
         data: {
@@ -231,7 +220,7 @@ function getMessages(partner, subject, target, scroll = false, limit = 50) {
         type: 'GET',
         success: function (response) {
             $(target).html(response);
-            
+
             //Scroll down
             if (scroll) $(target).scrollTop($(target)[0].scrollHeight)
         },
