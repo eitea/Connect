@@ -262,7 +262,7 @@ function deleteSubject(partner, subject) {
         },
         type: 'GET',
         success: function (response) {
-            console.log(response);
+            // nothing to do here
         },
     })
 }
