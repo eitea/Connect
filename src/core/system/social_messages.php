@@ -1,4 +1,5 @@
 <?php require dirname(dirname(__DIR__)) . '/header.php'; ?>
+
 <style>
 .subject {
     padding: 5px;
@@ -124,7 +125,10 @@
                     $receiver = $row['partnerID'];
 
                     if($userID == $receiver) $receiver = $sender; //sending process must be reversed
-                    echo '<div class="subject"><p style="padding: 10px" onclick="showChat('.$receiver.', \''.$subject.'\')">'.$userID_toName[$receiver].' - '.$subject.'</p></div>';
+                    echo '<div class="subject input-group">';
+                    echo '<p style="padding: 10px" onclick="showChat('.$receiver.', \''.$subject.'\')">'.$userID_toName[$receiver].' - '.$subject.'</p>';
+                    echo '<span class="input-group-btn"><button class="btn" onclick="deleteSubject('.$receiver.', \''.$subject.'\')"><i class="fa fa-trash" aria-hidden="true"></i></button></span>';
+                    echo '</div>';
                 }
                 echo $conn->error;
             ?>
@@ -231,23 +235,37 @@ function getMessages(partner, subject, target, scroll = false, limit = 50) {
 }
 
 function sendMessage(partner, subject, message, target, limit = 50) {
-        if(message.length==0 || partner == -1 || subject.length == 0){
-            return;
-        }
-
-        $.ajax({
-            url: 'ajaxQuery/AJAX_postSendMessage.php',
-            data: {
-                partner: partner,
-                subject: subject,
-                message: message,
-            },
-            type: 'GET',
-            success: function (response) {
-                getMessages(partner, subject, target, true, limit)
-            },
-        })
+    if(message.length==0 || partner == -1 || subject.length == 0){
+        return;
     }
+
+    $.ajax({
+        url: 'ajaxQuery/AJAX_postSendMessage.php',
+        data: {
+            partner: partner,
+            subject: subject,
+            message: message,
+        },
+        type: 'GET',
+        success: function (response) {
+            getMessages(partner, subject, target, true, limit)
+        },
+    })
+}
+
+function deleteSubject(partner, subject) {
+    $.ajax({
+        url: 'ajaxQuery/AJAX_postDeleteSubject.php',
+        data: {
+            partner: partner,
+            subject: subject,
+        },
+        type: 'GET',
+        success: function (response) {
+            console.log(response);
+        },
+    })
+}
 </script>
 
 
