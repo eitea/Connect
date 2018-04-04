@@ -585,3 +585,27 @@ function util_strip_prefix($subject, $prefix) {
 function util_starts_with($subject, $prefix) {
     return substr($subject, 0, strlen($prefix)) === $prefix;
 }
+
+function showErrorToString($message){
+    if(!$message || strlen($message) == 0) return;
+    $message = str_replace("'", "\\'", $message);
+    return "<script>$(document).ready(function(){showError('$message')})</script>";
+}
+
+function showWarningToString($message){
+    if(!$message || strlen($message) == 0) return;
+    $message = str_replace("'", "\\'", $message);
+    return "<script>$(document).ready(function(){showWarning('$message')})</script>";
+}
+
+function showInfoToString($message){
+    if(!$message || strlen($message) == 0) return;
+    $message = str_replace("'", "\\'", $message);
+    return "<script>$(document).ready(function(){showInfo('$message')})</script>";
+}
+
+function showSuccessToString($message){
+    if(!$message || strlen($message) == 0) return;
+    $message = str_replace("'", "\\'", $message);
+    return "<script>$(document).ready(function(){showSuccess('$message')})</script>";
+}

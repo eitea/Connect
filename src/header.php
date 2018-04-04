@@ -14,30 +14,6 @@ require __DIR__ . "/utilities.php";
 require __DIR__ . "/validate.php";
 require __DIR__ . "/language.php";
 
-function showErrorToString($message){
-    if(!$message || strlen($message) == 0) return;
-    $message = str_replace("'", "\\'", $message);
-    return "<script>$(document).ready(function(){showError('$message')})</script>";
-}
-
-function showWarningToString($message){
-    if(!$message || strlen($message) == 0) return;
-    $message = str_replace("'", "\\'", $message);
-    return "<script>$(document).ready(function(){showWarning('$message')})</script>";
-}
-
-function showInfoToString($message){
-    if(!$message || strlen($message) == 0) return;
-    $message = str_replace("'", "\\'", $message);
-    return "<script>$(document).ready(function(){showInfo('$message')})</script>";
-}
-
-function showSuccessToString($message){
-    if(!$message || strlen($message) == 0) return;
-    $message = str_replace("'", "\\'", $message);
-    return "<script>$(document).ready(function(){showSuccess('$message')})</script>";
-}
-
 $result = $conn->query("SELECT * FROM roles WHERE userID = $userID");
 if ($result && $result->num_rows > 0) {
     $row = $result->fetch_assoc();
@@ -326,7 +302,7 @@ if ($_SESSION['color'] == 'light') {
     <script src="plugins/remember-state/remember-state.min.js"></script>
 
     <link href="plugins/animate.css/animate.css" rel="stylesheet" />
-    <script src="plugins/lodash/lodash.js"></script>    
+    <script src="plugins/lodash/lodash.js"></script>
 
     <script src="plugins/homeMenu/js/homeMenu.js"></script>
     <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
@@ -1049,15 +1025,15 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                 <?php
                 if(count($available_companies) == 2){
                   $isActivePanel = true;
-                  $isActive = ($isActivePanel && $this_page == 'dsgvo_view.php') ? $setActiveLink : "";        
+                  $isActive = ($isActivePanel && $this_page == 'dsgvo_view.php') ? $setActiveLink : "";
                   echo '<li><a '.$isActive.' href="../dsgvo/documents?n='.$available_companies[1].'">'.$lang['DOCUMENTS'].'</a></li>';
-                  $isActive = ($isActivePanel && ($this_page == 'dsgvo_vv.php' || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php")) ? $setActiveLink : "";                  
+                  $isActive = ($isActivePanel && ($this_page == 'dsgvo_vv.php' || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php")) ? $setActiveLink : "";
                   echo '<li><a '.$isActive.' href="../dsgvo/vv?n='.$available_companies[1].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
-                  $isActive = ($isActivePanel && $this_page == 'dsgvo_mail.php') ? $setActiveLink : "";   
+                  $isActive = ($isActivePanel && $this_page == 'dsgvo_mail.php') ? $setActiveLink : "";
                   echo '<li><a '.$isActive.' href="../dsgvo/templates?n='.$available_companies[1].'">E-Mail Templates</a></li>';
-                  $isActive = ($isActivePanel && $this_page == 'dsgvo_training.php') ? $setActiveLink : "";   
+                  $isActive = ($isActivePanel && $this_page == 'dsgvo_training.php') ? $setActiveLink : "";
                   echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$available_companies[1].'" >Schulung</a></li>';
-                  $isActive = ($isActivePanel && $this_page == 'dsgvo_log.php') ? $setActiveLink : "";   
+                  $isActive = ($isActivePanel && $this_page == 'dsgvo_log.php') ? $setActiveLink : "";
                   echo '<li><a '.$isActive.' href="../dsgvo/log?n='.$row['id'].'" >Logs</a></li>';
                 } else {
                   $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
@@ -1067,15 +1043,15 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     echo '<a href="#" data-toggle="collapse" data-target="#tdsgvo-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$row['name'].' <i class="fa fa-caret-down"></i></a>';
                     echo '<div class="collapse" id="tdsgvo-'.$row['id'].'" >';
                     echo '<ul class="nav nav-list">';
-                    $isActive = ($isActivePanel && $this_page == 'dsgvo_view.php') ? $setActiveLink : "";                
+                    $isActive = ($isActivePanel && $this_page == 'dsgvo_view.php') ? $setActiveLink : "";
                     echo '<li><a '.$isActive.' href="../dsgvo/documents?n='.$row['id'].'">'.$lang['DOCUMENTS'].'</a></li>';
-                    $isActive = ($isActivePanel && ($this_page == 'dsgvo_vv.php' || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php")) ? $setActiveLink : "";                  
+                    $isActive = ($isActivePanel && ($this_page == 'dsgvo_vv.php' || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php")) ? $setActiveLink : "";
                     echo '<li><a '.$isActive.' href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
-                    $isActive = ($isActivePanel && $this_page == 'dsgvo_mail.php') ? $setActiveLink : "";   
+                    $isActive = ($isActivePanel && $this_page == 'dsgvo_mail.php') ? $setActiveLink : "";
                     echo '<li><a '.$isActive.' href="../dsgvo/templates?n='.$row['id'].'">E-Mail Templates</a></li>';
-                    $isActive = ($isActivePanel && $this_page == 'dsgvo_training.php') ? $setActiveLink : "";   
+                    $isActive = ($isActivePanel && $this_page == 'dsgvo_training.php') ? $setActiveLink : "";
                     echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$row['id'].'" >Schulung</a></li>';
-                    $isActive = ($isActivePanel && $this_page == 'dsgvo_log.php') ? $setActiveLink : "";   
+                    $isActive = ($isActivePanel && $this_page == 'dsgvo_log.php') ? $setActiveLink : "";
                     echo '<li><a '.$isActive.' href="../dsgvo/log?n='.$row['id'].'" >Logs</a></li>';
                     echo '</ul></div></li>';
                   }

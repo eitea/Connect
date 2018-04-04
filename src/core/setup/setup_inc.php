@@ -1640,7 +1640,7 @@ function create_tables($conn) {
     if($conn->error){
         echo $conn->error;
     }
-    
+
     $sql = "CREATE TABLE security_projects(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         projectID INT(6) UNSIGNED,
@@ -1718,6 +1718,21 @@ function create_tables($conn) {
         sent DATETIME DEFAULT CURRENT_TIMESTAMP,
         seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
         )";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    }
+
+    $sql = "CREATE TABLE project_archive(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        projectID INT(6) UNSIGNED,
+        name VARCHAR(120) NOT NULL,
+        parent_directory VARCHAR(120) NOT NULL DEFAULT 'ROOT',
+        type VARCHAR(10) NOT NULL,
+        content TEXT,
+        FOREIGN KEY (projectID) REFERENCES projectData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    );";
     if (!$conn->query($sql)) {
         echo $conn->error;
     }

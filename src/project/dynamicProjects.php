@@ -269,6 +269,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     $skill = 0;
                     $parent = null;
                 }
+                if($status == 'COMPLETED') $percentage = 100;
                 if(!empty($_POST['projecttags'])){
                     $tags = implode(',', array_map( function($data){ return preg_replace("/[^A-Za-z0-9]/", '', $data); }, $_POST['projecttags'])); //strictly map and implode the tags
                 } else {
