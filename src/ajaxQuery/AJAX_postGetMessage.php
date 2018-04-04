@@ -42,6 +42,7 @@ if (!$result || $result->num_rows == 0) {
         $showseen = ($row["userID"] == $userID);
         $lastdate = $date ?? "";
         $date = date('Y-m-d', strtotime($row["sent"]));
+        $messageDate = date('G:i', strtotime($row["sent"]));
 
         if(!empty($firstname) && !empty($lastname)) 
             $name = $firstname . " " . $lastname;
@@ -66,7 +67,7 @@ if (!$result || $result->num_rows == 0) {
                         <?php if($showseen): ?>
                             <i class="fa <?php echo $seen; ?>" style="display:block; top:0px; right:-3px; position:absolute; color:#9d9d9d;"></i>
                         <?php elseif(!$showseen): ?>
-                            <span class="label label-default" style="display:block; top:-17px; left:0px; position:absolute;"><?php echo $name; ?></span>
+                            <span class="label label-default" style="display:block; top:-17px; left:0px; position:absolute;"><?php echo $name . " - " . $messageDate; ?></span>
                         <?php endif; ?>
                         <!-- endif -->
 
