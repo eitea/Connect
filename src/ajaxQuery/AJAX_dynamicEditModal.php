@@ -227,17 +227,17 @@ if($x){
                                 </div>
                                 <div class="col-md-6">
                                     <div class="col-md-6">
-                                        <?php  if($isDynamicProjectsAdmin == 'TRUE'): ?>
+                                        <?php if($isDynamicProjectsAdmin == 'TRUE'): ?>
                                             <label>Skill Minimum</label>
                                             <input type="range" step="10" value="<?php echo $dynrow['level']; ?>" oninput="document.getElementById('projectskill-<?php echo $x; ?>').value = this.value;"><br>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="col-md-6">
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="col-md-6">
                                         <?php  if($isDynamicProjectsAdmin == 'TRUE'): ?>
                                             <label>Level</label>
                                             <input id="projectskill-<?php echo $x; ?>" type="number" class="form-control" name="projectskill" value="<?php echo $dynrow['level']; ?>"><br>
-                                            <?php endif; ?>
-                                        </div>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                             </div>
                             <div class="row">

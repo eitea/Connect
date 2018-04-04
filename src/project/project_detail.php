@@ -231,7 +231,12 @@ $projectRow = $result->fetch_assoc();
 
 <br><hr>
 <h4>Dateifreigabe <div class="page-header-button-group">
-    <button type="button" class="btn btn-default" data-toggle="modal" data-target=".add-archive" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
+    <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
+        <ul class="dropdown-menu">
+            <li><a href="#">Entfernt bis S3 Verfügbar</a></li>
+        </ul>
+    </div>
 </div></h4>
 
 <table class="table">
@@ -249,19 +254,21 @@ $projectRow = $result->fetch_assoc();
         <?php
         function drawTree($parent_structure){
             global $conn;
+            global $projectID;
             $html = '';
-            
-            $stmt = $conn->prepare("SELECT name, type, parent_directory FROM project_archive WHERE projectID = $projectID AND parent_directory = ? ");
-            $stmt->bind("s", $parent_structure);
+            $stmt = $conn->prepare("SELECT name, type, parent_directory FROM project_archive WHERE projectID = $projectID AND parent_directory = ? "); echo $conn->error;
+            $stmt->bind_param("s", $parent_structure);
             $stmt->execute();
+            $result = $stmt->get_result();
             while($result && $row = $result->fetch_assoc()){
+                //text, file, s3File, s3Text, folder
                 if($row['type'] == 'folder'){
-                    drawTree($row['parent_directory']);
+                    return drawTree($row['parent_directory']);
                 } elseif($row['type'] == 'text'){
-
+                  $html .= '<tr></tr>';
                 }
-
             }
+            return $html;
         }
 
         echo drawTree('ROOT');

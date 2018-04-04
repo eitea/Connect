@@ -2465,7 +2465,7 @@ if($row['version'] < 146){
         ON UPDATE CASCADE
         ON DELETE CASCADE
     );";
-    if($conn->error){
+    if (!$conn->query($sql)) {
         echo $conn->error;
     } else {
         echo '<br>Projekte: Archiv';
