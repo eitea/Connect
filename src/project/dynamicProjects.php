@@ -7,7 +7,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 include dirname(__DIR__) . '/header.php';
 require dirname(__DIR__) . "/misc/helpcenter.php";
 require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
-function formatPercent($num){ return ($num * 100)."%"; }
 function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
     $allHours = 0;
     $times = explode(' ', $estimate);
@@ -38,13 +37,15 @@ function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$refe
         $redBar = 1-$yellowBar;
         $current = $allHours;
     }
+    $greenBar *= 100;
+    $yellowBar *= 100;
+    $redBar *= 100;
     //TODO: change title
     $progressLength = min(($timeLeft + $timeOver + $current)/$referenceTime, 1);
-    $bar = "<div style='height:5px;margin-bottom:2px;width:".formatPercent($progressLength)."' class='progress'>";
-    $bar .= "<div data-toggle='tooltip' title='".round($current,2)." Stunden' class='progress-bar progress-bar-warning' style='height:10px;width:".formatPercent($yellowBar)."'></div>";
-    $bar .= "<div data-toggle='tooltip' title='".round($timeLeft,2)." Stunden' class='progress-bar progress-bar-success' style='height:10px;width:".formatPercent($greenBar)."'></div>";
-    $bar .= "<div data-toggle='tooltip' title='".round($timeOver,2)." Stunden' class='progress-bar progress-bar-danger' style='height:10px;width:".formatPercent($redBar)."'></div>";
-    return "$bar</div>";
+    return '<div style="height:5px;margin-bottom:2px;width:'.($progressLength * 100).'%" class="progress">'
+    .'<div data-toggle="tooltip" title="'.round($current, 2).' Stunden" class="progress-bar progress-bar-warning" style="height:10px;width:'.$yellowBar.'%"></div>'
+    .'<div data-toggle="tooltip" title="'.round($timeLeft,2).' Stunden" class="progress-bar progress-bar-success" style="height:10px;width:'.$greenBar.'%"></div>'
+    .'<div data-toggle="tooltip" title="'.round($timeOver,2).' Stunden" class="progress-bar progress-bar-danger" style="height:10px;width:'.$redBar.'%"></div></div>';
 }
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', "priority" => 0, "employees" => ["user;".$userID]); //set_filter requirement
 ?>
@@ -357,7 +358,6 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             <th>Routine</th>
             <th>Status</th>
             <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?></th>
-            <th><?php echo $lang["OWNER"]; ?></th>
             <th><?php echo $lang["EMPLOYEE"]; ?></th>
             <th>Review</th>
             <th></th>
@@ -385,27 +385,24 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             }
         }
         if($filterings['priority'] > 0){ $query_filter .= " AND d.projectpriority = ".$filterings['priority']; }
-        $stmt_team = $conn->prepare("SELECT name, teamid FROM dynamicprojectsteams INNER JOIN teamData ON teamid = teamData.id WHERE projectid = ?");
-        $stmt_team->bind_param('s', $x);
-        $stmt_team_member = $conn->prepare("SELECT userID FROM teamRelationshipData WHERE teamID = ?"); echo $conn->error;
-        $stmt_team_member->bind_param('s', $teamID);
-        //changes here have to be synced with AJAX_dynamicInfo.php
-        $stmt_viewed = $conn->prepare("SELECT activity FROM dynamicprojectslogs WHERE projectid = ? AND
-            ((activity = 'VIEWED' AND userid = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID)) ORDER BY logTime DESC LIMIT 1"); echo $conn->error;
-        $stmt_viewed->bind_param('s', $x);
-        $stmt_employee = $conn->prepare("SELECT userid FROM dynamicprojectsemployees WHERE projectid = ? "); echo $conn->error;
-        $stmt_employee->bind_param('s', $x);
         $stmt_booking = $conn->prepare("SELECT userID, p.id, p.start FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = ?"); echo $conn->error;
         $stmt_booking->bind_param('s', $x);
+        //get hours booked for a project
         $stmt_time = $conn->prepare("SELECT SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) current FROM projectBookingData p WHERE p.dynamicID = ?");
-        $stmt_time->bind_param('s', $x); // this statement gets the time in hours booked for a project
+        $stmt_time->bind_param('s', $x);
+
         $result = $conn->query("SELECT id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND logs.userID = $userID AND `end` = '0000-00-00 00:00:00' LIMIT 1");
         $hasActiveBooking = $result->num_rows;
         if($isDynamicProjectsAdmin == 'TRUE'){ //see all access-legal tasks
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
-                projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours
+                projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours,
+                CONCAT(' ', GROUP_CONCAT(dynamicprojectsemployees.userid SEPARATOR ' '), GROUP_CONCAT(dynamicprojectsemployees.userid SEPARATOR ' ')) AS projectemployees
                 FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
-                WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
+                LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
+                LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
+                WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter
+                GROUP BY dynamicprojectsemployee
+                ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         } else { //see open tasks user is part of  (update AJAX_dynamicInfo if changed)
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
                 projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours
@@ -418,35 +415,12 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
         echo $conn->error;
         while($result && ($row = $result->fetch_assoc())){
             $x = $row['projectid'];
-            $selection = array('user;'.$row['projectowner']);
-            if($row['projectleader']) $selection[] = 'user;'.$row['projectleader'];
-            $employees = array();
-            $stmt_team->execute();
-            $emp_result = $stmt_team->get_result();
-            while(($emp_row = $emp_result->fetch_assoc()) && $emp_row['teamid']){
-                $teamID = $emp_row['teamid'];
-                $employees[] = $emp_row['name'];
-                $selection[] = 'team;'.$teamID;
-                $stmt_team_member->execute();
-                $emp_result_mem = $stmt_team_member->get_result();
-                while($emp_row_mem = $emp_result_mem->fetch_assoc()){
-                    $selection[] = 'user;'.$emp_row_mem['userID'];
-                }
-            }
-            $stmt_employee->execute();
-            $emp_result = $stmt_employee->get_result();
-            while(($emp_row = $emp_result->fetch_assoc()) && $emp_row['userid']){
-                $employees[] = $userID_toName[$emp_row['userid']];
-                $selection[] = 'user;'.$emp_row['userid'];
-            }
+
             if(count($filterings['employees']) > 1 && !array_intersect($filterings['employees'], $selection)) continue;
-            $stmt_viewed->execute();
-            $viewed_result = $stmt_viewed->get_result();
             $rowStyle = $tags = '';
             foreach(explode(',', $row['projecttags']) as $tag){
                 if($tag) $tags .= '<span class="badge">'.$tag.'</span> ';
             }
-            if (($viewed = $viewed_result->fetch_assoc()) && $viewed['activity'] != 'VIEWED'){ $rowStyle = 'style="color:#1689e7; font-weight:bold;"'; }
             echo '<tr '.$rowStyle.'>';
             echo '<td>';
             $stmt_time->execute();
@@ -473,10 +447,14 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             echo '<br><small style="color:transparent;">'.$x.'</small>';
             echo '</td>';
             echo '<td style="color:white;"><span class="badge" style="background-color:'.$priority_color[$row['projectpriority']].'" title="'.$lang['PRIORITY_TOSTRING'][$row['projectpriority']].'">'.$row['projectpriority'].'</span></td>';
-            echo '<td>'.$userID_toName[$row['projectowner']].'</td>';
             echo '<td>'; //employees
-            if($row['projectleader']) echo '<u title="Verantwortlicher Mitarbeiter">'.$userID_toName[$row['projectleader']].'</u>,<br>';
-            echo implode(',<br>', $employees);
+            if($row['projectleader'] == $row['projectowner']){
+                echo '<u title="Besitzer und Verantwortlicher Mitarbeiter"><b>'. $userID_toName[$row['projectowner']].'</b></u>,<br>';
+            } else {
+                echo '<b title="Besitzer">'. $userID_toName[$row['projectowner']].'</b>,<br>';
+                if($row['projectleader']) echo '<u title="Verantwortlicher Mitarbeiter">'.$userID_toName[$row['projectleader']].'</u>,<br>';
+            }
+            //echo implode(',<br>', $employees);
             echo '</td>';
             echo '<td>';
             $review = '<input type="checkbox" ';
