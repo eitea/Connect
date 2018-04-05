@@ -457,10 +457,10 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             //echo implode(',<br>', $employees);
             echo '</td>';
             echo '<td>';
-            $review = '<input type="checkbox" ';
-            $review .= ($isDynamicProjectsAdmin == 'FALSE' && $row['projectowner'] != $userID) ? ' disabled ' : ' onchange="reviewChange(event,\''.$x.'\')" ' ;
-            if($row['needsreview'] == 'TRUE') $review .= 'checked ';
-            echo $review.'>';
+            if(($isDynamicProjectsAdmin == 'TRUE' || $row['projectowner'] == $userID)){
+                $checked = $row['needsreview'] == 'TRUE' ? 'checked' : '';
+                echo '<input type="checkbox" onchange="reviewChange(event,\''.$x.'\')" '.$checked.'/>';
+            }
             if(strpos($completed_tasks, $x) !== false) echo '<i class="fa fa-check" style="color:#00cf65" title="In aktueller Version vorhanden"></i>';
             echo '</td>';
             echo '<td>';
