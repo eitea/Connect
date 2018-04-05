@@ -72,7 +72,16 @@ if (!$result || $result->num_rows == 0) {
                         <?php endif; ?>
                         <!-- endif -->
 
-                        <div><?php echo $message; ?></div>
+                        <div>
+                            <?php 
+                            // handle line breaks
+                            $parts = explode("\n", $message);
+
+                            foreach  ($parts as $part){
+                                echo $part . "<br>"; 
+                            }
+                            ?>
+                        </div>
                     </div>
                 </div>
             </div>

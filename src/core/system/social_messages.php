@@ -144,8 +144,8 @@
             <div id="chatinput" style="display: none">
                 <form class="form" autocomplete="off">
                     <div class="input-group">
-                        <input required type="text" id="message" placeholder="Type a message" class="form-control">
-                        <span class="input-group-btn"><button class="btn" type="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button></span>
+                        <textarea required type="text" id="message" placeholder="Type a message" class="form-control" style="height: 35px"></textarea>
+                        <span class="input-group-btn" style="height: 35px"><button class="btn" type="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button></span>
                     </div>
                 </form>
 
@@ -173,6 +173,7 @@
                         }
 
                     })
+
                 </script>
             </div>
         </div>
