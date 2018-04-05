@@ -25,7 +25,7 @@
 
 
 <!-- Page body -->
-<div class="page-content-fixed-150">
+<div class="page-content-fixed-100">
     <?php //Evaluate the post form and insert the message into the databse
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['sendButton'])) {
         //Check the $_POST values
