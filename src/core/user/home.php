@@ -259,35 +259,39 @@ if($result && ($row = $result->fetch_assoc())){
 $dates = array();
 $start = getCurrentTimestamp(); //normal users can only see future dates
 if($isCoreAdmin == 'TRUE') { $start = date('Y-m-d', strtotime('-1 year')); }
-$result = $conn->query("SELECT time, status, userID, firstname, lastname FROM logs INNER JOIN $userTable ON $userTable.id = logs.userID
-  WHERE status != 0 AND status != 5 AND DATE(time) >= DATE('$start') ORDER BY userID, status, time");
-  if($result && ($row = $result->fetch_assoc())){
+$result = $conn->query("SELECT time, status, userID FROM logs WHERE status != 0 AND status != 5 AND DATE(time) >= DATE('$start') ORDER BY userID, status, time");
+if($result && ($row = $result->fetch_assoc())){
     $start = substr($row['time'], 0, 10);
     $prev_row = $row;
     if($result && ($row = $result->fetch_assoc())){
-      do {
-        if($prev_row['userID'] != $row['userID'] || timeDiff_Hours($prev_row['time'], $row['time']) > 36){ //cut chain
-          $title = 'Abwesend: ' . $prev_row['firstname'] . ' ' . $prev_row['lastname'];
-          $end = substr(carryOverAdder_Hours($prev_row['time'],24), 0, 10); //adding hours would display '5a' for 5am.
-          $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '#81e8e5'}";
-          $start = substr($row['time'], 0, 10);
-        }
-        $prev_row = $row;
-      } while($row = $result->fetch_assoc());
-      $title = 'Abwesend: ' . $prev_row['firstname'] . ' ' . $prev_row['lastname'];
-      $end = substr(carryOverAdder_Hours($prev_row['time'],24), 0, 10); //adding hours would display '5a' for 5am.
-      $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '#81e8e5'}";
+        do {
+            if($prev_row['userID'] != $row['userID'] || timeDiff_Hours($prev_row['time'], $row['time']) > 36){ //cut chain
+                $title = 'Abwesend: ' . $userID_toName[$prev_row['userID']];
+                $end = substr(carryOverAdder_Hours($prev_row['time'],24), 0, 10); //adding hours would display '5a' for 5am.
+                $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '#81e8e5'}";
+                $start = substr($row['time'], 0, 10);
+            }
+            $prev_row = $row;
+        } while($row = $result->fetch_assoc());
+        $title = 'Abwesend: ' . $userID_toName[$prev_row['userID']];
+        $end = substr(carryOverAdder_Hours($prev_row['time'],24), 0, 10); //adding hours would display '5a' for 5am.
+        $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '#81e8e5'}";
     }
-  } else {
+} else {
     $conn->error;
-  }
+}
 
 $start = getCurrentTimestamp();
-$result = $conn->query("SELECT begin, name, ASCII(SUBSTRING(name, LENGTH(name)-1,1)) AS asciiVal FROM holidays WHERE begin > '$start' AND begin < '".date('Y-m-d', strtotime('+1 year'))."'"); echo $conn->error;
+$result = $conn->query("SELECT id, birthday FROM UserData WHERE birthday IS NOT NULL AND displayBirthday = 'TRUE'"); echo $conn->error;
 while($result && ($row = $result->fetch_assoc())){
-    if($row['asciiVal'] == 167 || $row['asciiVal'] == 41) $dates[] = "{ title: '".$row['name']."', start: '".substr($row['begin'], 0, 10)."', textColor: 'white', backgroundColor: '#999'}";
+    $dates[] = "{ title: 'Geburtstag: ".$userID_toName[$row['id']]."', start: '".substr($start, 0, 4).substr($row['birthday'], 4)."', textColor: 'white', backgroundColor: '#d65eb5'}";
 }
-  ?>
+
+$result = $conn->query("SELECT begin, name FROM holidays WHERE begin > '$start' AND begin < '".date('Y-m-d', strtotime('+1 year'))."' AND (ASCII(SUBSTRING(name, LENGTH(name)-1,1)) = 167 OR ASCII(SUBSTRING(name, LENGTH(name)-1,1)) = 41)"); echo $conn->error;
+while($result && ($row = $result->fetch_assoc())){
+    $dates[] = "{ title: '".$row['name']."', start: '".substr($row['begin'], 0, 10)."', textColor: 'white', backgroundColor: '#999'}";
+}
+?>
 
   <script>
   $(document).ready(function(){
