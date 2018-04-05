@@ -61,7 +61,7 @@
     ?>
 
     <!-- Post Popup -->
-    <form method="POST">
+    <form method="POST" autocomplete="off">
         <div class="modal fade" id="postMessages" tabindex="-1" role="dialog" aria-labelledby="postLabel">
             <div class="modal-dialog" role="form">
                 <div class="modal-content">
@@ -213,6 +213,7 @@
                         // clear the field
                         $("#message").val("")
 
+                        // prevent form redirect
                         return false;
                     })
 
@@ -318,7 +319,8 @@ function deleteSubject(partner, subject) {
         },
         type: 'GET',
         success: function (response) {
-            // nothing to do here
+            // reload without resending resent form
+            window.location.href = window.location.pathname;
         },
     })
 }
