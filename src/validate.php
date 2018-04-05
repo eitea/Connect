@@ -181,4 +181,15 @@ function enableToDynamicProjects($userID){
     die();
   }
 }
+
+function enableToWorkflow($userID){
+    global $conn;
+    if(!$conn) require 'connection.php';
+    $result = $conn->query("SELECT userID FROM roles WHERE userID = $userID AND canUseWorkflow = 'TRUE'");
+    if($userID != 1 && (!$result || $result->num_rows <= 0)){
+        echo 'Access denied. <a href="../user/logout"> logout</a>';
+        include 'footer.php';
+        die();
+    }
+}
 ?>

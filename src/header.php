@@ -35,24 +35,24 @@ if ($result && $result->num_rows > 0) {
     $canEditSuppliers = $row['canEditSuppliers'];
     $canCreateTasks = $row['canCreateTasks'];
     $canUseArchive = $row['canUseArchive'];
+    $canUseWorkflow = $row['canUseWorkflow']; //5ab7ae7596e5c
 } else {
     $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = false;
     $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = $canCreateTasks  = $canUseSuppliers = $canUseClients = $canEditClients = false;
-    $canEditSuppliers = $canUseArchive  = false;
+    $canEditSuppliers = $canUseArchive = $canUseWorkflow = false;
 }
 if ($userID == 1) { //superuser
     $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = 'TRUE';
-    $canStamp = $canBook = $canUseSocialMedia = $canCreateTasks  = $canUseClients = $canUseSuppliers = $canEditSuppliers = $canEditClients = $canUseArchive  ='TRUE';
+    $canStamp = $canBook = $canUseSocialMedia = $canCreateTasks  = $canUseClients = $canUseSuppliers = $canEditSuppliers = $canEditClients = $canUseArchive = $canUseWorkflow ='TRUE';
 }
 if($isERPAdmin == 'TRUE'){
     $canEditClients = $canEditSuppliers = 'TRUE';
 }
-$result = $conn->query("SELECT psw, lastPswChange, forcedPwdChange, publicPGPKey FROM UserData WHERE id = $userID");
-if($result && ($row = $result->fetch_assoc())) {
-    $lastPswChange = $row['lastPswChange'];
-    $userPasswordHash = $row['psw'];
-    $publicKey = $row['publicPGPKey'];
-    $forcedPwdChange = ($row['forcedPwdChange'] === '1');
+$result = $conn->query("SELECT psw, lastPswChange, forcedPwdChange, publicPGPKey, birthday, displayBirthday FROM UserData WHERE id = $userID");
+if($result && ($userdata = $result->fetch_assoc())) {
+    $userPasswordHash = $userdata['psw'];
+    $publicKey = $userdata['publicPGPKey'];
+    $forcedPwdChange = ($userdata['forcedPwdChange'] === '1');
 } else {
     echo $conn->error;
 }
@@ -231,7 +231,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['saveSocial'])) {
         // picture upload
         if (isset($_FILES['profilePictureUpload']) && !empty($_FILES['profilePictureUpload']['name'])) {
-            require_once __DIR__ . "/utilities.php";
             $pp = uploadImage("profilePictureUpload", 1, 1);
             if (!is_array($pp)) {
                 $stmt = $conn->prepare("UPDATE socialprofile SET picture = ? WHERE userID = $userID");
@@ -261,6 +260,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $sql = "UPDATE socialprofile SET isAvailable = 'FALSE' WHERE userID = '$userID'";
         }
         $conn->query($sql);
+    }
+    //5ab7bd3310438
+    if(!empty($_POST['social_birthday']) && test_Date($_POST['social_birthday'], 'Y-m-d')){
+        $val = isset($_POST['social_display_birthday']) ? 'TRUE' : 'FALSE';
+        $sql = test_input($_POST['social_birthday']);
+        $conn->query("UPDATE UserData SET birthday = '$sql', displayBirthday = '$val' WHERE id = $userID");
+        if($conn->error){
+            $validation_output = showErrorToString($conn->error);
+        } else {
+            $validation_output = showSuccessToString($lang['OK_SAVE']);
+        }
     }
 } //endif POST
 
@@ -536,22 +546,36 @@ if ($_SESSION['color'] == 'light') {
                   </div>
                   <br>
                   <div class="modal-body">
-                      <!-- modal body -->
                       <img src='<?php echo $profilePicture; ?>' style='width:30%;height:30%;' class='img-circle center-block' alt='Profile Picture'>
                       <br>
-                      <label class="btn btn-default">
-                          <?php echo $lang['SOCIAL_UPLOAD_PICTURE']; ?>
-                          <input type="file" name="profilePictureUpload" style="display:none">
-                      </label>
-                      <div class="checkbox">
-                          <label>
-                              <input type="checkbox" name="social_isAvailable" <?php if ($social_isAvailable == 'TRUE') {echo 'checked';}?>><?php echo $lang['SOCIAL_AVAILABLE']; ?>
+                      <div class="text-center">
+                          <label class="btn btn-default">
+                              <?php echo $lang['SOCIAL_UPLOAD_PICTURE']; ?>
+                              <input type="file" name="profilePictureUpload" style="display:none">
                           </label>
-                          <br>
                       </div>
-                      <label for="social_status"> <?php echo $lang['SOCIAL_STATUS'] ?> </label>
-                      <input type="text" class="form-control" name="social_status" placeholder="<?php echo $lang['SOCIAL_STATUS_EXAMPLE'] ?>" value="<?php echo $social_status; ?>">
-                      <!-- /modal body -->
+                      <div class="row">
+                          <div class="col-md-6">
+                              <label><?php echo $lang['BIRTHDAY']; ?></label>
+                              <input type="text" class="form-control datepicker" name="social_birthday" placeholder="1990-01-30" value="<?php echo $userdata['birthday']; ?>" >
+                          </div>
+                          <div class="col-md-6 checkbox">
+                              <label><br>
+                                  <input type="checkbox" name="social_display_birthday" <?php if($userdata['displayBirthday']) echo 'checked'; ?> /> Im Kalender Anzeigen
+                              </label>
+                          </div>
+                      </div>
+                      <div class="row">
+                          <div class="col-md-8">
+                              <label><?php echo $lang['SOCIAL_STATUS'] ?></label>
+                              <input type="text" class="form-control" name="social_status" placeholder="<?php echo $lang['SOCIAL_STATUS_EXAMPLE'] ?>" value="<?php echo $social_status; ?>">
+                          </div>
+                          <div class="col-md-4 checkbox">
+                              <label><br>
+                                  <input type="checkbox" name="social_isAvailable" <?php if($social_isAvailable == 'TRUE') {echo 'checked';} ?> ><?php echo $lang['SOCIAL_AVAILABLE']; ?>
+                              </label>
+                          </div>
+                      </div>
                   </div>
                   <div class="modal-footer">
                       <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
@@ -829,11 +853,11 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <?php endif;?>
 
       <!-- Section Three: PROJECTS -->
-      <?php if ($isProjectAdmin == 'TRUE'): ?>
+      <?php if ($isProjectAdmin == 'TRUE' || $canUseWorkflow == 'TRUE'): ?>
           <div class="panel panel-default panel-borderless">
               <div class="panel-heading" role="tab">
                   <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-project"  id="adminOption_PROJECT"><i class="fa fa-caret-down pull-right"></i>
-                      <i class="fa fa-tags"></i><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
+                      <i class="fa fa-tags"></i><?php echo $lang['PROJECTS']; ?>
                   </a>
               </div>
               <div id="collapse-project" class="panel-collapse collapse" role="tabpanel">
@@ -842,8 +866,8 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                           <?php if ($isProjectAdmin == 'TRUE'): ?>
                               <li><a <?php if ($this_page == 'project_view.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['PROJECTS']; ?></span></a></li>
                               <li><a <?php if ($this_page == 'audit_projectBookings.php') {echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
-                              <li><a <?php if ($this_page == 'options.php') {echo $setActiveLink;}?> href="../project/options"><span><?php echo $lang['PROJECT_OPTIONS']; ?></span></a></li>
                           <?php endif; ?>
+                          <li><a <?php if ($this_page == 'options.php') {echo $setActiveLink;}?> href="../project/options"><span>Workflow</span></a></li>
                       </ul>
                   </div>
               </div>
@@ -1110,7 +1134,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       $result = $conn->query("SELECT expiration, expirationDuration, expirationType FROM policyData"); echo $conn->error;
       $row = $result->fetch_assoc();
       if($row['expiration'] == 'TRUE' || $forcedPwdChange){ //can a password expire?
-          $pswDate = date('Y-m-d', strtotime("+".$row['expirationDuration']." months", strtotime($lastPswChange)));
+          $pswDate = date('Y-m-d', strtotime("+".$row['expirationDuration']." months", strtotime($userdata['lastPswChange'])));
           if(timeDiff_Hours($pswDate, getCurrentTimestamp()) > 0 || $forcedPwdChange){ //has my password actually expired?
               showError('<strong>Your Password has expired. </strong> Please change it by clicking on the gears in the top right corner.');
               if($row['expirationType'] == 'FORCE' || $forcedPwdChange){ //force the change

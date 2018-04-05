@@ -158,134 +158,31 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
 
     if(!empty($_POST['saveRoles'])){
-        $error = '';
         $x = intval($_POST['saveRoles']);
-        if(isset($_POST['isDSGVOAdmin'])){
-            $conn->query("UPDATE $roleTable SET isDSGVOAdmin = 'TRUE' WHERE userID = '$x'");
-        } else {
-            $conn->query("UPDATE $roleTable SET isDSGVOAdmin = 'FALSE' WHERE userID = '$x'");
-        }
-        $error = $conn->error;
-        if(isset($_POST['isCoreAdmin'])){
-            $sql = "UPDATE $roleTable SET isCoreAdmin = 'TRUE' WHERE userID = $x";
-        } else {
-            $sql = "UPDATE $roleTable SET isCoreAdmin = 'FALSE' WHERE userID = $x";
-        }
-        $conn->query($sql);
-        $error = $conn->error;
-        if(isset($_POST['isDynamicProjectsAdmin'])){
-            $sql = "UPDATE $roleTable SET isDynamicProjectsAdmin = 'TRUE' WHERE userID = $x";
-        } else {
-            $sql = "UPDATE $roleTable SET isDynamicProjectsAdmin = 'FALSE' WHERE userID = $x";
-        }
-        $conn->query($sql);
-        $error = $conn->error;
-        if(isset($_POST['isTimeAdmin'])){
-            $sql = "UPDATE $roleTable SET isTimeAdmin = 'TRUE' WHERE userID = '$x'";
-        } else {
-            $sql = "UPDATE $roleTable SET isTimeAdmin = 'FALSE' WHERE userID = '$x'";
-        }
-        $conn->query($sql);
-        $error = $conn->error;
-        if(isset($_POST['isProjectAdmin'])){
-            $sql = "UPDATE $roleTable SET isProjectAdmin = 'TRUE' WHERE userID = '$x'";
-        } else {
-            $sql = "UPDATE $roleTable SET isProjectAdmin = 'FALSE' WHERE userID = '$x'";
-        }
-        $conn->query($sql);
-        $error = $conn->error;
-        if(isset($_POST['isReportAdmin'])){
-            $sql = "UPDATE $roleTable SET isReportAdmin = 'TRUE' WHERE userID = '$x'";
-        } else {
-            $sql = "UPDATE $roleTable SET isReportAdmin = 'FALSE' WHERE userID = '$x'";
-        }
-        $conn->query($sql);
-        $error = $conn->error;
-        if(isset($_POST['isERPAdmin'])){
-            $sql = "UPDATE $roleTable SET isERPAdmin = 'TRUE' WHERE userID = '$x'";
-        } else {
-            $sql = "UPDATE $roleTable SET isERPAdmin = 'FALSE' WHERE userID = '$x'";
-        }
-        $conn->query($sql);
-        $error = $conn->error;
-        if(isset($_POST['isFinanceAdmin'])){
-            $sql = "UPDATE $roleTable SET isFinanceAdmin = 'TRUE' WHERE userID = '$x'";
-        } else {
-            $sql = "UPDATE $roleTable SET isFinanceAdmin = 'FALSE' WHERE userID = '$x'";
-        }
-        $conn->query($sql);
-        $error = $conn->error;
-        if(isset($_POST['canStamp'])){
-            $sql = "UPDATE $roleTable SET canStamp = 'TRUE' WHERE userID = '$x'";
-        } else {
-            $sql = "UPDATE $roleTable SET canStamp = 'FALSE' WHERE userID = '$x'";
-        }
-        $conn->query($sql);
-        $error = $conn->error;
-        if(isset($_POST['canStamp']) && isset($_POST['canBook'])){
-            $sql = "UPDATE $roleTable SET canBook = 'TRUE' WHERE userID = '$x'";
-        } else {
-            $sql = "UPDATE $roleTable SET canBook = 'FALSE' WHERE userID = '$x'";
-        }
-        $conn->query($sql);
-        $error = $conn->error;
-        if(isset($_POST['canEditTemplates'])){
-            $sql = "UPDATE $roleTable SET canEditTemplates = 'TRUE' WHERE userID = '$x'";
-        } else {
-            $sql = "UPDATE $roleTable SET canEditTemplates = 'FALSE' WHERE userID = '$x'";
-        }
-        $conn->query($sql);
-        $error = $conn->error;
-        if(isset($_POST['canUseSocialMedia'])){
-            $sql = "UPDATE $roleTable SET canUseSocialMedia = 'TRUE' WHERE userID = '$x'";
-        } else {
-            $sql = "UPDATE $roleTable SET canUseSocialMedia = 'FALSE' WHERE userID = '$x'";
-        }
-        $conn->query($sql);
-        $error = $conn->error;
-        if(isset($_POST['canCreateTasks'])){
-            $sql = "UPDATE $roleTable SET canCreateTasks = 'TRUE' WHERE userID = '$x'";
-        } else {
-            $sql = "UPDATE $roleTable SET canCreateTasks = 'FALSE' WHERE userID = '$x'";
-        }
-        $conn->query($sql);
-        $error = $conn->error;
-        if(isset($_POST['canUseArchive'])){
-            $sql = "UPDATE $roleTable SET canUseArchive = 'TRUE' WHERE userID = '$x'";
-        } else {
-            $sql = "UPDATE $roleTable SET canUseArchive = 'FALSE' WHERE userID = '$x'";
-        }
-        $conn->query($sql);
-        $error = $conn->error;
-        if(isset($_POST['canUseClients'])){
-            $sql = "UPDATE $roleTable SET canUseClients = 'TRUE' WHERE userID = '$x'";
-        } else {
-            $sql = "UPDATE $roleTable SET canUseClients = 'FALSE' WHERE userID = '$x'";
-        }
-        $conn->query($sql);
-        $error = $conn->error;
-        if(isset($_POST['canUseSuppliers'])){
-            $sql = "UPDATE $roleTable SET canUseSuppliers = 'TRUE' WHERE userID = '$x'";
-        } else {
-            $sql = "UPDATE $roleTable SET canUseSuppliers = 'FALSE' WHERE userID = '$x'";
-        }
-        $conn->query($sql);
-        $error = $conn->error;
-        if(isset($_POST['canEditClients'])){
-            $sql = "UPDATE $roleTable SET canEditClients = 'TRUE' WHERE userID = '$x'";
-        } else {
-            $sql = "UPDATE $roleTable SET canEditClients = 'FALSE' WHERE userID = '$x'";
-        }
-        $conn->query($sql);
-        $error = $conn->error;
-        if(isset($_POST['canEditSuppliers'])){
-            $sql = "UPDATE $roleTable SET canEditSuppliers = 'TRUE' WHERE userID = '$x'";
-        } else {
-            $sql = "UPDATE $roleTable SET canEditSuppliers = 'FALSE' WHERE userID = '$x'";
-        }
-        $conn->query($sql);
-        $error = $conn->error;
-        if($error){
+        $isDSGVOAdmin = isset($_POST['isDSGVOAdmin']) ? 'TRUE' : 'FALSE';
+        $isCoreAdmin = isset($_POST['isCoreAdmin']) ? 'TRUE' : 'FALSE';
+        $isDynamicProjectsAdmin = isset($_POST['isDynamicProjectsAdmin']) ? 'TRUE' : 'FALSE';
+        $isProjectAdmin = isset($_POST['isProjectAdmin']) ? 'TRUE' : 'FALSE';
+        $isReportAdmin = isset($_POST['isReportAdmin']) ? 'TRUE' : 'FALSE';
+        $isERPAdmin = isset($_POST['isERPAdmin']) ? 'TRUE' : 'FALSE';
+        $isFinanceAdmin = isset($_POST['isFinanceAdmin']) ? 'TRUE' : 'FALSE';
+        $canStamp = isset($_POST['canStamp']) ? 'TRUE' : 'FALSE';
+        $canEditTemplates = isset($_POST['canEditTemplates']) ? 'TRUE' : 'FALSE';
+        $canUseSocialMedia = isset($_POST['canUseSocialMedia']) ? 'TRUE' : 'FALSE';
+        $canCreateTasks = isset($_POST['canCreateTasks']) ? 'TRUE' : 'FALSE';
+        $canUseArchive = isset($_POST['canUseArchive']) ? 'TRUE' : 'FALSE';
+        $canUseClients = isset($_POST['canUseClients']) ? 'TRUE' : 'FALSE';
+        $canUseSuppliers = isset($_POST['canUseSuppliers']) ? 'TRUE' : 'FALSE';
+        $canEditClients = isset($_POST['canEditClients']) ? 'TRUE' : 'FALSE';
+        $canEditSuppliers = isset($_POST['canEditSuppliers']) ? 'TRUE' : 'FALSE';
+        $canUseWorkflow = isset($_POST['canUseWorkflow']) ? 'TRUE' : 'FALSE'; //5ab7ae7596e5c
+
+        $conn->query("UPDATE roles SET isDSGVOAdmin = '$isDSGVOAdmin', isCoreAdmin = '$isCoreAdmin', isDynamicProjectsAdmin = '$isDynamicProjectsAdmin', isTimeAdmin = '$isTimeAdmin',
+        isProjectAdmin = '$isProjectAdmin', isReportAdmin = '$isReportAdmin', isERPAdmin = '$isERPAdmin', isFinanceAdmin = '$isFinanceAdmin', canStamp = '$canStamp',
+        canEditTemplates = '$canEditTemplates', canUseSocialMedia = '$canUseSocialMedia', canCreateTasks = '$canCreateTasks', canUseArchive = '$canUseArchive', canUseClients = '$canUseClients',
+        canUseSuppliers = '$canUseSuppliers', canEditClients = '$canEditClients', canEditSuppliers = '$canEditSuppliers', canUseWorkflow = '$canUseWorkflow' WHERE userID = '$x'");
+
+        if($conn->error){
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$error.'</div>';
         } else {
             echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
@@ -356,7 +253,7 @@ if(!empty($key_downloads)){
                             </div>
                             <div class="col-md-3">
                                 <label>
-                                    <input type="checkbox" name="isProjectAdmin" <?php if($row['isProjectAdmin'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?>
+                                    <input type="checkbox" name="isProjectAdmin" <?php if($row['isProjectAdmin'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['PROJECTS']; ?>
                                 </label><br>
                             </div>
                             <div class="col-md-3">
@@ -435,6 +332,11 @@ if(!empty($key_downloads)){
                             <div class="col-md-3">
                                 <label>
                                     <input type="checkbox" name="canUseSuppliers" <?php if($row['canUseSuppliers'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_SUPPLIERS']; ?>
+                                </label>
+                            </div>
+                            <div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="canUseWorkflow" <?php if($row['canUseWorkflow'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_WORKFLOW']; ?>
                                 </label>
                             </div>
                         </div>
