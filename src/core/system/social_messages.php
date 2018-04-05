@@ -157,15 +157,14 @@
                     // send on enter
                     $("#message").keydown(function(event) {
                         if(event.which == 13){
-                            event.preventDefault();    // cancel it
+                            event.preventDefault();
 
-                            if($(this).val().length != 0){
+                            if($(this).val().trim().length != 0){
                                 messageLimit++;
                                 sendMessage(selectedPartner, selectedSubject, $("#message").val(), "#messages", messageLimit);
                                 $("#message").val("")
                             }
                         }
-                        console.log(event)
                     });
 
                     // mutlikeypress function
