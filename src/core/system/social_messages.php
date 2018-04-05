@@ -7,8 +7,8 @@
 }
 
 .subject:hover {
-    background-color: #F5F5F5;
     cursor: pointer;
+    background-color: red;
 }
 </style>
 
@@ -106,8 +106,6 @@
     </form>
 
     <!-- Active Conversations -->
-    <h4><?php echo $lang['MESSAGES']; ?></h4>
-
     <table class="table table-hover">
         <thead>
             <th style='white-space: nowrap;width: 1%;'><?php echo $lang['SUBJECT']; ?></th>
@@ -119,15 +117,21 @@
         <div class="col-xs-4">
             <?php
                 $result = $conn->query("SELECT subject, userID, partnerID FROM messages WHERE $userID IN (partnerID, userID) GROUP BY subject, LEAST(userID, partnerID), GREATEST(userID, partnerID) ");
+                $i = 0;
                 while ($result && ($row = $result->fetch_assoc())) {
                     $subject = $row['subject'];
                     $sender = $row['userID'];
                     $receiver = $row['partnerID'];
 
+                    $color = ($i % 2 == 0) ? "lightgray" : "silver";
+                    $i++;
+
                     if($userID == $receiver) $receiver = $sender; //sending process must be reversed
-                    echo '<div class="subject input-group">';
-                    echo '<p style="padding: 10px" onclick="showChat('.$receiver.', \''.$subject.'\')">'.$userID_toName[$receiver].' - '.$subject.'</p>';
-                    echo '<span class="input-group-btn"><button class="btn" onclick="deleteSubject('.$receiver.', \''.$subject.'\')"><i class="fa fa-trash" aria-hidden="true"></i></button></span>';
+                    echo '<div style="padding: 5px">';
+                    echo '<div class="subject input-group" style="background-color:' . $color . ';">';
+                    echo '<p style="padding: 10px;" onclick="showChat('.$receiver.', \''.$subject.'\')">' . $subject . '</p>';
+                    echo '<span class="input-group-btn"><button style="background-color: '.$color.';" class="btn" onclick="deleteSubject('.$receiver.', \''.$subject.'\')"><i class="fa fa-trash" aria-hidden="true"></i></button></span>';
+                    echo '</div>';
                     echo '</div>';
                 }
                 echo $conn->error;
