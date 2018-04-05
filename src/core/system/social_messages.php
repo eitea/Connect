@@ -236,6 +236,9 @@
 
 
 <script>
+//remove "are you sure you want to leave?"
+window.onbeforeunload = null;
+
 var selectedPartner = -1;
 var selectedSubject = "";
 var intervalID = -1;
