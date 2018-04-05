@@ -186,7 +186,6 @@
                             jQuery.each(pressed, function (i, key) {
                                 if (down[key] === true) {
                                     down[key] = false;
-                                    console.log(down[key])
                                     indexOfKey = remaining.indexOf(key);
                                     if (indexOfKey > -1) {
                                         remaining.splice(indexOfKey, 1);
