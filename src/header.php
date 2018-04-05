@@ -263,9 +263,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     //5ab7bd3310438
     if(!empty($_POST['social_birthday']) && test_Date($_POST['social_birthday'], 'Y-m-d')){
-        $val = isset($_POST['social_display_birthday']) ? 'TRUE' : 'FALSE';
-        $sql = test_input($_POST['social_birthday']);
-        $conn->query("UPDATE UserData SET birthday = '$sql', displayBirthday = '$val' WHERE id = $userID");
+        $userdata['displayBirthday'] = isset($_POST['social_display_birthday']) ? 'TRUE' : 'FALSE';
+        $userdata['birthday'] = test_input($_POST['social_birthday']);
+        $conn->query("UPDATE UserData SET birthday = '".$userdata['birthday']."', displayBirthday = '".$userdata['displayBirthday']."' WHERE id = $userID");
         if($conn->error){
             $validation_output = showErrorToString($conn->error);
         } else {
@@ -561,7 +561,7 @@ if ($_SESSION['color'] == 'light') {
                           </div>
                           <div class="col-md-6 checkbox">
                               <label><br>
-                                  <input type="checkbox" name="social_display_birthday" <?php if($userdata['displayBirthday']) echo 'checked'; ?> /> Im Kalender Anzeigen
+                                  <input type="checkbox" name="social_display_birthday" <?php if($userdata['displayBirthday'] == 'TRUE') echo 'checked'; ?> /> Im Kalender Anzeigen
                               </label>
                           </div>
                       </div>
