@@ -68,9 +68,6 @@ $lang_ger['ADMIN_CORE_OPTIONS'] = 'Allgemein';
 $lang_eng['ADMIN_MODULES'] = 'Admin Modules';
 $lang_ger['ADMIN_MODULES'] = 'Admin Module';
 
-$lang_eng['ADMIN_PROJECT_OPTIONS'] = 'Projects';
-$lang_ger['ADMIN_PROJECT_OPTIONS'] = 'Projekte';
-
 $lang_eng['ADMIN_TIME_OPTIONS'] = 'Time Records';
 $lang_ger['ADMIN_TIME_OPTIONS'] = 'Zeiterfassung';
 
@@ -127,6 +124,9 @@ $lang_ger['BEGIN'] = 'Anfang';
 
 $lang_eng['BILLING'] = 'Billing';
 $lang_ger['BILLING'] = 'Abrechnung';
+
+$lang_eng['BIRTHDAY'] = 'Birthday';
+$lang_ger['BIRTHDAY'] = 'Geburtstag';
 
 $lang_eng['BLESSING'] = 'Have a nice day!';
 $lang_ger['BLESSING'] ='Ich wünsche Ihnen einen angenehmen Tag!';
@@ -190,6 +190,9 @@ $lang_ger['CAN_EDIT_CLIENTS'] = 'Kann Kunden bearbeiten';
 
 $lang_eng['CAN_USE_SUPPLIERS'] = 'Can use suppliers';
 $lang_ger['CAN_USE_SUPPLIERS'] = 'Kann Lieferanten benutzen';
+
+$lang_eng['CAN_USE_WORKFLOW'] = 'Can use Workflow';
+$lang_ger['CAN_USE_WORKFLOW'] = 'Kann Workflow benutzen';
 
 $lang_eng['CAN_EDIT_SUPPLIERS'] = 'Can edit suppliers';
 $lang_ger['CAN_EDIT_SUPPLIERS'] = 'Kann Lieferanten bearbeiten';
@@ -1070,9 +1073,6 @@ $lang_ger['PROJECT_INFORMATION'] = 'Reports';
 
 $lang_eng['PROJECT_LOGS'] = 'Project Logs';
 $lang_ger['PROJECT_LOGS'] = 'Buchungsprotokoll ';
-
-$lang_eng['PROJECT_OPTIONS'] = 'Options';
-$lang_ger['PROJECT_OPTIONS'] = 'Optionen';
 
 $lang_eng['PROP_OUR_SIGN'] = 'Our Sign';
 $lang_ger['PROP_OUR_SIGN'] = 'Unser Zeichen';

@@ -1,5 +1,5 @@
 <?php
-require dirname(__DIR__) . '/header.php';
+require dirname(__DIR__) . '/header.php'; enableToWorkflow($userID);
 include dirname(__DIR__) . "/misc/helpcenter.php";
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(isset($_POST['delete'])){
@@ -44,7 +44,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
 }
 ?>
-<div class="page-header"><h3><?php echo $lang['PROJECT_OPTIONS']; ?>
+<div class="page-header"><h3>Workflow
   <div class="page-header-button-group">
     <button type="button" data-toggle="modal" data-target="#new-account" class="btn btn-default" title="New..."><i class="fa fa-plus"></i></button>
   </div>
@@ -593,7 +593,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $("#Priority").val(ruleData.priority).trigger('change');
             $("#Parent").val(ruleData.parent).trigger('change');
             $("#OptEmployees").val((ruleData.optionalemployees.substring(0,ruleData.optionalemployees.length-1)).split(',')).trigger('change');
-            $("#Status").val(ruleData.status).trigger('change'); 
+            $("#Status").val(ruleData.status).trigger('change');
             changeIdForRule(ruleData.emailaccount);
             $("#add-rule").modal('show');
         });
