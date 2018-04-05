@@ -416,7 +416,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
         while($result && ($row = $result->fetch_assoc())){
             $x = $row['projectid'];
 
-            if(count($filterings['employees']) > 1 && !array_intersect($filterings['employees'], $selection)) continue;
+            //if(count($filterings['employees']) > 1 && !array_intersect($filterings['employees'], $selection)) continue;
             $rowStyle = $tags = '';
             foreach(explode(',', $row['projecttags']) as $tag){
                 if($tag) $tags .= '<span class="badge">'.$tag.'</span> ';
