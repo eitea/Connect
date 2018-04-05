@@ -385,6 +385,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             }
         }
         if($filterings['priority'] > 0){ $query_filter .= " AND d.projectpriority = ".$filterings['priority']; }
+
         $stmt_booking = $conn->prepare("SELECT userID, p.id, p.start FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = ?"); echo $conn->error;
         $stmt_booking->bind_param('s', $x);
         //get hours booked for a project
@@ -394,14 +395,14 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
         $result = $conn->query("SELECT id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND logs.userID = $userID AND `end` = '0000-00-00 00:00:00' LIMIT 1");
         $hasActiveBooking = $result->num_rows;
         if($isDynamicProjectsAdmin == 'TRUE'){ //see all access-legal tasks
-            $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
-                projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours,
-                CONCAT(' ', GROUP_CONCAT(dynamicprojectsemployees.userid SEPARATOR ' '), GROUP_CONCAT(dynamicprojectsemployees.userid SEPARATOR ' ')) AS projectemployees
-                FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
-                LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
-                LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
+            $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,
+                projectpriority, projectowner, projectleader, projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, tbl.conemployees, tbl2.conteams,
+                companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours
+                FROM dynamicprojects d
+                LEFT JOIN ( SELECT projectid, GROUP_CONCAT(userid SEPARATOR ' ') AS conemployees FROM dynamicprojectsemployees GROUP BY projectid ) tbl ON tbl.projectid = d.projectid
+                LEFT JOIN ( SELECT t.projectid, GROUP_CONCAT(teamData.name SEPARATOR ',<br>') AS conteams FROM dynamicprojectsteams t LEFT JOIN teamData ON teamdata.id = t.teamid GROUP BY t.projectid ) tbl2 ON tbl2.projectid = d.projectid
+                LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
                 WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter
-                GROUP BY dynamicprojectsemployees.userid
                 ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         } else { //see open tasks user is part of  (update AJAX_dynamicInfo if changed)
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
@@ -416,7 +417,6 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
         while($result && ($row = $result->fetch_assoc())){
             $x = $row['projectid'];
 
-            //if(count($filterings['employees']) > 1 && !array_intersect($filterings['employees'], $selection)) continue;
             $rowStyle = $tags = '';
             foreach(explode(',', $row['projecttags']) as $tag){
                 if($tag) $tags .= '<span class="badge">'.$tag.'</span> ';
@@ -454,7 +454,8 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 echo '<b title="Besitzer">'. $userID_toName[$row['projectowner']].'</b>,<br>';
                 if($row['projectleader']) echo '<u title="Verantwortlicher Mitarbeiter">'.$userID_toName[$row['projectleader']].'</u>,<br>';
             }
-            //echo implode(',<br>', $employees);
+            foreach(explode(' ',$row['conemployees']) as $val){ if(isset($userID_toName[$val])) echo $userID_toName[$val]; };
+            echo $row['conteams'];
             echo '</td>';
             echo '<td>';
             if(($isDynamicProjectsAdmin == 'TRUE' || $row['projectowner'] == $userID)){
