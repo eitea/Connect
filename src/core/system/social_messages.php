@@ -139,17 +139,35 @@
 
         <!-- Messages -->
         <div class="col-xs-8">
-            <div class="pre-scrollable" id="messages" style="display: none; background-color: WhiteSmoke; overflow: auto; overflow-x: hidden; max-height: 60vh"></div>
+            <div class="pre-scrollable" id="messages" style="display: none; background-color: WhiteSmoke; overflow: auto; overflow-x: hidden; max-height: 55vh"></div>
 
             <div id="chatinput" style="display: none">
                 <form class="form" autocomplete="off">
                     <div class="input-group">
-                        <textarea required type="text" id="message" placeholder="Type a message" class="form-control" style="height: 35px; resize: none;"></textarea>
-                        <span class="input-group-btn" style="height: 35px"><button class="btn" type="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button></span>
+                        <textarea required id="message" placeholder="Type a message" class="form-control" style="height: 4vh; max-height: 11vh; resize: none; outline: none;"></textarea>
+                        <span class="input-group-btn"><button class="btn" type="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button></span>
                     </div>
                 </form>
 
                 <script>
+                    $('#message').on('change keyup keydown paste cut', function (event) {
+                        if(event.which != 13) $(this).height(0).height(this.scrollHeight/1.2);
+                    }).find('textarea').change();
+                                  
+                    // send on enter
+                    $("#message").keydown(function(event) {
+                        if(event.which == 13){
+                            event.preventDefault();    // cancel it
+
+                            if($(this).val().length != 0){
+                                messageLimit++;
+                                sendMessage(selectedPartner, selectedSubject, $("#message").val(), "#messages", messageLimit);
+                                $("#message").val("")
+                            }
+                        }
+                        console.log(event)
+                    });
+
                     // mutlikeypress function
                     jQuery.multipress = function (keys, handler) {
                         if (keys.length === 0) {
@@ -157,17 +175,19 @@
                         }
 
                         var down = {};
-                        jQuery(document).keydown(function (event) {
+                        jQuery("#message").keydown(function (event) {                            
                             down[event.keyCode] = true;
                         }).keyup(function (event) {
                             // Copy keys array, build array of pressed keys
-                            var remaining = keys.slice(0),
-                                pressed = Object.keys(down).map(function (num) { return parseInt(num, 10); }),
-                                indexOfKey;
+                            var remaining = keys.slice(0);
+                            var pressed = Object.keys(down).map(function (num) { return parseInt(num, 10); });
+                            var indexOfKey;
+
                             // Remove pressedKeys from remainingKeys
                             jQuery.each(pressed, function (i, key) {
                                 if (down[key] === true) {
                                     down[key] = false;
+                                    console.log(down[key])
                                     indexOfKey = remaining.indexOf(key);
                                     if (indexOfKey > -1) {
                                         remaining.splice(indexOfKey, 1);
@@ -180,25 +200,10 @@
                             }
                         });
                     };
-            
                     jQuery.multipress([13, 16], function () { 
-                        //new line
+                        //$("#message").append("\n")
                     })
-                                  
-                    // send on enter
-                    $("#message").keydown(function(event) {
-                        if(event.which == 13){
-                            event.preventDefault();    // cancel it
-
-                            // send the message
-                            messageLimit++;
-                            sendMessage(selectedPartner, selectedSubject, $("#message").val(), "#messages", messageLimit);
-
-                            // clear the field
-                            $("#message").val("")
-                        }
-                    });
-
+                           
                     //submit
                     $("#chatinput").submit(function (e) {
                         e.preventDefault()
