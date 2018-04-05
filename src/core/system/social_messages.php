@@ -144,12 +144,61 @@
             <div id="chatinput" style="display: none">
                 <form class="form" autocomplete="off">
                     <div class="input-group">
-                        <textarea required type="text" id="message" placeholder="Type a message" class="form-control" style="height: 35px"></textarea>
+                        <textarea required type="text" id="message" placeholder="Type a message" class="form-control" style="height: 35px; resize: none;"></textarea>
                         <span class="input-group-btn" style="height: 35px"><button class="btn" type="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button></span>
                     </div>
                 </form>
 
                 <script>
+                    // mutlikeypress function
+                    jQuery.multipress = function (keys, handler) {
+                        if (keys.length === 0) {
+                            return;
+                        }
+
+                        var down = {};
+                        jQuery(document).keydown(function (event) {
+                            down[event.keyCode] = true;
+                        }).keyup(function (event) {
+                            // Copy keys array, build array of pressed keys
+                            var remaining = keys.slice(0),
+                                pressed = Object.keys(down).map(function (num) { return parseInt(num, 10); }),
+                                indexOfKey;
+                            // Remove pressedKeys from remainingKeys
+                            jQuery.each(pressed, function (i, key) {
+                                if (down[key] === true) {
+                                    down[key] = false;
+                                    indexOfKey = remaining.indexOf(key);
+                                    if (indexOfKey > -1) {
+                                        remaining.splice(indexOfKey, 1);
+                                    }
+                                }
+                            });
+                            // If we hit all the keys, fire off handler
+                            if (remaining.length === 0) {
+                                handler(event);
+                            }
+                        });
+                    };
+            
+                    jQuery.multipress([13, 16], function () { 
+                        //new line
+                    })
+                                  
+                    // send on enter
+                    $("#message").keydown(function(event) {
+                        if(event.which == 13){
+                            event.preventDefault();    // cancel it
+
+                            // send the message
+                            messageLimit++;
+                            sendMessage(selectedPartner, selectedSubject, $("#message").val(), "#messages", messageLimit);
+
+                            // clear the field
+                            $("#message").val("")
+                        }
+                    });
+
                     //submit
                     $("#chatinput").submit(function (e) {
                         e.preventDefault()
