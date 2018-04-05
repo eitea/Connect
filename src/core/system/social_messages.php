@@ -77,7 +77,7 @@
                     <!-- modal body -->
                     <div class="modal-body">
                         <label><?php echo $lang['POST_TO']; ?> </label>
-                        <select class="js-example-basic-single" name="to_userid[]" multiple="multiple">
+                        <select required class="js-example-basic-single" name="to_userid[]" multiple="multiple">
                             <?php //5abdd31716137
                             foreach($available_users as $x){
                             echo '<option value="'.$x.'">'.$userID_toName[$x].'</option>';
