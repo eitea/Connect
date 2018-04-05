@@ -2473,7 +2473,37 @@ if($row['version'] < 146){
 }
 
 
-//if($row['version'] < 147){}
+if($row['version'] < 147){
+    //5ab7ae7596e5c
+    $conn->query("ALTER TABLE roles ADD COLUMN canUseWorkflow ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>Rollen: Workflow';
+    }
+
+    //5ab7bd3310438
+    $conn->query("ALTER TABLE UserData ADD COLUMN birthday DATE");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>Benutzer: Geburtstag';
+    }
+    $conn->query("ALTER TABLE UserData ADD COLUMN displayBirthday ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>Benutzer: Geburtstag';
+    }
+
+    //5abcfa8f314ae
+    $conn->query("ALTER TABLE UserData ADD COLUMN companyID INT(6) UNSIGNED");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>Benutzer: Hauptmandant';
+    }
+}
 //if($row['version'] < 148){}
 //if($row['version'] < 149){}
 //if($row['version'] < 150){}
