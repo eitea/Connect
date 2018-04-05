@@ -143,6 +143,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $val = test_input($_POST['gender']);
           $conn->query("UPDATE UserData SET gender= '$val' WHERE id = '$x';");
       }
+      if(!empty($_POST['main_company'])){
+          $val = intval($_POST['main_company']);
+          $conn->query("UPDATE UserData SET companyID = $val WHERE id = '$x'");
+      }
       if (!empty($_POST['password']) && !empty($_POST['passwordConfirm'])) {
           if (strcmp($_POST['password'], $_POST['passwordConfirm']) == 0  && match_passwordpolicy($_POST['password'])) {
               $psw = password_hash($password, PASSWORD_BCRYPT);
@@ -215,10 +219,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
 } //end POST
 
-$selection_company = '';
+$selection_main_company = $selection_company = '';
 $result = $conn->query("SELECT id, name FROM companyData");
 while($row = $result->fetch_assoc()){
     $selection_company .= '<div class="col-md-3"><label><input type="checkbox" name="company[]" value="'.$row['id'].'" />' . $row['name'] .'</label><br></div>';
+    $selection_main_company .= '<option value="'.$row['id'].'">' . $row['name'] .'</option>';
 }
 $stmt_company_relationship = $conn->prepare("SELECT companyID FROM relationship_company_client WHERE userID = ?");
 $stmt_company_relationship->bind_param('i', $x);
@@ -328,20 +333,28 @@ $stmt_company_relationship->bind_param('i', $x);
                     <button type="button" class="btn btn-danger btn-block" onClick="forcePswChange(<?php echo $x; ?>,event)" ><?php echo "Force Password Change"; ?></button>
                   </div>
               </div>
-              <div class="row radio">
-                <div class="col-md-2">
-                  <?php echo $lang['GENDER']; ?>:
-                </div>
-                <div class="col-md-2">
-                  <label>
-                    <input type="radio" name="gender" value="female" <?php if($row['gender'] == 'female'){echo 'checked';} ?> ><i class="fa fa-venus"></i><?php echo $lang['GENDER_TOSTRING']['female']; ?> <br>
-                  </label>
-                </div>
-                <div class="col-md-8">
-                  <label>
-                    <input type="radio" name="gender" value="male" <?php if($row['gender'] == 'male'){echo 'checked';} ?> ><i class="fa fa-mars"></i><?php echo $lang['GENDER_TOSTRING']['male']; ?>
-                  </label>
-                </div>
+              <div class="row">
+                  <div class="col-md-2">
+                      Hauptmandant:
+                  </div>
+                  <div class="col-md-3">
+                      <select name="main_company" class="js-example-basic-single"> <option value=""> .... </option>
+                          <?php echo str_replace('<option value="'.$row['companyID'].'" ', '<option selected value="'.$row['companyID'].'" ', $selection_main_company); ?>
+                      </select>
+                  </div>
+                  <div class="col-md-2 text-right">
+                    <?php echo $lang['GENDER']; ?>:
+                  </div>
+                  <div class="col-md-2">
+                    <label>
+                      <input type="radio" name="gender" value="female" <?php if($row['gender'] == 'female'){echo 'checked';} ?> ><i class="fa fa-venus"></i><?php echo $lang['GENDER_TOSTRING']['female']; ?> <br>
+                    </label>
+                  </div>
+                  <div class="col-md-2">
+                    <label>
+                      <input type="radio" name="gender" value="male" <?php if($row['gender'] == 'male'){echo 'checked';} ?> ><i class="fa fa-mars"></i><?php echo $lang['GENDER_TOSTRING']['male']; ?>
+                    </label>
+                  </div>
               </div>
               <div class="row">
                 <div class="col-md-5">
