@@ -2493,7 +2493,7 @@ if($row['version'] < 147){
     if($conn->error){
         echo $conn->error;
     } else {
-        echo '<br>Benutzer: Geburtstag';
+        echo '<br>Benutzer: Geburtstag Kalendereintrag';
     }
 
     //5abcfa8f314ae

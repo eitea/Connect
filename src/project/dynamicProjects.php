@@ -47,7 +47,7 @@ function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$refe
     .'<div data-toggle="tooltip" title="'.round($timeLeft,2).' Stunden" class="progress-bar progress-bar-success" style="height:10px;width:'.$greenBar.'%"></div>'
     .'<div data-toggle="tooltip" title="'.round($timeOver,2).' Stunden" class="progress-bar progress-bar-danger" style="height:10px;width:'.$redBar.'%"></div></div>';
 }
-$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', "priority" => 0, "employees" => ["user;".$userID]); //set_filter requirement
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', "priority" => 0, 'employees' => ["user;".$userID]); //set_filter requirement
 ?>
 <div class="page-header-fixed">
 <div class="page-header"><h3>Tasks<div class="page-header-button-group">
@@ -366,6 +366,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
     <tbody>
         <?php
         $modals = $occupation = $query_filter = '';
+        $filter_emps = $filter_team = '0';
         $priority_color = ['', '#2a5da1', '#0c95d9', '#9d9c9c', '#ff7600', '#ff0000'];
         if($filterings['company']){ $query_filter .= "AND d.companyid = ".intval($filterings['company']); }
         if($filterings['client']){ $query_filter .= " AND d.clientid = ".intval($filterings['client']); }
@@ -385,29 +386,41 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             }
         }
         if($filterings['priority'] > 0){ $query_filter .= " AND d.projectpriority = ".$filterings['priority']; }
+        foreach($filterings['employees'] as $val){
+            $arr = explode(';', $val);
+            if($arr[0] == 'user') $filter_emps .= " OR conemployees LIKE '%".$arr[1]."%'";
+            if($arr[0] == 'team') $filter_team .= " OR conteamsids LIKE '%".$arr[1]."%'";
+        }
+
+        if($filter_emps || $filter_team) $query_filter .= "AND ($filter_emps OR $filter_team)";
 
         $stmt_booking = $conn->prepare("SELECT userID, p.id, p.start FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = ?"); echo $conn->error;
         $stmt_booking->bind_param('s', $x);
-        //get hours booked for a project
-        $stmt_time = $conn->prepare("SELECT SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) current FROM projectBookingData p WHERE p.dynamicID = ?");
-        $stmt_time->bind_param('s', $x);
 
         $result = $conn->query("SELECT id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND logs.userID = $userID AND `end` = '0000-00-00 00:00:00' LIMIT 1");
         $hasActiveBooking = $result->num_rows;
         if($isDynamicProjectsAdmin == 'TRUE'){ //see all access-legal tasks
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,
-                projectpriority, projectowner, projectleader, projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, tbl.conemployees, tbl2.conteams,
-                companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours
+                projectpriority, projectowner, projectleader, projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
+                clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours
                 FROM dynamicprojects d
                 LEFT JOIN ( SELECT projectid, GROUP_CONCAT(userid SEPARATOR ' ') AS conemployees FROM dynamicprojectsemployees GROUP BY projectid ) tbl ON tbl.projectid = d.projectid
-                LEFT JOIN ( SELECT t.projectid, GROUP_CONCAT(teamData.name SEPARATOR ',<br>') AS conteams FROM dynamicprojectsteams t LEFT JOIN teamData ON teamData.id = t.teamid GROUP BY t.projectid ) tbl2 ON tbl2.projectid = d.projectid
+                LEFT JOIN ( SELECT t.projectid, GROUP_CONCAT(teamData.name SEPARATOR ',<br>') AS conteams, GROUP_CONCAT(teamData.id SEPARATOR ' ') AS conteamsids FROM dynamicprojectsteams t
+                    LEFT JOIN teamData ON teamData.id = t.teamid GROUP BY t.projectid ) tbl2 ON tbl2.projectid = d.projectid
                 LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
+                LEFT JOIN ( SELECT p.dynamicID, SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) AS currentHours FROM projectBookingData p) tbl3 ON tbl3.dynamicID = d.projectid
                 WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter
                 ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         } else { //see open tasks user is part of  (update AJAX_dynamicInfo if changed)
-            $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
-                projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours
-                FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
+            $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,
+                projectpriority, projectowner, projectleader, projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
+                clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours,
+                FROM dynamicprojects d
+                LEFT JOIN ( SELECT projectid, GROUP_CONCAT(userid SEPARATOR ' ') AS conemployees FROM dynamicprojectsemployees GROUP BY projectid ) tbl ON tbl.projectid = d.projectid
+                LEFT JOIN ( SELECT t.projectid, GROUP_CONCAT(teamData.name SEPARATOR ',<br>') AS conteams, GROUP_CONCAT(teamData.id SEPARATOR ' ') AS conteamsids FROM dynamicprojectsteams t
+                    LEFT JOIN teamData ON teamData.id = t.teamid GROUP BY t.projectid ) tbl2 ON tbl2.projectid = d.projectid
+                LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
+                LEFT JOIN ( SELECT p.dynamicID, SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) AS currentHours FROM projectBookingData p) tbl3 ON tbl3.dynamicID = d.projectid
                 LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
                 WHERE d.isTemplate = 'FALSE' AND (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (teamRelationshipData.userID = $userID AND teamRelationshipData.skill >= d.level))
@@ -417,17 +430,15 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
         while($result && ($row = $result->fetch_assoc())){
             $x = $row['projectid'];
 
-            $rowStyle = $tags = '';
-            foreach(explode(',', $row['projecttags']) as $tag){
-                if($tag) $tags .= '<span class="badge">'.$tag.'</span> ';
-            }
+            $rowStyle = '';
             echo '<tr '.$rowStyle.'>';
             echo '<td>';
-            $stmt_time->execute();
-            $currentTime = 0;
-            if($timeResult = $stmt_time->get_result()){ $currentTime = $timeResult->fetch_assoc()["current"]; } // in hours with precision 4
-            echo generate_progress_bar(floatval($currentTime), $row["estimatedHours"]);
-            echo '<i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].' <div>'.$tags.'</div></td>';
+            if($row['currentHours'] && $row['estimatedHours']) echo generate_progress_bar($row["currentHours"], $row["estimatedHours"]);
+            echo '<i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].' <div>';
+            foreach(explode(',', $row['projecttags']) as $tag){
+                if($tag) echo '<span class="badge">'.$tag.'</span> ';
+            }
+            echo '</div></td>';
             echo '<td><button type="button" class="btn btn-default view-modal-open" value="'.$x.'" >View</button></td>';
             echo '<td>'.$row['companyName'].'<br>'.$row['clientName'].'<br>'.$row['projectDataName'].'</td>';
             $A = substr(carryOverAdder_Hours($row['projectstart'], $timeToUTC),0,10);
