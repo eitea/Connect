@@ -3,12 +3,11 @@
 <style>
 .subject {
     padding: 5px;
-    border-radius: 5px;
 }
 
 .subject:hover {
     cursor: pointer;
-    background-color: red;
+    
 }
 </style>
 
@@ -123,7 +122,7 @@
                     $sender = $row['userID'];
                     $receiver = $row['partnerID'];
 
-                    $color = ($i % 2 == 0) ? "lightgray" : "silver";
+                    $color = ($i % 2 == 0) ? "gainsboro" : "silver";
                     $i++;
 
                     if($userID == $receiver) $receiver = $sender; //sending process must be reversed
