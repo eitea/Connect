@@ -400,7 +400,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours
                 FROM dynamicprojects d
                 LEFT JOIN ( SELECT projectid, GROUP_CONCAT(userid SEPARATOR ' ') AS conemployees FROM dynamicprojectsemployees GROUP BY projectid ) tbl ON tbl.projectid = d.projectid
-                LEFT JOIN ( SELECT t.projectid, GROUP_CONCAT(teamData.name SEPARATOR ',<br>') AS conteams FROM dynamicprojectsteams t LEFT JOIN teamData ON teamdata.id = t.teamid GROUP BY t.projectid ) tbl2 ON tbl2.projectid = d.projectid
+                LEFT JOIN ( SELECT t.projectid, GROUP_CONCAT(teamData.name SEPARATOR ',<br>') AS conteams FROM dynamicprojectsteams t LEFT JOIN teamData ON teamData.id = t.teamid GROUP BY t.projectid ) tbl2 ON tbl2.projectid = d.projectid
                 LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
                 WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter
                 ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
