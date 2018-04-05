@@ -3,6 +3,7 @@ if(file_exists(dirname(dirname(__DIR__)) . '/connection_config.php') || getenv('
   header("Location: ../login/auth");
 }
 ignore_user_abort(1);
+ini_set('max_execution_time',999);
 ?>
 <!DOCTYPE html>
 <html lang="en">

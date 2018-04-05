@@ -16,9 +16,6 @@ MAKING CHANGES TO EXISTING TABLE:
 
 Please test the setup after every change.
 */
-
-ini_set('max_execution_time',999);
-
 function create_tables($conn) {
     $sql = "CREATE TABLE UserData (
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -41,7 +38,10 @@ function create_tables($conn) {
         erpOption VARCHAR(10) DEFAULT 'TRUE',
         strikeCount INT(3) DEFAULT 0,
         publicPGPKey VARCHAR(150) NULL,
-        privatePGPKey VARCHAR(150) NULL
+        privatePGPKey VARCHAR(150) NULL,
+        birthday DATE,
+        displayBirthday ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+        companyID INT(6) UNSIGNED
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -238,25 +238,26 @@ function create_tables($conn) {
     }
 
     $sql = "CREATE TABLE roles(
-        userID INT(6) UNSIGNED,
-        isCoreAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        isTimeAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        isProjectAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        isReportAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        isERPAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        isFinanceAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        isDSGVOAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        isDynamicProjectsAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        canStamp ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
-        canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        canUseSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        canUseSuppliers ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        canEditSuppliers ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        canUseClients ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        canEditClients ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        canEditTemplates ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        canCreateTasks ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
+        userID INT(6) UNSIGNED NOT NULL,
+        isCoreAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+        isTimeAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+        isProjectAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+        isReportAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+        isERPAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+        isFinanceAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+        isDSGVOAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+        isDynamicProjectsAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+        canStamp ENUM('TRUE', 'FALSE') DEFAULT 'TRUE' NOT NULL,
+        canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+        canUseSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+        canUseSuppliers ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+        canEditSuppliers ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+        canUseClients ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+        canEditClients ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+        canEditTemplates ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+        canCreateTasks ENUM('TRUE', 'FALSE') DEFAULT 'TRUE' NOT NULL,
         canUseArchive ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL,
+        canUseWorkflow ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
         FOREIGN KEY (userID) REFERENCES UserData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE

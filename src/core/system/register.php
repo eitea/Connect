@@ -289,7 +289,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <label><input type="checkbox" name="isReportAdmin" /><?php echo $lang['REPORTS']; ?></label><br>
           <label><input type="checkbox" name="isERPAdmin" />ERP</label><br>
           <label><input type="checkbox" name="isFinanceAdmin" /><?php echo $lang['FINANCES']; ?></label><br>
-          <label><input type="checkbox" name="isDSGVOAdmin" checked />DSGVO</label>
+          <label><input type="checkbox" name="isDSGVOAdmin" />DSGVO</label>
         </div>
       </div>
       <div class="col-md-3">

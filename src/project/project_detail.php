@@ -137,12 +137,10 @@ $projectRow = $result->fetch_assoc();
             $result = $conn->query("SELECT privateKey FROM security_projects WHERE userID = $userID AND projectID = $projectID AND outDated = 'FALSE' LIMIT 1");
             if($result && ($row = $result->fetch_assoc())):
                 $keypair = base64_decode($privateKey).base64_decode($projectRow['publicKey']);
-                //echo mb_strlen($privateKey).'--<br>';
-                //echo mb_strlen(base64_decode($projectRow['publicKey'])).'--<br>';
                 $cipher = base64_decode($row['privateKey']);
                 $nonce = mb_substr($cipher, 0, 24, '8bit');
                 $encrypted = mb_substr($cipher, 24, null, '8bit');
-                try{
+                try {
                     $decrypted = sodium_crypto_box_open($encrypted, $nonce, $keypair);
                 } catch(Exception $e){
                     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';

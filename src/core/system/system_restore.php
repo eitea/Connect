@@ -35,7 +35,6 @@ if(isset($_POST['accept'])){
     $import = new MySQLImport($conn);
     $import->load($file);
     redirect("../user/logout");
-
   }
 }
 
