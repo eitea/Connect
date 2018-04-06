@@ -122,8 +122,8 @@
                     $sender = $row['userID'];
                     $receiver = $row['partnerID'];
 
-                    $color = ($i % 2 == 0) ? "gray" : "silver";
-                    $hoverColor = ($i % 2 == 0) ? "gainsboro" : "whitesmoke";
+                    $color = ($i % 2 == 0) ? "#BEBEBE" : "#E0E0E0";
+                    $hoverColor = ($i % 2 == 0) ? "#C8C8C8" : "#F0F0F0";
                     $i++;
 
                     if($userID == $receiver) $receiver = $sender; //sending process must be reversed
@@ -152,7 +152,7 @@
 
         <!-- Messages -->
         <div class="col-xs-8">
-            <div class="pre-scrollable" id="messages" style="display: none; background-color: WhiteSmoke; overflow: auto; overflow-x: hidden; max-height: 55vh"></div>
+            <div class="pre-scrollable" id="messages" style="display: none; background-color: white; overflow: auto; overflow-x: hidden; max-height: 55vh"></div>
 
             <div id="chatinput" style="display: none">
                 <form class="form" autocomplete="off">
