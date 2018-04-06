@@ -122,27 +122,24 @@
                     $subject = $row['subject'];
                     $sender = $row['userID'];
                     $receiver = $row['partnerID'];
-
-                    $color = ($i % 2 == 0) ? "#BEBEBE" : "#E0E0E0";
-                    $hoverColor = ($i % 2 == 0) ? "#C8C8C8" : "#F0F0F0";
                     $i++;
 
                     if($userID == $receiver) $receiver = $sender; //sending process must be reversed
                     echo '<div style="padding: 5px">';
-                    echo '<div class="subject'.$i.' input-group" style="background-color:' . $color . ';">';
+                    echo '<div class="subject'.$i.' input-group" style="background-color: white; border: 1px solid gainsboro;">';
                     echo '<p style="padding: 10px;" onclick="showChat('.$receiver.', \''.$subject.'\')">' . $subject . '</p>';
-                    echo '<span class="input-group-btn"><button style="background-color: '.$color.';" class="icon'.$i.' btn" onclick="deleteSubject('.$receiver.', \''.$subject.'\')"><i class="fa fa-trash" aria-hidden="true"></i></button></span>';
+                    echo '<span class="input-group-btn"><button style="background-color: white; " class="icon'.$i.' btn" onclick="deleteSubject('.$receiver.', \''.$subject.'\')"><i class="fa fa-trash" aria-hidden="true"></i></button></span>';
                     echo '</div>';
                     echo '</div>';
                     
                     // on hover
                     echo '<script>';
                     echo '$(".subject'.$i.'").hover(function(){
-                                $(this).css("background-color", "'.$hoverColor.'");
-                                $(".icon'.$i.'").css("background-color", "'.$hoverColor.'");
+                                $(this).css("background-color", "whitesmoke");
+                                $(".icon'.$i.'").css("background-color", "whitesmoke");
                             }, function(){
-                                $(this).css("background-color", "'.$color.'");
-                                $(".icon'.$i.'").css("background-color", "'.$color.'");
+                                $(this).css("background-color", "white");
+                                $(".icon'.$i.'").css("background-color", "white");
                             });';
                     echo '</script>';
                 }
