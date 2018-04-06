@@ -122,17 +122,30 @@
                     $sender = $row['userID'];
                     $receiver = $row['partnerID'];
 
-                    $color = ($i % 2 == 0) ? "gainsboro" : "silver";
+                    $color = ($i % 2 == 0) ? "gray" : "silver";
+                    $hoverColor = ($i % 2 == 0) ? "gainsboro" : "whitesmoke";
                     $i++;
 
                     if($userID == $receiver) $receiver = $sender; //sending process must be reversed
                     echo '<div style="padding: 5px">';
-                    echo '<div class="subject input-group" style="background-color:' . $color . ';">';
+                    echo '<div class="subject'.$i.' input-group" style="background-color:' . $color . ';">';
                     echo '<p style="padding: 10px;" onclick="showChat('.$receiver.', \''.$subject.'\')">' . $subject . '</p>';
-                    echo '<span class="input-group-btn"><button style="background-color: '.$color.';" class="btn" onclick="deleteSubject('.$receiver.', \''.$subject.'\')"><i class="fa fa-trash" aria-hidden="true"></i></button></span>';
+                    echo '<span class="input-group-btn"><button style="background-color: '.$color.';" class="icon'.$i.' btn" onclick="deleteSubject('.$receiver.', \''.$subject.'\')"><i class="fa fa-trash" aria-hidden="true"></i></button></span>';
                     echo '</div>';
                     echo '</div>';
+                    
+                    // on hover
+                    echo '<script>';
+                    echo '$(".subject'.$i.'").hover(function(){
+                                $(this).css("background-color", "'.$hoverColor.'");
+                                $(".icon'.$i.'").css("background-color", "'.$hoverColor.'");
+                            }, function(){
+                                $(this).css("background-color", "'.$color.'");
+                                $(".icon'.$i.'").css("background-color", "'.$color.'");
+                            });';
+                    echo '</script>';
                 }
+                
                 echo $conn->error;
             ?>
         </div>
