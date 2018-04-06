@@ -113,6 +113,7 @@
     </table>
 
     <div class="row">
+        <!-- Subjects -->
         <div class="col-xs-4">
             <?php
                 $result = $conn->query("SELECT subject, userID, partnerID FROM messages WHERE $userID IN (partnerID, userID) GROUP BY subject, LEAST(userID, partnerID), GREATEST(userID, partnerID) ");
@@ -244,7 +245,6 @@
             </div>
         </div>
     </div>
-    <!-- /contacts -->
 </div>
 
 

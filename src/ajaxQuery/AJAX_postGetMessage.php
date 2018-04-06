@@ -38,7 +38,7 @@ if (!$result || $result->num_rows == 0) {
 
         $message = $row["message"];
         $pull = $row["userID"] == $userID ? "pull-right":"pull-left";       // left or right side?
-        $color = $row["userID"] == $userID ? "#dcf8c6" : "#b3d1ff"; 
+        $color = $row["userID"] == $userID ? "#c7f4a4" : "#whitesmoke";     //dcf8c6
         $seen = $row["seen"] == 'TRUE' ? "fa-eye":"fa-eye-slash";
         $showseen = ($row["userID"] == $userID);
         $lastdate = $date ?? "";
@@ -68,7 +68,7 @@ if (!$result || $result->num_rows == 0) {
                         <?php if($showseen): ?>
                             <i class="fa <?php echo $seen; ?>" style="display:block; top:0px; right:-3px; position:absolute; color:#9d9d9d;"></i>
                         <?php elseif(!$showseen): ?>
-                            <span class="label label-default" style="display:block; top:-17px; left:0px; position:absolute; background-color: gainsboro; color: black;"><?php echo $name . " - " . $messageDate; ?></span>
+                            <span class="label label-default" style="display:block; top:-17px; left:0px; position:absolute; background-color: white; color: black;"><?php echo $name . " - " . $messageDate; ?></span>
                         <?php endif; ?>
                         <!-- endif -->
 
