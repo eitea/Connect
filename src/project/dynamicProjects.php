@@ -47,7 +47,12 @@ function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$refe
     .'<div data-toggle="tooltip" title="'.round($timeLeft,2).' Stunden" class="progress-bar progress-bar-success" style="height:10px;width:'.$greenBar.'%"></div>'
     .'<div data-toggle="tooltip" title="'.round($timeOver,2).' Stunden" class="progress-bar progress-bar-danger" style="height:10px;width:'.$redBar.'%"></div></div>';
 }
+
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', "priority" => 0, 'employees' => ["user;".$userID]); //set_filter requirement
+$result = $conn->query("SELECT teamID FROM teamRelationshipData WHERE userID = $userID");
+while($result && ( $row = $result->fetch_assoc())){
+    $filterings['employees'][] = 'team;'.$row['teamID'];
+}
 ?>
 <div class="page-header-fixed">
 <div class="page-header"><h3>Tasks<div class="page-header-button-group">
