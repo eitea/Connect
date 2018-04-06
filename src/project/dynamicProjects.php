@@ -414,7 +414,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
         } else { //see open tasks user is part of  (update AJAX_dynamicInfo if changed)
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,
                 projectpriority, projectowner, projectleader, projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
-                clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours,
+                clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours
                 FROM dynamicprojects d
                 LEFT JOIN ( SELECT projectid, GROUP_CONCAT(userid SEPARATOR ' ') AS conemployees FROM dynamicprojectsemployees GROUP BY projectid ) tbl ON tbl.projectid = d.projectid
                 LEFT JOIN ( SELECT t.projectid, GROUP_CONCAT(teamData.name SEPARATOR ',<br>') AS conteams, GROUP_CONCAT(teamData.id SEPARATOR ' ') AS conteamsids FROM dynamicprojectsteams t
