@@ -153,7 +153,7 @@
 
         <!-- Messages -->
         <div class="col-xs-8">
-            <div class="pre-scrollable" id="messages" style="display: none; background-color: white; overflow: auto; overflow-x: hidden; max-height: 55vh"></div>
+            <div class="pre-scrollable" id="messages" style="display: none; background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh"></div>
 
             <div id="chatinput" style="display: none">
                 <form class="form" autocomplete="off">
