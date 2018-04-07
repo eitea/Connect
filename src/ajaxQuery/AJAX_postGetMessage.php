@@ -72,15 +72,8 @@ if (!$result || $result->num_rows == 0) {
                         <?php endif; ?>
                         <!-- endif -->
 
-                        <div>
-                            <?php 
-                            // handle line breaks
-                            $parts = explode("\n", $message);
-
-                            foreach  ($parts as $part){
-                                echo $part . "<br>"; 
-                            }
-                            ?>
+                        <div style='word-break: break-all; word-wrap: break-word;'>
+                            <?php echo $message; ?>
                         </div>
                     </div>
                 </div>

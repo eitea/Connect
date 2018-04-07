@@ -9,6 +9,7 @@
     cursor: pointer;
     
 }
+
 </style>
 
 <!-- TODO: Add ability to send pictures -->
@@ -23,7 +24,7 @@
 
 
 <!-- Page body -->
-<div class="page-content-fixed-100">
+<div class="page-content-fixed-50">
     <?php //Evaluate the post form and insert the message into the databse
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['sendButton'])) {
         //Check the $_POST values
@@ -89,7 +90,7 @@
                         <br>
 
                         <label for="message"> <?php echo $lang['MESSAGE'] ?></label>
-                        <textarea required name="message" class="form-control"></textarea>
+                        <textarea required name="message" class="form-control" style="resize: none"></textarea>
                     </div>
 
                     <!-- modal footer -->
@@ -154,7 +155,7 @@
             <div id="chatinput" style="display: none; padding-top: 5px;">
                 <form autocomplete="off">
                     <div class="input-group">
-                        <textarea id="message" wrap="hard" placeholder="Type a message" class="form-control" style="height: 3.6vh; max-height: 11vh; resize: none; outline: none;"></textarea>
+                        <textarea id="message" wrap="hard" placeholder="Type a message" class="form-control" style="height: 3.6vh; max-height: 11vh; resize: none; "></textarea>
                         <span class="input-group-btn"><button id="sendButton" class="btn btn-default" type="submit" style="height: 3.6vh"><?php echo $lang['SEND'] ?></button></span>
                     </div>
                 </form>
