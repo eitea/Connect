@@ -166,8 +166,21 @@
                     }).find('textarea').change();
                                   
                     // send on enter
+                    var shiftPressed = false;
                     $("#message").keydown(function(event) {
-                        if(event.which == 13){
+                        //shift + enter?
+                        if(shiftPressed && event.which == 13) {
+                            console.log("shit enter")
+                            $("#message").append("<br>");
+                        } else {
+                            // update shiftPressed when not pressed shift+enter
+                            if(event.which == 16) shiftPressed = true; else shiftPressed = false;
+                        }
+                        
+                        
+
+                        if(event.which == 13 && !shiftPressed){
+                            console.log("send")
                             event.preventDefault();
 
                             if($(this).val().trim().length != 0){
@@ -177,41 +190,6 @@
                             }
                         }
                     });
-
-                    // mutlikeypress function
-                    jQuery.multipress = function (keys, handler) {
-                        if (keys.length === 0) {
-                            return;
-                        }
-
-                        var down = {};
-                        jQuery("#message").keydown(function (event) {                            
-                            down[event.keyCode] = true;
-                        }).keyup(function (event) {
-                            // Copy keys array, build array of pressed keys
-                            var remaining = keys.slice(0);
-                            var pressed = Object.keys(down).map(function (num) { return parseInt(num, 10); });
-                            var indexOfKey;
-
-                            // Remove pressedKeys from remainingKeys
-                            jQuery.each(pressed, function (i, key) {
-                                if (down[key] === true) {
-                                    down[key] = false;
-                                    indexOfKey = remaining.indexOf(key);
-                                    if (indexOfKey > -1) {
-                                        remaining.splice(indexOfKey, 1);
-                                    }
-                                }
-                            });
-                            // If we hit all the keys, fire off handler
-                            if (remaining.length === 0) {
-                                handler(event);
-                            }
-                        });
-                    };
-                    jQuery.multipress([13, 16], function () { 
-                        //$("#message").append("\n")
-                    })
                            
                     //submit
                     $("#chatinput").submit(function (e) {
