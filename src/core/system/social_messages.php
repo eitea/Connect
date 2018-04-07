@@ -12,15 +12,13 @@
 
 </style>
 
-<!-- TODO: Add ability to send pictures -->
-<!-- TODO: Badge -->
 <!-- Page header -->
-    <div class="page-header">
-        <h4>
-            <?php echo $lang['MESSAGING']; ?>
-            <button class="btn btn-default" data-toggle="modal" data-target="#postMessages" type="button"><i class="fa fa-plus"></i></button>
-        </h4>
-    </div>
+<div class="page-header">
+    <h4>
+        <?php echo $lang['MESSAGING']; ?>
+        <button class="btn btn-default" data-toggle="modal" data-target="#postMessages" type="button"><i class="fa fa-plus"></i></button>
+    </h4>
+</div>
 
 
 <!-- Page body -->
