@@ -14,14 +14,12 @@
 <!-- TODO: Add ability to send pictures -->
 <!-- TODO: Badge -->
 <!-- Page header -->
-<div class="page-header-fixed">
     <div class="page-header">
         <h4>
             <?php echo $lang['MESSAGING']; ?>
             <button class="btn btn-default" data-toggle="modal" data-target="#postMessages" type="button"><i class="fa fa-plus"></i></button>
         </h4>
     </div>
-</div>
 
 
 <!-- Page body -->
@@ -87,7 +85,7 @@
                         <br>
 
                         <label for="subject"> <?php echo $lang['SUBJECT']; ?> </label>
-                        <input required type="text" name="subject" class="form-control">
+                        <input required type="text" maxlength="40" name="subject" class="form-control">
                         <br>
 
                         <label for="message"> <?php echo $lang['MESSAGE'] ?></label>
@@ -111,6 +109,7 @@
             <th style='white-space: nowrap;width: 2%;'></th>
         </thead>
     </table>
+
 
     <div class="row">
         <!-- Subjects -->
@@ -152,17 +151,17 @@
         <div class="col-xs-8">
             <div class="pre-scrollable" id="messages" style="display: none; background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh"></div>
 
-            <div id="chatinput" style="display: none">
-                <form class="form" autocomplete="off">
+            <div id="chatinput" style="display: none; padding-top: 5px;">
+                <form autocomplete="off">
                     <div class="input-group">
-                        <textarea required id="message" placeholder="Type a message" class="form-control" style="height: 4vh; max-height: 11vh; resize: none; outline: none;"></textarea>
-                        <span class="input-group-btn"><button class="btn" type="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button></span>
+                        <textarea id="message" wrap="hard" placeholder="Type a message" class="form-control" style="height: 3.6vh; max-height: 11vh; resize: none; outline: none;"></textarea>
+                        <span class="input-group-btn"><button id="sendButton" class="btn btn-default" type="submit" style="height: 3.6vh"><?php echo $lang['SEND'] ?></button></span>
                     </div>
                 </form>
 
                 <script>
-                    $('#message').on('change keyup keydown paste cut', function (event) {
-                        if(event.which != 13) $(this).height(0).height(this.scrollHeight/1.2);
+                    $('#message, #sendButton').on('change keyup keydown paste cut click', function (event) {
+                        $("#message").height(0).height(this.scrollHeight/1.4);
                     }).find('textarea').change();
                                   
                     // send on enter
@@ -215,6 +214,10 @@
                            
                     //submit
                     $("#chatinput").submit(function (e) {
+                        //parse the line breaks
+                        $("#message").html($("#message").text().replace(/\n\r?/g, '<br>'));
+
+                        //prevent enter
                         e.preventDefault()
 
                         // send the message
