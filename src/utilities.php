@@ -582,30 +582,36 @@ function util_strip_prefix($subject, $prefix) {
     return $subject;
 }
 
-function util_starts_with($subject, $prefix) {
-    return substr($subject, 0, strlen($prefix)) === $prefix;
-}
-
-function showErrorToString($message){
+//TODO: very bad design, redo
+function showError($message, $toString = false){
     if(!$message || strlen($message) == 0) return;
     $message = str_replace("'", "\\'", $message);
-    return "<script>$(document).ready(function(){showError('$message')})</script>";
+    if($toString){
+        return "<script>$(document).ready(function(){showError('$message')})</script>";
+    }
+    echo "<script>$(document).ready(function(){showError('$message')})</script>";
 }
-
-function showWarningToString($message){
+function showWarning($message, $toString = false){
+    if(!$message || strlen(trim($message)) == 0) return;
+    $message = str_replace("'", "\\'", $message);
+    if($toString){
+        return "<script>$(document).ready(function(){showWarning('$message')})</script>";
+    }
+    echo "<script>$(document).ready(function(){showWarning('$message')})</script>";
+}
+function showInfo($message, $toString = false){
     if(!$message || strlen($message) == 0) return;
     $message = str_replace("'", "\\'", $message);
-    return "<script>$(document).ready(function(){showWarning('$message')})</script>";
+    if($toString){
+        return "<script>$(document).ready(function(){showInfo('$message')})</script>";
+    }
+    echo "<script>$(document).ready(function(){showInfo('$message')})</script>";
 }
-
-function showInfoToString($message){
+function showSuccess($message, $toString = false){
     if(!$message || strlen($message) == 0) return;
     $message = str_replace("'", "\\'", $message);
-    return "<script>$(document).ready(function(){showInfo('$message')})</script>";
-}
-
-function showSuccessToString($message){
-    if(!$message || strlen($message) == 0) return;
-    $message = str_replace("'", "\\'", $message);
-    return "<script>$(document).ready(function(){showSuccess('$message')})</script>";
+    if($toString){
+        return "<script>$(document).ready(function(){showSuccess('$message')})</script>";
+    }
+    echo "<script>$(document).ready(function(){showSuccess('$message')})</script>";
 }

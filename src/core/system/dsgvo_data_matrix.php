@@ -95,7 +95,7 @@ if (isset($_POST['add_setting']) && isset($matrixID)) {
     if (!empty($_POST['add_setting']) && !empty($_POST[test_input($_POST['add_setting'])])) {
         $setting = test_input($_POST['add_setting']);
         $descr = test_input($_POST[$setting]);
-        insertVVLog("INSERT","Add a new field (name: $setting, description: $descr) to matrix $matrixID");        
+        insertVVLog("INSERT","Add a new field (name: $setting, description: $descr) to matrix $matrixID");
         $conn->query("INSERT INTO dsgvo_vv_data_matrix_settings (matrixID, opt_name, opt_descr) VALUES ($matrixID, '$setting', '$descr')");
         if ($conn->error) {
             showError($conn->error);
@@ -109,7 +109,7 @@ if (isset($_POST['delete_setting']) && isset($matrixID)) {
     if (!empty($_POST['delete_setting'])) {
         $setting = test_input($_POST['delete_setting']);
         $conn->query("DELETE FROM dsgvo_vv_data_matrix_settings WHERE matrixID = $matrixID AND opt_name = '$setting'");
-        insertVVLog("DELETE","Delete a field (name: $setting) in matrix $matrixID");  
+        insertVVLog("DELETE","Delete a field (name: $setting) in matrix $matrixID");
         if ($conn->error) {
             showError($conn->error);
         } else {
@@ -126,12 +126,12 @@ if (isset($_POST['save_all']) && isset($matrixID)) {
     foreach ($_POST as $name => $value) {
         $setting = test_input($name);
         $descr = test_input($value);
-        if (util_starts_with($setting, "APP_GROUP_") || util_starts_with($setting, "APP_CAT_")) {
+        if (substr($setting, 0, 9) == 'APP_GROUP' || substr($setting, 0, 8) == 'APP_CAT_') {
             if (!empty($descr)) {
                 $stmt->execute();
                 $affected_rows += $stmt->affected_rows;
                 if($stmt->affected_rows && $stmt->affected_rows > 0){
-                    insertVVLog("UPDATE","Update a field (name: $setting, description: $descr) in matrix $matrixID");  
+                    insertVVLog("UPDATE","Update a field (name: $setting, description: $descr) in matrix $matrixID");
                 }
                 showError($stmt->error);
             }

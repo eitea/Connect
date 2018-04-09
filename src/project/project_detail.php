@@ -123,7 +123,7 @@ $projectRow = $result->fetch_assoc();
     </div>
 </form>
 
-<?php if($projectRow['publicKey']): ?>
+<?php if($projectRow['publicKey'] && $projectRow['creator'] == $userID): ?>
 <form method="POST" action="../setup/keys" target="_blank">
     <div class="row form-group">
         <div class="col-sm-2">

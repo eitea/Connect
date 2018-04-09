@@ -125,13 +125,13 @@ if($x){
                             <div class="row">
                                 <div class="col-md-6">
                                     <label><?php echo $lang["OWNER"]; ?>*</label>
-                                    <select <?php if($isDynamicProjectsAdmin != 'TRUE') echo "disabled" ?> class="select2-team-icons" name="owner">
-                                    <?php echo str_replace('<option value="'.$dynrow['projectowner'].'" ', '<option selected value="'.$dynrow['projectowner'].'" ', $modal_options); ?>
+                                    <select class="select2-team-icons" name="owner">
+                                        <?php echo str_replace('<option value="'.$dynrow['projectowner'].'" ', '<option selected value="'.$dynrow['projectowner'].'" ', $modal_options); ?>
                                     </select><br>
                                 </div>
                                 <div class="col-md-6">
                                     <label><?php echo $lang["EMPLOYEE"]; ?>/ Team*</label>
-                                    <select <?php if($isDynamicProjectsAdmin != 'TRUE') echo "disabled" ?> class="select2-team-icons" name="employees[]" multiple="multiple">
+                                    <select class="select2-team-icons" name="employees[]" multiple="multiple">
                                         <?php
                                         if($isDynamicProjectsAdmin != 'TRUE'){
                                             $result = str_replace('<option value="', '<option selected value="user;', $modal_options);
@@ -264,8 +264,8 @@ if($x){
                             <div class="row">
                                 <div class="col-md-6">
                                     <label><?php echo $lang["LEADER"]; ?></label>
-                                    <select <?php if($isDynamicProjectsAdmin != 'TRUE') echo "disabled" ?> class="select2-team-icons" name="leader">
-                                        <option value="">...</option>
+                                    <select class="select2-team-icons" name="leader">
+                                        <?php if($isDynamicProjectsAdmin == 'TRUE') echo '<option value="">...</option>'; ?>
                                         <?php echo str_replace('<option value="'.$dynrow['projectleader'].'" ', '<option selected value="'.$dynrow['projectleader'].'" ', $modal_options); ?>
                                     </select><br>
                                 </div>

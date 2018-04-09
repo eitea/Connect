@@ -183,10 +183,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         require __DIR__ . "/misc/ckInOut.php";
         if (isset($_POST['stampIn'])) {
             checkIn($userID);
-            $validation_output = showInfoToString($lang['INFO_CHECKIN']);
+            $validation_output = showInfo($lang['INFO_CHECKIN'], 1);
         } elseif (isset($_POST['stampOut'])) {
             $error_output = checkOut($userID, intval($_POST['stampOut']));
-            $validation_output = showInfoToString($lang['INFO_CHECKOUT']);
+            $validation_output = showInfo($lang['INFO_CHECKOUT'], 1);
         }
     }
     if (isset($_SESSION['posttimer']) && (time() - $_SESSION['posttimer']) < 2) {
@@ -201,15 +201,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $private_encrypted = simple_encryption($privateKey, $password);
             $conn->query("UPDATE UserData SET psw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP, privatePGPKey = '$private_encrypted' WHERE id = '$userID';");
             if(!$conn->error){
-                $validation_output = showSuccessToString('Password successfully changed. '.$userPasswordHash);
+                $validation_output = showSuccess('Password successfully changed. '.$userPasswordHash, 1);
             } else {
-                $validation_output = showErrorToString($conn->error);
+                $validation_output = showErrorg($conn->error, 1);
             }
         } else {
-            $validation_output  = showErrorToString($output);
+            $validation_output  = showError($output, 1);
         }
     } elseif(isset($_POST['savePAS'])) {
-        $validation_output = showErrorToString($lang['ERROR_MISSING_FIELDS']);
+        $validation_output = showError($lang['ERROR_MISSING_FIELDS'], 1);
     }
     if(isset($_POST['setup_firsttime']) && crypt($_POST['setup_firsttime'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK"){
       $_SESSION['userid'] = (crypt($_POST['setup_firsttime'], "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK") == "$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK");
@@ -217,12 +217,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $sql="UPDATE UserData SET preferredLang='GER' WHERE id = $userID";
       $conn->query($sql);
       $_SESSION['language'] = 'GER';
-      $validation_output = showErrorToString($conn->error);
+      $validation_output = showError($conn->error, 1);
     } elseif(isset($_POST['ENGLISH'])){
       $sql="UPDATE UserData SET preferredLang='ENG' WHERE id = $userID";
       $conn->query($sql);
       $_SESSION['language'] = 'ENG';
-      $validation_output = showErrorToString($conn->error);
+      $validation_output = showError($conn->error, 1);
     }
     if (isset($_POST['set_skin'])) {
         $_SESSION['color'] = $txt = test_input($_POST['set_skin']);
@@ -267,9 +267,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $userdata['birthday'] = test_input($_POST['social_birthday']);
         $conn->query("UPDATE UserData SET birthday = '".$userdata['birthday']."', displayBirthday = '".$userdata['displayBirthday']."' WHERE id = $userID");
         if($conn->error){
-            $validation_output = showErrorToString($conn->error);
+            $validation_output = showError($conn->error, 1);
         } else {
-            $validation_output = showSuccessToString($lang['OK_SAVE']);
+            $validation_output = showSuccess($lang['OK_SAVE'], 1);
         }
     }
 } //endif POST
@@ -318,28 +318,6 @@ if ($_SESSION['color'] == 'light') {
     <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
     <link href="<?php echo $css_file; ?>" rel="stylesheet" />
     <title>Connect</title>
-  <?php
-    function showError($message){
-        if(!$message || strlen($message) == 0) return;
-        $message = str_replace("'", "\\'", $message);
-        echo "<script>$(document).ready(function(){showError('$message')})</script>";
-    }
-    function showWarning($message){
-        if(!$message || strlen($message) == 0) return;
-        $message = str_replace("'", "\\'", $message);
-        echo "<script>$(document).ready(function(){showWarning('$message')})</script>";
-    }
-    function showInfo($message){
-        if(!$message || strlen($message) == 0) return;
-        $message = str_replace("'", "\\'", $message);
-        echo "<script>$(document).ready(function(){showInfo('$message')})</script>";
-    }
-    function showSuccess($message){
-        if(!$message || strlen($message) == 0) return;
-        $message = str_replace("'", "\\'", $message);
-        echo "<script>$(document).ready(function(){showSuccess('$message')})</script>";
-    }
-  ?>
 </head>
 <body id="body_container" class="is-table-row">
     <div id="loader"></div>

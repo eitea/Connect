@@ -10,7 +10,7 @@ require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
 function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
     $allHours = 0;
     $times = explode(' ', $estimate);
-    foreach($times as $t){ //TODO: should base hours on intervalData, makes more sense than 24/7 format
+    foreach($times as $t){
         if(is_numeric($t) || substr($t, -1) == 'h'){
             $allHours += intval($t);
         } elseif(substr($t, -1) == 'M'){
@@ -340,6 +340,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $stmt->close();
             } else {
                 showError($lang['ERROR_MISSING_FIELDS']);
+                if(empty($_POST['owner'])) showError('Fehlend: Projektbesitzer');
+                if(empty($_POST['employees'])) showError('Fehlend: Mitarbeiter');
             }
         }
     } // end if dynamic Admin
@@ -407,11 +409,13 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
         if($isDynamicProjectsAdmin == 'TRUE'){ //see all access-legal tasks
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,
                 projectpriority, projectowner, projectleader, projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
-                clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours
+                clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours, tbl4.activity
                 FROM dynamicprojects d
                 LEFT JOIN ( SELECT projectid, GROUP_CONCAT(userid SEPARATOR ' ') AS conemployees FROM dynamicprojectsemployees GROUP BY projectid ) tbl ON tbl.projectid = d.projectid
                 LEFT JOIN ( SELECT t.projectid, GROUP_CONCAT(teamData.name SEPARATOR ',<br>') AS conteams, GROUP_CONCAT(teamData.id SEPARATOR ' ') AS conteamsids FROM dynamicprojectsteams t
                     LEFT JOIN teamData ON teamData.id = t.teamid GROUP BY t.projectid ) tbl2 ON tbl2.projectid = d.projectid
+                LEFT JOIN ( SELECT activity, projectid FROM dynamicprojectslogs WHERE ((activity = 'VIEWED' AND userid = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID))
+                    ORDER BY logTime DESC LIMIT 1) tbl4 ON tbl4.projectid = d.projectid
                 LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
                 LEFT JOIN ( SELECT p.dynamicID, SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) AS currentHours FROM projectBookingData p) tbl3 ON tbl3.dynamicID = d.projectid
                 WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter
@@ -419,11 +423,13 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
         } else { //see open tasks user is part of  (update AJAX_dynamicInfo if changed)
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,
                 projectpriority, projectowner, projectleader, projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
-                clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours
+                clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours, tbl4.activity
                 FROM dynamicprojects d
                 LEFT JOIN ( SELECT projectid, GROUP_CONCAT(userid SEPARATOR ' ') AS conemployees FROM dynamicprojectsemployees GROUP BY projectid ) tbl ON tbl.projectid = d.projectid
                 LEFT JOIN ( SELECT t.projectid, GROUP_CONCAT(teamData.name SEPARATOR ',<br>') AS conteams, GROUP_CONCAT(teamData.id SEPARATOR ' ') AS conteamsids FROM dynamicprojectsteams t
                     LEFT JOIN teamData ON teamData.id = t.teamid GROUP BY t.projectid ) tbl2 ON tbl2.projectid = d.projectid
+                LEFT JOIN ( SELECT activity, projectid FROM dynamicprojectslogs WHERE ((activity = 'VIEWED' AND userid = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID))
+                    ORDER BY logTime DESC LIMIT 1) tbl4 ON tbl4.projectid = d.projectid
                 LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
                 LEFT JOIN ( SELECT p.dynamicID, SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) AS currentHours FROM projectBookingData p) tbl3 ON tbl3.dynamicID = d.projectid
                 LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
@@ -436,6 +442,9 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             $x = $row['projectid'];
 
             $rowStyle = '';
+            if ($row['activity'] && $row['activity'] != 'VIEWED') {
+                $rowStyle = 'style="color:#1689e7; font-weight:bold;"';
+            }
             echo '<tr '.$rowStyle.'>';
             echo '<td>';
             if($row['currentHours'] && $row['estimatedHours']) echo generate_progress_bar($row["currentHours"], $row["estimatedHours"]);
@@ -470,7 +479,8 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 echo '<b title="Besitzer">'. $userID_toName[$row['projectowner']].'</b>,<br>';
                 if($row['projectleader']) echo '<u title="Verantwortlicher Mitarbeiter">'.$userID_toName[$row['projectleader']].'</u>,<br>';
             }
-            foreach(explode(' ',$row['conemployees']) as $val){ if(isset($userID_toName[$val])) echo $userID_toName[$val]; };
+            echo implode(',<br>', array_map(function($val){ global $userID_toName; if(isset($userID_toName[$val])) return $userID_toName[$val]; }, explode(' ',$row['conemployees'])));
+            //foreach(explode(' ',$row['conemployees']) as $val){ if(isset($userID_toName[$val])) echo $userID_toName[$val].',<br>'; };
             echo $row['conteams'];
             echo '</td>';
             echo '<td>';
