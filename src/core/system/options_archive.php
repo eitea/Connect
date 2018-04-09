@@ -1,14 +1,12 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php';?>
-<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; 
-
+<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php";
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(isset($_POST['addConfig'])){
-        $server = $_POST['server'];
-        $aKey = $_POST['aKey'];
-        $sKey = $_POST['sKey'];
-        $name = test_input($_POST['name']);
-        require dirname(dirname(__DIR__)) . "/misc/useS3Config.php";
-        if (isset($_POST['server'])) {
+        if (!empty($_POST['server'])) {
+            $server = $_POST['server'];
+            $aKey = $_POST['aKey'];
+            $sKey = $_POST['sKey'];
+            $name = test_input($_POST['name']);
             try{
                 $credentials = array('key' => $aKey, 'secret' => $sKey);
                 $testconfig = array(
@@ -20,14 +18,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 );
                 $test = new Aws\S3\S3Client($testconfig);
                 $test->listBuckets();
-                if(!addS3Config($server,$aKey,$sKey,$name)){
-                    throw new S3Exception("Ups! Something went wrong");
-                }
+
+                $conn->query("INSERT INTO archiveconfig (endpoint,awskey,secret,isActive,name) VALUES ('$server','$key','$secret','$active','$name')");
             } catch(Exception $e) {
                 echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
             }
         }
-    }elseif(isset($_POST['deleteConfig'])){
+    } elseif(isset($_POST['deleteConfig'])){
         $id = $_POST['deleteConfig'];
         $isActive = $conn->query("SELECT isActive FROM archiveconfig WHERE id = $id");
         if($isActive && $isActive->fetch_assoc()['isActive']==="TRUE"){
@@ -39,38 +36,40 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         }
     }
 }
-
-$configs = $conn->query("SELECT * FROM archiveconfig");?>
+?>
 <div class="page-header"><h3 id="title" ><?php echo $lang['OPTIONS'] ?>
     <div class="page-header-button-group">
         <button class="btn btn-default" type="button" id="newConfig" data-target="#new-config" data-toggle="modal"><i class="fa fa-plus"></i></button>
     </div>
-  </h3>
+    </h3>
 </div>
-    <table class="table" id="configTable">
-        <thead>
-            <tr>
-                <td><label>Name</label></td>
-                <td><label>Addresse</label></td>
-                <td><label>Key</label></td>
-                <td><label>Active</label></td>
-                <td></td>
-            </tr>
-        </thead>
-        <tbody id="tableContent"><?php 
-                while($row = $configs->fetch_assoc()){
-                    $checked = '';
-                    if($row['isActive']=="TRUE") $checked = 'checked';
-                    echo '<tr>';
-                    echo '<td>'.$row['name'].'</td>';
-                    echo '<td>'.$row['endpoint'].'</td>';
-                    echo '<td>'.$row['awskey'].'</td>';
-                    echo '<td><input type="radio" name="active" value="'.$row['id'].'" '.$checked.'></input></td>';
-                    echo '<td><form method="POST" onSubmit="return confirmDelete()"><button name="deleteConfig" class="btn btn-default" type="submit" value="'.$row['id'].'" ><i class="fa fa-trash" /></button></form></td>';
-                    echo '</tr>';
-                }
-            ?></tbody>
-    </table>
+<table class="table" id="configTable">
+    <thead>
+        <tr>
+            <td><label>Name</label></td>
+            <td><label>Addresse</label></td>
+            <td><label>Key</label></td>
+            <td><label>Active</label></td>
+            <td></td>
+        </tr>
+    </thead>
+    <tbody id="tableContent">
+        <?php
+        $configs = $conn->query("SELECT id, name, endpoint, awskey FROM archiveconfig");
+        while($row = $configs->fetch_assoc()){
+            $checked = '';
+            if($row['isActive']=="TRUE") $checked = 'checked';
+            echo '<tr>';
+            echo '<td>'.$row['name'].'</td>';
+            echo '<td>'.$row['endpoint'].'</td>';
+            echo '<td>'.$row['awskey'].'</td>';
+            echo '<td><input type="radio" name="active" value="'.$row['id'].'" '.$checked.'></input></td>';
+            echo '<td><form method="POST" id="confirmDelete"><button name="deleteConfig" class="btn btn-default" type="submit" value="'.$row['id'].'" ><i class="fa fa-trash" /></button></form></td>';
+            echo '</tr>';
+        }
+        ?>
+    </tbody>
+</table>
 
 <form method="POST">
     <div class="modal fade" id="new-config">
@@ -91,16 +90,9 @@ $configs = $conn->query("SELECT * FROM archiveconfig");?>
 </form>
 
 <script>
-    $("[name='active']").on("click",function(event){
-        $.post("ajaxQuery/AJAX_changeActiveS3.php",{
-            id: event.target.value
-        },function(data){
-            console.log(data);
-        });
-    });
-    
-    function confirmDelete(){
-        return confirm("Ary you sure you want to delete this Configuration ?");
-    }
+//havent you people ever heard of anonymous functions?
+$('#confirmDelete').on('submit', function(){
+    return confirm("Ary you sure you want to delete this Configuration ?");
+});
 </script>
 <?php include dirname(dirname(__DIR__)) . '/footer.php'; ?>

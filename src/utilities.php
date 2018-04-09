@@ -49,13 +49,13 @@ function isHoliday($ts) {
     }
     return false;
 }
-//name should be clean_input or sanitize_input
+//name should be clean_input or sanitize_input..
 function test_input($data, $strong = false) {
     //REGEXString
     if($strong){
-        $data = preg_replace("/[^A-Za-z0-9]/", '', $data);
+        $data = preg_replace("/[^A-Za-z0-9]/", ' ', $data);
     } else {
-        $data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€§#$%()+*öäüÖÄÜß_ ]~", "", $data);
+        $data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€§#$%()+*öäüÖÄÜß_ ]~", ' ', $data);
         //$regex_names = "/([^-_@A-Za-z0-9ąa̧ ɓçđɗɖęȩə̧ɛ̧ƒɠħɦįi̧ ɨɨ̧ƙłm̧ ɲǫo̧ øơɔ̧ɍşţŧųu̧ ưʉy̨ƴæɑðǝəɛɣıĳɩŋœɔʊĸßʃþʋƿȝʒʔáàȧâäǟǎăāãåǽǣćċĉčďḍḑḓéèėêëěĕēẽe̊ ẹġĝǧğg̃ ģĥḥíìiîïǐĭīĩịĵķǩĺļľŀḽm̂ m̄ ŉńn̂ ṅn̈ ňn̄ ñņṋóòôȯȱöȫǒŏōõȭőọǿơp̄ ŕřŗśŝṡšşṣťțṭṱúùûüǔŭūũűůụẃẁŵẅýỳŷÿȳỹźżžẓǯÁÀȦÂÄǞǍĂĀÃÅǼǢĆĊĈČĎḌḐḒÉÈĖÊËĚĔĒẼE̊ ẸĠĜǦĞG̃ ĢĤḤÍÌIÎÏǏĬĪĨỊĴĶǨĹĻĽĿḼM̂ M̄ ʼNŃN̂ ṄN̈ ŇN̄ ÑŅṊÓÒÔȮȰÖȪǑŎŌÕȬŐỌǾƠP̄ ŔŘŖŚŜṠŠŞṢŤȚṬṰÚÙÛÜǓŬŪŨŰŮỤẂẀŴẄÝỲŶŸȲỸŹŻŽẒǮĄA̧ ƁÇĐƊƉĘȨƏ̧Ɛ̧ƑƓĦꞪĮI̧ ƗƗ̧ƘŁM̧ ƝǪO̧ ØƠƆ̧ɌŞŢŦŲU̧ ƯɄY̨ƳÆⱭÐƎƏƐƔIĲƖŊŒƆƱĸƩÞƲȜƷʔ]+)/";
         //$data = preg_replace_callback($regex_names, function($m){ return convToUTF8($m[1]); }, $data);
     }
@@ -110,9 +110,8 @@ function simple_encryption($message, $key) {
 
 function simple_decryption($message, $key) {
     $message = base64_decode($message, true);
-    if ($message === false) {
-        throw new Exception('Encryption failure');
-    }
+    if ($message === false) return $message;
+
     $nonceSize = openssl_cipher_iv_length('aes-256-ctr');
     $nonce = mb_substr($message, 0, $nonceSize, '8bit');
     $ciphertext = mb_substr($message, $nonceSize, null, '8bit');
