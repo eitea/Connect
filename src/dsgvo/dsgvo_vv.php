@@ -12,6 +12,7 @@ if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventual
 <div class="page-header-button-group">
     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-app">+</button>
     <button type="button" class="btn btn-default" id="listTemplates"><?php echo $lang['MANAGE_TEMPLATES'] ?></button>
+    <a href="data-matrix?n=<?php echo $_GET['n']; //5acb74765fddc ?>" class="btn btn-default" ><?php echo $lang['DATA_MATRIX'] ?></a>
 </div>
 </h3></div>
 </div>

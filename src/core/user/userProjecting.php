@@ -211,7 +211,7 @@ echo mysqli_error($conn);
   <h3><?php echo $lang['BOOK_PROJECTS'] .'<small> &nbsp ' . $date .'</small>'; ?></h3>
 </div>
 
-<form method="post">
+<form method="POST" id="bookingForm">
 <?php if(!$request_addendum): ?>
   <div style='text-align:right;'>
     <?php if($showUndoButton): ?>
@@ -276,18 +276,18 @@ echo mysqli_error($conn);
                     if($row['exp_price'] > 0) $expensesinfo .= $lang['PRICE_STK'].': '.$row['exp_price'].'<br>';
                     if($row['exp_info']) $expensesinfo .= $lang['DESCRIPTION'].': '.$row['exp_info'].'<br>';
 
-                    echo "<tr>";
+                    echo '<tr>';
                     echo "<td><i class='$icon'></i></td>";
-                    echo "<td>". substr(carryOverAdder_Hours($row['start'],$timeToUTC), 11, 5) ."</td>";
-                    echo "<td>". substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 5) ."</td>";
-                    echo "<td>". $row['name'] ."</td>";
-                    echo "<td>". $row['projectName'] ."</td>";
-                    echo "<td style='text-align:left'>". $row['infoText'] ."</td>";
-                    echo "<td style='text-align:left'>";
-                    if(!empty($interninfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a>"; }
-                    if(!empty($optionalinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='Optional' data-content='$optionalinfo' data-placement='left'><i class='fa fa-question-circle'></i></a>"; }
-                    if(!empty($expensesinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='hover' title='".$lang['EXPENSES']."' data-content='$expensesinfo' data-placement='left'><i class='fa fa-plus'></i></a>"; }             echo '</td>';
-                    echo "</tr>";
+                    echo '<td>'. substr(carryOverAdder_Hours($row['start'],$timeToUTC), 11, 5) ."</td>";
+                    echo '<td>'. substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 5) ."</td>";
+                    echo '<td>'. $row['name'] .'</td>';
+                    echo '<td>'. $row['projectName'] .'</td>';
+                    echo '<td style="text-align:left">'. $row['infoText'] .'</td>';
+                    echo '<td style="text-align:left">';
+                    if(!empty($interninfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='click hover' title='Intern' data-content='$interninfo' data-placement='left'><i class='fa fa-question-circle-o'></i></a>"; }
+                    if(!empty($optionalinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='click hover' title='Optional' data-content='$optionalinfo' data-placement='left'><i class='fa fa-question-circle'></i></a>"; }
+                    if(!empty($expensesinfo)){ echo " <a type='button' class='btn btn-default' data-toggle='popover' data-trigger='click hover' title='".$lang['EXPENSES']."' data-content='$expensesinfo' data-placement='left'><i class='fa fa-plus'></i></a>"; }             echo '</td>';
+                    echo '</tr>';
 
                     $start = substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 8);
                 }
@@ -467,7 +467,9 @@ function showMyDiv(o, toShow){
   }
 }
 
-function fill_keepFields(){}
+$("#bookingForm").rememberState();
+
+function fill_keepFields(){};
 </script>
 
 <?php
