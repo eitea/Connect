@@ -261,7 +261,7 @@ $projectRow = $result->fetch_assoc();
             while($result && $row = $result->fetch_assoc()){
                 //text, file, s3File, s3Text, folder
                 if($row['type'] == 'folder'){
-                    return drawTree($row['parent_directory']);
+                    $html .= drawTree($row['parent_directory']);
                 } elseif($row['type'] == 'text'){
                   $html .= '<tr></tr>';
                 }

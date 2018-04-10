@@ -173,31 +173,31 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         //decrypt modules user has access to
         while($result && ($row = $result->fetch_assoc())){
             if(array_key_exists($row['module'], $encrypted_modules)){
-                    $cipher_private_module = base64_decode($row['privateKey']);
-                    $result = $conn->query("SELECT publicPGPKey, symmetricKey FROM security_modules WHERE outDated = 'FALSE'");
-                    if($result && ($row = $result->fetch_assoc())){
-                        $public_module = base64_decode($row['publicPGPKey']);
-                        $cipher_symmetric = base64_decode($row['symmetricKey']);
-                        //decrypt access
-                        $nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
-                        $cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
-                        $private_module = sodium_crypto_box_open($cipher_private_module, $nonce, $privateKey.$public_module);
-                        //decrypt module
-                        $nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
-                        $cipher_symmetric = mb_substr($cipher_symmetric, 24, null, '8bit');
-                        $symmetric = sodium_crypto_box_open($cipher_symmetric, $nonce, $private_module.$public_module);
+                $cipher_private_module = base64_decode($row['privateKey']);
+                $result = $conn->query("SELECT publicPGPKey, symmetricKey FROM security_modules WHERE outDated = 'FALSE'");
+                if($result && ($row = $result->fetch_assoc())){
+                    $public_module = base64_decode($row['publicPGPKey']);
+                    $cipher_symmetric = base64_decode($row['symmetricKey']);
+                    //decrypt access
+                    $nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
+                    $cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
+                    $private_module = sodium_crypto_box_open($cipher_private_module, $nonce, $privateKey.$public_module);
+                    //decrypt module
+                    $nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
+                    $cipher_symmetric = mb_substr($cipher_symmetric, 24, null, '8bit');
+                    $symmetric = sodium_crypto_box_open($cipher_symmetric, $nonce, $private_module.$public_module);
 
-                        if($symmetric){
-                            secure_module($row['module'], $symmetric);
+                    if($symmetric){
+                        secure_module($row['module'], $symmetric);
 
-                            $conn->query("UPDATE security_company SET outDated = 'TRUE' WHERE module = ".$row['module']);
-                            $conn->query("UPDATE security_modules SET outDated = 'TRUE' WHERE module = ".$row['module']);
-                            $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = ".$row['module']);
-                        }
+                        $conn->query("UPDATE security_company SET outDated = 'TRUE' WHERE module = ".$row['module']);
+                        $conn->query("UPDATE security_modules SET outDated = 'TRUE' WHERE module = ".$row['module']);
+                        $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = ".$row['module']);
                     }
                 }
             }
         }
+
 
         if(count($encrypted_modules) == 0) $conn->query("UPDATE configurationData SET activeEncryption = 'FALSE'");
         if(count($encrypted_modules) < $result->num_rows){
