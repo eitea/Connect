@@ -12,7 +12,7 @@ function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$refe
     $times = explode(' ', $estimate);
     foreach($times as $t){
         if(is_numeric($t) || substr($t, -1) == 'h'){
-            $allHours += intval($t);
+            $allHours += floatval($t);
         } elseif(substr($t, -1) == 'M'){
             $allHours += intval($t) * 730.5;
         } elseif(substr($t, -1) == 'w'){
