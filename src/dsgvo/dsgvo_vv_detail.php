@@ -22,7 +22,7 @@ $company = $vv_row['companyID'];
 $matrix_result = $conn->query("SELECT id FROM dsgvo_vv_data_matrix WHERE companyID = $company");
 if($matrix_result){
     if($matrix_result->num_rows === 0){
-        showError("Diese Firma hat keine Matrix in den Einstellungen. <a href='../system/data-matrix'>Hier klicken</a>, um eine zu erstellen.");
+        showError("Diese Firma hat keine Matrix in den Einstellungen. <a href='data-matrix'>Hier klicken</a>, um eine zu erstellen.");
     }
     $matrixID = $matrix_result->fetch_assoc()["id"];
 }else{
@@ -39,7 +39,7 @@ function insertVVLog($short,$long){
     global $stmt_insert_vv_log_scope;
     global $userID;
     global $privateKey;
-    $stmt_insert_vv_log_short_description = secure_data('DSGVO', $short, 'encrypt', $userID, $privateKey, $encryptionError);
+    $stmt_insert_vv_log_short_description = secure_data('DSGVO', $short, 'encrypt', $userID, $privateKey);
     $stmt_insert_vv_log_long_description = secure_data('DSGVO', $long, 'encrypt', $userID, $privateKey, $encryptionError);
     $stmt_insert_vv_log_scope = secure_data('DSGVO', "VV", 'encrypt', $userID, $privateKey, $encryptionError);
     if($encryptionError){
@@ -54,10 +54,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $stmt_update_setting->bind_param("si", $setting_encrypt, $valID);
     $stmt_insert_setting = $conn->prepare("INSERT INTO dsgvo_vv_settings(vv_id, setting_id, setting, category) VALUES($vvID, ?, ?, ?)");
     $stmt_insert_setting->bind_param("iss", $setID, $setting_encrypt, $cat);
-    
+
     $stmt_insert_setting_client = $conn->prepare("INSERT INTO dsgvo_vv_settings(vv_id, setting_id, setting, category, clientID) VALUES($vvID, ?, ?, ?, ?)");
     $stmt_insert_setting_client->bind_param("issi", $setID, $setting_encrypt, $cat, $clientID);
-    
+
     $stmt_update_setting_matrix = $conn->prepare("UPDATE dsgvo_vv_settings SET setting = ? WHERE id = ?");
     $stmt_update_setting_matrix->bind_param("si", $setting_encrypt, $valID);
     $stmt_insert_setting_matrix = $conn->prepare("INSERT INTO dsgvo_vv_settings(vv_id, matrix_setting_id, setting, category) VALUES($vvID, ?, ?, ?)");
@@ -134,12 +134,12 @@ if(isset($settings['DESCRIPTION'])):
             ?>
             <div class="panel-heading">Firmendaten</div>
             <div class="panel-body">
-                <div class="col-sm-6 bold">Name der Firma</div><div class="col-sm-6 grey"><?php echo $row['name']; ?></div>
-                <div class="col-sm-6 bold">Straße</div><div class="col-sm-6 grey"><?php echo $row['address']; ?></div>
-                <div class="col-sm-6 bold">Ort</div><div class="col-sm-6 grey"><?php echo $row['companyCity']; ?></div>
-                <div class="col-sm-6 bold">PLZ</div><div class="col-sm-6 grey"><?php echo $row['companyPostal']; ?></div>
-                <div class="col-sm-6 bold">Telefon</div><div class="col-sm-6 grey"><?php echo $row['phone']; ?></div>
-                <div class="col-sm-6 bold">E-Mail</div><div class="col-sm-6 grey"><?php echo $row['mail']; ?></div>
+                <div class="col-sm-6 bold">Name der Firma</div><div class="col-sm-6 grey"><?php echo $row['name']; ?><br></div>
+                <div class="col-sm-6 bold">Straße</div><div class="col-sm-6 grey"><?php echo $row['address']; ?><br></div>
+                <div class="col-sm-6 bold">Ort</div><div class="col-sm-6 grey"><?php echo $row['companyCity']; ?><br></div>
+                <div class="col-sm-6 bold">PLZ</div><div class="col-sm-6 grey"><?php echo $row['companyPostal']; ?><br></div>
+                <div class="col-sm-6 bold">Telefon</div><div class="col-sm-6 grey"><?php echo $row['phone']; ?><br></div>
+                <div class="col-sm-6 bold">E-Mail</div><div class="col-sm-6 grey"><?php echo $row['mail']; ?><br></div>
             </div>
             <?php else: ?>
             <div class="panel-heading">Kurze Beschreibung der Applikation, bzw. den Zweck dieser Applikation <?php echo mc_status(); ?></div>
@@ -273,9 +273,9 @@ if(isset($settings['EXTRA_DOC'])){
             $str_heads = $space = $space_key = '';
             $heading = getSettings('APP_HEAD_%', true);
             foreach($heading as $key => $val){
-                if(!empty($_POST['delete_cat']) && $val['valID'][0] == $_POST['delete_cat']){       
-                    $id = $val['setting_id'][0];         
-                    $conn->query("DELETE FROM dsgvo_vv_settings WHERE vv_id = $vvID AND setting_id = $id"); 
+                if(!empty($_POST['delete_cat']) && $val['valID'][0] == $_POST['delete_cat']){
+                    $id = $val['setting_id'][0];
+                    $conn->query("DELETE FROM dsgvo_vv_settings WHERE vv_id = $vvID AND setting_id = $id");
                     if($conn->error){
                         showError($conn->error);
                     }else{
@@ -313,7 +313,7 @@ if(isset($settings['EXTRA_DOC'])){
                     unset($heading[$key]);
                 }
             }
-            // no other sane choice for the backend to be but here            
+            // no other sane choice for the backend to be but here
             if($space && isset($_POST['add_category']) && !empty($_POST['add_category_name'])){
                 $setID = $space;
                 $setting = test_input($_POST['add_category_name']);
@@ -326,7 +326,7 @@ if(isset($settings['EXTRA_DOC'])){
                     $stmt = $stmt_insert_setting;
                 }
                 $stmt->execute();
-                insertVVLog("INSERT","Add new category '$setting' for Procedure Directory $vvID");                
+                insertVVLog("INSERT","Add new category '$setting' for Procedure Directory $vvID");
                 if($stmt->error){
                     showError($stmt->error);
                 } else {
@@ -358,7 +358,7 @@ if(isset($settings['EXTRA_DOC'])){
                 showWarning("Kein Platz mehr");
             }
             ?>
-           
+
             <?php  if($matrixID){ ?>
             <table class="table table-condensed">
             <thead><tr>
@@ -404,7 +404,7 @@ if(isset($settings['EXTRA_DOC'])){
                         echo '<td>'.$catVal['descr'].'</td>';
                         $checked = $catVal['setting'] ? 'checked' : '';
                         echo '<td><input type="checkbox" '.$checked.' name="'.$catKey.'" value="1" /></td>';
-                        
+
                         foreach($heading as $headKey => $headVal){
                             $j = array_search($catKey, $headVal['category']); //$j = numeric index
                             $checked = ($j && $headVal['setting'][$j]) ? 'checked' : '';
@@ -429,7 +429,7 @@ if(isset($settings['EXTRA_DOC'])){
                                     $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
                                     $checked = '';
                                     $stmt_update_setting->execute();
-                                    insertVVLog("UPDATE","Update Value '$valID' for Procedure Directory $vvID to '$setting'");                                    
+                                    insertVVLog("UPDATE","Update Value '$valID' for Procedure Directory $vvID to '$setting'");
                                     showError($stmt_update_setting->error);
                                 }
                             }
@@ -448,7 +448,7 @@ if(isset($settings['EXTRA_DOC'])){
                 <?php
             }
             ?>
-           
+
         </div>
     </div>
 </div>
@@ -467,9 +467,9 @@ if(isset($settings['EXTRA_DOC'])){
             <div class="col-sm-12">
                 <div class="radio">
                     <label><input type="radio" name="add_category_mittlung" value="heading1" checked />Übermittlung</label>
-                </div> 
+                </div>
                 <div class="radio">
-                    <label><input type="radio" name="add_category_mittlung" value="heading3" />Übermittlung in nicht-EU Ausland</label>    
+                    <label><input type="radio" name="add_category_mittlung" value="heading3" />Übermittlung in nicht-EU Ausland</label>
                 </div>
                 <div class="radio">
                     <label><input type="radio" name="add_category_mittlung" value="heading2" />Verarbeitung</label>
@@ -510,14 +510,14 @@ if(isset($settings['EXTRA_DOC'])){
 <?php endif;?>
 </form>
 <script>
-    $('[data-toggle="tooltip"]').tooltip(); 
+    $('[data-toggle="tooltip"]').tooltip();
 
     function toggleCustomerChooser(visible){
         if(visible){
             $("#mittlung_customer_chooser").fadeIn();
         } else {
             $("select[name='add_category_client']").val("0");
-            $("#mittlung_customer_chooser").fadeOut();      
+            $("#mittlung_customer_chooser").fadeOut();
         }
     }
 
@@ -528,7 +528,7 @@ if(isset($settings['EXTRA_DOC'])){
     $("input[name='add_category_mittlung'][value='heading2']").change(function(event){
         toggleCustomerChooser(false);
     })
-    
+
     $("input[name='add_category_mittlung'][value='heading3']").change(function(event){
         toggleCustomerChooser(true);
     })
