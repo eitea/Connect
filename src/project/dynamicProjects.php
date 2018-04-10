@@ -453,7 +453,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             }
             echo '<tr '.$rowStyle.'>';
             echo '<td>';
-            echo generate_progress_bar($row["currentHours"], $row["estimatedHours"]);
+            if($row['estimatedHours']) echo generate_progress_bar($row["currentHours"], $row["estimatedHours"]);
             echo '<i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].' <div>';
             foreach(explode(',', $row['projecttags']) as $tag){
                 if($tag) echo '<span class="badge">'.$tag.'</span> ';
