@@ -23,7 +23,7 @@ function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$refe
             $allHours += intval($t) / 60;
         }
     }
-    
+
     if($current < $allHours){
         $yellowBar = $current/($allHours+0.0001);
         $greenBar = 1-$yellowBar;
@@ -453,7 +453,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             }
             echo '<tr '.$rowStyle.'>';
             echo '<td>';
-            if($row['currentHours'] && $row['estimatedHours']) echo generate_progress_bar($row["currentHours"], $row["estimatedHours"]);
+            echo generate_progress_bar($row["currentHours"], $row["estimatedHours"]);
             echo '<i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].' <div>';
             foreach(explode(',', $row['projecttags']) as $tag){
                 if($tag) echo '<span class="badge">'.$tag.'</span> ';
