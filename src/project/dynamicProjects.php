@@ -423,7 +423,8 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 LEFT JOIN ( SELECT activity, projectid FROM dynamicprojectslogs WHERE ((activity = 'VIEWED' AND userid = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID))
                     AND id IN ( SELECT MAX(id) FROM dynamicprojectslogs GROUP BY projectid)) tbl4 ON tbl4.projectid = d.projectid
                 LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
-                LEFT JOIN ( SELECT p.dynamicID, SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) AS currentHours FROM projectBookingData p) tbl3 ON tbl3.dynamicID = d.projectid
+                LEFT JOIN ( SELECT p.dynamicID, SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) AS currentHours
+                    FROM projectBookingData p GROUP BY dynamicID) tbl3 ON tbl3.dynamicID = d.projectid
                 WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter
                 ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         } else {
@@ -437,7 +438,8 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 LEFT JOIN ( SELECT activity, projectid FROM dynamicprojectslogs WHERE ((activity = 'VIEWED' AND userid = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID))
                     AND id IN ( SELECT MAX(id) FROM dynamicprojectslogs GROUP BY projectid)) tbl4 ON tbl4.projectid = d.projectid
                 LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
-                LEFT JOIN ( SELECT p.dynamicID, SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) AS currentHours FROM projectBookingData p) tbl3 ON tbl3.dynamicID = d.projectid
+                LEFT JOIN ( SELECT p.dynamicID, SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) AS currentHours
+                FROM projectBookingData p GROUP BY dynamicID) tbl3 ON tbl3.dynamicID = d.projectid
                 LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
                 WHERE d.isTemplate = 'FALSE' AND (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (teamRelationshipData.userID = $userID AND teamRelationshipData.skill >= d.level))
