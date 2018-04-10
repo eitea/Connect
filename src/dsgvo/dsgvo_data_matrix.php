@@ -1,19 +1,19 @@
 <?php
-include dirname(dirname(__DIR__)) . '/header.php';
+include dirname(__DIR__) . '/header.php';
 enableToCore($userID);
-require dirname(dirname(__DIR__)) . "/misc/helpcenter.php";
+require dirname(__DIR__) . "/misc/helpcenter.php";
 
 if (isset($_GET['n'])) {
     $cmpID = intval($_GET['n']);
 } else if (count($available_companies) == 2) {
     $cmpID = $available_companies[1];
-    redirect("../system/data-matrix?n=$cmpID");
+    redirect("data-matrix?n=$cmpID");
 }
 
 if (isset($_POST['company_id'])) {
     $newCmpID = intval($_POST['company_id']);
     if ($cmpID !== $newCmpID) {
-        redirect("../system/data-matrix?n=$newCmpID");
+        redirect("data-matrix?n=$newCmpID");
     }
 }
 
@@ -315,4 +315,4 @@ $j = 1;
 
     </form>
     <!-- /BODY -->
-    <?php include dirname(dirname(__DIR__)) . '/footer.php';?>
+    <?php include dirname(__DIR__) . '/footer.php';?>

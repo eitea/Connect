@@ -764,7 +764,6 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                         </ul>
                     </div>
                 </li>
-                <li><a href="../system/clients"><span><?php echo $lang['CLIENTS']; ?></span></a></li>
                 <li><a <?php if ($this_page == 'teamConfig.php') {echo $setActiveLink;}?> href="../system/teams">Teams</a></li>
                 <li>
                     <a id="coreSettingsToggle" href="#" data-toggle="collapse" data-target="#toggleSettings" data-parent="#sidenav01" class="collapsed">
@@ -784,7 +783,6 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                                 <li><a <?php if ($this_page == 'pullGitRepo.php') {echo $setActiveLink;}?> href="../system/update"><span>Git Update</span></a></li>
                             <?php endif;?>
                             <li><a <?php if ($this_page == 'resticBackup.php') {echo $setActiveLink;}?> href="../system/restic"><span> Restic Backup</span></a></li>
-                            <li><a <?php if ($this_page == 'dsgvo_data_matrix.php') {echo $setActiveLink;}?> href="../system/data-matrix"><span> DSGVO <?php echo $lang['DATA_MATRIX']; ?></span></a></li>
                         </ul>
                     </div>
                 </li>
@@ -795,11 +793,11 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
         <?php
         if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register.php" || $this_page == "deactivatedUsers.php" || $this_page == "checkinLogs.php" || $this_page == "securitySettings.php" ){
           echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-        } elseif($this_page == "options_report.php" || $this_page == "editHolidays.php" || $this_page == "options_advanced.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "options_password.php" || $this_page == 'options_archive.php' || $this_page == 'resticBackup.php' || $this_page == 'dsgvo_data_matrix.php'){
+        } elseif($this_page == "options_report.php" || $this_page == "editHolidays.php" || $this_page == "options_advanced.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "options_password.php" || $this_page == 'options_archive.php' || $this_page == 'resticBackup.php'){
           echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
         } elseif($this_page == "editCompanies.php" || $this_page == "new_Companies.php"){
           echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-        } elseif($this_page == "download_sql.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php" || $this_page == "editCustomer_detail.php") {
+        } elseif($this_page == "download_sql.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php") {
           echo "<script>document.getElementById('adminOption_CORE').click();</script>";
         }
         ?>
@@ -1029,7 +1027,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   $isActivePanel = true;
                   $isActive = ($isActivePanel && $this_page == 'dsgvo_view.php') ? $setActiveLink : "";
                   echo '<li><a '.$isActive.' href="../dsgvo/documents?n='.$available_companies[1].'">'.$lang['DOCUMENTS'].'</a></li>';
-                  $isActive = ($isActivePanel && ($this_page == 'dsgvo_vv.php' || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php")) ? $setActiveLink : "";
+                  $isActive = ($isActivePanel && ($this_page == 'dsgvo_vv.php' || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php" || $this_page == 'dsgvo_data_matrix.php')) ? $setActiveLink : "";
                   echo '<li><a '.$isActive.' href="../dsgvo/vv?n='.$available_companies[1].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
                   $isActive = ($isActivePanel && $this_page == 'dsgvo_mail.php') ? $setActiveLink : "";
                   echo '<li><a '.$isActive.' href="../dsgvo/templates?n='.$available_companies[1].'">E-Mail Templates</a></li>';
@@ -1047,7 +1045,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     echo '<ul class="nav nav-list">';
                     $isActive = ($isActivePanel && $this_page == 'dsgvo_view.php') ? $setActiveLink : "";
                     echo '<li><a '.$isActive.' href="../dsgvo/documents?n='.$row['id'].'">'.$lang['DOCUMENTS'].'</a></li>';
-                    $isActive = ($isActivePanel && ($this_page == 'dsgvo_vv.php' || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php")) ? $setActiveLink : "";
+                    $isActive = ($isActivePanel && ($this_page == 'dsgvo_vv.php' || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php" || $this_page == 'dsgvo_data_matrix.php')) ? $setActiveLink : "";
                     echo '<li><a '.$isActive.' href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
                     $isActive = ($isActivePanel && $this_page == 'dsgvo_mail.php') ? $setActiveLink : "";
                     echo '<li><a '.$isActive.' href="../dsgvo/templates?n='.$row['id'].'">E-Mail Templates</a></li>';
@@ -1064,7 +1062,9 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           </div>
         </div>
         <?php
-        if ($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php" || $this_page == "dsgvo_vv.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php" || $this_page == "dsgvo_training.php" || $this_page == "dsgvo_log.php") {
+        if ($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php" || $this_page == "dsgvo_vv.php"
+            || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php"
+            || $this_page == "dsgvo_training.php" || $this_page == "dsgvo_log.php" || $this_page == 'dsgvo_data_matrix.php') {
             echo "<script>$('#adminOption_DSGVO').click();";
             if (isset($_GET['n'])) {
                 echo "$('#tdsgvo-" . $_GET['n'] . "').toggle();";
