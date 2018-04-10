@@ -8,6 +8,10 @@
 #statisticChart, #analysisChart{
   margin:50px 0px 50px 0px;
 }
+
+.fc-today{
+    background-color:#ffe59f !important; /*5acaf8028dcb4*/
+}
 </style>
 
 <div class="container">
