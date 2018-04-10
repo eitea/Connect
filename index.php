@@ -2,7 +2,7 @@
 $routes = array(
   'login/auth' => 'core/login/login.php',                           'login/register' => 'core/login/selfregistration.php',       'login/update' => 'core/login/doUpdate.php',
   'login/access' => 'core/login/login_docker.php',
-  
+
   'php/info' => 'core/dev/phpinfo.php',                             'php/ext' => 'core/dev/phpext.php',
 
   'user/home' => 'core/user/home.php',                              'user/time' => 'core/user/timeCalcTable.php',                'user/book' => 'core/user/userProjecting.php',
@@ -16,11 +16,9 @@ $routes = array(
   'system/teams' => 'core/system/teamConfig.php',                   'system/holidays' => 'core/system/editHolidays.php',         'system/advanced' => 'core/system/options_advanced.php',
   'system/password' => 'core/system/options_password.php',          'system/email' => 'core/system/options_report.php',          'system/tasks' => 'core/system/taskScheduler.php',
   'system/backup' => 'core/system/system_backup.php',               'system/restore' => 'core/system/system_restore.php',        'system/clients' => 'core/system/editCustomers.php',
-  'system/clientDetail' => 'core/system/editCustomer_detail.php',
-
+  'system/clientDetail' => 'core/system/editCustomer_detail.php',   'system/archive' => 'core/system/options_archive.php',       'system/security' => 'core/system/securitySettings.php',
   'system/downloadSql' => 'core/system/backup_download.php',        'system/cryptlog'=> 'core/system/viewCryptLog.php',          'system/restic' => 'core/system/resticBackup.php',
-  'system/checkinLogs' => 'core/system/checkinLogs.php',            'system/archive' => 'core/system/options_archive.php',       'system/security' => 'core/system/securitySettings.php',
-  'system/data-matrix' => 'core/system/dsgvo_data_matrix.php',
+  'system/checkinLogs' => 'core/system/checkinLogs.php',
 
   'time/view' => 'time/time_projects.php',                          'time/corrections' => 'time/time_adjusts.php',               'time/travels' => 'time/time_travel.php',
   'time/vacations' => 'time/time_vacation.php',                     'time/check' => 'time/adminTodos.php',                       'time/requests' => 'time/time_requests.php',
@@ -46,6 +44,7 @@ $routes = array(
   'dsgvo/documents' => 'dsgvo/dsgvo_view.php',                      'dsgvo/access' => 'dsgvo/dsgvo_access.php',                  'dsgvo/templates' => 'dsgvo/dsgvo_mail.php',
   'dsgvo/edit' => 'dsgvo/dsgvo_edit.php',                           'dsgvo/vv' => 'dsgvo/dsgvo_vv.php',                          'dsgvo/log' => 'dsgvo/dsgvo_log.php',
   'dsgvo/vDetail' => 'dsgvo/dsgvo_vv_detail.php',                   'dsgvo/editTemplate' => 'dsgvo/dsgvo_vv_template_edit.php',  'dsgvo/training' => 'dsgvo/dsgvo_training.php',
+  'dsgvo/data-matrix' => 'dsgvo/dsgvo_data_matrix.php',
 
   'archive/share' => 'archive/archive_share.php',                   'archive/files' => 'archive/archive_files.php',              'archive/download' => 'archive/archive_download.php',
   'archive/delete' => 'archive/archive_delete.php',                 'archive/upload' => 'archive/archive_upload.php',            'archive/private'  => 'archive/private_view.php',
