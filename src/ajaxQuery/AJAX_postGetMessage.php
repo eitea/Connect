@@ -72,7 +72,7 @@ if (!$result || $result->num_rows == 0) {
                         <?php endif; ?>
                         <!-- endif -->
 
-                        <div style='word-break: break-all; word-wrap: break-word;'>
+                        <div style='word-break: normal; word-wrap: normal;'>
                             <?php 
                                 // handle line breaks
                                 $parts = explode("\n", $message);

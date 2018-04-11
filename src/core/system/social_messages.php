@@ -136,7 +136,7 @@
 
                     if($userID == $receiver) $receiver = $sender; //sending process must be reversed
                     echo '<div style="padding: 5px">';
-                    echo '<div class="subject'.$i.' input-group" style="background-color: white; border: 1px solid gainsboro;">';
+                    echo '<div class="subject'.$i.' input-group" style="word-break: normal; word-wrap: normal; background-color: white; border: 1px solid gainsboro;">';
                     echo '<p style="padding: 10px;" onclick="showChat('.$receiver.', \''.$subject.'\')">' . $subject . '</p>';
                     echo '<span class="input-group-btn"><button style="background-color: white; " class="icon'.$i.' btn" onclick="deleteSubject('.$receiver.', \''.$subject.'\')"><i class="fa fa-trash" aria-hidden="true"></i></button></span>';
                     echo '</div>';
