@@ -401,8 +401,8 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
         if($filterings['priority'] > 0){ $query_filter .= " AND d.projectpriority = ".$filterings['priority']; }
         foreach($filterings['employees'] as $val){
             $arr = explode(';', $val);
-            if($arr[0] == 'user') $filter_emps .= " OR conemployees LIKE '%".$arr[1]."%'";
-            if($arr[0] == 'team') $filter_team .= " OR conteamsids LIKE '%".$arr[1]."%'";
+            if($arr[0] == 'user') $filter_emps .= " OR conemployees LIKE '%{$arr[1]}%'";
+            if($arr[0] == 'team') $filter_team .= " OR conteamsids LIKE '%{$arr[1]}%'";
         }
 
         if($filter_emps || $filter_team) $query_filter .= " AND ($filter_emps OR $filter_team)";
@@ -443,6 +443,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
         }
 
         /*
+        //TODO: will be optimized later, below LEFT (!) join will make query return only 1 company ID, reason unknown
         LEFT JOIN ( SELECT activity, projectid FROM dynamicprojectslogs WHERE ((activity = 'VIEWED' AND userID = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID))
             AND id IN ( SELECT MAX(id) FROM dynamicprojectslogs GROUP BY projectid)) tbl4 ON tbl4.projectid = d.projectid
         */
@@ -454,7 +455,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             echo '<tr>';
             echo '<td>';
             //echo $row['activity'];
-            if($row['estimatedHours'] || $row['currentHours']) echo generate_progress_bar($row['currentHours'], $row['estimatedHours']);
+            //if($row['estimatedHours'] || $row['currentHours']) echo generate_progress_bar($row['currentHours'], $row['estimatedHours']);
             echo '<i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].' <div>';
             foreach(explode(',', $row['projecttags']) as $tag){
                 if($tag) echo '<span class="badge">'.$tag.'</span> ';

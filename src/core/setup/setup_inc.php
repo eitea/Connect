@@ -123,7 +123,7 @@ function create_tables($conn) {
         field_3 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         creator INT(6),
         symmetricKey VARCHAR(150),
-        publicPGPKey VARCHAR(150),
+        publicKey VARCHAR(150),
         FOREIGN KEY (clientID) REFERENCES clientData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
