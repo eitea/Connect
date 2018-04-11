@@ -17,6 +17,16 @@ if (isset($_GET["partner"], $_GET["subject"]) && !empty($_SESSION["userid"])) {
     $result = $conn->query($sql);
     if ($result && $result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
+            $partner_firstname = $row['firstname'];
+            $partner_lastname = $row['lastname'];
+        }
+    }
+
+    // get the name of the current logged in user
+    $sql = "SELECT firstname, lastname FROM UserData WHERE id = '{$userID}' GROUP BY id";
+    $result = $conn->query($sql);
+    if ($result && $result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
             $firstname = $row['firstname'];
             $lastname = $row['lastname'];
         }
@@ -45,10 +55,18 @@ if (!$result || $result->num_rows == 0) {
         $date = date('Y-m-d', strtotime($row["sent"]));
         $messageDate = date('G:i', strtotime($row["sent"]));
 
+        //5ac62d49ea1c4
+        //current user 
         if(!empty($firstname) && !empty($lastname)) 
             $name = $firstname . " " . $lastname;
-        elseif ((empty($firstname) && !empty($lastname)) || (empty($firstname) && !empty($lastname)))   // the user has no firstname or no lastname
+        elseif ((empty($firstname) && !empty($lastname)) || (empty($firstname) && !empty($lastname)))   // the user has no firstname or no lastname (admin)
             $name = $firstname . " " . $lastname;
+
+        //partner
+        if(!empty($partner_firstname) && !empty($partner_lastname)) 
+            $partner_name = $partner_firstname . " " . $partner_lastname;
+        elseif ((empty($partner_firstname) && !empty($partner_lastname)) || (empty($partner_firstname) && !empty($partner_lastname)))   // the user has no firstname or no lastname (admin)
+            $partner_name = $partner_firstname . " " . $partner_lastname;
 
         if($lastdate != $date):
         ?>
@@ -66,9 +84,10 @@ if (!$result || $result->num_rows == 0) {
                     <div class="well <?php echo $pull; ?>" style="position:relative; background-color: <?php echo $color ?>">
                         <!-- if -->
                         <?php if($showseen): ?>
-                            <i class="fa <?php echo $seen; ?>" style="display:block; top:0px; right:-3px; position:absolute; color:#9d9d9d;"></i>
+                            <!-- 5ac62d49ea1c4 -->
+                            <span class="label label-default" style="display:block; top:-17px; left:0px; position:absolute; background-color: white; color: black;"><?php echo $name . " - " . $messageDate; ?></span><i class="fa <?php echo $seen; ?>" style="display:block; top:0px; right:-3px; position:absolute; color:#9d9d9d;"></i>
                         <?php elseif(!$showseen): ?>
-                            <span class="label label-default" style="display:block; top:-17px; left:0px; position:absolute; background-color: white; color: black;"><?php echo $name . " - " . $messageDate; ?></span>
+                            <span class="label label-default" style="display:block; top:-17px; left:0px; position:absolute; background-color: white; color: black;"><?php echo $partner_name . " - " . $messageDate; ?></span>
                         <?php endif; ?>
                         <!-- endif -->
 

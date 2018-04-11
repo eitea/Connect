@@ -100,7 +100,7 @@
                         <br>
 
                         <label for="message"> <?php echo $lang['MESSAGE'] ?></label>
-                        <textarea required name="message" class="form-control" rows="6" style="resize: none"></textarea>
+                        <textarea required id="post_message" name="message" class="form-control" rows="6" wrap="hard" style="resize: none"></textarea>
                     </div>
 
                     <!-- modal footer -->
@@ -200,9 +200,6 @@
                            
                     //submit
                     $("#chatinput").submit(function (e) {
-                        //parse the line breaks
-                        $("#message").html($("#message").text().replace(/\n\r?/g, '<br>'));
-
                         //prevent enter
                         e.preventDefault()
 
@@ -326,6 +323,5 @@ function deleteSubject(partner, subject) {
     })
 }
 </script>
-
 
 <?php require dirname(dirname(__DIR__)) . '/footer.php'; ?>
