@@ -140,16 +140,12 @@
                         $sender = $help;    // 5ac62d49ea1c4
                     }
 
-
                     // 5ac62d49ea1c4
                     $sql = "SELECT firstname, lastname FROM UserData WHERE id = '{$receiver}' GROUP BY id";
-                    $r = $conn->query($sql);
-                    if ($r && $r->num_rows > 0) {
-                        while ($row2 = $r->fetch_assoc()) {
-                            $firstname = $row2['firstname'];
-                            $lastname = $row2['lastname'];
-                        }
-                    }
+                    $result2 = $conn->query($sql);
+                    $row2 = $result2->fetch_assoc();
+                    $firstname = $row2['firstname'];
+                    $lastname = $row2['lastname'];
 
                     if(!empty($firstname) && !empty($lastname)) 
                         $name = $firstname . " " . $lastname;

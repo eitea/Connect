@@ -15,22 +15,16 @@ if (isset($_GET["partner"], $_GET["subject"]) && !empty($_SESSION["userid"])) {
     // get the name of the partner
     $sql = "SELECT firstname, lastname FROM UserData WHERE id = '{$partner}' GROUP BY id";
     $result = $conn->query($sql);
-    if ($result && $result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $partner_firstname = $row['firstname'];
-            $partner_lastname = $row['lastname'];
-        }
-    }
+    $row = $result->fetch_assoc();
+    $partner_firstname = $row['firstname'];
+    $partner_lastname = $row['lastname'];
 
     // get the name of the current logged in user
     $sql = "SELECT firstname, lastname FROM UserData WHERE id = '{$userID}' GROUP BY id";
     $result = $conn->query($sql);
-    if ($result && $result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $firstname = $row['firstname'];
-            $lastname = $row['lastname'];
-        }
-    }
+    $row = $result->fetch_assoc();
+    $firstname = $row['firstname'];
+    $lastname = $row['lastname'];
 
     // get the messages
     $sql = "SELECT * FROM (SELECT * FROM messages WHERE (( userID = $userID AND partnerID = $partner ) OR ( userID = $partner AND partnerID = $userID )) AND subject = '$subject' ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC";
@@ -45,7 +39,6 @@ if (!$result || $result->num_rows == 0) {
 } else {
     // process the result
     while ($row = $result->fetch_assoc()) {
-
         $message = $row["message"];
         $pull = $row["userID"] == $userID ? "pull-right":"pull-left";       // left or right side?
         $color = $row["userID"] == $userID ? "#c7f4a4" : "#whitesmoke";     //dcf8c6
