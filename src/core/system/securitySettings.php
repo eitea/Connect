@@ -1,4 +1,4 @@
-<?php require dirname(dirname(__DIR__)) . '/header.php'; ?>
+<?php require dirname(dirname(__DIR__)) . '/header.php'; enableToCore($userID); ?>
 <?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php
 $activeTab = 0;
@@ -13,10 +13,10 @@ $config_row = $result->fetch_assoc();
 $encrypted_modules = array();
 $result = $conn->query("SELECT DISTINCT module, outDated FROM security_modules WHERE outDated = 'FALSE'");
 while($row = $result->fetch_assoc()){
-    $encrypted_modules[$row['module']] = $row['outDated'];
+    $encrypted_modules[$row['module']] = $row['outDated']; //save module as keys so array_key_exists() or isset() can be used (performance)
 }
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    function encrypt_module($module, $symmetric){
+    function secure_module($module, $symmetric, $decrypt = false){
         global $conn;
         if($module == 'DSGVO'){
             $stmt = $conn->prepare("UPDATE documents SET txt = ?, name = ? WHERE id = ?"); echo $stmt->error;
@@ -24,8 +24,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $result = $conn->query("SELECT id, txt, name FROM documents"); echo $conn->error;
             while($result && ($row = $result->fetch_assoc())){
                 $id = $row['id'];
-                $text = simple_encryption($row['txt'], $symmetric);
-                $head = simple_encryption($row['name'], $symmetric);
+                if($decrypt){
+                    $text = simple_decryption($row['txt'], $symmetric);
+                    $head = simple_decryption($row['name'], $symmetric);
+                } else {
+                    $text = simple_encryption($row['txt'], $symmetric);
+                    $head = simple_encryption($row['name'], $symmetric);
+                }
                 $stmt->execute();
             }
             $stmt->close();
@@ -35,7 +40,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $result = $conn->query("SELECT id, content FROM document_customs"); echo $conn->error;
             while($result && ($row = $result->fetch_assoc())){
                 $id = $row['id'];
-                $text = simple_encryption($row['content'], $symmetric);
+                if($decrypt){
+                    $text = simple_decryption($row['content'], $symmetric);
+                } else {
+                    $text = simple_encryption($row['content'], $symmetric);
+                }
                 $stmt->execute();
             }
             $stmt->close();
@@ -45,7 +54,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $result = $conn->query("SELECT id, setting FROM dsgvo_vv_settings"); echo $conn->error;
             while($result && ($row = $result->fetch_assoc())){
                 $id = $row['id'];
-                $text = simple_encryption($row['setting'], $symmetric);
+                if($decrypt){
+                    $text = simple_decryption($row['setting'], $symmetric);
+                } else {
+                    $text = simple_encryption($row['setting'], $symmetric);
+                }
                 $stmt->execute();
             }
             $stmt->close();
@@ -56,8 +69,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $result = $conn->query("SELECT id, name, description FROM products"); echo $conn->error;
             while($result && ($row = $result->fetch_assoc())){
                 $id = intval($row['id']);
-                $name = simple_encryption($row['name'], $symmetric);
-                $text = simple_encryption($row['description'], $symmetric);
+                if($decrypt){
+                    $name = simple_decryption($row['name'], $symmetric);
+                    $text = simple_decryption($row['description'], $symmetric);
+                } else {
+                    $name = simple_encryption($row['name'], $symmetric);
+                    $text = simple_encryption($row['description'], $symmetric);
+                }
                 $stmt->execute();
             }
             $stmt->close();
@@ -67,13 +85,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $result = $conn->query("SELECT id, name, description FROM articles"); echo $conn->error;
             while($result && ($row = $result->fetch_assoc())){
                 $id = intval($row['id']);
-                $name = simple_encryption($row['name'], $symmetric);
-                $text = simple_encryption($row['description'], $symmetric);
+                if($decrypt){
+                    $name = simple_decryption($row['name'], $symmetric);
+                    $text = simple_decryption($row['description'], $symmetric);
+                } else {
+                    $name = simple_encryption($row['name'], $symmetric);
+                    $text = simple_encryption($row['description'], $symmetric);
+                }
                 $stmt->execute();
             }
             $stmt->close();
         }
     }
+
 
     if(isset($_POST['activate_encryption'])){
         if($config_row['activeEncryption'] == 'FALSE'){
@@ -113,7 +137,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     if($conn->error) $accept = false;
 
                     if($accept){ //access
-                        encrypt_module($module, $symmetric);
+                        secure_module($module, $symmetric);
                         $result = $conn->query("SELECT publicPGPKey, id FROM UserData LEFT JOIN roles ON userID = id WHERE publicPGPKey IS NOT NULL AND ".$query_access_modules[$module]);
                         while($row = $result->fetch_assoc()){
                             $user_public = base64_decode($row['publicPGPKey']);
@@ -138,23 +162,47 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
         } else {
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Feature yet to be implemented</div>';
-            //see if any modules were added, and encrypt those
+            //TODO: see if any modules were added, and encrypt those
 
 
-            //see if modules were removed, and decrypt them.
+            //TODO: see if modules were removed, and decrypt them.
         }
     }
     if(empty($_POST['activate_encryption']) && $config_row['activeEncryption'] == 'TRUE'){
-        //you can only deactivate if you can decrypt every module.
-        $result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND outDated = 'FALSE'");
-        if(count($encrypted_modules) > $result->num_rows){
+        $result = $conn->query("SELECT module, privateKey FROM security_access WHERE userID = $userID AND outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
+        //decrypt modules user has access to
+        while($result && ($row = $result->fetch_assoc())){
+            if(array_key_exists($row['module'], $encrypted_modules)){
+                $cipher_private_module = base64_decode($row['privateKey']);
+                $result = $conn->query("SELECT publicPGPKey, symmetricKey FROM security_modules WHERE outDated = 'FALSE'");
+                if($result && ($row = $result->fetch_assoc())){
+                    $public_module = base64_decode($row['publicPGPKey']);
+                    $cipher_symmetric = base64_decode($row['symmetricKey']);
+                    //decrypt access
+                    $nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
+                    $cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
+                    $private_module = sodium_crypto_box_open($cipher_private_module, $nonce, $privateKey.$public_module);
+                    //decrypt module
+                    $nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
+                    $cipher_symmetric = mb_substr($cipher_symmetric, 24, null, '8bit');
+                    $symmetric = sodium_crypto_box_open($cipher_symmetric, $nonce, $private_module.$public_module);
 
+                    if($symmetric){
+                        secure_module($row['module'], $symmetric);
+
+                        $conn->query("UPDATE security_company SET outDated = 'TRUE' WHERE module = ".$row['module']);
+                        $conn->query("UPDATE security_modules SET outDated = 'TRUE' WHERE module = ".$row['module']);
+                        $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = ".$row['module']);
+                    }
+                }
+            }
         }
-        $conn->query("UPDATE security_company SET outDated = 'TRUE'");
-        $conn->query("UPDATE security_modules SET outDated = 'TRUE'");
-        $conn->query("UPDATE security_access SET outDated = 'TRUE'");
 
-        $conn->query("UPDATE configurationData SET activeEncryption = 'FALSE'");
+
+        if(count($encrypted_modules) == 0) $conn->query("UPDATE configurationData SET activeEncryption = 'FALSE'");
+        if(count($encrypted_modules) < $result->num_rows){
+            showError('');
+        }
     }
 
     if(!empty($_POST['saveRoles'])){

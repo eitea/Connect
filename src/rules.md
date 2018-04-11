@@ -1,13 +1,12 @@
 # Connect Code of Conduct
 
-> A user interface is like a joke. If you have to explain it, it’s not that good. 
->
-> \- <cite>sulgie-eitea</cite>
+> A user interface is like a joke. If you have to explain it, it’s not that good.
+
+</cite>
 
 ## Git/GitHub rules
 
 * You have to work on your own branch. Before requesting a merge with `master`, you have to merge `master` into your own branch. It is a good idea to test the features you've been working on one more time after the merge.
-* Only Sulgie is allowed to commit to `master` directly.
 * Commits to `master` will be authored in the morning or late evening.
 
 ## General
@@ -31,30 +30,24 @@ Tasks that are ready for review need their ID to be appended to `src/project/tas
 
 * Do not separate `require`, `src`, `href` with \\ (BACKSLASH).
 * Join `require` paths using the `DIRECTORY_SEPARATOR` constant.
-* Use `$conn->multiquery("...")` only when really necessary.
-* Do not call `$conn->query("...")` within a loop. Consider using prepared statements instead.
-* Do not use `$_POST`, `$_GET`, `$_COOKIE`, `$_REQUEST` and the like without sanitizing the input.
+* Do not use `$conn->multiquery("...")`.
+* Do not call `$conn->query("...")` within a loop. Consider using prepared statements instead or optimize your query.
+* Never use `$_POST`, `$_GET`, `$_COOKIE`, `$_REQUEST` and the like without sanitizing the input.
   * `intval`/`floatval` for numbers.
   * `test_input` for text.
-  * `real_escape_string` is usually not enough (could still contain JS injection).
-  * Prepared statments (could still contain JS injection).
-* Do not use Prepared statements without calling `$result->free()`.
+  * `real_escape_string` is not enough. (Trivial)
+  * Prepared statments are not enough. (Trivial)
+* Do not use Prepared statements and $conn->query without calling `$result->free()`.
 * Always test results from `$result = $conn->query("...")`.
   * E.g. `if ($result) {...}`
-  * Optionally `if ($result && $result->num_rows !== 0) {...}`
+  * Optionally `if ($result && $result->num_rows !== 0) {...}` or `if ($result && ($row = $result->fetch_assoc())) {...}`
 * Use one of 4 predefined functions for showing status to the user.
   * If the input is `NULL` or `""`, no message will be shown (so you can always call `showError($conn->error)` after a query).
-  * These functions will echo output
     * `showError(string $message)`
     * `showSuccess(string $message)`
     * `showInfo(string $message)`
     * `showWarning(string $message)`
-  * These functions will return a string that you can output later
-    * `showErrorToString(string $message)`
-    * `showSuccessToString(string $message)`
-    * `showInfoToString(string $message)`
-    * `showWarningToString(string $message)`
-* AJAX files should be placed in `src\ajaxQuery`.
+* AJAX files must be placed in `src\ajaxQuery`.
 * Use `src/validate.php` if a feature requires permissions.
 * `convToUTF8($text)` is recommended for handling file input.
 * Filenames should be lowercase.

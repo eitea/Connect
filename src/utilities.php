@@ -49,13 +49,13 @@ function isHoliday($ts) {
     }
     return false;
 }
-//name should be clean_input or sanitize_input
+//name should be clean_input or sanitize_input..
 function test_input($data, $strong = false) {
     //REGEXString
     if($strong){
-        $data = preg_replace("/[^A-Za-z0-9]/", '', $data);
+        $data = preg_replace("/[^A-Za-z0-9]/", ' ', $data);
     } else {
-        $data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€§#$%()+*öäüÖÄÜß_ ]~", "", $data);
+        $data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€§#$%()+*öäüÖÄÜß_ ]~", ' ', $data);
         //$regex_names = "/([^-_@A-Za-z0-9ąa̧ ɓçđɗɖęȩə̧ɛ̧ƒɠħɦįi̧ ɨɨ̧ƙłm̧ ɲǫo̧ øơɔ̧ɍşţŧųu̧ ưʉy̨ƴæɑðǝəɛɣıĳɩŋœɔʊĸßʃþʋƿȝʒʔáàȧâäǟǎăāãåǽǣćċĉčďḍḑḓéèėêëěĕēẽe̊ ẹġĝǧğg̃ ģĥḥíìiîïǐĭīĩịĵķǩĺļľŀḽm̂ m̄ ŉńn̂ ṅn̈ ňn̄ ñņṋóòôȯȱöȫǒŏōõȭőọǿơp̄ ŕřŗśŝṡšşṣťțṭṱúùûüǔŭūũűůụẃẁŵẅýỳŷÿȳỹźżžẓǯÁÀȦÂÄǞǍĂĀÃÅǼǢĆĊĈČĎḌḐḒÉÈĖÊËĚĔĒẼE̊ ẸĠĜǦĞG̃ ĢĤḤÍÌIÎÏǏĬĪĨỊĴĶǨĹĻĽĿḼM̂ M̄ ʼNŃN̂ ṄN̈ ŇN̄ ÑŅṊÓÒÔȮȰÖȪǑŎŌÕȬŐỌǾƠP̄ ŔŘŖŚŜṠŠŞṢŤȚṬṰÚÙÛÜǓŬŪŨŰŮỤẂẀŴẄÝỲŶŸȲỸŹŻŽẒǮĄA̧ ƁÇĐƊƉĘȨƏ̧Ɛ̧ƑƓĦꞪĮI̧ ƗƗ̧ƘŁM̧ ƝǪO̧ ØƠƆ̧ɌŞŢŦŲU̧ ƯɄY̨ƳÆⱭÐƎƏƐƔIĲƖŊŒƆƱĸƩÞƲȜƷʔ]+)/";
         //$data = preg_replace_callback($regex_names, function($m){ return convToUTF8($m[1]); }, $data);
     }
@@ -110,9 +110,8 @@ function simple_encryption($message, $key) {
 
 function simple_decryption($message, $key) {
     $message = base64_decode($message, true);
-    if ($message === false) {
-        throw new Exception('Encryption failure');
-    }
+    if ($message === false) return $message;
+
     $nonceSize = openssl_cipher_iv_length('aes-256-ctr');
     $nonce = mb_substr($message, 0, $nonceSize, '8bit');
     $ciphertext = mb_substr($message, $nonceSize, null, '8bit');
@@ -582,30 +581,36 @@ function util_strip_prefix($subject, $prefix) {
     return $subject;
 }
 
-function util_starts_with($subject, $prefix) {
-    return substr($subject, 0, strlen($prefix)) === $prefix;
-}
-
-function showErrorToString($message){
+//TODO: very bad design, redo
+function showError($message, $toString = false){
     if(!$message || strlen($message) == 0) return;
     $message = str_replace("'", "\\'", $message);
-    return "<script>$(document).ready(function(){showError('$message')})</script>";
+    if($toString){
+        return "<script>$(document).ready(function(){showError('$message')})</script>";
+    }
+    echo "<script>$(document).ready(function(){showError('$message')})</script>";
 }
-
-function showWarningToString($message){
+function showWarning($message, $toString = false){
+    if(!$message || strlen(trim($message)) == 0) return;
+    $message = str_replace("'", "\\'", $message);
+    if($toString){
+        return "<script>$(document).ready(function(){showWarning('$message')})</script>";
+    }
+    echo "<script>$(document).ready(function(){showWarning('$message')})</script>";
+}
+function showInfo($message, $toString = false){
     if(!$message || strlen($message) == 0) return;
     $message = str_replace("'", "\\'", $message);
-    return "<script>$(document).ready(function(){showWarning('$message')})</script>";
+    if($toString){
+        return "<script>$(document).ready(function(){showInfo('$message')})</script>";
+    }
+    echo "<script>$(document).ready(function(){showInfo('$message')})</script>";
 }
-
-function showInfoToString($message){
+function showSuccess($message, $toString = false){
     if(!$message || strlen($message) == 0) return;
     $message = str_replace("'", "\\'", $message);
-    return "<script>$(document).ready(function(){showInfo('$message')})</script>";
-}
-
-function showSuccessToString($message){
-    if(!$message || strlen($message) == 0) return;
-    $message = str_replace("'", "\\'", $message);
-    return "<script>$(document).ready(function(){showSuccess('$message')})</script>";
+    if($toString){
+        return "<script>$(document).ready(function(){showSuccess('$message')})</script>";
+    }
+    echo "<script>$(document).ready(function(){showSuccess('$message')})</script>";
 }

@@ -10,9 +10,9 @@ require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
 function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
     $allHours = 0;
     $times = explode(' ', $estimate);
-    foreach($times as $t){ //TODO: should base hours on intervalData, makes more sense than 24/7 format
+    foreach($times as $t){
         if(is_numeric($t) || substr($t, -1) == 'h'){
-            $allHours += intval($t);
+            $allHours += floatval($t);
         } elseif(substr($t, -1) == 'M'){
             $allHours += intval($t) * 730.5;
         } elseif(substr($t, -1) == 'w'){
@@ -23,6 +23,7 @@ function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$refe
             $allHours += intval($t) / 60;
         }
     }
+
     if($current < $allHours){
         $yellowBar = $current/($allHours+0.0001);
         $greenBar = 1-$yellowBar;
@@ -174,13 +175,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
         }
     }
-    if(!empty($_POST['createBooking']) && !empty($_POST['description'])){
+    if(!empty($_POST['createBooking']) && (!empty($_POST['completeWithoutBooking']) || !empty($_POST['description']))){
         $bookingID = test_input($_POST['createBooking']);
         $result = $conn->query("SELECT dynamicID, clientprojectid, needsreview FROM projectBookingData p, dynamicprojects d WHERE id = $bookingID AND d.projectid = p.dynamicID");
         if($row = $result->fetch_assoc()){
             $dynamicID = $row['dynamicID'];
-            $projectID = $row['clientprojectid'] ? $row['clientprojectid'] : intval($_POST['bookDynamicProjectID']);
-            if($projectID){
+            $projectID = $row['clientprojectid'];
+            if(!$projectID && !empty($_POST['bookDynamicProjectID'])) $projectID = intval($_POST['bookDynamicProjectID']); //5acaff282ced0
+            if($projectID || !empty($_POST['completeWithoutBooking'])){
                 $result->free();
                 $percentage = intval($_POST['bookCompleted']);
                 if($percentage == 100 || isset($_POST['bookCompletedCheckbox'])){
@@ -202,12 +204,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                         }
                     }
                 }
-                $description = test_input($_POST['description']);
-                $conn->query("UPDATE projectBookingData SET end = UTC_TIMESTAMP, infoText = '$description', projectID = '$projectID', internInfo = '$percentage% von $dynamicID Abgeschlossen'  WHERE id = $bookingID");
-                if($conn->error){
-                	showError($conn->error);
+                if(!empty($_POST['completeWithoutBooking'])){
+                    $conn->query("DELETE FROM projectBookingData WHERE id = $bookingID");
                 } else {
-                	redirect('view'); //to refresh the disabled check out button
+                    $description = $dynamicID.' - '.test_input($_POST['description']); //5ac9e5167c616
+                    $conn->query("UPDATE projectBookingData SET end = UTC_TIMESTAMP, infoText = '$description', projectID = '$projectID', internInfo = '$percentage% von $dynamicID Abgeschlossen' WHERE id = $bookingID");
+                }
+                if($conn->error){
+                    showError($conn->error);
+                } else {
+                    redirect('view'); //to refresh the disabled check out button. i know.
                 }
             } else {
                 showError($lang['ERROR_MISSING_SELECTION'].' (Projekt)');
@@ -340,6 +346,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $stmt->close();
             } else {
                 showError($lang['ERROR_MISSING_FIELDS']);
+                if(empty($_POST['owner'])) showError('Fehlend: Projektbesitzer');
+                if(empty($_POST['employees'])) showError('Fehlend: Mitarbeiter');
             }
         }
     } // end if dynamic Admin
@@ -393,11 +401,11 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
         if($filterings['priority'] > 0){ $query_filter .= " AND d.projectpriority = ".$filterings['priority']; }
         foreach($filterings['employees'] as $val){
             $arr = explode(';', $val);
-            if($arr[0] == 'user') $filter_emps .= " OR conemployees LIKE '%".$arr[1]."%'";
-            if($arr[0] == 'team') $filter_team .= " OR conteamsids LIKE '%".$arr[1]."%'";
+            if($arr[0] == 'user') $filter_emps .= " OR conemployees LIKE '%{$arr[1]}%'";
+            if($arr[0] == 'team') $filter_team .= " OR conteamsids LIKE '%{$arr[1]}%'";
         }
 
-        if($filter_emps || $filter_team) $query_filter .= "AND ($filter_emps OR $filter_team)";
+        if($filter_emps || $filter_team) $query_filter .= " AND ($filter_emps OR $filter_team)";
 
         $stmt_booking = $conn->prepare("SELECT userID, p.id, p.start FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = ?"); echo $conn->error;
         $stmt_booking->bind_param('s', $x);
@@ -410,13 +418,14 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours
                 FROM dynamicprojects d
                 LEFT JOIN ( SELECT projectid, GROUP_CONCAT(userid SEPARATOR ' ') AS conemployees FROM dynamicprojectsemployees GROUP BY projectid ) tbl ON tbl.projectid = d.projectid
+                LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
                 LEFT JOIN ( SELECT t.projectid, GROUP_CONCAT(teamData.name SEPARATOR ',<br>') AS conteams, GROUP_CONCAT(teamData.id SEPARATOR ' ') AS conteamsids FROM dynamicprojectsteams t
                     LEFT JOIN teamData ON teamData.id = t.teamid GROUP BY t.projectid ) tbl2 ON tbl2.projectid = d.projectid
-                LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
-                LEFT JOIN ( SELECT p.dynamicID, SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) AS currentHours FROM projectBookingData p) tbl3 ON tbl3.dynamicID = d.projectid
+                LEFT JOIN ( SELECT p.dynamicID, SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) AS currentHours
+                    FROM projectBookingData p GROUP BY dynamicID) tbl3 ON tbl3.dynamicID = d.projectid
                 WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter
                 ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
-        } else { //see open tasks user is part of  (update AJAX_dynamicInfo if changed)
+        } else {
             $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,
                 projectpriority, projectowner, projectleader, projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
                 clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours
@@ -425,20 +434,28 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 LEFT JOIN ( SELECT t.projectid, GROUP_CONCAT(teamData.name SEPARATOR ',<br>') AS conteams, GROUP_CONCAT(teamData.id SEPARATOR ' ') AS conteamsids FROM dynamicprojectsteams t
                     LEFT JOIN teamData ON teamData.id = t.teamid GROUP BY t.projectid ) tbl2 ON tbl2.projectid = d.projectid
                 LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
-                LEFT JOIN ( SELECT p.dynamicID, SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) AS currentHours FROM projectBookingData p) tbl3 ON tbl3.dynamicID = d.projectid
+                LEFT JOIN ( SELECT p.dynamicID, SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) AS currentHours
+                    FROM projectBookingData p GROUP BY dynamicID) tbl3 ON tbl3.dynamicID = d.projectid
                 LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                 LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
                 WHERE d.isTemplate = 'FALSE' AND (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (teamRelationshipData.userID = $userID AND teamRelationshipData.skill >= d.level))
                 $query_filter ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
         }
+
+        /*
+        //TODO: will be optimized later, below LEFT (!) join will make query return only 1 company ID, reason unknown
+        LEFT JOIN ( SELECT activity, projectid FROM dynamicprojectslogs WHERE ((activity = 'VIEWED' AND userID = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID))
+            AND id IN ( SELECT MAX(id) FROM dynamicprojectslogs GROUP BY projectid)) tbl4 ON tbl4.projectid = d.projectid
+        */
         echo $conn->error;
         while($result && ($row = $result->fetch_assoc())){
             $x = $row['projectid'];
 
-            $rowStyle = '';
-            echo '<tr '.$rowStyle.'>';
+            //$rowStyle = ($row['activity'] && $row['activity'] != 'VIEWED') ? 'style="color:#1689e7; font-weight:bold;"' : '';
+            echo '<tr>';
             echo '<td>';
-            if($row['currentHours'] && $row['estimatedHours']) echo generate_progress_bar($row["currentHours"], $row["estimatedHours"]);
+            //echo $row['activity'];
+            //if($row['estimatedHours'] || $row['currentHours']) echo generate_progress_bar($row['currentHours'], $row['estimatedHours']);
             echo '<i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].' <div>';
             foreach(explode(',', $row['projecttags']) as $tag){
                 if($tag) echo '<span class="badge">'.$tag.'</span> ';
@@ -470,7 +487,9 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 echo '<b title="Besitzer">'. $userID_toName[$row['projectowner']].'</b>,<br>';
                 if($row['projectleader']) echo '<u title="Verantwortlicher Mitarbeiter">'.$userID_toName[$row['projectleader']].'</u>,<br>';
             }
-            foreach(explode(' ',$row['conemployees']) as $val){ if(isset($userID_toName[$val])) echo $userID_toName[$val]; };
+            echo implode(',<br>', array_map(function($val){ global $userID_toName; if(isset($userID_toName[$val])) return $userID_toName[$val]; }, explode(' ',$row['conemployees'])));
+            //foreach(explode(' ',$row['conemployees']) as $val){ if(isset($userID_toName[$val])) echo $userID_toName[$val].',<br>'; };
+            if($row['conemployees'] && $row['conteams']) echo ',<br>';
             echo $row['conteams'];
             echo '</td>';
             echo '<td>';
@@ -606,49 +625,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             <form method="POST">
                 <div class="modal-header h4"><button type="button" class="close"><span>&times;</span></button><?php echo $lang["DYNAMIC_PROJECTS_BOOKING_PROMPT"]; ?></div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <textarea name="description" rows="4" class="form-control" style="max-width:100%; min-width:100%" placeholder="Info..."></textarea><br>
-                        </div>
-                        <div class="col-md-6">
-                            <input id="bookRanger" type="range" min="1" max="100" value="<?php echo $occupation['percentage']; ?>" oninput="document.getElementById('bookCompleted').value = this.value;"><br>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="input-group">
-                                <input type="number" class="form-control" name="bookCompleted" id="bookCompleted" min="0" max="100" value="<?php echo $occupation['percentage']; ?>" />
-                                <span class="input-group-addon">%</span>
-                            </div><br>
-                        </div>
-                        <div class="col-md-3">
-                            <label><input type="checkbox" name="bookCompletedCheckbox" id="bookCompletedCheckbox"> Task erledigt</label><br>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <?php
-                            $microtasks = $conn->query("SELECT microtaskid, title, ischecked FROM microtasks WHERE projectid = '".$occupation['dynamicID']."' WHERE ischecked = 'FALSE'");
-                            if($microtasks && $microtasks->num_rows > 0){
-                                echo '<table id="microlist" class="dataTable table">';
-                                echo '<thead><tr>';
-                                echo '<th>Completed</th>';
-                                echo '<th>Micro Task</th>';
-                                echo '</tr></thead>';
-                                echo '<tbody>';
-                                while($mtask = $microtasks->fetch_assoc()){
-                                    $mid = $mtask['microtaskid'];
-                                    $title = $mtask['title'];
-                                    echo '<tr>';
-                                    echo '<td><input type="checkbox" name="mtask'.$mid.'" title="'.$title.'"></input></td>';
-                                    echo '<td><label>'.$title.'</label></td>';
-                                    echo '</tr>';
-                                }
-                                echo '</tbody>';
-                                echo '</table>';
-                            }
-                            ?>
-                        </div>
-                    </div>
-                    <div class="row">
+                    <div class="row" id="occupation_booking_fields">
                         <?php if(!$occupation['companyid'] && count($available_companies) > 2): ?>
                             <div class="col-md-4">
                                 <label><?php echo $lang['COMPANY']; ?></label>
@@ -660,7 +637,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                                         echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
                                     }
                                     ?>
-                                </select>
+                                </select><br><br>
                             </div>
                         <?php endif; if(!$occupation['clientid']): ?>
                             <div class="col-md-4">
@@ -676,7 +653,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                                     echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
                                 }
                                 ?>
-                                </select>
+                                </select><br><br>
                             </div>
                         <?php endif; if(!$occupation['projectid']): ?>
                             <div class="col-md-4">
@@ -689,10 +666,57 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                                             echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
                                         }
                                     } ?>
-                                </select>
+                                </select><br><br>
                             </div>
                         <?php endif; ?>
+                        <div class="col-md-12">
+                            <textarea name="description" rows="4" class="form-control" style="max-width:100%; min-width:100%" placeholder="Info..."></textarea><br>
+                        </div>
                     </div>
+                    <div class="col-md-12">
+                        <label><input type="checkbox" name="completeWithoutBooking" value="1" id="occupation_booking_fields_toggle">Task ohne Buchung abschließen</label><br><br>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input id="bookRanger" type="range" min="1" max="100" value="<?php echo $occupation['percentage']; ?>" oninput="document.getElementById('bookCompleted').value = this.value;"><br>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="bookCompleted" id="bookCompleted" min="0" max="100" value="<?php echo $occupation['percentage']; ?>" />
+                                <span class="input-group-addon">%</span>
+                            </div><br>
+                        </div>
+                        <div class="col-md-3">
+                            <label><input type="checkbox" name="bookCompletedCheckbox" id="bookCompletedCheckbox"> Task erledigt</label><br>
+                        </div>
+                    </div>
+                    <?php
+                    $microtasks = $conn->query("SELECT microtaskid, title, ischecked FROM microtasks WHERE projectid = '".$occupation['dynamicID']."' WHERE ischecked = 'FALSE'");
+                    if($microtasks && $microtasks->num_rows > 0):
+                        ?>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table id="microlist" class="dataTable table">
+                                    <thead><tr>
+                                        <th>Completed</th>
+                                        <th>Micro Task</th>
+                                    </tr></thead>
+                                    <tbody>
+                                        <?php
+                                        while($mtask = $microtasks->fetch_assoc()){
+                                            $mid = $mtask['microtaskid'];
+                                            $title = $mtask['title'];
+                                            echo '<tr>';
+                                            echo '<td><input type="checkbox" name="mtask'.$mid.'" title="'.$title.'"></input></td>';
+                                            echo '<td><label>'.$title.'</label></td>';
+                                            echo '</tr>';
+                                        }
+                                        ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 </div>
                 <div class="modal-footer">
                     <div class="pull-left"><?php echo $occupation['dynamicID']; ?></div>
@@ -710,12 +734,19 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 <script src="plugins/rtfConverter/rtf.js-master/rtf.js"></script>
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 <script>
-$("#bookCompletedCheckbox").change(function(event){
+$("#bookCompletedCheckbox").change(function(){
     $("#bookCompleted").attr('readonly', this.checked);
     $("#bookRanger").attr('disabled', this.checked);
     if(this.checked){
         $("#bookRanger").val(100);
         $("#bookCompleted").val(100);
+    }
+});
+$('#occupation_booking_fields_toggle').change(function(){
+    if(this.checked){
+        $("#occupation_booking_fields").hide();
+    } else {
+        $("#occupation_booking_fields").show();
     }
 });
 function formatState (state) {
