@@ -126,25 +126,36 @@
         <!-- Subjects -->
         <div class="col-xs-4">
             <?php
-                $result = $conn->query("SELECT subject, userID, partnerID, firstname, lastname FROM messages INNER JOIN UserData ON UserData.id = partnerID WHERE $userID IN (partnerID, userID) GROUP BY subject, LEAST(userID, partnerID), GREATEST(userID, partnerID) ");
+                $result = $conn->query("SELECT subject, userID, partnerID FROM messages WHERE $userID IN (partnerID, userID) GROUP BY subject, LEAST(userID, partnerID), GREATEST(userID, partnerID) ");
                 $i = 0;
                 while ($result && ($row = $result->fetch_assoc())) {
                     $subject = $row['subject'];
                     $sender = $row['userID'];
                     $receiver = $row['partnerID'];
-                    $firstname = $row['firstname'];
-                    $lastname = $row['lastname'];
                     $i++;
 
+                    if($userID == $receiver) {
+                        $help = $receiver;
+                        $receiver = $sender; //sending process must be reversed
+                        $sender = $help;    // 5ac62d49ea1c4
+                    }
+
+
                     // 5ac62d49ea1c4
+                    $sql = "SELECT firstname, lastname FROM UserData WHERE id = '{$receiver}' GROUP BY id";
+                    $r = $conn->query($sql);
+                    if ($r && $r->num_rows > 0) {
+                        while ($row2 = $r->fetch_assoc()) {
+                            $firstname = $row2['firstname'];
+                            $lastname = $row2['lastname'];
+                        }
+                    }
+
                     if(!empty($firstname) && !empty($lastname)) 
                         $name = $firstname . " " . $lastname;
                     elseif ((empty($firstname) && !empty($lastname)) || (empty($firstname) && !empty($lastname)))   // the user has no firstname or no lastname (admin)
                         $name = $firstname . " " . $lastname;
 
-                    
-
-                    if($userID == $receiver) $receiver = $sender; //sending process must be reversed
                     echo '<div style="padding: 5px">';
                     echo '<div class="subject'.$i.' input-group" style="word-break: normal; word-wrap: normal; background-color: white; border: 1px solid gainsboro;">';
                     echo '<p style="padding: 10px;" onclick="showChat('.$receiver.', \''.$subject.'\', \''.$name.'\')">' . $subject . '</p>';
