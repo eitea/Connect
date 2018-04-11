@@ -126,18 +126,28 @@
         <!-- Subjects -->
         <div class="col-xs-4">
             <?php
-                $result = $conn->query("SELECT subject, userID, partnerID FROM messages WHERE $userID IN (partnerID, userID) GROUP BY subject, LEAST(userID, partnerID), GREATEST(userID, partnerID) ");
+                $result = $conn->query("SELECT subject, userID, partnerID, firstname, lastname FROM messages INNER JOIN UserData ON UserData.id = partnerID WHERE $userID IN (partnerID, userID) GROUP BY subject, LEAST(userID, partnerID), GREATEST(userID, partnerID) ");
                 $i = 0;
                 while ($result && ($row = $result->fetch_assoc())) {
                     $subject = $row['subject'];
                     $sender = $row['userID'];
                     $receiver = $row['partnerID'];
+                    $firstname = $row['firstname'];
+                    $lastname = $row['lastname'];
                     $i++;
+
+                    // 5ac62d49ea1c4
+                    if(!empty($firstname) && !empty($lastname)) 
+                        $name = $firstname . " " . $lastname;
+                    elseif ((empty($firstname) && !empty($lastname)) || (empty($firstname) && !empty($lastname)))   // the user has no firstname or no lastname (admin)
+                        $name = $firstname . " " . $lastname;
+
+                    
 
                     if($userID == $receiver) $receiver = $sender; //sending process must be reversed
                     echo '<div style="padding: 5px">';
                     echo '<div class="subject'.$i.' input-group" style="word-break: normal; word-wrap: normal; background-color: white; border: 1px solid gainsboro;">';
-                    echo '<p style="padding: 10px;" onclick="showChat('.$receiver.', \''.$subject.'\')">' . $subject . '</p>';
+                    echo '<p style="padding: 10px;" onclick="showChat('.$receiver.', \''.$subject.'\', \''.$name.'\')">' . $subject . '</p>';
                     echo '<span class="input-group-btn"><button style="background-color: white; " class="icon'.$i.' btn" onclick="deleteSubject('.$receiver.', \''.$subject.'\')"><i class="fa fa-trash" aria-hidden="true"></i></button></span>';
                     echo '</div>';
                     echo '</div>';
@@ -160,7 +170,10 @@
 
         <!-- Messages -->
         <div class="col-xs-8">
-            <div class="pre-scrollable" id="messages" style="display: none; background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh"></div>
+            <!-- 5ac62d49ea1c4 -->
+            <div id="user_bar" style="display: none; background-color: whitesmoke; border: 1px gainsboro solid; border-bottom: none; max-height: 10vh; padding: 10px;"></div>
+            
+            <div class="pre-scrollable" id="messages" style="display: none; background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh; padding-top: 5px"></div>
 
             <div id="chatinput" style="display: none; padding-top: 5px;">
                 <form autocomplete="off">
@@ -231,16 +244,13 @@
 
 
 <script>
-//remove "are you sure you want to leave?"
-window.onbeforeunload = null;
-
 var selectedPartner = -1;
 var selectedSubject = "";
 var intervalID = -1;
 var messageLimit = 10;
 
 //Make the div visible, when someone clicks the button
-function showChat(partner, subject) {
+function showChat(partner, subject, name) {
     //reset the limit after a new conversation will be shown
     messageLimit = 10;
 
@@ -257,6 +267,10 @@ function showChat(partner, subject) {
     }, 1000);
 
     // make the messages and the response field visible
+    var user_bar = document.getElementById("user_bar");     //5ac62d49ea1c4
+    user_bar.style.display = "block";
+    user_bar.innerHTML = name;
+
     var messagesElement = document.getElementById("messages");
     messagesElement.style.display = "block";
 
