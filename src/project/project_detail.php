@@ -70,7 +70,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 $result = $conn->query("SELECT p.*, c.companyID, c.name AS clientName FROM projectData p LEFT JOIN clientData c ON p.clientID = c.id WHERE p.id = $projectID");
 $projectRow = $result->fetch_assoc();
 
-$result = $conn->query("SELECT privateKey, publicKey, symmetricKey FROM security_projects WHERE userID = $userID AND projectID = $projectID AND outDated = 'FALSE' LIMIT 1");
+$result = $conn->query("SELECT publicKey, symmetricKey FROM security_projects WHERE userID = $userID AND projectID = $projectID AND outDated = 'FALSE' LIMIT 1");
 if($result && ($row = $result->fetch_assoc())){
     $keypair = base64_decode($privateKey).base64_decode($projectRow['publicKey']);
     $cipher = base64_decode($row['privateKey']);
