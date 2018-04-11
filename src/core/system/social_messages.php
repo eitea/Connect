@@ -181,7 +181,6 @@
                     $("#message").keydown(function(event) {
                         //shift + enter?
                         if(shiftPressed && event.which == 13) {
-                            console.log("shit enter")
                             $("#message").append("<br>");
                         } else {
                             // update shiftPressed when not pressed shift+enter
@@ -189,7 +188,6 @@
                         }
                         
                         if(event.which == 13 && !shiftPressed){
-                            console.log("send")
                             event.preventDefault();
 
                             if($(this).val().trim().length != 0){
