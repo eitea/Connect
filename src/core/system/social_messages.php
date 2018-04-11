@@ -84,11 +84,24 @@
                         <br>
 
                         <label for="subject"> <?php echo $lang['SUBJECT']; ?> </label>
-                        <input required type="text" maxlength="40" name="subject" class="form-control">
+                        <input required id="subject" type="text" maxlength="250" name="subject" class="form-control">
+                        <div id="textarea_count" class="pull-right"style="padding-top: 0.5em;" ></div>
+                        <script>
+                            //for the character counter
+                            var text_max = 250;
+                            $('#textarea_count').html(text_max + ' remaining')
+
+                            $('#subject').on("change keyup keydown paste cut", function() {
+                                var text_length = $('#subject').val().length;
+                                var text_remaining = text_max - text_length;
+
+                                $('#textarea_count').html(text_remaining + ' remaining')
+                            });
+                        </script>
                         <br>
 
                         <label for="message"> <?php echo $lang['MESSAGE'] ?></label>
-                        <textarea required name="message" class="form-control" style="resize: none"></textarea>
+                        <textarea required name="message" class="form-control" rows="6" style="resize: none"></textarea>
                     </div>
 
                     <!-- modal footer -->
@@ -159,6 +172,7 @@
                 </form>
 
                 <script>
+                    // auto resize
                     $('#message, #sendButton').on('change keyup keydown paste cut click', function (event) {
                         $("#message").height(0).height(this.scrollHeight/1.4);
                     }).find('textarea').change();
@@ -175,8 +189,6 @@
                             if(event.which == 16) shiftPressed = true; else shiftPressed = false;
                         }
                         
-                        
-
                         if(event.which == 13 && !shiftPressed){
                             console.log("send")
                             event.preventDefault();
@@ -217,7 +229,6 @@
                         }
 
                     })
-
                 </script>
             </div>
         </div>

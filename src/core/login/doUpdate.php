@@ -2504,7 +2504,18 @@ if($row['version'] < 147){
         echo '<br>Benutzer: Hauptmandant';
     }
 }
-//if($row['version'] < 148){}
+
+if($row['version'] < 148){
+    //5acc47de619a8
+    $conn->query("ALTER TABLE messages MODIFY COLUMN subject VARCHAR(250)");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>Nachrichten: Betrefflänge geändert';
+    }
+}
+
+
 //if($row['version'] < 149){}
 //if($row['version'] < 150){}
 //if($row['version'] < 151){}
