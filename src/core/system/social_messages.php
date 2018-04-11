@@ -80,12 +80,11 @@
                             }
                             ?>
                         </select><br>
-
                         <br>
 
                         <label for="subject"> <?php echo $lang['SUBJECT']; ?> </label>
                         <input required id="subject" type="text" maxlength="250" name="subject" class="form-control">
-                        <div id="textarea_count" class="pull-right"style="padding-top: 0.5em;" ></div>
+                        <div id="textarea_count" class="pull-right" style="padding-top: 0.5em;" ></div>
                         <script>
                             //for the character counter
                             var text_max = 250;
