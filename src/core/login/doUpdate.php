@@ -70,7 +70,7 @@ function move() {
 require dirname(dirname(__DIR__)) . "/connection.php";
 require dirname(dirname(__DIR__)) . "/utilities.php";
 include dirname(dirname(__DIR__)) . '/validate.php';
-
+set_time_limit(999);
 $result = mysqli_query($conn, "SELECT version FROM configurationData;");
 if(!$result){ //can be removed later on
     $result = mysqli_query($conn, "SELECT version FROM ldapConfigTab;");
@@ -2508,6 +2508,18 @@ if($row['version'] < 147){
 }
 
 if($row['version'] < 148){
+    $sql = "CREATE TABLE dsgvo_training_company_relations (
+        trainingID int(6),
+        companyID INT(6) UNSIGNED NOT NULL,
+        PRIMARY KEY (trainingID, companyID),
+        FOREIGN KEY (trainingID) REFERENCES dsgvo_training(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (companyID) REFERENCES companyData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }else{
+        echo '<br> DSGVO Training Company Relations';
+    }
     $conn->query("ALTER TABLE security_projects ADD COLUMN publicKey VARCHAR(150) NOT NULL"); echo $conn->error;
     $conn->query("ALTER TABLE security_projects ADD COLUMN symmetricKey VARCHAR(150) NOT NULL"); echo $conn->error;
 

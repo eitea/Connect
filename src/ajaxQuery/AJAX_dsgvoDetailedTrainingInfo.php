@@ -1,29 +1,43 @@
 <?php 
-if (!isset($_REQUEST["trainingID"])){
+if (!isset($_REQUEST["trainingID"])) {
     echo "error";
     die();
 }
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "connection.php";
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "language.php";
 
-function formatPercent($num){
-    $num = round($num * 1000)/10;
+function formatPercent($num)
+{
+    $num = round($num * 1000) / 10;
     return "$num%";
 }
-function getColor($percent,$inverse = false){
-    switch(($inverse?10-round($percent * 10):round($percent * 10))){
-        case 10:return "#00FF00";
-        case 9: return "#66FF00";
-        case 8: return "#3FFF00";
-        case 7: return "#7FFF00";
-        case 6: return "#BFFF00";
-        case 5: return "#FFF700";
-        case 4: return "#FFBF00";
-        case 3: return "#FFA500";
-        case 2: return "#FF4500";
-        case 1: return "#FF2400";
-        case 0: return "#FF0000";
-        default:return "#FF0000";
+function getColor($percent, $inverse = false)
+{
+    switch (($inverse ? 10 - round($percent * 10) : round($percent * 10))) {
+        case 10:
+            return "#00FF00";
+        case 9:
+            return "#66FF00";
+        case 8:
+            return "#3FFF00";
+        case 7:
+            return "#7FFF00";
+        case 6:
+            return "#BFFF00";
+        case 5:
+            return "#FFF700";
+        case 4:
+            return "#FFBF00";
+        case 3:
+            return "#FFA500";
+        case 2:
+            return "#FF4500";
+        case 1:
+            return "#FF2400";
+        case 0:
+            return "#FF0000";
+        default:
+            return "#FF0000";
     }
 }
 
@@ -44,8 +58,16 @@ $result_user = $conn->query(
      INNER JOIN teamRelationshipData 
      ON teamRelationshipData.teamID = dsgvo_training_team_relations.teamID
      INNER JOIN UserData ON UserData.id = teamRelationshipData.userID
-     WHERE dsgvo_training_team_relations.trainingID = $trainingID"
+     WHERE dsgvo_training_team_relations.trainingID = $trainingID
+     UNION
+     SELECT relationship_company_client.userID, firstname, lastname
+     FROM dsgvo_training_company_relations 
+     INNER JOIN relationship_company_client 
+     ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
+     INNER JOIN UserData ON UserData.id = relationship_company_client.userID
+     WHERE dsgvo_training_company_relations.trainingID = $trainingID"
 );
+echo $conn->error;
 $result = $conn->query("SELECT count(*) count
 FROM dsgvo_training_questions
 WHERE dsgvo_training_questions.trainingID = $trainingID");
@@ -56,7 +78,7 @@ $total = intval($result->fetch_assoc()["count"]);
       <div class="modal-dialog modal-content modal-lg">
         <div class="modal-header">Auswertung von <?php echo $name ?></div>
         <div class="modal-body">
-            <?php if ($total != 0): ?>
+            <?php if ($total != 0) : ?>
             <table class="table table-hover">
                 <thead>
                     <tr>
@@ -74,9 +96,9 @@ $total = intval($result->fetch_assoc()["count"]);
                 </thead>
                 <tbody>
 <?php
-while($row = $result_user->fetch_assoc()){
+while ($row = $result_user->fetch_assoc()) {
     $user = $row["userID"];
-    $name = $row["firstname"]." ".$row["lastname"];
+    $name = $row["firstname"] . " " . $row["lastname"];
     $result = $conn->query("SELECT count(*) count
         FROM dsgvo_training_questions
         INNER JOIN dsgvo_training_completed_questions ON dsgvo_training_completed_questions.questionID = dsgvo_training_questions.id
@@ -98,16 +120,20 @@ while($row = $result_user->fetch_assoc()){
     WHERE userID = $user AND dsgvo_training_questions.trainingID = $trainingID");
     echo $conn->error;
     $time = intval($result->fetch_assoc()["duration"]);
-    $timePerQuestion = round($time / ($total - $unanswered));
+    if($total - $unanswered == 0){
+        $timePerQuestion = 0;
+    }else{
+        $timePerQuestion = round($time / ($total - $unanswered));
+    }
     echo "<tr>";
     echo "<td>$user</td>";
     echo "<td>$name</td>";
-    echo "<td style='background-color:".getColor($percentRight).";'>$right</td>";
-    echo "<td style='background-color:".getColor($percentRight).";'>".formatPercent($percentRight)."</td>";
-    echo "<td style='background-color:".getColor($percentWrong,true).";'>$wrong</td>";
-    echo "<td style='background-color:".getColor($percentWrong,true).";'>".formatPercent($percentWrong)."</td>";
-    echo "<td style='background-color:".getColor($percentUnanswered,true).";'>$unanswered</td>";
-    echo "<td style='background-color:".getColor($percentUnanswered,true).";'>".formatPercent($percentUnanswered)."</td>";
+    echo "<td style='background-color:" . getColor($percentRight) . ";'>$right</td>";
+    echo "<td style='background-color:" . getColor($percentRight) . ";'>" . formatPercent($percentRight) . "</td>";
+    echo "<td style='background-color:" . getColor($percentWrong, true) . ";'>$wrong</td>";
+    echo "<td style='background-color:" . getColor($percentWrong, true) . ";'>" . formatPercent($percentWrong) . "</td>";
+    echo "<td style='background-color:" . getColor($percentUnanswered, true) . ";'>$unanswered</td>";
+    echo "<td style='background-color:" . getColor($percentUnanswered, true) . ";'>" . formatPercent($percentUnanswered) . "</td>";
     echo "<td>$time Sekunden</td>";
     echo "<td>$timePerQuestion Sekunden</td>";
     echo "</tr>";
@@ -115,7 +141,7 @@ while($row = $result_user->fetch_assoc()){
 ?>
                 </tbody>
             </table>
-            <?php else: ?>
+            <?php else : ?>
                 Noch keine Daten vorhanden
             <?php endif; ?>
         </div>
