@@ -1714,7 +1714,7 @@ function create_tables($conn) {
         messageID INT(6) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         userID INT(6) UNSIGNED NOT NULL,
         partnerID INT(6) UNSIGNED NOT NULL,
-        subject varchar(60),
+        subject varchar(250),
         message TEXT,
         picture MEDIUMBLOB,
         sent DATETIME DEFAULT CURRENT_TIMESTAMP,

@@ -80,15 +80,27 @@
                             }
                             ?>
                         </select><br>
-
                         <br>
 
                         <label for="subject"> <?php echo $lang['SUBJECT']; ?> </label>
-                        <input required type="text" maxlength="40" name="subject" class="form-control">
+                        <input required id="subject" type="text" maxlength="250" name="subject" class="form-control">
+                        <div id="textarea_count" class="pull-right" style="padding-top: 0.5em;" ></div>
+                        <script>
+                            //for the character counter
+                            var text_max = 250;
+                            $('#textarea_count').html(text_max + ' remaining')
+
+                            $('#subject').on("change keyup keydown paste cut", function() {
+                                var text_length = $('#subject').val().length;
+                                var text_remaining = text_max - text_length;
+
+                                $('#textarea_count').html(text_remaining + ' remaining')
+                            });
+                        </script>
                         <br>
 
                         <label for="message"> <?php echo $lang['MESSAGE'] ?></label>
-                        <textarea required name="message" class="form-control" style="resize: none"></textarea>
+                        <textarea required id="post_message" name="message" class="form-control" rows="6" wrap="hard" style="resize: none"></textarea>
                     </div>
 
                     <!-- modal footer -->
@@ -122,10 +134,27 @@
                     $receiver = $row['partnerID'];
                     $i++;
 
-                    if($userID == $receiver) $receiver = $sender; //sending process must be reversed
+                    if($userID == $receiver) {
+                        $help = $receiver;
+                        $receiver = $sender; //sending process must be reversed
+                        $sender = $help;    // 5ac62d49ea1c4
+                    }
+
+                    // 5ac62d49ea1c4
+                    $sql = "SELECT firstname, lastname FROM UserData WHERE id = '{$receiver}' GROUP BY id";
+                    $result2 = $conn->query($sql);
+                    $row2 = $result2->fetch_assoc();
+                    $firstname = $row2['firstname'];
+                    $lastname = $row2['lastname'];
+
+                    if(!empty($firstname) && !empty($lastname)) 
+                        $name = $firstname . " " . $lastname;
+                    elseif ((empty($firstname) && !empty($lastname)) || (empty($firstname) && !empty($lastname)))   // the user has no firstname or no lastname (admin)
+                        $name = $firstname . " " . $lastname;
+
                     echo '<div style="padding: 5px">';
-                    echo '<div class="subject'.$i.' input-group" style="background-color: white; border: 1px solid gainsboro;">';
-                    echo '<p style="padding: 10px;" onclick="showChat('.$receiver.', \''.$subject.'\')">' . $subject . '</p>';
+                    echo '<div class="subject'.$i.' input-group" style="word-break: normal; word-wrap: normal; background-color: white; border: 1px solid gainsboro;">';
+                    echo '<p style="padding: 10px;" onclick="showChat('.$receiver.', \''.$subject.'\', \''.$name.'\')">' . $subject . '</p>';
                     echo '<span class="input-group-btn"><button style="background-color: white; " class="icon'.$i.' btn" onclick="deleteSubject('.$receiver.', \''.$subject.'\')"><i class="fa fa-trash" aria-hidden="true"></i></button></span>';
                     echo '</div>';
                     echo '</div>';
@@ -148,7 +177,10 @@
 
         <!-- Messages -->
         <div class="col-xs-8">
-            <div class="pre-scrollable" id="messages" style="display: none; background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh"></div>
+            <!-- 5ac62d49ea1c4 -->
+            <div id="user_bar" style="display: none; background-color: whitesmoke; border: 1px gainsboro solid; border-bottom: none; max-height: 10vh; padding: 10px;"></div>
+            
+            <div class="pre-scrollable" id="messages" style="display: none; background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh; padding-top: 5px"></div>
 
             <div id="chatinput" style="display: none; padding-top: 5px;">
                 <form autocomplete="off">
@@ -159,6 +191,7 @@
                 </form>
 
                 <script>
+                    // auto resize
                     $('#message, #sendButton').on('change keyup keydown paste cut click', function (event) {
                         $("#message").height(0).height(this.scrollHeight/1.4);
                     }).find('textarea').change();
@@ -168,17 +201,13 @@
                     $("#message").keydown(function(event) {
                         //shift + enter?
                         if(shiftPressed && event.which == 13) {
-                            console.log("shit enter")
                             $("#message").append("<br>");
                         } else {
                             // update shiftPressed when not pressed shift+enter
                             if(event.which == 16) shiftPressed = true; else shiftPressed = false;
                         }
                         
-                        
-
                         if(event.which == 13 && !shiftPressed){
-                            console.log("send")
                             event.preventDefault();
 
                             if($(this).val().trim().length != 0){
@@ -191,9 +220,6 @@
                            
                     //submit
                     $("#chatinput").submit(function (e) {
-                        //parse the line breaks
-                        $("#message").html($("#message").text().replace(/\n\r?/g, '<br>'));
-
                         //prevent enter
                         e.preventDefault()
 
@@ -217,7 +243,6 @@
                         }
 
                     })
-
                 </script>
             </div>
         </div>
@@ -226,16 +251,13 @@
 
 
 <script>
-//remove "are you sure you want to leave?"
-window.onbeforeunload = null;
-
 var selectedPartner = -1;
 var selectedSubject = "";
 var intervalID = -1;
 var messageLimit = 10;
 
 //Make the div visible, when someone clicks the button
-function showChat(partner, subject) {
+function showChat(partner, subject, name) {
     //reset the limit after a new conversation will be shown
     messageLimit = 10;
 
@@ -252,6 +274,10 @@ function showChat(partner, subject) {
     }, 1000);
 
     // make the messages and the response field visible
+    var user_bar = document.getElementById("user_bar");     //5ac62d49ea1c4
+    user_bar.style.display = "block";
+    user_bar.innerHTML = name;
+
     var messagesElement = document.getElementById("messages");
     messagesElement.style.display = "block";
 
@@ -318,6 +344,5 @@ function deleteSubject(partner, subject) {
     })
 }
 </script>
-
 
 <?php require dirname(dirname(__DIR__)) . '/footer.php'; ?>

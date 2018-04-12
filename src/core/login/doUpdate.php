@@ -2528,6 +2528,14 @@ if($row['version'] < 148){
     $conn->query("ALTER TABLE security_projects DROP FOREIGN KEY security_projects_ibfk_1");
     $conn->query("ALTER TABLE security_projects DROP COLUMN userID");
     $conn->query("ALTER TABLE security_projects DROP COLUMN privateKey");
+
+    //5acc47de619a8
+    $conn->query("ALTER TABLE messages MODIFY COLUMN subject VARCHAR(250)");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>Nachrichten: Betrefflänge geändert';
+    }
 }
 
 //if($row['version'] < 149){}
