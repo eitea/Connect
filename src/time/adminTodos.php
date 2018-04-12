@@ -251,13 +251,10 @@ if($result && $result->num_rows > 0):
       <th class="text-center"><?php echo $lang['REPLY_TEXT']; ?></th>
       <tbody>
         <?php
-        $sql = "SELECT $userRequests.*, $userTable.firstname, $userTable.lastname FROM $userRequests INNER JOIN $userTable ON $userTable.id = $userRequests.userID WHERE status = '0'";
-        $result = $conn->query($sql);
-        if($result && $result->num_rows > 0){
           while($row = $result->fetch_assoc()){
             echo '<tr>';
             echo '<td>'. $lang['REQUEST_TOSTRING'][$row['requestType']].'</td>';
-            echo '<td>'. $row['firstname']. ' ' .$row['lastname'] . '</td>';
+            echo '<td>'. $userID_toName[$row['userID']] . '</td>';
             if($row['requestType'] == 'acc'){
               echo '<td>'. substr($row['fromDate'],0,10). '</td>';
               echo '<td> --- </td>';
@@ -314,7 +311,6 @@ if($result && $result->num_rows > 0):
             }
             echo '</tr>';
           }
-        }
         ?>
      </tbody>
     </table>

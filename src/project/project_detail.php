@@ -1,10 +1,51 @@
 <?php require dirname(__DIR__).DIRECTORY_SEPARATOR.'header.php'; enableToProject($userID); ?>
 
 <?php
-if(!isset($_GET['p'])) die('Invalid access');
+if(!isset($_GET['p'])){ include dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php'; die('Invalid access'); }
 $projectID = intval($_GET['p']);
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
+    if(isset($_POST['saveGeneral'])){
+        $hours = floatval(test_input($_POST['project_hours']));
+        $hourlyPrice = floatval(test_input($_POST['project_hourlyPrice']));
+        $status = isset($_POST['project_productive']) ? 'checked' : '';
+        $field_1 = $field_2 = $field_3 = 'FALSE';
+        if(isset($_POST['project_field_1'])){ $field_1 = 'TRUE'; }
+        if(isset($_POST['project_field_2'])){ $field_2 = 'TRUE'; }
+        if(isset($_POST['project_field_3'])){ $field_3 = 'TRUE'; }
+
+        $conn->query("UPDATE projectData SET hours = '$hours', hourlyPrice = '$hourlyPrice', status='$status', field_1 = '$field_1', field_2 = '$field_2', field_3 = '$field_3' WHERE id = $projectID");
+        if($conn->error){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+        } else {
+            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+        }
+    } elseif(isset($_POST['reKey'])){
+        $keyPair = sodium_crypto_box_keypair();
+        $new_private = sodium_crypto_box_secretkey($keyPair);
+        $new_public = sodium_crypto_box_publickey($keyPair);
+        //outdate and insert
+        $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$projectID'"); echo $conn->error;
+        $result = $conn->query("SELECT userID, publicPGPKey FROM relationship_project_user r LEFT JOIN UserData ON r.userID = UserData.id WHERE projectID = $projectID");
+        while($result && ($row = $result->fetch_assoc())){
+            $user_public = base64_decode($row['publicPGPKey']);
+            $nonce = random_bytes(24);
+            $private_encrypt = $nonce . sodium_crypto_box($new_private, $nonce, $new_private.$new_public);
+            $conn->query("INSERT INTO security_access(userID, module, privateKey, optionalID) VALUES ($userID, 'PRIVATE_PROJECT', '".base64_encode($private_encrypt)."', '$projectID')");
+            echo $conn->error .' - access error<br>';
+        }
+        $result = $conn->query("SELECT id, symmetricKey, publicKey FROM security_projects WHERE projectID = $projectID AND outDated = 'FALSE' LIMIT 1"); echo $conn->error;
+        if($row = $result->fetch_assoc()){
+            $symmetric_cipher = base64_decode($row['symmetricKey']);
+            //TODO: decrypt old symmetric key or re-encrypt all old data.
+        } else {
+            $symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
+        }
+        //outdate and insert
+        $conn->query("UPDATE security_projects SET outDated = 'TRUE' WHERE projectID = $projectID"); echo $conn->error;
+        $symmetric_encrypted = base64_encode($nonce . sodium_crypto_box($symmetric, $nonce, $private.$public));
+        $conn->query("INSERT INTO security_projects (projectID, publicKey, symmetricKey) VALUES ($projectID, $new_public, $symmetric_encrypted)");
+    }
     if(isset($_POST['hire'])){
         if(!empty($_POST['userID'])){
             $stmt = $conn->prepare("INSERT INTO relationship_project_user (projectID, userID, access, expirationDate) VALUES($projectID, ?, ?, ?)"); echo $conn->error;
@@ -31,16 +72,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $stmt->close();
         }
     }
+
     if(!empty($_POST['removeUser'])){
         $x = intval($_POST['removeUser']);
+        $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$projectID' AND userID = $x");
         $conn->query("DELETE FROM relationship_project_user WHERE userID = $x AND projectID = $projectID");
         if($conn->error){
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
         } else {
             echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
         }
-    }
-    if(!empty($_POST['removeExtern'])){
+    } elseif(!empty($_POST['removeExtern'])){
         $x = intval($_POST['removeExtern']);
         $conn->query("DELETE FROM relationship_project_extern WHERE userID = $x AND projectID = $projectID");
         if($conn->error){
@@ -49,41 +91,34 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
         }
     }
-    if(isset($_POST['saveGeneral'])){
-        $hours = floatval(test_input($_POST['project_hours']));
-        $hourlyPrice = floatval(test_input($_POST['project_hourlyPrice']));
-        $status = isset($_POST['project_productive']) ? 'checked' : '';
-        $field_1 = $field_2 = $field_3 = 'FALSE';
-        if(isset($_POST['project_field_1'])){ $field_1 = 'TRUE'; }
-        if(isset($_POST['project_field_2'])){ $field_2 = 'TRUE'; }
-        if(isset($_POST['project_field_3'])){ $field_3 = 'TRUE'; }
-
-        $conn->query("UPDATE projectData SET hours = '$hours', hourlyPrice = '$hourlyPrice', status='$status', field_1 = '$field_1', field_2 = '$field_2', field_3 = '$field_3' WHERE id = $projectID");
-        if($conn->error){
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
-        } else {
-            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
-        }
-    }
 } //endif POST
 
-$result = $conn->query("SELECT p.*, c.companyID, c.name AS clientName FROM projectData p LEFT JOIN clientData c ON p.clientID = c.id WHERE p.id = $projectID");
+$result = $conn->query("SELECT p.*, c.companyID, s.publicKey, s.symmetricKey, c.name AS clientName FROM projectData p LEFT JOIN clientData c ON p.clientID = c.id
+LEFT JOIN security_projects s ON s.projectID = p.id AND s.outDated = 'FALSE' WHERE p.id = $projectID LIMIT 1");
+
+if(!$result){ include dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php'; die($conn->error); }
+
 $projectRow = $result->fetch_assoc();
 
-$result = $conn->query("SELECT privateKey, publicKey, symmetricKey FROM security_projects WHERE userID = $userID AND projectID = $projectID AND outDated = 'FALSE' LIMIT 1");
-if($result && ($row = $result->fetch_assoc())){
-    $keypair = base64_decode($privateKey).base64_decode($projectRow['publicKey']);
-    $cipher = base64_decode($row['privateKey']);
-    $nonce = mb_substr($cipher, 0, 24, '8bit');
-    $encrypted = mb_substr($cipher, 24, null, '8bit');
-    try {
-        $project_private = sodium_crypto_box_open($encrypted, $nonce, $keypair);
-        $project_symmetric = simple_decryption($projectRow);
-    } catch(Exception $e){
-        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
+//$result = $conn->query("SELECT publicKey, symmetricKey FROM security_projects WHERE projectID = $projectID AND outDated = 'FALSE' LIMIT 1");
+if($projectRow['publicKey']){
+    $result = $conn->query("SELECT privateKey FROM security_access WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$projectID' AND userID = $userID AND outDated = 'FALSE' LIMIT 1");
+    if($result && ($row = $result->fetch_assoc())){
+        $keypair = base64_decode($privateKey).base64_decode($projectRow['publicKey']);
+        $cipher = base64_decode($row['privateKey']);
+        $nonce = mb_substr($cipher, 0, 24, '8bit');
+        $encrypted = mb_substr($cipher, 24, null, '8bit');
+        try {
+            $project_private = sodium_crypto_box_open($encrypted, $nonce, $keypair);
+            $project_symmetric = simple_decryption($projectRow);
+        } catch(Exception $e){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
+        }
+    } else {
+        if($conn->error) echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+        else echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Unerwartet: Sie besitzen keinen Zugriff auf dieses Projekt.</div><hr>';
     }
 }
-
 ?>
 
 <form method="POST">
@@ -91,11 +126,12 @@ if($result && ($row = $result->fetch_assoc())){
         <h3><?php echo $projectRow['clientName'].' - '.$projectRow['name']; ?>
             <div class="page-header-button-group">
                 <button type="submit" name="saveGeneral" class="btn btn-default blinking" title="<?php echo $lang['SAVE']; ?>" ><i class="fa fa-floppy-o"></i></button>
+                <button type="submit" name="reKey" class="btn btn-default blinking" title="Neues Schlüsselpaar erstellen" ><i class="fa fa-lock"></i></button>
             </div>
         </h3>
     </div>
     <?php if(!$projectRow['publicKey']) echo '<div class="alert alert-warning"><a href="#" data-dismiss="alert" class="close">&times;</a>
-    Dieses Projekt besitzt noch kein Schlüsselpaar. Zugriff wurde eingeschränkt. Um das Projekt absichern zu lassen, drücken Sie auf den Re-Key Button</div><hr>'; ?>
+    Dieses Projekt besitzt noch kein Schlüsselpaar. Zugriff wurde eingeschränkt. Um das Projekt absichern zu lassen, drücken Sie auf den Schloss-Button</div><hr>'; ?>
 
     <h4>Allgemein</h4>
     <br>

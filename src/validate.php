@@ -166,7 +166,6 @@ function isDynamicProjectAdmin($userID){
 function enableToDynamicProjects($userID){
   global $conn;
   if(!$conn) require 'connection.php';
-  enableToBookings($userID);
   // test whether user has active dynamic projects
   $result = $conn->query("SELECT dynamicprojectsemployees.*, dynamicprojectsoptionalemployees.*, dynamicprojects.*
   FROM dynamicprojects
@@ -185,7 +184,7 @@ function enableToDynamicProjects($userID){
 function enableToWorkflow($userID){
     global $conn;
     if(!$conn) require 'connection.php';
-    $result = $conn->query("SELECT userID FROM roles WHERE userID = $userID AND canUseWorkflow = 'TRUE'");
+    $result = $conn->query("SELECT userID FROM roles WHERE userID = $userID AND (canUseWorkflow = 'TRUE' OR isProjectAdmin = 'TRUE')");
     if($userID != 1 && (!$result || $result->num_rows <= 0)){
         echo 'Access denied. <a href="../user/logout"> logout</a>';
         include 'footer.php';

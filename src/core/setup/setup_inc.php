@@ -1243,10 +1243,7 @@ function create_tables($conn) {
         ON DELETE CASCADE,
         FOREIGN KEY (projectowner) REFERENCES UserData(id)
         ON UPDATE CASCADE
-        ON DELETE CASCADE,
-        FOREIGN KEY (projectleader) REFERENCES UserData(id)
-        ON UPDATE CASCADE
-        ON DELETE SET NULL
+        ON DELETE CASCADE
     );";
     if (!$conn->query($sql)) {
         echo $conn->error;
