@@ -118,6 +118,16 @@ $result = $conn->query(
              LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
              WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day)
              OR dsgvo_training.answerEveryNDays = 0 )
+         ) 
+        UNION
+        SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations INNER JOIN relationship_company_client ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
+        LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID WHERE relationship_company_client.userID = $userID AND NOT EXISTS (
+             SELECT userID
+             FROM dsgvo_training_completed_questions
+             LEFT JOIN dsgvo_training_questions dtq ON dtq.id = dsgvo_training_completed_questions.questionID
+             LEFT JOIN dsgvo_training ON dsgvo_training.id = dtq.trainingID
+             WHERE questionID = dtq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day)
+             OR dsgvo_training.answerEveryNDays = 0 )
          )
     ) temp"
 );
@@ -149,6 +159,18 @@ if(!$userHasSurveys){
                  LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
                  WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
                  )
+            UNION
+            SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations 
+            INNER JOIN relationship_company_client ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
+            LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID 
+            WHERE relationship_company_client.userID = $userID 
+            AND NOT EXISTS (
+                SELECT userID
+                FROM dsgvo_training_completed_questions
+                LEFT JOIN dsgvo_training_questions dtq ON dtq.id = dsgvo_training_completed_questions.questionID
+                LEFT JOIN dsgvo_training ON dsgvo_training.id = dtq.trainingID
+                WHERE questionID = dtq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
+            )
         ) temp"
     );
     echo $conn->error;
@@ -173,6 +195,19 @@ if($userHasUnansweredSurveys){
                 LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
                 WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
              )
+            UNION
+            SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations 
+            INNER JOIN relationship_company_client ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
+            INNER JOIN dsgvo_training on dsgvo_training.id = dsgvo_training_company_relations.trainingID
+            LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID 
+            WHERE relationship_company_client.userID = $userID 
+            AND dsgvo_training.onLogin = 'TRUE' AND NOT EXISTS (
+                SELECT userID
+                FROM dsgvo_training_completed_questions
+                LEFT JOIN dsgvo_training_questions dtq ON dtq.id = dsgvo_training_completed_questions.questionID
+                LEFT JOIN dsgvo_training ON dsgvo_training.id = dtq.trainingID
+                WHERE questionID = dtq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
+            )
         ) temp"
     );
     echo $conn->error;
@@ -318,28 +353,6 @@ if ($_SESSION['color'] == 'light') {
     <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
     <link href="<?php echo $css_file; ?>" rel="stylesheet" />
     <title>Connect</title>
-  <?php
-    function showError($message){
-        if(!$message || strlen($message) == 0) return;
-        $message = str_replace("'", "\\'", $message);
-        echo "<script>$(document).ready(function(){showError('$message')})</script>";
-    }
-    function showWarning($message){
-        if(!$message || strlen($message) == 0) return;
-        $message = str_replace("'", "\\'", $message);
-        echo "<script>$(document).ready(function(){showWarning('$message')})</script>";
-    }
-    function showInfo($message){
-        if(!$message || strlen($message) == 0) return;
-        $message = str_replace("'", "\\'", $message);
-        echo "<script>$(document).ready(function(){showInfo('$message')})</script>";
-    }
-    function showSuccess($message){
-        if(!$message || strlen($message) == 0) return;
-        $message = str_replace("'", "\\'", $message);
-        echo "<script>$(document).ready(function(){showSuccess('$message')})</script>";
-    }
-  ?>
 </head>
 <body id="body_container" class="is-table-row">
     <div id="loader"></div>

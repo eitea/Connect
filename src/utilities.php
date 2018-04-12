@@ -609,3 +609,24 @@ function showSuccessToString($message){
     $message = str_replace("'", "\\'", $message);
     return "<script>$(document).ready(function(){showSuccess('$message')})</script>";
 }
+
+function showError($message){
+    if(!$message || strlen($message) == 0) return;
+    $message = str_replace("'", "\\'", $message);
+    echo "<script>$(document).ready(function(){showError('$message')})</script>";
+}
+function showWarning($message){
+    if(!$message || strlen($message) == 0) return;
+    $message = str_replace("'", "\\'", $message);
+    echo "<script>$(document).ready(function(){showWarning('$message')})</script>";
+}
+function showInfo($message){
+    if(!$message || strlen($message) == 0) return;
+    $message = str_replace("'", "\\'", $message);
+    echo "<script>$(document).ready(function(){showInfo('$message')})</script>";
+}
+function showSuccess($message){
+    if(!$message || strlen($message) == 0) return;
+    $message = str_replace("'", "\\'", $message);
+    echo "<script>$(document).ready(function(){showSuccess('$message')})</script>";
+}

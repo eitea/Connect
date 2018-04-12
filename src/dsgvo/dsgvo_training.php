@@ -1,6 +1,6 @@
 <?php require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'header.php';
-enableToDSGVO($userID);?>
-<?php require dirname(__DIR__) . DIRECTORY_SEPARATOR . "misc" . DIRECTORY_SEPARATOR . "helpcenter.php";?>
+enableToDSGVO($userID); ?>
+<?php require dirname(__DIR__) . DIRECTORY_SEPARATOR . "misc" . DIRECTORY_SEPARATOR . "helpcenter.php"; ?>
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 
 <?php
@@ -9,10 +9,10 @@ enableToDSGVO($userID);?>
 // A question is a text with different answers      (renamed to Frage)
 
 $trainingID = 0;
-if(isset($_REQUEST["trainingid"])){
+if (isset($_REQUEST["trainingid"])) {
     $trainingID = intval($_REQUEST["trainingid"]);
 }
-if(!isset($_REQUEST["n"])){
+if (!isset($_REQUEST["n"])) {
     showError("no company");
     include dirname(__DIR__) . '/footer.php';
     die();
@@ -23,7 +23,8 @@ $moduleID = 0;
 $stmt_insert_vv_log = $conn->prepare("INSERT INTO dsgvo_vv_logs (user_id,short_description,long_description,scope) VALUES ($userID,?,?,?)");
 showError($conn->error);
 $stmt_insert_vv_log->bind_param("sss", $stmt_insert_vv_log_short_description, $stmt_insert_vv_log_long_description, $stmt_insert_vv_log_scope);
-function insertVVLog($short,$long){
+function insertVVLog($short, $long)
+{
     global $stmt_insert_vv_log;
     global $stmt_insert_vv_log_short_description;
     global $stmt_insert_vv_log_long_description;
@@ -33,7 +34,7 @@ function insertVVLog($short,$long){
     $stmt_insert_vv_log_short_description = secure_data('DSGVO', $short, 'encrypt', $userID, $privateKey, $encryptionError);
     $stmt_insert_vv_log_long_description = secure_data('DSGVO', $long, 'encrypt', $userID, $privateKey, $encryptionError);
     $stmt_insert_vv_log_scope = secure_data('DSGVO', "TRAINING", 'encrypt', $userID, $privateKey, $encryptionError);
-    if($encryptionError){
+    if ($encryptionError) {
         showError($encryptionError);
     }
     $stmt_insert_vv_log->execute();
@@ -45,46 +46,46 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $name = test_input($_POST['name']);
         $moduleID = intval($_POST["module"]);
         $conn->query("INSERT INTO dsgvo_training (name,companyID, moduleID) VALUES('$name', $companyID, $moduleID)");
-        if($conn->error){
+        if ($conn->error) {
             showError($conn->error);
-        }else{
+        } else {
             showSuccess($lang["OK_ADD"]);
         }
         $trainingID = mysqli_insert_id($conn);
-        insertVVLog("INSERT","Create new training '$name' with id '$trainingID'");
+        insertVVLog("INSERT", "Create new training '$name' with id '$trainingID'");
     } elseif (isset($_POST['removeTraining'])) {
         $trainingID = intval($_POST['removeTraining']);
         $conn->query("DELETE FROM dsgvo_training WHERE id = $trainingID");
-        if($conn->error){
+        if ($conn->error) {
             showError($conn->error);
-        }else{
+        } else {
             showSuccess($lang["OK_DELETE"]);
         }
-        insertVVLog("DELETE","Delete training with id '$trainingID'");
+        insertVVLog("DELETE", "Delete training with id '$trainingID'");
     } elseif (isset($_POST['addQuestion']) && !empty($_POST['question']) && !empty($_POST["title"])) {
         $trainingID = intval($_POST['addQuestion']);
         $title = test_input($_POST["title"]);
         $text = $_POST["question"]; // todo: test input
         $stmt = $conn->prepare("INSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES($trainingID, ?, '$title')");
-        if($conn->error){
+        if ($conn->error) {
             showError($conn->error);
-        }else{
+        } else {
             showSuccess($lang["OK_ADD"]);
         }
         $stmt->bind_param("s", $text);
         $stmt->execute();
         showError($stmt->error);
-        insertVVLog("INSERT","Add new question with title '$title'");
+        insertVVLog("INSERT", "Add new question with title '$title'");
     } elseif (isset($_POST["removeQuestion"])) {
         $trainingID = $_POST["trainingID"];
         $questionID = intval($_POST["removeQuestion"]);
         $conn->query("DELETE FROM dsgvo_training_questions WHERE id = $questionID");
-        if($conn->error){
+        if ($conn->error) {
             showError($conn->error);
-        }else{
+        } else {
             showSuccess($lang["OK_DELETE"]);
         }
-        insertVVLog("DELETE","Delete question with id '$questionID'");
+        insertVVLog("DELETE", "Delete question with id '$questionID'");
     } elseif (isset($_POST["editQuestion"])) {
         $questionID = intval($_POST["editQuestion"]);
         $title = test_input($_POST["title"]);
@@ -95,12 +96,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->execute();
         $conn->query("SELECT trainingID FROM dsgvo_training_questions WHERE id = $questionID");
 
-        if($stmt->error){
+        if ($stmt->error) {
             showError($stmt->error);
-        } else{ 
+        } else {
             showSuccess($lang["OK_SAVE"]);
         }
-        insertVVLog("UPDATE","Edit question with id '$questionID'");
+        insertVVLog("UPDATE", "Edit question with id '$questionID'");
     } elseif (isset($_POST["editTraining"])) {
         $trainingID = $_POST["editTraining"];
         $version = 1;
@@ -113,21 +114,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $random = test_input($_POST["random"]);
         $moduleID = intval($_POST["module"]);
         $answerEveryNDays = 0; // 0 means no interval
-        if(isset($_POST["answerEveryNDays"])){
+        if (isset($_POST["answerEveryNDays"])) {
             $answerEveryNDays = intval($_POST["answerEveryNDays"]);
         }
-        if($onLogin == 'FALSE' || $allowOverwrite == 'FALSE'){
+        if ($onLogin == 'FALSE' || $allowOverwrite == 'FALSE') {
             $answerEveryNDays = 0; // 0 means no interval
         }
         $conn->query("UPDATE dsgvo_training SET version = $version, name = '$name', onLogin = '$onLogin', allowOverwrite = '$allowOverwrite', random = '$random', moduleID = $moduleID, answerEveryNDays = $answerEveryNDays WHERE id = $trainingID");
-        if($conn->error){
+        if ($conn->error) {
             showError($conn->error);
-        } else{ 
+        } else {
             showSuccess($lang["OK_SAVE"]);
         }
         $conn->query("DELETE FROM dsgvo_training_user_relations WHERE trainingID = $trainingID");
         showError($conn->error);
         $conn->query("DELETE FROM dsgvo_training_team_relations WHERE trainingID = $trainingID");
+        showError($conn->error);
+        $conn->query("DELETE FROM dsgvo_training_company_relations WHERE trainingID = $trainingID");
         showError($conn->error);
         if (isset($_POST["employees"])) {
             $employeeID = $teamID = "";
@@ -135,53 +138,62 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             showError($conn->error);
             $stmtTeam = $conn->prepare("INSERT INTO dsgvo_training_team_relations (trainingID, teamID) VALUES ($trainingID, ?)");
             showError($conn->error);
+            $stmtCompany = $conn->prepare("INSERT INTO dsgvo_training_company_relations (trainingID, companyID) VALUES ($trainingID, ?)");
+            showError($conn->error);
             $stmtUser->bind_param("i", $employeeID);
             $stmtTeam->bind_param("i", $teamID);
+            $stmtCompany->bind_param("i", $cmpID);
             foreach ($_POST["employees"] as $employee) {
                 $emp_array = explode(";", $employee);
                 if ($emp_array[0] == "user") {
                     $employeeID = intval($emp_array[1]);
                     $stmtUser->execute();
-                } else { //team
+                    showError($stmtUser->error);
+                } else if ($emp_array[0] == "team") { //team
                     $teamID = intval($emp_array[1]);
                     $stmtTeam->execute();
+                    showError($stmtTeam->error);
+                } else {
+                    $cmpID = intval($emp_array[1]);
+                    $stmtCompany->execute();
+                    showError($stmtCompany->error);
                 }
             }
         }
-        insertVVLog("UPDATE","Update training '$name'");
+        insertVVLog("UPDATE", "Update training '$name'");
     } elseif (isset($_POST["createModule"])) {
         $name = test_input($_POST['name']);
         $conn->query("INSERT INTO dsgvo_training_modules (name) VALUES('$name')");
-        if($conn->error){
+        if ($conn->error) {
             showError($conn->error);
-        }else{
+        } else {
             showSuccess($lang["OK_ADD"]);
         }
         $moduleID = mysqli_insert_id($conn);
-        insertVVLog("INSERT","Create module '$name'");
+        insertVVLog("INSERT", "Create module '$name'");
     } elseif (isset($_POST['removeModule'])) {
         $moduleID = intval($_POST['removeModule']);
         $conn->query("DELETE FROM dsgvo_training_modules WHERE id = $moduleID");
-        if($conn->error){
+        if ($conn->error) {
             showError($conn->error);
-        }else{
+        } else {
             showSuccess($lang["OK_DELETE"]);
         }
-        insertVVLog("DELETE","Remove module with id '$moduleID'");
+        insertVVLog("DELETE", "Remove module with id '$moduleID'");
     } elseif (isset($_POST["jsonImport"])) {
         $replace_old = isset($_POST["replace_old"]);
         //todo: remove next line
-        if($replace_old) showWarning("Replacing old modules currently doesn't work but your import will continue as usual.");
+        if ($replace_old) showWarning("Replacing old modules currently doesn't work but your import will continue as usual.");
         $error_happened = false;
         $json = json_decode($_POST["jsonImport"], true);
-        if($json){
+        if ($json) {
             foreach ($json as $module) {
                 $name = test_input($module["module"]);
                 $sets = $module["sets"];
                 //todo: replace old 
                 $conn->query("INSERT INTO dsgvo_training_modules (name) VALUES('$name')");
                 showError($conn->error);
-                if($conn->error) $error_happened = true;
+                if ($conn->error) $error_happened = true;
                 $moduleID = mysqli_insert_id($conn);
                 foreach ($sets as $set) {
                     $name = test_input($set["set"]);
@@ -192,38 +204,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $questions = $set["questions"];
                     $conn->query("INSERT INTO dsgvo_training (name,companyID, moduleID, version, onLogin, allowOverwrite, random) VALUES('$name', $companyID, $moduleID, $version, '$onLogin', '$allowOverwrite', '$random')");
                     showError($conn->error);
-                    if($conn->error) $error_happened = true;
+                    if ($conn->error) $error_happened = true;
                     $trainingID = mysqli_insert_id($conn);
                     foreach ($questions as $question) {
                         $title = test_input($question["title"]);
                         $text = $question["text"];
                         $stmt = $conn->prepare("INSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES($trainingID, ?, '$title')");
                         showError($conn->error);
-                        if($conn->error) $error_happened = true;
+                        if ($conn->error) $error_happened = true;
                         $stmt->bind_param("s", $text);
                         $stmt->execute();
                     }
                 }
-                insertVVLog("IMPORT","Import module '$name'");
+                insertVVLog("IMPORT", "Import module '$name'");
             }
-        }else{
+        } else {
             showError($lang["ERROR_MISSING_FIELDS"]);
             $error_happened = true;
         }
-        if(!$error_happened){
+        if (!$error_happened) {
             showSuccess($lang["OK_IMPORT"]);
         }
     } elseif (isset($_POST["editModule"])) {
         $name = test_input($_POST['name']);
         $moduleID = intval($_POST["editModule"]);
         $conn->query("UPDATE dsgvo_training_modules SET name = '$name' WHERE id=$moduleID");
-        if($conn->error){
+        if ($conn->error) {
             showError($conn->error);
-        } else{ 
+        } else {
             showSuccess($lang["OK_SAVE"]);
         }
         $moduleID = mysqli_insert_id($conn);
-        insertVVLog("UPDATE","Change module name to '$name' (id: '$moduleID')");        
+        insertVVLog("UPDATE", "Change module name to '$name' (id: '$moduleID')");
     }
 }
 $activeTab = $trainingID;
@@ -254,11 +266,11 @@ showError($conn->error);
 <div class="page-content-fixed-130">
 <div class="container-fluid">
     <?php
-$result_module = $conn->query("SELECT dsgvo_training_modules.id, dsgvo_training_modules.name FROM dsgvo_training_modules LEFT JOIN dsgvo_training ON dsgvo_training.moduleID = dsgvo_training_modules.id WHERE dsgvo_training.companyID = $companyID OR dsgvo_training.companyID IS NULL GROUP BY dsgvo_training_modules.id");
-while ($result_module && ($row_module = $result_module->fetch_assoc())) {
-    $moduleID = $row_module["id"];
-    $moduleName = $row_module["name"];
-    ?>
+    $result_module = $conn->query("SELECT dsgvo_training_modules.id, dsgvo_training_modules.name FROM dsgvo_training_modules LEFT JOIN dsgvo_training ON dsgvo_training.moduleID = dsgvo_training_modules.id WHERE dsgvo_training.companyID = $companyID OR dsgvo_training.companyID IS NULL GROUP BY dsgvo_training_modules.id");
+    while ($result_module && ($row_module = $result_module->fetch_assoc())) {
+        $moduleID = $row_module["id"];
+        $moduleName = $row_module["name"];
+        ?>
 <div class="panel panel-default">
     <div class="panel-heading container-fluid">
     <span data-container="body" data-toggle="tooltip" title="Set">    
@@ -278,13 +290,13 @@ while ($result_module && ($row_module = $result_module->fetch_assoc())) {
         </form>
     </div>
     </div>
-    <div class="collapse <?=$moduleID == $activeModule ? 'in' : ''?>" id="moduleCollapse-<?php echo $moduleID; ?>">
+    <div class="collapse <?= $moduleID == $activeModule ? 'in' : '' ?>" id="moduleCollapse-<?php echo $moduleID; ?>">
     <div class="panel-body container-fluid">
     <?php
-$result = $conn->query("SELECT * FROM dsgvo_training WHERE companyID = $companyID AND moduleID = $moduleID");
-    while ($result && ($row = $result->fetch_assoc())):
+    $result = $conn->query("SELECT * FROM dsgvo_training WHERE companyID = $companyID AND moduleID = $moduleID");
+    while ($result && ($row = $result->fetch_assoc())) :
         $trainingID = $row['id'];
-        ?>
+    ?>
 <form method="post">
     <input type="hidden" name="trainingID" value="<?php echo $trainingID; ?>" />
 <div class="panel panel-default">
@@ -298,19 +310,21 @@ $result = $conn->query("SELECT * FROM dsgvo_training WHERE companyID = $companyI
         </span>        
     </div>
     </div>
-    <div class="collapse <?php if ($trainingID == $activeTab) {  echo 'in'; } ?>" id="trainingCollapse-<?php echo $trainingID; ?>">
+    <div class="collapse <?php if ($trainingID == $activeTab) {
+                            echo 'in';
+                        } ?>" id="trainingCollapse-<?php echo $trainingID; ?>">
 						                <div class="panel-body container-fluid">
 						                    <?php
 
-        $result_question = $conn->query("SELECT * FROM dsgvo_training_questions WHERE trainingID = $trainingID");
-        while ($row_question = $result_question->fetch_assoc()):
-            $questionID = $row_question["id"];
-            $title = $row_question["title"];
-            $text = $row_question["text"];
-            if($trainingID == $activeTab){
-                echo "<script>$('#moduleCollapse-$moduleID').addClass('in')</script>";
-            }
-            ?>
+                            $result_question = $conn->query("SELECT * FROM dsgvo_training_questions WHERE trainingID = $trainingID");
+                            while ($row_question = $result_question->fetch_assoc()) :
+                                $questionID = $row_question["id"];
+                            $title = $row_question["title"];
+                            $text = $row_question["text"];
+                            if ($trainingID == $activeTab) {
+                                echo "<script>$('#moduleCollapse-$moduleID').addClass('in')</script>";
+                            }
+                            ?>
             <div class="col-md-12">
                 <span data-container="body" data-toggle="tooltip" title="Frage löschen">   
                     <button type="submit" style="background:none;border:none" name="removeQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-trash"></i></button>
@@ -325,7 +339,7 @@ $result = $conn->query("SELECT * FROM dsgvo_training WHERE companyID = $companyI
     <?php
     endwhile;
 
-        ?>
+    ?>
 
             <div class="col-md-12 float-right">
             <div class="btn-group float-right" style="float:right!important">
@@ -366,9 +380,10 @@ $result = $conn->query("SELECT * FROM dsgvo_training WHERE companyID = $companyI
     <!-- /question add modal -->
 </form>
 
-    <?php endwhile;?>
+    <?php endwhile; ?>
 </div></div></div>
-<?php }?>
+<?php 
+} ?>
 </div>
 
 <!-- new training modal -->
@@ -386,13 +401,13 @@ $result = $conn->query("SELECT * FROM dsgvo_training WHERE companyID = $companyI
         <label>Set*</label>
         <select class="js-example-basic-single" name="module" required>
             <?php
-$result = $conn->query("SELECT * FROM dsgvo_training_modules");
-while ($result && ($row = $result->fetch_assoc())) {
-    $name = $row["name"];
-    $id = $row["id"];
-    echo "<option value='$id'>$name</option>";
-}
-?>
+            $result = $conn->query("SELECT * FROM dsgvo_training_modules");
+            while ($result && ($row = $result->fetch_assoc())) {
+                $name = $row["name"];
+                $id = $row["id"];
+                echo "<option value='$id'>$name</option>";
+            }
+            ?>
             </select>
         </div>
         <div class="modal-footer">
@@ -452,7 +467,7 @@ $("button[name=editQuestion]").click(function(){
     setCurrentModal({questionID: $(this).val()},'get', 'ajaxQuery/AJAX_dsgvoQuestionEdit.php')
 })
 $("button[name=editTraining]").click(function(){
-    setCurrentModal({trainingID: $(this).val()},'get', 'ajaxQuery/AJAX_dsgvoTrainingEdit.php')
+    setCurrentModal({trainingID: $(this).val()},'get', 'ajaxQuery/ajax_dsgvo_training_edit.php')
 })
 $("button[name=infoQuestion]").click(function(){
     setCurrentModal({questionID: $(this).val()},'get', 'ajaxQuery/AJAX_dsgvoQuestionInfo.php')
@@ -481,7 +496,7 @@ $("button[name=editModule]").click(function(){
 function formatState (state) {
     if (!state.id) { return state.text; }
     var $state = $(
-        '<span><i class="fa fa-' + state.element.dataset.icon + '"></i> ' + state.text + '</span>'
+        '<span><i class="fa fa-fw fa-' + state.element.dataset.icon + '"></i> ' + state.text + '</span>'
     );
     return $state;
 };
@@ -525,4 +540,4 @@ onModalLoad();
 </script>
 </div>
 <!-- /BODY -->
-<?php include dirname(__DIR__) . '/footer.php';?>
+<?php include dirname(__DIR__) . '/footer.php'; ?>
