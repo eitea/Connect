@@ -22,29 +22,22 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
     } elseif(isset($_POST['reKey'])){
         $keyPair = sodium_crypto_box_keypair();
-        $new_private = base64_encode(sodium_crypto_box_secretkey($keyPair));
-        $new_public = base64_encode(sodium_crypto_box_publickey($keyPair));
+        $new_private = sodium_crypto_box_secretkey($keyPair);
+        $new_public = sodium_crypto_box_publickey($keyPair);
         //outdate and insert
         $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$projectID'"); echo $conn->error;
         $result = $conn->query("SELECT userID, publicPGPKey FROM relationship_project_user r LEFT JOIN UserData ON r.userID = UserData.id WHERE projectID = $projectID");
         while($result && ($row = $result->fetch_assoc())){
             $user_public = base64_decode($row['publicPGPKey']);
-
-            $nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
-            $public_module = base64_decode($row['publicPGPKey']);
-            $cipher_private_module = base64_decode($row['privateKey']);
-            $cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
-
-            $private_module = sodium_crypto_box_open($cipher_private_module, $nonce, $privateKey.$public_module);
             $nonce = random_bytes(24);
-            $private_encrypt = $nonce . sodium_crypto_box($private_module, $nonce, $private_module.$public);
-            $conn->query("INSERT INTO security_access(userID, module, privateKey) VALUES ($userID, 'DSGVO', '".base64_encode($private_encrypt)."')");
+            $private_encrypt = $nonce . sodium_crypto_box($new_private, $nonce, $new_private.$new_public);
+            $conn->query("INSERT INTO security_access(userID, module, privateKey, optionalID) VALUES ($userID, 'PRIVATE_PROJECT', '".base64_encode($private_encrypt)."', '$projectID')");
+            echo $conn->error .' - access error<br>';
         }
-        echo $conn->error;
         $result = $conn->query("SELECT id, symmetricKey, publicKey FROM security_projects WHERE projectID = $projectID AND outDated = 'FALSE' LIMIT 1"); echo $conn->error;
         if($row = $result->fetch_assoc()){
             $symmetric_cipher = base64_decode($row['symmetricKey']);
-
+            //TODO: decrypt old symmetric key or re-encrypt all old data.
         } else {
             $symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
         }
