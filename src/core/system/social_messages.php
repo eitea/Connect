@@ -183,7 +183,7 @@
             <div class="pre-scrollable" id="messages" style="display: none; background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh; padding-top: 5px"></div>
 
             <div id="chatinput" style="display: none; padding-top: 5px;">
-                <form autocomplete="off">
+                <form name="chatInputForm" autocomplete="off">
                     <div class="input-group">
                         <textarea id="message" wrap="hard" placeholder="Type a message" class="form-control" style="height: 3.6vh; max-height: 11vh; resize: none; "></textarea>
                         <span class="input-group-btn"><button id="sendButton" class="btn btn-default" type="submit" style="height: 3.6vh"><?php echo $lang['SEND'] ?></button></span>
@@ -243,6 +243,14 @@
                         }
 
                     })
+
+                    //removes "do you really want to leave this site message"
+                    $(document).ready(function() {
+                        $(":input", document.chatInputForm).bind("change", function() {
+                            window.onbeforeunload = null;
+                            console.log(window.onbeforeunload);
+                        });
+                    });
                 </script>
             </div>
         </div>
