@@ -952,7 +952,7 @@ $lang_eng['OK_DELETE'] = 'Your selections have been deleted.';
 $lang_ger['OK_DELETE'] = 'Ihre Auswahl wurde gelöscht.';
 
 $lang_eng['OK_REQUEST'] = 'Your request has been successfully registered. Please wait until an Administrator processed your issue.';
-$lang_ger['OK_REQUEST'] = 'Ihr Antrag wurde erfolgreich erstellt. Bitte warten Sie bis sich ein Administrator um ihr Anliegen gekümmert hat.';
+$lang_ger['OK_REQUEST'] = 'Ihr Antrag wurde erfolgreich erstellt. Bitte warten Sie bis sich ein Administrator um Ihr Anliegen gekümmert hat.';
 
 $lang_eng['OK_SAVE'] = 'Changes were successfully saved.';
 $lang_ger['OK_SAVE'] = 'Änderungen wurden erfolgreich gespeichert.';

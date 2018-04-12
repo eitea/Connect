@@ -26,7 +26,7 @@ if(isset($_POST['request_submit'])){
     if(test_Date($startTime)){
       $sql = "INSERT INTO $userRequests(userID, fromDate, toDate, status, requestText, requestType, requestID, timeToUTC) VALUES($userID, '$startTime', '$endTime', '0', '$requestText', 'log', '".$arr[0]."', $timeToUTC )";
       if($conn->query($sql)){
-        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_REQUEST'].'</div>';
       } else {
         echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
       }
