@@ -13,21 +13,6 @@
         }
         return false;
     }
-
-    function addS3Config($server,$key,$secret,$name){
-        require dirname(__DIR__) . "/connection.php";
-        try{
-            $active = 'FALSE';
-            $result = $conn->query("SELECT id FROM archiveconfig");
-            if($result->num_rows<1) $active = 'TRUE';
-            if(empty($name)) $name = $server;
-            $conn->query("INSERT INTO archiveconfig (endpoint,awskey,secret,isActive,name) VALUES ('$server','$key','$secret','$active','$name')");
-            return true;
-        }catch(Exception $e){
-            return false;
-        }
-    }
-
     function clearS3Config(){
         require dirname(__DIR__) . "/connection.php";
         try{

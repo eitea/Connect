@@ -7,15 +7,14 @@ session_start();
 $userID = $_SESSION["userid"] or die("Session died");
 $x = test_input($_GET['projectid'], 1);
 
-$result = $conn->query("SELECT activity, userID FROM dynamicprojectslogs WHERE projectID = '$x' AND
-    ((activity = 'VIEWED' AND userid = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID)) ORDER BY logTime DESC LIMIT 1"); //changes here have to be synced with dynamicProjects.php
+$result = $conn->query("SELECT activity, userID FROM dynamicprojectslogs WHERE projectid = '$x' AND
+    ((activity = 'VIEWED' AND userid = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID)) ORDER BY logTime DESC LIMIT 1"); echo $conn->error;
 if (($row = $result->fetch_assoc()) && $row['activity'] != 'VIEWED') {
     $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$x', 'VIEWED', $userID)");
 }
 $showMissingBookings = true;
 $missingBookingsArray = array();
 
-//copied from dynamicProjects (when something changes there, update it here too)
 //see open tasks user is part of
 $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
     projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours

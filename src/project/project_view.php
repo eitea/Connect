@@ -28,13 +28,19 @@ if(isset($_POST['add']) && !empty($_POST['name']) && !empty($_POST['filterClient
     if(isset($_POST['createField_3'])){ $field_3 = 'TRUE'; } else { $field_3 = 'FALSE'; }
     $conn->query("INSERT INTO projectData (clientID, name, status, hours, hourlyPrice, field_1, field_2, field_3, creator, symmetricKey, publicKey)
     VALUES ($client_id, '$name', '$status', '$hours', '$hourlyPrice', '$field_1', '$field_2', '$field_3', $userID, '$symmetric_encrypted', '".base64_encode($public)."')");
-
-    $projectID = $conn->insert_id;
-    $nonce = random_bytes(24);
-    $private_encrypt = base64_encode($nonce . sodium_crypto_box(base64_encode($private), $nonce, $private.base64_decode($publicKey)));
-    $conn->query("INSERT INTO security_projects (projectID, userID, privateKey) VALUES($projectID, $userID, '$private_encrypt')");
-
-    if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
+    if($conn->error){
+        showError($conn->error);
+    } else {
+        $projectID = $conn->insert_id;
+        $nonce = random_bytes(24);
+        $private_encrypt = base64_encode($nonce . sodium_crypto_box(base64_encode($private), $nonce, $private.base64_decode($publicKey)));
+        $conn->query("INSERT INTO security_projects (projectID, userID, privateKey) VALUES($projectID, $userID, '$private_encrypt')");
+        if($conn->error){
+            showError($conn->error);
+        } else {
+            showSuccess($lang['OK_ADD']);
+        }
+    }
 }
 if(isset($_POST['delete']) && isset($_POST['index'])) {
     $index = $_POST["index"];

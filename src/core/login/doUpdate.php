@@ -2503,6 +2503,9 @@ if($row['version'] < 147){
     } else {
         echo '<br>Benutzer: Hauptmandant';
     }
+
+    $conn->query("ALTER TABLE dynamicprojectslogs ADD COLUMN id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY");
+    $conn->query("ALTER TABLE projectData ADD COLUMN publicKey VARCHAR(150)");
 }
 
 if($row['version'] < 148){

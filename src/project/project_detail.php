@@ -123,7 +123,7 @@ $projectRow = $result->fetch_assoc();
     </div>
 </form>
 
-<?php if($projectRow['publicKey']): ?>
+<?php if($projectRow['publicKey'] && $projectRow['creator'] == $userID): ?>
 <form method="POST" action="../setup/keys" target="_blank">
     <div class="row form-group">
         <div class="col-sm-2">
@@ -261,7 +261,7 @@ $projectRow = $result->fetch_assoc();
             while($result && $row = $result->fetch_assoc()){
                 //text, file, s3File, s3Text, folder
                 if($row['type'] == 'folder'){
-                    return drawTree($row['parent_directory']);
+                    $html .= drawTree($row['parent_directory']);
                 } elseif($row['type'] == 'text'){
                   $html .= '<tr></tr>';
                 }

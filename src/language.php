@@ -885,6 +885,9 @@ $lang_ger['INVALID_USER'] = 'Ungültiger Benutzer!';
 $lang_eng['MESSAGE_SENT'] = 'Message has been sent!';
 $lang_ger['MESSAGE_SENT'] = 'Nachricht wurde verschickt!';
 
+$lang_eng['MESSAGES_DELETED'] = 'Messages have been deleted!';
+$lang_ger['MESSAGES_DELETED'] = 'Nachrichten wurden gelöscht!';
+
 $lang_eng['NEW'] = 'New';
 $lang_ger['NEW'] = 'Neu';
 
