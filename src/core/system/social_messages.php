@@ -124,7 +124,7 @@
 
     <div class="row">
         <!-- Subjects -->
-        <div class="col-xs-4">
+        <div class="col-md-4">
             <?php
                 $result = $conn->query("SELECT subject, userID, partnerID FROM messages WHERE $userID IN (partnerID, userID) GROUP BY subject, LEAST(userID, partnerID), GREATEST(userID, partnerID) ");
                 $i = 0;
@@ -142,35 +142,63 @@
 
                     // 5ac62d49ea1c4
                     $sql = "SELECT firstname, lastname FROM UserData WHERE id = '{$receiver}' GROUP BY id";
-                    $result2 = $conn->query($sql);
-                    $row2 = $result2->fetch_assoc();
-                    $firstname = $row2['firstname'];
-                    $lastname = $row2['lastname'];
+                    $name_result = $conn->query($sql);
+                    $name_row = $name_result->fetch_assoc();
+                    $firstname = $name_row['firstname'];
+                    $lastname = $name_row['lastname'];
 
                     if(!empty($firstname) && !empty($lastname)) 
                         $name = $firstname . " " . $lastname;
                     elseif ((empty($firstname) && !empty($lastname)) || (empty($firstname) && !empty($lastname)))   // the user has no firstname or no lastname (admin)
                         $name = $firstname . " " . $lastname;
 
-                    echo '<div style="padding: 5px">';
-                    echo '<div class="subject'.$i.' input-group" style="word-break: normal; word-wrap: normal; background-color: white; border: 1px solid gainsboro;">';
-                    echo '<p style="padding: 10px;" onclick="showChat('.$receiver.', \''.$subject.'\', \''.$name.'\')">' . $subject . '</p>';
-                    echo '<span class="input-group-btn"><button style="background-color: white; " class="icon'.$i.' btn" onclick="deleteSubject('.$receiver.', \''.$subject.'\')"><i class="fa fa-trash" aria-hidden="true"></i></button></span>';
-                    echo '</div>';
-                    echo '</div>';
+                ?>
+
+                    <div style="padding: 5px;">
+                        <div class="subject<?php echo $i; ?> input-group" style="word-break: normal; word-wrap: normal; background-color: white; border: 1px solid gainsboro;">
+                            <p style="padding: 10px;" onclick="showChat(<?php echo $receiver; ?>, '<?php echo $subject; ?>', '<?php echo $name; ?>')"><?php echo $subject; ?></p>
+
+                            <span class="input-group-btn">
+                                <button style="display: none; background-color: white;" class="btn icon<?php echo $i; ?>" onclick="deleteSubject(<?php echo $receiver; ?>, '<?php echo $i; ?>')">
+                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                </button>
+
+                            <?php
+                            $badge_result = $conn->query("SELECT messageID FROM messages WHERE subject = '$subject' and partnerID = $userID and seen = 'FALSE'");
+                            echo $conn->error;
+                            ?>
+                            <?php if($badge_result && $badge_result->num_rows >= 0) echo '<span class="badge pull-right badge'.$i.'">'.$badge_result->num_rows.'</span>'; ?>
+                            </span>
+                        </div>
+                    </div>
                     
-                    // on hover
-                    echo '<script>';
-                    echo '$(".subject'.$i.'").hover(function(){
-                                $(this).css("background-color", "whitesmoke");
-                                $(".icon'.$i.'").css("background-color", "whitesmoke");
-                            }, function(){
-                                $(this).css("background-color", "white");
-                                $(".icon'.$i.'").css("background-color", "white");
-                            });';
-                    echo '</script>';
-                }
+                    
+                    <script>
+                    //on hover (for dynamic html elements)
+                    $(".subject<?php echo $i; ?>").hover(function(){
+                        $(this).css("background-color", "whitesmoke")
+                        $(".icon<?php echo $i; ?>").css("background-color", "whitesmoke")
+
+                        $(".icon<?php echo $i; ?>").css({
+                            'background-color' : 'whitesmoke',
+                            'display' : 'block'
+                        });
+
+                        $(".badge<?php echo $i; ?>").css("display", "none");
+                    }, function(){
+                        $(this).css("background-color", "white")
+                        
+                        $(".icon<?php echo $i; ?>").css({
+                            'background-color' : 'white',
+                            'display' : 'none'
+                        });
+
+                        $(".badge<?php echo $i; ?>").css("display", "block")
+                    });
+                     </script>
                 
+                <?php
+                }
                 echo $conn->error;
             ?>
         </div>
