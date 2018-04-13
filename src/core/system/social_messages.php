@@ -121,10 +121,9 @@
         </thead>
     </table>
 
-
     <div class="row">
         <!-- Subjects -->
-        <div class="col-md-4">
+        <div class="col-md-6">
             <?php
                 $result = $conn->query("SELECT subject, userID, partnerID FROM messages WHERE $userID IN (partnerID, userID) GROUP BY subject, LEAST(userID, partnerID), GREATEST(userID, partnerID) ");
                 $i = 0;
@@ -153,27 +152,23 @@
                         $name = $firstname . " " . $lastname;
 
                 ?>
-
                     <div style="padding: 5px;">
                         <div class="subject<?php echo $i; ?> input-group" style="word-break: normal; word-wrap: normal; background-color: white; border: 1px solid gainsboro;">
                             <p style="padding: 10px;" onclick="showChat(<?php echo $receiver; ?>, '<?php echo $subject; ?>', '<?php echo $name; ?>')"><?php echo $subject; ?></p>
 
-                            <span class="input-group-btn">
+                            <div class="input-group-btn">
                                 <button style="display: none; background-color: white;" class="btn icon<?php echo $i; ?>" onclick="deleteSubject(<?php echo $receiver; ?>, '<?php echo $i; ?>')">
                                     <i class="fa fa-trash" aria-hidden="true"></i>
                                 </button>
-
-                            <?php
-                            $badge_result = $conn->query("SELECT messageID FROM messages WHERE subject = '$subject' and partnerID = $userID and seen = 'FALSE'");
-                            echo $conn->error;
-                            ?>
-                            <?php if($badge_result && $badge_result->num_rows >= 0) echo '<span class="badge pull-right badge'.$i.'">'.$badge_result->num_rows.'</span>'; ?>
-                            </span>
+                                <span id="badge<?php echo $i ?>" class="badge pull-right">0</span>
+                            </div>
                         </div>
                     </div>
                     
-                    
                     <script>
+                    // interval for the notification badge
+                    setInterval(function(){udpateBadge("#badge<?php echo $i; ?>", <?php echo $receiver; ?>, "<?php echo $subject; ?>")},1000);
+
                     //on hover (for dynamic html elements)
                     $(".subject<?php echo $i; ?>").hover(function(){
                         $(this).css("background-color", "whitesmoke")
@@ -184,7 +179,7 @@
                             'display' : 'block'
                         });
 
-                        $(".badge<?php echo $i; ?>").css("display", "none");
+                        $("#badge<?php echo $i; ?>").css("display", "none");
                     }, function(){
                         $(this).css("background-color", "white")
                         
@@ -193,9 +188,9 @@
                             'display' : 'none'
                         });
 
-                        $(".badge<?php echo $i; ?>").css("display", "block")
+                        $("#badge<?php echo $i; ?>").css("display", "block")
                     });
-                     </script>
+                    </script>
                 
                 <?php
                 }
@@ -204,7 +199,7 @@
         </div>
 
         <!-- Messages -->
-        <div class="col-xs-8">
+        <div class="col-xs-6">
             <!-- 5ac62d49ea1c4 -->
             <div id="user_bar" style="display: none; background-color: whitesmoke; border: 1px gainsboro solid; border-bottom: none; max-height: 10vh; padding: 10px;"></div>
             
@@ -223,7 +218,7 @@
                     $('#message, #sendButton').on('change keyup keydown paste cut click', function (event) {
                         $("#message").height(0).height(this.scrollHeight/1.4);
                     }).find('textarea').change();
-                                  
+                                
                     // send on enter
                     var shiftPressed = false;
                     $("#message").keydown(function(event) {
@@ -245,7 +240,7 @@
                             }
                         }
                     });
-                           
+                        
                     //submit
                     $("#chatinput").submit(function (e) {
                         //prevent enter
@@ -284,7 +279,6 @@
         </div>
     </div>
 </div>
-
 
 <script>
 var selectedPartner = -1;
@@ -379,6 +373,25 @@ function deleteSubject(partner, subject) {
         },
     })
 }
+
+function udpateBadge(target, partner, subject) {
+    if(partner == -1 && subject.length == 0) {
+        return;
+    }
+
+    $.ajax({
+        url: 'ajaxQuery/AJAX_postGetAlerts.php',
+        type: 'GET',
+        data:{
+            partner: partner,
+            subject: subject
+        },
+        success: function (response) {
+            $(target).html(response)
+        },
+    })
+}
+
 </script>
 
 <?php require dirname(dirname(__DIR__)) . '/footer.php'; ?>
