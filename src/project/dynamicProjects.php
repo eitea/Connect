@@ -505,7 +505,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 $disabled = (time() - strtotime($row['workStart']) > 60) ? 'title="Task stoppen"' : 'disabled title="1 Minute Wartezeit"';
                 echo '<button class="btn btn-default" '.$disabled.' type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal" name="pauseBtn"><i class="fa fa-pause"></i></button> ';
                 $occupation = array('bookingID' => $row['workingID'], 'dynamicID' => $x, 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage']);
-            } elseif(strtotime($A) < time() && $row['projectstatus'] == 'ACTIVE' && $row['workingUser'] && !$hasActiveBooking){
+            } elseif(strtotime($A) < time() && $row['projectstatus'] == 'ACTIVE' && !$row['workingUser'] && !$hasActiveBooking){
                 if(!$row['projectleader']){
                     echo "<button class='btn btn-default' type='button' title='Task starten' data-toggle='modal' data-target='#play-take-$x'><i class='fa fa-play'></i></button>";
                 } else {
