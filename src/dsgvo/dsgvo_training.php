@@ -184,21 +184,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $replace_old = isset($_POST["replace_old"]);
         $error_happened = false;
         $json = json_decode($_POST["jsonImport"], true);
+        $select_module_stmt = $conn->prepare("SELECT id from dsgvo_training_modules where name = ?");
+        $select_module_stmt->bind_param("s", $name);
+        $select_training_stmt = $conn->prepare("SELECT id from dsgvo_training WHERE name = ? AND moduleID = ?");
+        $select_training_stmt->bind_param("si", $name, $moduleID);
+        $select_question_stmt = $conn->prepare("SELECT id from dsgvo_training_questions WHERE title = ? AND trainingID = ?");
+        $select_question_stmt->bind_param("si", $title, $trainingID);
+        $insert_module_stmt = $conn->prepare("INSERT INTO dsgvo_training_modules (name) VALUES( ? )");
+        $insert_module_stmt->bind_param("s", $name);
+        $insert_training_stmt = $conn->prepare("INSERT INTO dsgvo_training (name,companyID,moduleID,version,onLogin,allowOverwrite,random) VALUES(?, ?, ?, ?, ?, ?, ?)");
+        $insert_training_stmt->bind_param("siiisss", $name, $companyID, $moduleID, $version, $onLogin, $allowOverwrite, $random);
+        $update_question_stmt = $conn->prepare("UPDATE dsgvo_training_questions SET text = ? WHERE id = ?");
+        $update_question_stmt->bind_param("si", $text, $questionID);
+        $insert_question_stmt = $conn->prepare("INSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES(?, ?, ?)");
+        $insert_question_stmt->bind_param("iss", $trainingID, $text, $title);
         if ($json) {
             foreach ($json as $module) {
                 $name = test_input($module["module"]);
                 $sets = $module["sets"];
                 $moduleID = false;
-                if($replace_old){
-                    $result = $conn->query("SELECT id from dsgvo_training_modules where name = '$name'");
-                    if($result && $row = $result->fetch_assoc()){
+                if ($replace_old) {
+                    $select_module_stmt->execute();
+                    $result = $select_module_stmt->get_result();
+                    if ($result && $row = $result->fetch_assoc()) {
                         $moduleID = $row["id"];
+                        $result->free();
                     }
                 }
                 showError($conn->error);
-                if(!$moduleID){
-                    $conn->query("INSERT INTO dsgvo_training_modules (name) VALUES('$name')");
-                    $moduleID = mysqli_insert_id($conn);
+                if (!$moduleID) {
+                    $insert_module_stmt->execute();
+                    $moduleID = $insert_module_stmt->insert_id;
                 }
                 showError($conn->error);
                 if ($conn->error) $error_happened = true;
@@ -210,16 +226,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $random = test_input($set["random"]);
                     $questions = $set["questions"];
                     $trainingID = false;
-                    if($replace_old){
-                        $result = $conn->query("SELECT id from dsgvo_training WHERE name = '$name' AND moduleID = $moduleID");
-                        if($result && $row = $result->fetch_assoc()){
+                    if ($replace_old) {
+                        $moduleID = intval($moduleID);
+                        $select_training_stmt->execute();
+                        $result = $select_training_stmt->get_result();
+                        if ($result && $row = $result->fetch_assoc()) {
                             $trainingID = $row["id"];
+                            $result->free();
                         }
                     }
                     showError($conn->error);
-                    if(!$trainingID){
-                        $conn->query("INSERT INTO dsgvo_training (name,companyID, moduleID, version, onLogin, allowOverwrite, random) VALUES('$name', $companyID, $moduleID, $version, '$onLogin', '$allowOverwrite', '$random')");
-                        $trainingID = mysqli_insert_id($conn);
+                    if (!$trainingID) {
+                        $companyID = intval($companyID);
+                        $moduleID = intval($moduleID);
+                        $version = intval($version);
+                        $insert_training_stmt->execute();
+                        $trainingID = $insert_training_stmt->insert_id;
                     }
                     showError($conn->error);
                     if ($conn->error) $error_happened = true;
@@ -227,25 +249,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         $title = test_input($question["title"]);
                         $text = $question["text"];
                         $questionID = false;
-                        if($replace_old){
-                            $result = $conn->query("SELECT id from dsgvo_training_questions WHERE title = '$title' AND trainingID = $trainingID");
-                            if($result && $row = $result->fetch_assoc()){
+                        if ($replace_old) {
+                            $trainingID = intval($trainingID);
+                            $select_question_stmt->execute();
+                            $result = $select_question_stmt->get_result();
+                            if ($result && $row = $result->fetch_assoc()) {
                                 $questionID = $row["id"];
                             }
                         }
                         showError($conn->error);
-                        if(!$questionID){
-                            $stmt = $conn->prepare("INSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES($trainingID, ?, '$title')");
-                            showError($conn->error);
-                            if ($conn->error) $error_happened = true;
-                            $stmt->bind_param("s", $text);
-                            $stmt->execute();
-                        }else{
-                            $stmt = $conn->prepare("UPDATE dsgvo_training_questions SET text = ? WHERE id = $questionID");
-                            showError($conn->error);
-                            if ($conn->error) $error_happened = true;
-                            $stmt->bind_param("s", $text);
-                            $stmt->execute();
+                        if (!$questionID) {
+                            $trainingID = intval($trainingID);
+                            $insert_question_stmt->execute();
+                            if ($insert_question_stmt->error) $error_happened = true;
+                        } else {
+                            $questionID = intval($questionID);
+                            $update_question_stmt->execute();
+                            if ($update_question_stmt->error) $error_happened = true;
                         }
                     }
                 }
