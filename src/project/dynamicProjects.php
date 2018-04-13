@@ -446,7 +446,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
         }
 
         /*
-        //TODO: will be optimized later, below LEFT (!) join will make query return only 1 company ID, reason unknown
+        //TODO: will be optimized later, below LEFT (!) join will make query return tasks of only 1 company ID, reason unknown (not even the same ID for all uses)
         LEFT JOIN ( SELECT activity, projectid FROM dynamicprojectslogs WHERE ((activity = 'VIEWED' AND userID = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID))
             AND id IN ( SELECT MAX(id) FROM dynamicprojectslogs GROUP BY projectid)) tbl4 ON tbl4.projectid = d.projectid
         */

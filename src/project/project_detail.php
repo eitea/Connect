@@ -20,33 +20,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         } else {
             echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
         }
-    } elseif(isset($_POST['reKey'])){
-        $keyPair = sodium_crypto_box_keypair();
-        $new_private = sodium_crypto_box_secretkey($keyPair);
-        $new_public = sodium_crypto_box_publickey($keyPair);
-        //outdate and insert
-        $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$projectID'"); echo $conn->error;
-        $result = $conn->query("SELECT userID, publicPGPKey FROM relationship_project_user r LEFT JOIN UserData ON r.userID = UserData.id WHERE projectID = $projectID");
-        while($result && ($row = $result->fetch_assoc())){
-            $user_public = base64_decode($row['publicPGPKey']);
-            $nonce = random_bytes(24);
-            $private_encrypt = $nonce . sodium_crypto_box($new_private, $nonce, $new_private.$new_public);
-            $conn->query("INSERT INTO security_access(userID, module, privateKey, optionalID) VALUES ($userID, 'PRIVATE_PROJECT', '".base64_encode($private_encrypt)."', '$projectID')");
-            echo $conn->error .' - access error<br>';
-        }
-        $result = $conn->query("SELECT id, symmetricKey, publicKey FROM security_projects WHERE projectID = $projectID AND outDated = 'FALSE' LIMIT 1"); echo $conn->error;
-        if($row = $result->fetch_assoc()){
-            $symmetric_cipher = base64_decode($row['symmetricKey']);
-            //TODO: decrypt old symmetric key or re-encrypt all old data.
-        } else {
-            $symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
-        }
-        //outdate and insert
-        $conn->query("UPDATE security_projects SET outDated = 'TRUE' WHERE projectID = $projectID"); echo $conn->error;
-        $symmetric_encrypted = base64_encode($nonce . sodium_crypto_box($symmetric, $nonce, $private.$public));
-        $conn->query("INSERT INTO security_projects (projectID, publicKey, symmetricKey) VALUES ($projectID, $new_public, $symmetric_encrypted)");
-    }
-    if(isset($_POST['hire'])){
+    } elseif(isset($_POST['hire'])){
         if(!empty($_POST['userID'])){
             $stmt = $conn->prepare("INSERT INTO relationship_project_user (projectID, userID, access, expirationDate) VALUES($projectID, ?, ?, ?)"); echo $conn->error;
             $stmt->bind_param('iss', $x, $access, $date);
@@ -110,15 +84,61 @@ if($projectRow['publicKey']){
         $encrypted = mb_substr($cipher, 24, null, '8bit');
         try {
             $project_private = sodium_crypto_box_open($encrypted, $nonce, $keypair);
-            $project_symmetric = simple_decryption($projectRow);
+
+            $cipher_symmetric = base64_decode($projectRow['symmetricKey']);
+            $nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
+            $project_symmetric = sodium_crypto_box_open(mb_substr($cipher_symmetric, 24, null, '8bit'), $nonce, $project_private.base64_decode($projectRow['publicKey']));
+
         } catch(Exception $e){
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
         }
     } else {
-        if($conn->error) echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
-        else echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Unerwartet: Sie besitzen keinen Zugriff auf dieses Projekt.</div><hr>';
+        if($conn->error){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+        } else {
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Sie besitzen keinen Zugriff auf dieses Projekt.Nur der Projektersteller kann Ihnen diesen Zugriff gewähren.</div><hr>';
+        }
     }
 }
+
+
+if(isset($_POST['reKey'])){
+    $keyPair = sodium_crypto_box_keypair();
+    $new_private = sodium_crypto_box_secretkey($keyPair);
+    $new_public = sodium_crypto_box_publickey($keyPair);
+
+    if($projectRow['publicKey']){
+        if(isset($project_symmetric)){
+            $symmetric = $project_symmetric;
+        } else {
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Erneut verschlüsseln ohne Zugriff nicht möglich.</div>';
+        }
+    } else {
+        $symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
+    }
+
+    if($symmetric){
+        $symmetric_encrypted = base64_encode($nonce . sodium_crypto_box($symmetric, $nonce, $new_private.$new_public));
+        //outdate and insert
+        $conn->query("UPDATE security_projects SET outDated = 'TRUE' WHERE projectID = $projectID"); echo $conn->error;
+        $conn->query("INSERT INTO security_projects (projectID, publicKey, symmetricKey) VALUES ($projectID, $new_public, $symmetric_encrypted)");
+
+        $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$projectID'"); echo $conn->error;
+    } else {
+
+    }
+
+
+    $result = $conn->query("SELECT userID, publicPGPKey FROM relationship_project_user r LEFT JOIN UserData ON r.userID = UserData.id WHERE projectID = $projectID");
+    while($result && ($row = $result->fetch_assoc())){
+        $user_public = base64_decode($row['publicPGPKey']);
+        $nonce = random_bytes(24);
+        $private_encrypt = $nonce . sodium_crypto_box($new_private, $nonce, $new_private.$new_public);
+        $conn->query("INSERT INTO security_access(userID, module, privateKey, optionalID) VALUES ($userID, 'PRIVATE_PROJECT', '".base64_encode($private_encrypt)."', '$projectID')");
+        echo $conn->error .' - access error<br>';
+    }
+}
+
 ?>
 
 <form method="POST">
