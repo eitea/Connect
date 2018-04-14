@@ -70,7 +70,7 @@ function move() {
 require dirname(dirname(__DIR__)) . "/connection.php";
 require dirname(dirname(__DIR__)) . "/utilities.php";
 include dirname(dirname(__DIR__)) . '/validate.php';
-
+set_time_limit(999);
 $result = mysqli_query($conn, "SELECT version FROM configurationData;");
 if(!$result){ //can be removed later on
     $result = mysqli_query($conn, "SELECT version FROM ldapConfigTab;");
@@ -2505,10 +2505,42 @@ if($row['version'] < 147){
     }
 
     $conn->query("ALTER TABLE dynamicprojectslogs ADD COLUMN id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY");
-    $conn->query("ALTER TABLE projectData ADD COLUMN publicKey VARCHAR(150)");
 }
 
 if($row['version'] < 148){
+    $sql = "CREATE TABLE dsgvo_training_company_relations (
+        trainingID int(6),
+        companyID INT(6) UNSIGNED NOT NULL,
+        PRIMARY KEY (trainingID, companyID),
+        FOREIGN KEY (trainingID) REFERENCES dsgvo_training(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (companyID) REFERENCES companyData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }else{
+        echo '<br> DSGVO Training Company Relations';
+    }
+    $conn->query("ALTER TABLE security_projects ADD COLUMN publicKey VARCHAR(150) NOT NULL"); echo $conn->error;
+    $conn->query("ALTER TABLE security_projects ADD COLUMN symmetricKey VARCHAR(150) NOT NULL"); echo $conn->error;
+
+    $conn->query("UPDATE security_projects s, projectData p SET s.publicKey = p.publicKey, s.symmetricKey = p.symmetricKey WHERE s.projectID = p.id ");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>Projects: better security storage';
+    }
+
+    $conn->query("ALTER TABLE projectData DROP COLUMN publicKey");
+    $conn->query("ALTER TABLE projectData DROP COLUMN publicPGPKey");
+    $conn->query("ALTER TABLE projectData DROP COLUMN symmetricKey");
+
+    $conn->query("ALTER TABLE security_access ADD COLUMN optionalID VARCHAR(32)");
+    $conn->query("INSERT INTO security_access (userID, module, privateKey, outDated, optionalID) SELECT userID, 'PRIVATE_PROJECT', privateKey, outDated, projectID FROM security_projects");
+
+    $conn->query("ALTER TABLE security_projects DROP FOREIGN KEY security_projects_ibfk_1");
+    $conn->query("ALTER TABLE security_projects DROP COLUMN userID");
+    $conn->query("ALTER TABLE security_projects DROP COLUMN privateKey");
+
     //5acc47de619a8
     $conn->query("ALTER TABLE messages MODIFY COLUMN subject VARCHAR(250)");
     if($conn->error){
@@ -2517,7 +2549,6 @@ if($row['version'] < 148){
         echo '<br>Nachrichten: Betrefflänge geändert';
     }
 }
-
 
 //if($row['version'] < 149){}
 //if($row['version'] < 150){}

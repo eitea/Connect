@@ -82,7 +82,16 @@ $timesColorsArray = array();
                  INNER JOIN teamRelationshipData ON teamRelationshipData.teamID = dsgvo_training_team_relations.teamID
                  LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_team_relations.trainingID
                  INNER JOIN UserData ud ON ud.id = teamRelationshipData.userID
-                 WHERE dsgvo_training_questions.id = $questionID AND NOT EXISTS (SELECT questionID FROM dsgvo_training_completed_questions WHERE userID = ud.id AND questionID = $questionID)"
+                 WHERE dsgvo_training_questions.id = $questionID AND NOT EXISTS (SELECT questionID FROM dsgvo_training_completed_questions WHERE userID = ud.id AND questionID = $questionID)
+                 UNION
+                 SELECT relationship_company_client.userID, firstname, lastname
+                 FROM dsgvo_training_company_relations 
+                 INNER JOIN relationship_company_client 
+                 ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
+                 LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID
+                 INNER JOIN UserData ud ON ud.id = relationship_company_client.userID
+                 WHERE dsgvo_training_questions.id = $questionID AND NOT EXISTS (SELECT questionID FROM dsgvo_training_completed_questions WHERE userID = ud.id AND questionID = $questionID)
+                 "
             );
             echo $conn->error;
             while($row = $result->fetch_assoc()){

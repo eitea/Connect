@@ -121,9 +121,7 @@ function create_tables($conn) {
         field_1 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         field_2 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         field_3 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        creator INT(6),
-        symmetricKey VARCHAR(150),
-        publicKey VARCHAR(150),
+        creator INT(6)
         FOREIGN KEY (clientID) REFERENCES clientData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -1245,10 +1243,7 @@ function create_tables($conn) {
         ON DELETE CASCADE,
         FOREIGN KEY (projectowner) REFERENCES UserData(id)
         ON UPDATE CASCADE
-        ON DELETE CASCADE,
-        FOREIGN KEY (projectleader) REFERENCES UserData(id)
-        ON UPDATE CASCADE
-        ON DELETE SET NULL
+        ON DELETE CASCADE
     );";
     if (!$conn->query($sql)) {
         echo $conn->error;
@@ -1507,6 +1502,17 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
+    $sql = "CREATE TABLE dsgvo_training_company_relations (
+        trainingID int(6),
+        companyID INT(6) UNSIGNED NOT NULL,
+        PRIMARY KEY (trainingID, companyID),
+        FOREIGN KEY (trainingID) REFERENCES dsgvo_training(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (companyID) REFERENCES companyData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
     $sql = "CREATE TABLE dsgvo_training_completed_questions (
         questionID int(6),
         userID INT(6) UNSIGNED,
@@ -1598,6 +1604,7 @@ function create_tables($conn) {
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         userID INT(6) UNSIGNED,
         module VARCHAR(50) NOT NULL,
+        optionalID VARCHAR(32),
         privateKey VARCHAR(150) NOT NULL,
         recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
@@ -1647,6 +1654,8 @@ function create_tables($conn) {
         projectID INT(6) UNSIGNED,
         userID INT(6) UNSIGNED,
         privateKey VARCHAR(150) NOT NULL,
+        publicKey VARCHAR(150) NOT NULL,
+        symmetricKey VARCHAR(150) NOT NULL,
         recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         FOREIGN KEY (userID) REFERENCES UserData(id)

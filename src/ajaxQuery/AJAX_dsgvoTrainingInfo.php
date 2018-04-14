@@ -24,7 +24,14 @@ $result = $conn->query(
      INNER JOIN teamRelationshipData 
      ON teamRelationshipData.teamID = dsgvo_training_team_relations.teamID
      INNER JOIN UserData ON UserData.id = teamRelationshipData.userID
-     WHERE dsgvo_training_team_relations.trainingID = $trainingID"
+     WHERE dsgvo_training_team_relations.trainingID = $trainingID
+     UNION
+     SELECT relationship_company_client.userID, firstname, lastname
+     FROM dsgvo_training_company_relations 
+     INNER JOIN relationship_company_client 
+     ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
+     INNER JOIN UserData ON UserData.id = relationship_company_client.userID
+     WHERE dsgvo_training_company_relations.trainingID = $trainingID"
 );
 while($row = $result->fetch_assoc()){
     $userArray[] = array("id"=>$row["userID"],"name"=>$row["firstname"]." ".$row["lastname"]);
