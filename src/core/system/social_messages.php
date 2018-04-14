@@ -269,7 +269,7 @@
 
                     //removes "do you really want to leave this site message"
                     $(document).ready(function() {
-                        $(":input", document.chatInputForm).bind("change", function() {
+                        $(":input", document.chatInputForm).bind("click", function() {
                             window.onbeforeunload = null;
                             console.log(window.onbeforeunload);
                         });
