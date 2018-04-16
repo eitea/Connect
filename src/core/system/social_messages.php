@@ -123,7 +123,7 @@
 
     <div class="row">
         <!-- Subjects -->
-        <div class="col-md-6">
+        <div class="col-sm-6">
             <?php
                 $result = $conn->query("SELECT subject, userID, partnerID FROM messages WHERE $userID IN (partnerID, userID) GROUP BY subject, LEAST(userID, partnerID), GREATEST(userID, partnerID) ");
                 $i = 0;
@@ -154,41 +154,45 @@
                 ?>
                     <div style="padding: 5px;">
                         <div class="subject<?php echo $i; ?> input-group" style="word-break: normal; word-wrap: normal; background-color: white; border: 1px solid gainsboro;">
-                            <p style="padding: 10px;" onclick="showChat(<?php echo $receiver; ?>, '<?php echo $subject; ?>', '<?php echo $name; ?>')"><?php echo $subject; ?></p>
-
+                            <p style="padding: 10px;" onclick="showChat(<?php echo $receiver; ?>, '<?php echo $subject; ?>', '<?php echo $name; ?>')">
+                                <?php echo $subject; ?>
+                            </p>
+                            
                             <div class="input-group-btn">
-                                <button style="display: none; background-color: white;" class="btn icon<?php echo $i; ?>" onclick="deleteSubject(<?php echo $receiver; ?>, '<?php echo $i; ?>')">
-                                    <i class="fa fa-trash" aria-hidden="true"></i>
-                                </button>
-                                <span id="badge<?php echo $i ?>" class="badge pull-right">0</span>
-                            </div>
+                                <div class="dropdown" id="menu<?php echo $i; ?>" style="background-color: white;">
+                                    <button class="btn btn-default dropdown-toggle menuButton" type="button" data-toggle="dropdown" style="border: none;">
+                                        <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                    </button>
+
+                                    <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="menu">
+                                        <li>
+                                            <a role="menuitem" href="#" onclick="deleteSubject(<?php echo $receiver; ?>, '<?php echo $subject; ?>')">
+                                                <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                            </a>
+                                        </li>
+
+                                        <!--Placeholder: 
+                                        <li role="presentation"><a role="menuitem" href="#"></a></li>
+                                        -->
+                                    </ul>
+                                </div>
+
+                                <span id="badge<?php echo $i ?>" class="badge pull-right" style="display: none; position: relative; left: -8px"></span>
+                            </div>   
                         </div>
                     </div>
                     
                     <script>
                     // interval for the notification badge
-                    setInterval(function(){udpateBadge("#badge<?php echo $i; ?>", <?php echo $receiver; ?>, "<?php echo $subject; ?>")},1000);
+                    setInterval(function(){udpateBadge("#badge<?php echo $i; ?>", "#menu<?php echo $i; ?>", <?php echo $receiver; ?>, "<?php echo $subject; ?>")},1000);
 
                     //on hover (for dynamic html elements)
                     $(".subject<?php echo $i; ?>").hover(function(){
                         $(this).css("background-color", "whitesmoke")
-                        $(".icon<?php echo $i; ?>").css("background-color", "whitesmoke")
-
-                        $(".icon<?php echo $i; ?>").css({
-                            'background-color' : 'whitesmoke',
-                            'display' : 'block'
-                        });
-
-                        $("#badge<?php echo $i; ?>").css("display", "none");
+                        $(".menuButton").css("background-color", "whitesmoke")
                     }, function(){
                         $(this).css("background-color", "white")
-                        
-                        $(".icon<?php echo $i; ?>").css({
-                            'background-color' : 'white',
-                            'display' : 'none'
-                        });
-
-                        $("#badge<?php echo $i; ?>").css("display", "block")
+                        $(".menuButton").css("background-color", "white")
                     });
                     </script>
                 
@@ -199,7 +203,7 @@
         </div>
 
         <!-- Messages -->
-        <div class="col-xs-6">
+        <div class="col-sm-6">
             <!-- 5ac62d49ea1c4 -->
             <div id="user_bar" style="display: none; background-color: whitesmoke; border: 1px gainsboro solid; border-bottom: none; max-height: 10vh; padding: 10px;"></div>
             
@@ -374,8 +378,8 @@ function deleteSubject(partner, subject) {
     })
 }
 
-function udpateBadge(target, partner, subject) {
-    if(partner == -1 && subject.length == 0) {
+function udpateBadge(target, menu, partner, subject) {
+    if(partner == -1 || subject.length == 0) {
         return;
     }
 
@@ -387,7 +391,17 @@ function udpateBadge(target, partner, subject) {
             subject: subject
         },
         success: function (response) {
-            $(target).html(response)
+
+            // dont show a badge, when the chat is already opened or the response is 0
+            if(response == "0" || selectedPartner == partner || subject == selectedSubject) {
+                $(menu).show();
+                $(target).hide();
+            } else {
+                $(target).show();
+                $(menu).hide();
+
+                $(target).html(response);
+            }
         },
     })
 }
