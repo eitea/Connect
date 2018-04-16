@@ -92,6 +92,7 @@ if($projectRow['publicKey']){
         } catch(Exception $e){
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
         }
+
     } else {
         if($conn->error){
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
