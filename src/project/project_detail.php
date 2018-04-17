@@ -4,6 +4,22 @@
 if(!isset($_GET['p'])){ include dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php'; die('Invalid access'); }
 $projectID = intval($_GET['p']);
 
+function insert_access_user($userID, $privateKey){
+    global $conn;
+    global $projectID;
+    $result = $conn->query("SELECT publicPGPKey FROM UserData WHERE id = $userID");
+    if($result && ($row = $result->fetch_assoc())){
+        $user_public = base64_decode($row['publicPGPKey']);
+        $nonce = random_bytes(24);
+        $private_encrypt = $nonce . sodium_crypto_box($privateKey, $nonce, $privateKey.$user_public);
+        $conn->query("INSERT INTO security_access(userID, module, privateKey, optionalID) VALUES ($userID, 'PRIVATE_PROJECT', '".base64_encode($private_encrypt)."', '$projectID')");
+        if($conn->error){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+        }
+    } else {
+        echo $conn->error;
+    }
+}
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(isset($_POST['saveGeneral'])){
         $hours = floatval(test_input($_POST['project_hours']));
@@ -20,33 +36,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         } else {
             echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
         }
-    } elseif(isset($_POST['hire'])){
-        if(!empty($_POST['userID'])){
-            $stmt = $conn->prepare("INSERT INTO relationship_project_user (projectID, userID, access, expirationDate) VALUES($projectID, ?, ?, ?)"); echo $conn->error;
-            $stmt->bind_param('iss', $x, $access, $date);
-            for($i = 0; $i < count($_POST['userID']); $i++){
-                $x = intval($_POST['userID'][$i]);
-                $access = test_input($_POST['userAccess'][$i], 1);
-                $date = test_Date($_POST['userExpiration'][$i], 'Y-m-d') ? $_POST['userExpiration'][$i] : '0000-00-00';
-                $stmt->execute();
-                echo $stmt->error;
-            }
-            $stmt->close();
-        }
-        if(!empty($_POST['externID'])){
-            $stmt = $conn->prepare("INSERT INTO relationship_project_extern (projectID, userID, access, expirationDate) VALUES($projectID, ?, ?, ?)"); echo $conn->error;
-            $stmt->bind_param('iss', $x, $access, $date);
-            for($i = 0; $i < count($_POST['externID']); $i++){
-                $x = intval($_POST['externID'][$i]);
-                $access = test_input($_POST['externAccess'][$i], 1);
-                $date = test_Date($_POST['externExpiration'][$i], 'Y-m-d') ? $_POST['externExpiration'][$i] : '0000-00-00';
-                $stmt->execute();
-                echo $stmt->error;
-            }
-            $stmt->close();
-        }
     }
-
     if(!empty($_POST['removeUser'])){
         $x = intval($_POST['removeUser']);
         $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$projectID' AND userID = $x");
@@ -98,51 +88,66 @@ if($projectRow['publicKey']){
     }
 }
 
-
-if(isset($_POST['reKey'])){
-    $keyPair = sodium_crypto_box_keypair();
-    $new_private = sodium_crypto_box_secretkey($keyPair);
-    $new_public = sodium_crypto_box_publickey($keyPair);
-    if($projectRow['publicKey']){
-        if(isset($project_symmetric)){
-            $symmetric = $project_symmetric;
+if($_SERVER['REQUEST_METHOD'] == 'POST'){
+    if(isset($_POST['reKey'])){
+        $keyPair = sodium_crypto_box_keypair();
+        $new_private = sodium_crypto_box_secretkey($keyPair);
+        $new_public = sodium_crypto_box_publickey($keyPair);
+        if($projectRow['publicKey']){
+            if(isset($project_symmetric)){
+                $symmetric = $project_symmetric;
+            } else {
+                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Erneutes verschlüsseln ohne Zugriff nicht möglich.</div>';
+            }
         } else {
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Erneutes verschlüsseln ohne Zugriff nicht möglich.</div>';
+            $symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
         }
-    } else {
-        $symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
-    }
-    if($symmetric){
-        $projectRow['publicKey'] = base64_encode($new_public);
-        $project_private = $new_private;
-        $project_symmetric = $symmetrc;
+        if($symmetric){
+            $projectRow['publicKey'] = base64_encode($new_public);
+            $project_private = $new_private;
+            $project_symmetric = $symmetric;
 
-        $nonce = random_bytes(24);
-        $symmetric_encrypted = base64_encode($nonce . sodium_crypto_box($symmetric, $nonce, $new_private.$new_public));
-        //outdate and insert
-        $conn->query("UPDATE security_projects SET outDated = 'TRUE' WHERE projectID = $projectID"); echo $conn->error;
-        $conn->query("INSERT INTO security_projects (projectID, publicKey, symmetricKey) VALUES ('$projectID', '".base64_encode($new_public)."', '$symmetric_encrypted')"); echo $conn->error;
-        $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$projectID'"); echo $conn->error;
-        $result = $conn->query("SELECT userID, publicPGPKey FROM relationship_project_user r LEFT JOIN UserData ON r.userID = UserData.id WHERE r.projectID = $projectID AND r.userID != $userID");
-        echo $conn->error;
-        while($result && ($row = $result->fetch_assoc())){
-            $user_public = base64_decode($row['publicPGPKey']);
             $nonce = random_bytes(24);
-            $private_encrypt = $nonce . sodium_crypto_box($new_private, $nonce, $new_private.$user_public);
-            $conn->query("INSERT INTO security_access(userID, module, privateKey, optionalID) VALUES (".$row['userID'].", 'PRIVATE_PROJECT', '".base64_encode($private_encrypt)."', '$projectID')");
+            $symmetric_encrypted = base64_encode($nonce . sodium_crypto_box($symmetric, $nonce, $new_private.$new_public));
+            //outdate and insert
+            $conn->query("UPDATE security_projects SET outDated = 'TRUE' WHERE projectID = $projectID"); echo $conn->error;
+            $conn->query("INSERT INTO security_projects (projectID, publicKey, symmetricKey) VALUES ('$projectID', '".base64_encode($new_public)."', '$symmetric_encrypted')"); echo $conn->error;
+            $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$projectID'"); echo $conn->error;
+            $result = $conn->query("SELECT userID FROM relationship_project_user WHERE projectID = $projectID AND userID != $userID");
+            echo $conn->error;
+            while($result && ($row = $result->fetch_assoc())){
+                insert_access_user($row['userID'], $new_private);
+            }
+            insert_access_user($userID, $new_private);
             if($conn->error){
                 echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
             }
         }
-        $nonce = random_bytes(24);
-        $private_encrypt = $nonce . sodium_crypto_box($new_private, $nonce, $new_private.base64_decode($publicKey));
-        $conn->query("INSERT INTO security_access(userID, module, privateKey, optionalID) VALUES ($userID, 'PRIVATE_PROJECT', '".base64_encode($private_encrypt)."', '$projectID')");
-        if($conn->error){
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+    }
+    if(isset($_POST['hire'])){
+        if(!empty($_POST['userID'])){
+            $stmt = $conn->prepare("INSERT INTO relationship_project_user (projectID, userID, access, expirationDate) VALUES($projectID, ?, 'READ', '0000-00-00')"); echo $conn->error;
+            $stmt->bind_param('i', $x);
+            for($i = 0; $i < count($_POST['userID']); $i++){
+                $x = intval($_POST['userID'][$i]);
+                $stmt->execute();
+                echo $stmt->error;
+                insert_access_user($x, $project_private);
+            }
+            $stmt->close();
+        }
+        if(!empty($_POST['externID'])){
+            $stmt = $conn->prepare("INSERT INTO relationship_project_extern (projectID, userID, access, expirationDate) VALUES($projectID, ?, 'READ', '0000-00-00')"); echo $conn->error;
+            $stmt->bind_param('i', $x);
+            for($i = 0; $i < count($_POST['externID']); $i++){
+                $x = intval($_POST['externID'][$i]);
+                $stmt->execute();
+                echo $stmt->error;
+            }
+            $stmt->close();
         }
     }
 }
-
 ?>
 
 <form method="POST">
@@ -249,35 +254,30 @@ if(isset($_POST['reKey'])){
             <form method="POST">
                 <div class="modal-header">Benutzer Hinzufügen</div>
                 <div class="modal-body">
-                    <div class="col-xs-6 h4">Interne Benutzer</div>
-                    <div class="col-xs-3 h4">Zugriff</div>
-                    <div class="col-xs-3 h4">Ablaufdatum</div>
-                    <?php
-                    $access_select = '<option value="WRITE">Vollzugriff</option><option value="READ">Halbzugriff</option>';
-                    $res_addmem = $conn->query("SELECT id FROM UserData WHERE id NOT IN (SELECT DISTINCT userID FROM relationship_project_user WHERE projectID = $projectID)");
-                    while ($res_addmem && ($row_addmem = $res_addmem->fetch_assoc())) {
-                        echo '<div class="row">';
-                        echo '<div class="col-sm-6"><label><input type="checkbox" name="userID[]" value="'.$row_addmem['id'].'" >'.$userID_toName[$row_addmem['id']].'</label></div>';
-                        echo '<div class="col-sm-3"><select name="userAccess[]" class="form-control">'.$access_select.'</select></div>';
-                        echo '<div class="col-sm-3"><input type="text" name="userExpiration[]" class="form-control datepicker" /></div>';
-                        echo '</div>';
-                    }
-                    ?>
-                    <hr>
-                    <div class="col-xs-6 h4">Externe Benutzer</div>
-                    <div class="col-xs-3 h4">Zugriff</div>
-                    <div class="col-xs-3 h4">Ablaufdatum</div>
-                    <?php
-                    $res_addmem = $conn->query("SELECT e.id, firstname, lastname FROM external_users e INNER JOIN contactPersons c ON c.id = e.contactID WHERE c.clientID = "
-                    .$projectRow['clientID']." AND e.id NOT IN (SELECT DISTINCT userID FROM relationship_project_extern WHERE projectID = $projectID)"); echo $conn->error;
-                    while ($res_addmem && ($row_addmem = $res_addmem->fetch_assoc())) {
-                        echo '<div class="row">';
-                        echo '<div class="col-sm-6"><label><input type="checkbox" name="externID[]" value="'.$row_addmem['id'].'" >'.$row_addmem['firstname'].' '.$row_addmem['lastname'].'</label><br></div>';
-                        echo '<div class="col-sm-3"><select name="externAccess[]" class="form-control">'.$access_select.'</select></div>';
-                        echo '<div class="col-sm-3"><input type="text" name="externExpiration[]" class="form-control datepicker" placeholder="Ablaufdatum" /></div>';
-                        echo '</div>';
-                    }
-                    ?>
+                    <div class="col-xs-12">
+                        <h4>Interne Benutzer</h4>
+                        <select class="js-example-basic-single" name="userID[]" multiple>
+                            <?php
+                            $res_addmem = $conn->query("SELECT id FROM UserData WHERE id NOT IN (SELECT DISTINCT userID FROM relationship_project_user WHERE projectID = $projectID)");
+                            while ($res_addmem && ($row_addmem = $res_addmem->fetch_assoc())) {
+                                echo '<option value="'.$row_addmem['id'].'" >'.$userID_toName[$row_addmem['id']].'</option>';
+                            }
+                            ?>
+                        </select>
+                        <hr>
+                    </div>
+                    <div class="col-xs-12">
+                        <h4>Externe Benutzer</h4>
+                        <select class="js-example-basic-single" name="externID[]" multiple>
+                            <?php
+                            $res_addmem = $conn->query("SELECT e.id, firstname, lastname FROM external_users e INNER JOIN contactPersons c ON c.id = e.contactID WHERE c.clientID = "
+                            .$projectRow['clientID']." AND e.id NOT IN (SELECT DISTINCT userID FROM relationship_project_extern WHERE projectID = $projectID)"); echo $conn->error;
+                            while ($res_addmem && ($row_addmem = $res_addmem->fetch_assoc())) {
+                                echo '<option value="'.$row_addmem['id'].'" >'.$row_addmem['firstname'].' '.$row_addmem['lastname'].'</option>';
+                            }
+                            ?>
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -298,6 +298,7 @@ if(isset($_POST['reKey'])){
     </div></h4>
 
 <?php
+//insert default tables if name doesnt exist.
 $result = $conn->query("SELECT name FROM company_folders WHERE companyID = ".$projectRow['companyID']." AND name NOT IN
     ( SELECT name FROM project_archive WHERE projectID = $projectID AND parent_directory = 'ROOT') ");
 echo $conn->error;
