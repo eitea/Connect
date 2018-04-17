@@ -288,57 +288,50 @@ if(isset($_POST['reKey'])){
     </div>
 
     <br><hr>
-    <h4>Dateifreigabe <div class="page-header-button-group">
-        <div class="btn-group">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
-            <ul class="dropdown-menu">
-                <li><a href="#">Entfernt bis S3 Verfügbar</a></li>
-            </ul>
-        </div>
-    </div></h4>
+    <h4>Dateifreigabe</h4>
 
-<?php
-$result = $conn->query("SELECT name FROM company_folders WHERE companyID = ".$projectRow['companyID']." AND name NOT IN
-    ( SELECT name FROM project_archive WHERE projectID = $projectID AND parent_directory = 'ROOT') ");
-echo $conn->error;
-while($result && ($row = $result->fetch_assoc())){
-    $conn->query("INSERT INTO project_archive(projectID, name, parent_directory, type) VALUES($projectID, '".$row['name']."', 'ROOT', 'folder')"); echo $conn->error;
-}
-?>
-    <table class="table">
-        <thead>
-            <tr>
-                <td><input type="checkbox" class="form-control" id="allCheck" /></td>
-                <td><label>Name</label></td>
-                <td><label>Upload Datum</label></td>
-                <td><label>File Size</label></td>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            function drawTree($parent_structure){
-                global $conn;
-                global $projectID;
-                $html = '';
-                $result = $conn->query("SELECT name, type, parent_directory, uploadDate FROM project_archive WHERE projectID = $projectID AND parent_directory = '$parent_structure' "); echo $conn->error;
-                while($result && ($row = $result->fetch_assoc())){
-                    //text, file, s3File, s3Text, folder
-                    if($row['type'] == 'folder'){
-                        if($row['parent_directory'] == 'ROOT'){
-                            $html .= '<tr><td></td><td>'.$row['name'].'</td><td>'.$row['uploadDate'].'</td><td></td></tr>';
-                        } else {
-                            $html .= drawTree($row['parent_directory']);
-                        }
-                    } else {
-                      $html .= '<tr></tr>';
-                    }
-                }
-                return $html;
-            }
+    <?php
+    $result = $conn->query("SELECT name FROM company_folders WHERE companyID = ".$projectRow['companyID']." AND name NOT IN
+        ( SELECT name FROM project_archive WHERE projectID = $projectID AND parent_directory = 'ROOT') ");
+    echo $conn->error;
+    while($result && ($row = $result->fetch_assoc())){
+        $conn->query("INSERT INTO project_archive(projectID, name, parent_directory, type) VALUES($projectID, '".$row['name']."', 'ROOT', 'folder')"); echo $conn->error;
+    }
+    ?>
+    <?php
+    function drawFolder($parent_structure, $color){
+        global $conn;
+        global $projectID;
+        $color = hexdec($color) > 2434341 ? dechex(hexdec($color) - hexdec('252525')) : '000';
 
-            echo drawTree('ROOT');
-            ?>
-        </tbody>
-    </table>
+        $html = '<div class="panel-group" id="parent-'.$parent_structure.'" style="border:1px solid #'.$color.'">';
+        //folders
+        $result = $conn->query("SELECT id, name, uploadDate FROM project_archive WHERE projectID = $projectID AND parent_directory = '$parent_structure' AND type = 'folder' "); echo $conn->error;
+        while($result && ($row = $result->fetch_assoc())){
+            //text, file, s3File, s3Text, folder
+            $html .= '<div class="panel row"><div class="col-xs-1"><i class="fa fa-folder-open-o"></i></div>
+            <div class="col-xs-4"><a data-toggle="collapse" data-parent="#parent-'.$parent_structure.'" href="#child-'.$parent_structure.'">'.$row['name'].'</a></div>
+            <div class="col-xs-4">'.$row['uploadDate'].'</div>
+            <div class="col-xs-3"><button type="button" class="btn btn-default"><i class="fa fa-pencil"></i></button></div>
+            <div class="row"><div class="col-xs-12"><div id="child-'.$parent_structure.'" class="panel-collapse collapse"><div class="panel-body">';
+            $html .= drawFolder($row['id'], $color);
+            $html .= '</div></div></div></div></div>';
+        }
+        //files
+        $result = $conn->query("SELECT name, uploadDate, uniqID FROM project_archive WHERE projectID = $projectID AND parent_directory = '$parent_structure' AND type != 'folder' "); echo $conn->error;
+        while($result && ($row = $result->fetch_assoc())){
+            $html .= $row['name'];
+        }
+
+        $html .= '<div class="panel row"><div class="col-xs-1"><i class="fa fa-plus"></i></div>
+        <div class="col-xs-11"><div class="btn-group"><button type="button" class="btn-link dropdown-toggle" data-toggle="dropdown">Hinzufügen</button>
+            <ul class="dropdown-menu"><li><a href="#">Ordner</a></li></ul></div></div>
+        </div></div>';
+
+        return $html;
+    }
+    echo drawFolder('ROOT', 'FFFFFF');
+    ?>
+
 <?php endif; //key ?>
 <?php require dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php'; ?>

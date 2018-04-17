@@ -2575,6 +2575,8 @@ if($row['version'] < 149){
     $conn->query("ALTER TABLE project_archive ADD COLUMN uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP");
     $conn->query("ALTER TABLE project_archive DROP COLUMN content");
 }
+
+$conn->query("ALTER TABLE project_archive ADD COLUMN uniqID VARCHAR(30)");
 //if($row['version'] < 150){}
 //if($row['version'] < 151){}
 //if($row['version'] < 152){}
