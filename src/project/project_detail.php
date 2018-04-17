@@ -71,7 +71,6 @@ $result = $conn->query("SELECT p.*, c.companyID, s.publicKey, s.symmetricKey, c.
 LEFT JOIN security_projects s ON s.projectID = p.id AND s.outDated = 'FALSE' WHERE p.id = $projectID LIMIT 1");
 
 if(!$result){ include dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php'; die($conn->error); }
-
 $projectRow = $result->fetch_assoc();
 
 //$result = $conn->query("SELECT publicKey, symmetricKey FROM security_projects WHERE projectID = $projectID AND outDated = 'FALSE' LIMIT 1");
@@ -84,11 +83,9 @@ if($projectRow['publicKey']){
         $encrypted = mb_substr($cipher, 24, null, '8bit');
         try {
             $project_private = sodium_crypto_box_open($encrypted, $nonce, $keypair);
-
             $cipher_symmetric = base64_decode($projectRow['symmetricKey']);
             $nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
             $project_symmetric = sodium_crypto_box_open(mb_substr($cipher_symmetric, 24, null, '8bit'), $nonce, $project_private.base64_decode($projectRow['publicKey']));
-
         } catch(Exception $e){
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
         }
@@ -106,36 +103,43 @@ if(isset($_POST['reKey'])){
     $keyPair = sodium_crypto_box_keypair();
     $new_private = sodium_crypto_box_secretkey($keyPair);
     $new_public = sodium_crypto_box_publickey($keyPair);
-
     if($projectRow['publicKey']){
         if(isset($project_symmetric)){
             $symmetric = $project_symmetric;
         } else {
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Erneut verschlüsseln ohne Zugriff nicht möglich.</div>';
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Erneutes verschlüsseln ohne Zugriff nicht möglich.</div>';
         }
     } else {
         $symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
     }
-
     if($symmetric){
+        $projectRow['publicKey'] = base64_encode($new_public);
+        $project_private = $new_private;
+        $project_symmetric = $symmetrc;
+
+        $nonce = random_bytes(24);
         $symmetric_encrypted = base64_encode($nonce . sodium_crypto_box($symmetric, $nonce, $new_private.$new_public));
         //outdate and insert
         $conn->query("UPDATE security_projects SET outDated = 'TRUE' WHERE projectID = $projectID"); echo $conn->error;
-        $conn->query("INSERT INTO security_projects (projectID, publicKey, symmetricKey) VALUES ($projectID, $new_public, $symmetric_encrypted)");
-
+        $conn->query("INSERT INTO security_projects (projectID, publicKey, symmetricKey) VALUES ('$projectID', '".base64_encode($new_public)."', '$symmetric_encrypted')"); echo $conn->error;
         $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$projectID'"); echo $conn->error;
-    } else {
-
-    }
-
-
-    $result = $conn->query("SELECT userID, publicPGPKey FROM relationship_project_user r LEFT JOIN UserData ON r.userID = UserData.id WHERE projectID = $projectID");
-    while($result && ($row = $result->fetch_assoc())){
-        $user_public = base64_decode($row['publicPGPKey']);
+        $result = $conn->query("SELECT userID, publicPGPKey FROM relationship_project_user r LEFT JOIN UserData ON r.userID = UserData.id WHERE r.projectID = $projectID AND r.userID != $userID");
+        echo $conn->error;
+        while($result && ($row = $result->fetch_assoc())){
+            $user_public = base64_decode($row['publicPGPKey']);
+            $nonce = random_bytes(24);
+            $private_encrypt = $nonce . sodium_crypto_box($new_private, $nonce, $new_private.$user_public);
+            $conn->query("INSERT INTO security_access(userID, module, privateKey, optionalID) VALUES (".$row['userID'].", 'PRIVATE_PROJECT', '".base64_encode($private_encrypt)."', '$projectID')");
+            if($conn->error){
+                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+            }
+        }
         $nonce = random_bytes(24);
-        $private_encrypt = $nonce . sodium_crypto_box($new_private, $nonce, $new_private.$new_public);
+        $private_encrypt = $nonce . sodium_crypto_box($new_private, $nonce, $new_private.base64_decode($publicKey));
         $conn->query("INSERT INTO security_access(userID, module, privateKey, optionalID) VALUES ($userID, 'PRIVATE_PROJECT', '".base64_encode($private_encrypt)."', '$projectID')");
-        echo $conn->error .' - access error<br>';
+        if($conn->error){
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+        }
     }
 }
 
@@ -293,15 +297,21 @@ if(isset($_POST['reKey'])){
         </div>
     </div></h4>
 
+<?php
+$result = $conn->query("SELECT name FROM company_folders WHERE companyID = ".$projectRow['companyID']." AND name NOT IN
+    ( SELECT name FROM project_archive WHERE projectID = $projectID AND parent_directory = 'ROOT') ");
+echo $conn->error;
+while($result && ($row = $result->fetch_assoc())){
+    $conn->query("INSERT INTO project_archive(projectID, name, parent_directory, type) VALUES($projectID, '".$row['name']."', 'ROOT', 'folder')"); echo $conn->error;
+}
+?>
     <table class="table">
         <thead>
             <tr>
                 <td><input type="checkbox" class="form-control" id="allCheck" /></td>
-                <td></td>
                 <td><label>Name</label></td>
                 <td><label>Upload Datum</label></td>
                 <td><label>File Size</label></td>
-                <td></td>
             </tr>
         </thead>
         <tbody>
@@ -310,15 +320,16 @@ if(isset($_POST['reKey'])){
                 global $conn;
                 global $projectID;
                 $html = '';
-                $stmt = $conn->prepare("SELECT name, type, parent_directory FROM project_archive WHERE projectID = $projectID AND parent_directory = ? "); echo $conn->error;
-                $stmt->bind_param("s", $parent_structure);
-                $stmt->execute();
-                $result = $stmt->get_result();
-                while($result && $row = $result->fetch_assoc()){
+                $result = $conn->query("SELECT name, type, parent_directory, uploadDate FROM project_archive WHERE projectID = $projectID AND parent_directory = '$parent_structure' "); echo $conn->error;
+                while($result && ($row = $result->fetch_assoc())){
                     //text, file, s3File, s3Text, folder
                     if($row['type'] == 'folder'){
-                        $html .= drawTree($row['parent_directory']);
-                    } elseif($row['type'] == 'text'){
+                        if($row['parent_directory'] == 'ROOT'){
+                            $html .= '<tr><td></td><td>'.$row['name'].'</td><td>'.$row['uploadDate'].'</td><td></td></tr>';
+                        } else {
+                            $html .= drawTree($row['parent_directory']);
+                        }
+                    } else {
                       $html .= '<tr></tr>';
                     }
                 }

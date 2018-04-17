@@ -2460,7 +2460,7 @@ if($row['version'] < 146){
         name VARCHAR(120) NOT NULL,
         parent_directory VARCHAR(120) NOT NULL DEFAULT 'ROOT',
         type VARCHAR(10) NOT NULL,
-        content TEXT,
+        uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (projectID) REFERENCES projectData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -2550,7 +2550,31 @@ if($row['version'] < 148){
     }
 }
 
-//if($row['version'] < 149){}
+if($row['version'] < 149){
+    $conn->query("CREATE TABLE company_folders(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        companyID INT(6) UNSIGNED,
+        name VARCHAR(155) NOT NULL,
+        FOREIGN KEY (companyID) REFERENCES companyData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>Mandant: Ordnerstruktur';
+    }
+
+    $conn->query("INSERT INTO company_folders(companyID, name) SELECT id, 'Uploads' FROM companyData");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>Mandant: Upload folder';
+    }
+
+    $conn->query("ALTER TABLE project_archive ADD COLUMN uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP");
+    $conn->query("ALTER TABLE project_archive DROP COLUMN content");
+}
 //if($row['version'] < 150){}
 //if($row['version'] < 151){}
 //if($row['version'] < 152){}
