@@ -10,7 +10,7 @@ if (isset($_GET["partner"], $_GET["subject"]) && !empty($_SESSION["userid"])) {
     $subject = test_input($_GET["subject"]);
 
     // message has been seen
-    $conn->query("UPDATE messages SET seen = 'TRUE' WHERE ( userID = $partner AND partnerID = $userID )");
+    $conn->query("UPDATE messages SET seen = 'TRUE' WHERE ( userID = $partner AND partnerID = $userID ) AND subject = '$subject'");
 
     // get the name of the partner
     $sql = "SELECT firstname, lastname FROM UserData WHERE id = '{$partner}' GROUP BY id";

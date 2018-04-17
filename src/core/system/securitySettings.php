@@ -178,7 +178,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             //if module is encrypted but is now un-checked
             if(array_key_exists($module, $encrypted_modules) && !array_key_exists($module, $temp)){
                 $result = $conn->query("SELECT module, privateKey FROM security_access WHERE userID = $userID AND outDated = 'FALSE' AND module = '$module' ORDER BY recentDate LIMIT 1");
-                //decrypt modules user has access to
+                //decrypt module user has access to
                 if($result && ($row = $result->fetch_assoc()) && array_key_exists($module, $encrypted_modules)){
                     $cipher_private_module = base64_decode($row['privateKey']);
                     $result = $conn->query("SELECT publicPGPKey, symmetricKey FROM security_modules WHERE outDated = 'FALSE'");
@@ -207,6 +207,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     }
                 } else {
                     if($conn->error) showError($conn->error);
+                    showError("Module Access not available; you cannot decrypt this module");
                 }
             }
         } //endfor

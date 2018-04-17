@@ -121,10 +121,9 @@
         </thead>
     </table>
 
-
     <div class="row">
         <!-- Subjects -->
-        <div class="col-xs-4">
+        <div class="col-sm-6">
             <?php
                 $result = $conn->query("SELECT subject, userID, partnerID FROM messages WHERE $userID IN (partnerID, userID) GROUP BY subject, LEAST(userID, partnerID), GREATEST(userID, partnerID) ");
                 $i = 0;
@@ -142,48 +141,76 @@
 
                     // 5ac62d49ea1c4
                     $sql = "SELECT firstname, lastname FROM UserData WHERE id = '{$receiver}' GROUP BY id";
-                    $result2 = $conn->query($sql);
-                    $row2 = $result2->fetch_assoc();
-                    $firstname = $row2['firstname'];
-                    $lastname = $row2['lastname'];
+                    $name_result = $conn->query($sql);
+                    $name_row = $name_result->fetch_assoc();
+                    $firstname = $name_row['firstname'];
+                    $lastname = $name_row['lastname'];
 
                     if(!empty($firstname) && !empty($lastname)) 
                         $name = $firstname . " " . $lastname;
                     elseif ((empty($firstname) && !empty($lastname)) || (empty($firstname) && !empty($lastname)))   // the user has no firstname or no lastname (admin)
                         $name = $firstname . " " . $lastname;
 
-                    echo '<div style="padding: 5px">';
-                    echo '<div class="subject'.$i.' input-group" style="word-break: normal; word-wrap: normal; background-color: white; border: 1px solid gainsboro;">';
-                    echo '<p style="padding: 10px;" onclick="showChat('.$receiver.', \''.$subject.'\', \''.$name.'\')">' . $subject . '</p>';
-                    echo '<span class="input-group-btn"><button style="background-color: white; " class="icon'.$i.' btn" onclick="deleteSubject('.$receiver.', \''.$subject.'\')"><i class="fa fa-trash" aria-hidden="true"></i></button></span>';
-                    echo '</div>';
-                    echo '</div>';
+                ?>
+                    <div style="padding: 5px;">
+                        <div class="subject<?php echo $i; ?> input-group" style="word-break: normal; word-wrap: normal; background-color: white; border: 1px solid gainsboro;">
+                            <p style="padding: 10px;" onclick="showChat(<?php echo $receiver; ?>, '<?php echo $subject; ?>', '<?php echo $name; ?>')">
+                                <?php echo $subject; ?>
+                            </p>
+                            
+                            <div class="input-group-btn">
+                                <div class="dropdown" id="menu<?php echo $i; ?>" style="background-color: white;">
+                                    <button class="btn btn-default dropdown-toggle menuButton" type="button" data-toggle="dropdown" style="border: none;">
+                                        <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                    </button>
+
+                                    <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="menu">
+                                        <li>
+                                            <a role="menuitem" href="#" onclick="deleteSubject(<?php echo $receiver; ?>, '<?php echo $subject; ?>')">
+                                                <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                                            </a>
+                                        </li>
+
+                                        <!--Placeholder: 
+                                        <li role="presentation"><a role="menuitem" href="#"></a></li>
+                                        -->
+                                    </ul>
+                                </div>
+
+                                <span id="badge<?php echo $i ?>" class="badge pull-right" style="display: none; position: relative; left: -8px"></span>
+                            </div>   
+                        </div>
+                    </div>
                     
-                    // on hover
-                    echo '<script>';
-                    echo '$(".subject'.$i.'").hover(function(){
-                                $(this).css("background-color", "whitesmoke");
-                                $(".icon'.$i.'").css("background-color", "whitesmoke");
-                            }, function(){
-                                $(this).css("background-color", "white");
-                                $(".icon'.$i.'").css("background-color", "white");
-                            });';
-                    echo '</script>';
-                }
+                    <script>
+                    // interval for the notification badge
+                    setInterval(function(){udpateBadge("#badge<?php echo $i; ?>", "#menu<?php echo $i; ?>", <?php echo $receiver; ?>, "<?php echo $subject; ?>")},1000);
+
+                    //on hover (for dynamic html elements)
+                    $(".subject<?php echo $i; ?>").hover(function(){
+                        $(this).css("background-color", "whitesmoke")
+                        $(".menuButton").css("background-color", "whitesmoke")
+                    }, function(){
+                        $(this).css("background-color", "white")
+                        $(".menuButton").css("background-color", "white")
+                    });
+                    </script>
                 
+                <?php
+                }
                 echo $conn->error;
             ?>
         </div>
 
         <!-- Messages -->
-        <div class="col-xs-8">
+        <div class="col-sm-6">
             <!-- 5ac62d49ea1c4 -->
             <div id="user_bar" style="display: none; background-color: whitesmoke; border: 1px gainsboro solid; border-bottom: none; max-height: 10vh; padding: 10px;"></div>
             
             <div class="pre-scrollable" id="messages" style="display: none; background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh; padding-top: 5px"></div>
 
             <div id="chatinput" style="display: none; padding-top: 5px;">
-                <form autocomplete="off">
+                <form name="chatInputForm" autocomplete="off">
                     <div class="input-group">
                         <textarea id="message" wrap="hard" placeholder="Type a message" class="form-control" style="height: 3.6vh; max-height: 11vh; resize: none; "></textarea>
                         <span class="input-group-btn"><button id="sendButton" class="btn btn-default" type="submit" style="height: 3.6vh"><?php echo $lang['SEND'] ?></button></span>
@@ -195,7 +222,7 @@
                     $('#message, #sendButton').on('change keyup keydown paste cut click', function (event) {
                         $("#message").height(0).height(this.scrollHeight/1.4);
                     }).find('textarea').change();
-                                  
+                                
                     // send on enter
                     var shiftPressed = false;
                     $("#message").keydown(function(event) {
@@ -217,7 +244,7 @@
                             }
                         }
                     });
-                           
+                        
                     //submit
                     $("#chatinput").submit(function (e) {
                         //prevent enter
@@ -243,12 +270,19 @@
                         }
 
                     })
+
+                    //removes "do you really want to leave this site message"
+                    $(document).ready(function() {
+                        $(":input", document.chatInputForm).bind("click", function() {
+                            window.onbeforeunload = null;
+                            console.log(window.onbeforeunload);
+                        });
+                    });
                 </script>
             </div>
         </div>
     </div>
 </div>
-
 
 <script>
 var selectedPartner = -1;
@@ -343,6 +377,35 @@ function deleteSubject(partner, subject) {
         },
     })
 }
+
+function udpateBadge(target, menu, partner, subject) {
+    if(partner == -1 || subject.length == 0) {
+        return;
+    }
+
+    $.ajax({
+        url: 'ajaxQuery/AJAX_postGetAlerts.php',
+        type: 'GET',
+        data:{
+            partner: partner,
+            subject: subject
+        },
+        success: function (response) {
+
+            // dont show a badge, when the chat is already opened or the response is 0
+            if(response == "0" || selectedPartner == partner || subject == selectedSubject) {
+                $(menu).show();
+                $(target).hide();
+            } else {
+                $(target).show();
+                $(menu).hide();
+
+                $(target).html(response);
+            }
+        },
+    })
+}
+
 </script>
 
 <?php require dirname(dirname(__DIR__)) . '/footer.php'; ?>
