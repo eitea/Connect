@@ -59,11 +59,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 $result = $conn->query("SELECT p.*, c.companyID, s.publicKey, s.symmetricKey, c.name AS clientName FROM projectData p LEFT JOIN clientData c ON p.clientID = c.id
 LEFT JOIN security_projects s ON s.projectID = p.id AND s.outDated = 'FALSE' WHERE p.id = $projectID LIMIT 1");
-
 if(!$result){ include dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php'; die($conn->error); }
 $projectRow = $result->fetch_assoc();
-
-//$result = $conn->query("SELECT publicKey, symmetricKey FROM security_projects WHERE projectID = $projectID AND outDated = 'FALSE' LIMIT 1");
 if($projectRow['publicKey']){
     $result = $conn->query("SELECT privateKey FROM security_access WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$projectID' AND userID = $userID AND outDated = 'FALSE' LIMIT 1");
     if($result && ($row = $result->fetch_assoc())){
@@ -123,8 +120,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
             }
         }
-    }
-    if(isset($_POST['hire'])){
+    } elseif(isset($_POST['hire'])){
         if(!empty($_POST['userID'])){
             $stmt = $conn->prepare("INSERT INTO relationship_project_user (projectID, userID, access, expirationDate) VALUES($projectID, ?, 'READ', '0000-00-00')"); echo $conn->error;
             $stmt->bind_param('i', $x);
@@ -146,16 +142,29 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
             $stmt->close();
         }
+    } elseif(!empty($_POST['add-new-folder'])){
+        $x = test_input($_POST['add-new-folder']);
+        if(!empty($_POST['new-folder-name'])){
+            $val = test_input($_POST['new-folder-name']);
+            $conn->query("INSERT INTO project_archive(projectID, name, parent_directory, type) VALUES ($projectID, '$val', '$x', 'folder')");
+            if($conn->error){
+                showError($conn->error);
+            } else {
+                showSuccess($lang['OK_ADD']);
+            }
+        } else {
+            showError($lang['ERROR_MISSING_FIELDS']);
+        }
     }
-}
+} //endif POST #2
 ?>
 
 <form method="POST">
     <div class="page-header">
         <h3><?php echo $projectRow['clientName'].' - '.$projectRow['name']; ?>
             <div class="page-header-button-group">
-                <button type="submit" name="saveGeneral" class="btn btn-default blinking" title="<?php echo $lang['SAVE']; ?>" ><i class="fa fa-floppy-o"></i></button>
-                <button type="submit" name="reKey" class="btn btn-default blinking" title="Neues Schlüsselpaar erstellen" ><i class="fa fa-lock"></i></button>
+                <button type="submit" name="saveGeneral" class="btn btn-default" title="<?php echo $lang['SAVE']; ?>" ><i class="fa fa-floppy-o"></i></button>
+                <button type="submit" name="reKey" class="btn btn-default" title="Neues Schlüsselpaar erstellen" ><i class="fa fa-lock"></i></button>
             </div>
         </h3>
     </div>
@@ -287,9 +296,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             </form>
         </div>
     </div>
-
     <br><hr>
-    <h4>Dateifreigabe</h4>
+
+    <h4>Dateifreigabe
+        <div class="page-header-button-group">
+            <div class="btn-group"><a class="dropdown-toggle" data-toggle="dropdown">Hinzufügen</a>
+                <ul class="dropdown-menu">
+                    <li><a data-toggle="modal" data-target="#new-folder">Ordner</a></li>
+                    <li><input class="fileInput" type="file" id="uploadFile" multiple ><label class="lbl" for="uploadFile" >File</label></input></li>
+                    <li><a href="#">Text</a></li>
+                </ul>
+            </div>
+        </div>
+    </h4><br>
 
     <?php
     $result = $conn->query("SELECT name FROM company_folders WHERE companyID = ".$projectRow['companyID']." AND name NOT IN
@@ -298,41 +317,50 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     while($result && ($row = $result->fetch_assoc())){
         $conn->query("INSERT INTO project_archive(projectID, name, parent_directory, type) VALUES($projectID, '".$row['name']."', 'ROOT', 'folder')"); echo $conn->error;
     }
-    ?>
-    <?php
-    function drawFolder($parent_structure, $color){
+
+    function drawFolder($parent_structure){
         global $conn;
         global $projectID;
-        $color = hexdec($color) > 2434341 ? dechex(hexdec($color) - hexdec('252525')) : '000';
-
-        $html = '<div class="panel-group" id="parent-'.$parent_structure.'" style="border:1px solid #'.$color.'">';
         //folders
         $result = $conn->query("SELECT id, name, uploadDate FROM project_archive WHERE projectID = $projectID AND parent_directory = '$parent_structure' AND type = 'folder' "); echo $conn->error;
         while($result && ($row = $result->fetch_assoc())){
             //text, file, s3File, s3Text, folder
-            $html .= '<div class="panel row"><div class="col-xs-1"><i class="fa fa-folder-open-o"></i></div>
-            <div class="col-xs-4"><a data-toggle="collapse" data-parent="#parent-'.$parent_structure.'" href="#child-'.$parent_structure.'">'.$row['name'].'</a></div>
-            <div class="col-xs-4">'.$row['uploadDate'].'</div>
-            <div class="col-xs-3"><button type="button" class="btn btn-default"><i class="fa fa-pencil"></i></button></div>
-            <div class="row"><div class="col-xs-12"><div id="child-'.$parent_structure.'" class="panel-collapse collapse"><div class="panel-body">';
-            $html .= drawFolder($row['id'], $color);
-            $html .= '</div></div></div></div></div>';
+            $html .= '<div class="row"><div class="col-xs-1"><i class="fa fa-folder-open-o"></i></div>
+            <div class="col-xs-4"><a data-toggle="collapse" data-parent="#parent-'.$parent_structure.'" href="#child-'.$row['id'].'">'.$row['name'].'</a></div>
+            <div class="col-xs-4">'.$row['uploadDate'].'</div></div>';
+            $html .= drawFolder($row['id']);
         }
         //files
         $result = $conn->query("SELECT name, uploadDate, uniqID FROM project_archive WHERE projectID = $projectID AND parent_directory = '$parent_structure' AND type != 'folder' "); echo $conn->error;
         while($result && ($row = $result->fetch_assoc())){
             $html .= $row['name'];
         }
-
-        $html .= '<div class="panel row"><div class="col-xs-1"><i class="fa fa-plus"></i></div>
-        <div class="col-xs-11"><div class="btn-group"><button type="button" class="btn-link dropdown-toggle" data-toggle="dropdown">Hinzufügen</button>
-            <ul class="dropdown-menu"><li><a href="#">Ordner</a></li></ul></div></div>
-        </div></div>';
-
         return $html;
     }
-    echo drawFolder('ROOT', 'FFFFFF');
+    echo drawFolder('ROOT');
     ?>
 
+
+    <div id="new-folder" class="modal fade">
+        <div class="modal-dialog modal-content modal-sm">
+            <form method="POST">
+                <div class="modal-header h4">Neuer Ordner</div>
+                <div class="modal-body">
+                    <label>Name</label>
+                    <input type="text" name="new-folder-name" class="form-control" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button  id="new-folder-parent" type="submit" class="btn btn-warning" name="add-new-folder"><?php echo $lang['ADD']; ?></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    $('#new-folder').on('show.bs.modal', function (event){
+        $('#new-folder-parent').val($(event.relatedTarget).data('parent'));
+    });
+    </script>
 <?php endif; //key ?>
 <?php require dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php'; ?>
