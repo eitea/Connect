@@ -2550,10 +2550,27 @@ if($row['version'] < 148){
     }
 }
 
-//if($row['version'] < 149){}
+// 5ac63505c0ecd
+if($row['version'] < 149){
+    $sql = "CREATE TABLE taskmessages(
+        userID INT(6) UNSIGNED,
+        taskID varchar(100),
+        taskName varchar(100),
+        message TEXT,
+        picture MEDIUMBLOB,
+        sent DATETIME DEFAULT CURRENT_TIMESTAMP
+    )";
+    $conn->query($sql);
+    if (!$conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Task Messages hinzugefügt';
+    }
+}
 //if($row['version'] < 150){}
 //if($row['version'] < 151){}
 //if($row['version'] < 152){}
+//if($row['version'] < 153){}
 
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';

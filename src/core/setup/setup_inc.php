@@ -1747,4 +1747,16 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
+    // 5ac63505c0ecd
+    $sql = "CREATE TABLE taskmessages(
+        userID INT(6) UNSIGNED,
+        taskID varchar(100),
+        taskName varchar(100),
+        message TEXT,
+        picture MEDIUMBLOB,
+        sent DATETIME DEFAULT CURRENT_TIMESTAMP
+    )";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    }
 }

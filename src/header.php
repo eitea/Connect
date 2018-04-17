@@ -749,8 +749,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             url: 'ajaxQuery/AJAX_postGetAlerts.php',
                             type: 'GET',
                             success: function (response) {
-                                if(response != "0"){
-                                    console.log(response)
+                                if(response != "0"){                                    
                                     $(target).html(response)
                                     $(target).show()
                                 }else {

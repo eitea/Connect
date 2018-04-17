@@ -25,6 +25,10 @@ $result = $conn->query("SELECT d.projectid, projectname, projectdescription, pro
     AND d.projectstart <= UTC_TIMESTAMP and d.projectid = '$x'");
 $row = $result->fetch_assoc();
 $projectleader = $row['projectleader'];
+
+// 5ac63505c0ecd
+$projectname = $row['projectname'];
+
 $stmt_booking = $conn->prepare("SELECT userID, p.id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = ?");
 $stmt_booking->bind_param('s', $x);
 $stmt_booking->execute();
@@ -137,6 +141,7 @@ if (sizeof($missingBookingsArray) == 0) {
                 <li class="active"><a data-toggle="tab" href="#projectDescription<?php echo $x; ?>">Beschreibung</a></li>
                 <li><a data-toggle="tab" href="#projectInfoBookings<?php echo $x; ?>">Buchungen</a></li>
                 <li><a data-toggle="tab" href="#projectInfoLogs<?php echo $x; ?>">Logs</a></li>
+                <li><a data-toggle="tab" href="#projectMessages<?php echo $x; ?>">Messages</a></li>
                 <?php if($showMissingBookings): ?><li><a data-toggle="tab" href="#projectForgottenBooking<?php echo $x; ?>">Zeit nachbuchen</a></li><?php endif; ?>
             </ul>
             <div class="tab-content">
@@ -216,6 +221,154 @@ if (sizeof($missingBookingsArray) == 0) {
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Project Messages -->
+                <div id="projectMessages<?php echo $x; ?>" class="tab-pane fade"><br>
+                    <!-- User bar -->
+                    <div id="user_bar<?php echo $x; ?>" style="background-color: whitesmoke; border: 1px gainsboro solid; border-bottom: none; max-height: 10vh; padding: 10px;"></div>
+                    
+                    <!-- Messages -->
+                    <div class="pre-scrollable" id="messages<?php echo $x; ?>" style="background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh; padding-top: 5px">
+                    asdfasdfasdf
+                    </div>
+
+                    <!-- Response Field -->
+                    <div id="chatinput<?php echo $x; ?>" style="padding-top: 5px;">
+                        <form name="chatInputForm<?php echo $x; ?>" autocomplete="off">
+                            <div class="input-group">
+                                <textarea id="message<?php echo $x; ?>" wrap="hard" placeholder="Type a message" class="form-control" style="height: 3.6vh; max-height: 11vh; resize: none; "></textarea>
+                                <span class="input-group-btn"><button id="sendButton<?php echo $x; ?>" class="btn btn-default" type="submit" style="height: 3.6vh"><?php echo $lang['SEND'] ?></button></span>
+                            </div>
+                        </form>
+
+                        <script>
+                            messageLimit<?php echo $x; ?> = 10;
+
+                            // auto resize
+                            $('#message<?php echo $x; ?>, #sendButton<?php echo $x; ?>').on('change keyup keydown paste cut click', function (event) {
+                                $("#message").height(0).height(this.scrollHeight/1.4);
+                            }).find('textarea').change();
+                                        
+                            // send on enter
+                            var shiftPressed<?php echo "$x" ?> = false;
+                            $("#message<?php echo $x; ?>").keydown(function(event) {
+                                //shift + enter?
+                                if(shiftPressed<?php echo $x ?> && event.which == 13) {
+                                    $(this).append("<br>");
+                                } else {
+                                    // update shiftPressed when not pressed shift+enter
+                                    if(event.which == 16) shiftPressed<?php echo $x ?> = true; else shiftPressed<?php echo $x ?> = false;
+                                }
+                                
+                                if(event.which == 13 && !shiftPressed<?php echo $x ?>){
+                                    event.preventDefault();
+
+                                    if($(this).val().trim().length != 0){
+                                        messageLimit<?php echo $x; ?>++;
+                                        sendMessage("<?php echo $x; ?>", "<?php echo $projectname ?>", $("#message<?php echo $x; ?>").val(), "#messages<?php echo $x; ?>", messageLimit<?php echo $x; ?>);
+                                        $("#message<?php echo $x; ?>").val("")
+                                    }
+                                }
+                            });
+                                
+                            //submit
+                            $("#chatinput<?php echo $x; ?>").submit(function (e) {
+                                //prevent enter
+                                e.preventDefault()
+
+                                // send the message
+                                messageLimit<?php echo $x; ?>++;
+                                sendMessage("<?php echo $x; ?>", "<?php echo $projectname ?>", $("#message<?php echo $x; ?>").val(), "#messages<?php echo $x; ?>", messageLimit<?php echo $x; ?>);
+
+                                // clear the field
+                                $("#message<?php echo $x; ?>").val("")
+
+                                // prevent form redirect
+                                return false;
+                            })
+
+                            //scroll
+                            $("#messages<?php echo $x; ?>").scroll(function(){
+                                if($(this).scrollTop() == 0){
+                                    $(this).scrollTop(1);
+                                    messageLimit<?php echo $x; ?> += 1
+                                    getMessages("<?php echo $x; ?>", "<?php echo $projectname ?>", "messages<?php echo $x; ?>", true, messageLimit<?php echo $x; ?>);
+                                }
+
+                            })
+
+                            //removes "do you really want to leave this site message"
+                            $(document).ready(function() {
+                                $(":input", document.chatInputForm+"<?php echo $x; ?>").bind("click", function() {
+                                    window.onbeforeunload = null;
+                                });
+                            });
+                        </script>
+                    </div>
+
+                    <script>
+
+                        window.onload = function() {
+                            if (window.jQuery) {  
+                                // jQuery is loaded  
+                                console.log("Yeah!");
+                            } else {
+                                // jQuery is not loaded
+                                console.log("Doesn't Work");
+                            }
+                        }
+
+                    getMessages("<?php echo $x; ?>", "<?php echo $projectname ?>", "messages<?php echo $x; ?>", true, 10);
+
+                    // subject = Taskbezeichnung + ID
+                    function getMessages(taskID, taskName, target, scroll = false, limit = 50) {
+                        if(taskID.length == 0 || taskName.length == 0) {
+                            console.log("invalid getMessages!")
+                            return;
+                        }
+
+                        $.ajax({
+                            url: 'ajaxQuery/AJAX_postGetMessage.php',
+                            data: {
+                                taskID: taskID,
+                                taskName: taskName,
+                                limit: limit,
+                            },
+                            type: 'GET',
+                            success: function (response) {
+                                $(target).html(response);
+
+                                //Scroll down
+                                //if (scroll) $(target).scrollTop($(target)[0].scrollHeight)
+                            },
+                            error: function (response) {
+                                $(target).html(response);
+                                console.log("err response: " + response)
+                            },
+                        });
+                    }
+
+                    function sendMessage(taskID, taskName, message, target, limit = 50) {
+                        if(taskID.length == 0 || taskName.length == 0 || message.length == 0){
+                            return;
+                        }
+
+                        $.ajax({
+                            url: 'ajaxQuery/AJAX_postSendMessage.php',
+                            data: {
+                                taskID: taskID,
+                                taskName: taskName,
+                                message: message,
+                            },
+                            type: 'GET',
+                            success: function (response) {
+                                getMessages("<?php echo $x; ?>", "<?php echo "$projectname" ?>", "messages<?php echo $x; ?>", true, limit);
+                            },
+                        })
+                    }
+                    </script>
+                </div>
+
                 <?php if($showMissingBookings): ?>
                 <div id="projectForgottenBooking<?php echo $x; ?>" class="tab-pane fade"><br>
                 <form method="POST">
