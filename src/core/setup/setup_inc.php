@@ -121,7 +121,7 @@ function create_tables($conn) {
         field_1 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         field_2 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         field_3 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        creator INT(6)
+        creator INT(6),
         FOREIGN KEY (clientID) REFERENCES clientData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
