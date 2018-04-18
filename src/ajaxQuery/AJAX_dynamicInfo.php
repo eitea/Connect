@@ -308,8 +308,11 @@ if (sizeof($missingBookingsArray) == 0) {
                     </div>
 
                     <script>
+                    // scroll down when the tab gets shown
+                    $("#messages<?php echo $x; ?>").scrollTop($("#messages<?php echo $x; ?>")[0].scrollHeight)
+                    
                     intervalID<?php echo $x; ?> = setInterval(function() {
-                        getMessages("<?php echo $x; ?>", "<?php echo $projectname ?>", "#messages<?php echo $x; ?>", true, 10);
+                        getMessages("<?php echo $x; ?>", "<?php echo $projectname ?>", "#messages<?php echo $x; ?>", false, 10);
                     }, 1000);
                    
 
