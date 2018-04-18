@@ -26,7 +26,7 @@ if(isset($_POST['request_submit'])){
     if(test_Date($startTime)){
       $sql = "INSERT INTO $userRequests(userID, fromDate, toDate, status, requestText, requestType, requestID, timeToUTC) VALUES($userID, '$startTime', '$endTime', '0', '$requestText', 'log', '".$arr[0]."', $timeToUTC )";
       if($conn->query($sql)){
-        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_REQUEST'].'</div>';
       } else {
         echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
       }
@@ -183,7 +183,7 @@ if(isset($_POST['request_submit'])){
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default"data-dismiss="modal" >Cancel</button>
-          <button type="submit" class="btn btn-warning" name="request_submit" value="<?php echo $calculator->indecesIM[$i].' '.$calculator->date[$i]; ?>"><?php echo $lang['REQUESTS']; ?></button>
+          <button type="submit" class="btn btn-warning" name="request_submit" value="<?php echo $calculator->indecesIM[$i].' '.$calculator->date[$i]; ?>"><?php echo $lang['MAKE_REQUEST']; ?></button>
         </div>
       </div>
     </div>
@@ -257,7 +257,7 @@ if(isset($_POST['request_submit'])){
                       }
                       echo "</select>";
                       echo '</td>';
-                      echo '<td><button type="submit" class="btn btn-warning" name="splits_save" value="'.$x.'">'.$lang['REQUESTS'].'</button></td><td></td>';
+                      echo '<td><button type="submit" class="btn btn-warning" name="splits_save" value="'.$x.'">'.$lang['MAKE_REQUEST'].'</button></td><td></td>';
                       echo '</tr>';
                     }
                   }

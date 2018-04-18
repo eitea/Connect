@@ -16,25 +16,27 @@ if(isset($_POST['add']) && !empty($_POST['name']) && !empty($_POST['filterClient
     }
     $hourlyPrice = floatval(test_input($_POST['hourlyPrice']));
     $hours = floatval(test_input($_POST['hours']));
-    $keyPair = sodium_crypto_box_keypair();
-    $private = sodium_crypto_box_secretkey($keyPair);
-    $public = sodium_crypto_box_publickey($keyPair);
-    $symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
-    $nonce = random_bytes(24);
-    $symmetric_encrypted = base64_encode($nonce . sodium_crypto_box($symmetric, $nonce, $private.$public));
 
     if(isset($_POST['createField_1'])){ $field_1 = 'TRUE'; } else { $field_1 = 'FALSE'; }
     if(isset($_POST['createField_2'])){ $field_2 = 'TRUE'; } else { $field_2 = 'FALSE'; }
     if(isset($_POST['createField_3'])){ $field_3 = 'TRUE'; } else { $field_3 = 'FALSE'; }
-    $conn->query("INSERT INTO projectData (clientID, name, status, hours, hourlyPrice, field_1, field_2, field_3, creator, symmetricKey, publicKey)
-    VALUES ($client_id, '$name', '$status', '$hours', '$hourlyPrice', '$field_1', '$field_2', '$field_3', $userID, '$symmetric_encrypted', '".base64_encode($public)."')");
+    $conn->query("INSERT INTO projectData (clientID, name, status, hours, hourlyPrice, field_1, field_2, field_3, creator)
+    VALUES ($client_id, '$name', '$status', '$hours', '$hourlyPrice', '$field_1', '$field_2', '$field_3', $userID)");
     if($conn->error){
         showError($conn->error);
     } else {
         $projectID = $conn->insert_id;
+        $keyPair = sodium_crypto_box_keypair();
+        $private = sodium_crypto_box_secretkey($keyPair);
+        $public = sodium_crypto_box_publickey($keyPair);
+        $symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
+        $nonce = random_bytes(24);
+        $symmetric_encrypted = base64_encode($nonce . sodium_crypto_box($symmetric, $nonce, $private.$public));
+        $conn->query("INSERT INTO security_projects (projectID, publicKey, symmetricKey) VALUES($projectID, '".base64_encode($public)."', '$symmetric_encrypted')");
+        echo $conn->error;
         $nonce = random_bytes(24);
         $private_encrypt = base64_encode($nonce . sodium_crypto_box(base64_encode($private), $nonce, $private.base64_decode($publicKey)));
-        $conn->query("INSERT INTO security_projects (projectID, userID, privateKey) VALUES($projectID, $userID, '$private_encrypt')");
+        $conn->query("INSERT INTO security_access (userID, module, privateKey, optionalID) VALUES($userID, 'PRIVATE_PROJECT', '$private_encrypt', $projectID)");
         if($conn->error){
             showError($conn->error);
         } else {

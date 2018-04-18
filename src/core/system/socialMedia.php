@@ -559,6 +559,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteGroup'])) {
             },
         })
     }
+    
     function updateGroupSocialBadge(target, group) {
         $.ajax({
             url: 'ajaxQuery/AJAX_socialGetAlerts.php',
@@ -576,7 +577,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['deleteGroup'])) {
             },
         })
     }
-    </script>
+</script>
 
 </div>
     <!-- /BODY -->

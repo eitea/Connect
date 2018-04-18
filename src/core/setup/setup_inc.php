@@ -122,8 +122,6 @@ function create_tables($conn) {
         field_2 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         field_3 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         creator INT(6),
-        symmetricKey VARCHAR(150),
-        publicKey VARCHAR(150),
         FOREIGN KEY (clientID) REFERENCES clientData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -1245,10 +1243,7 @@ function create_tables($conn) {
         ON DELETE CASCADE,
         FOREIGN KEY (projectowner) REFERENCES UserData(id)
         ON UPDATE CASCADE
-        ON DELETE CASCADE,
-        FOREIGN KEY (projectleader) REFERENCES UserData(id)
-        ON UPDATE CASCADE
-        ON DELETE SET NULL
+        ON DELETE CASCADE
     );";
     if (!$conn->query($sql)) {
         echo $conn->error;
@@ -1610,6 +1605,7 @@ function create_tables($conn) {
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         userID INT(6) UNSIGNED,
         module VARCHAR(50) NOT NULL,
+        optionalID VARCHAR(32),
         privateKey VARCHAR(150) NOT NULL,
         recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
@@ -1659,6 +1655,8 @@ function create_tables($conn) {
         projectID INT(6) UNSIGNED,
         userID INT(6) UNSIGNED,
         privateKey VARCHAR(150) NOT NULL,
+        publicKey VARCHAR(150) NOT NULL,
+        symmetricKey VARCHAR(150) NOT NULL,
         recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         FOREIGN KEY (userID) REFERENCES UserData(id)
@@ -1725,7 +1723,7 @@ function create_tables($conn) {
         messageID INT(6) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         userID INT(6) UNSIGNED NOT NULL,
         partnerID INT(6) UNSIGNED NOT NULL,
-        subject varchar(60),
+        subject varchar(250),
         message TEXT,
         picture MEDIUMBLOB,
         sent DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -1741,7 +1739,7 @@ function create_tables($conn) {
         name VARCHAR(120) NOT NULL,
         parent_directory VARCHAR(120) NOT NULL DEFAULT 'ROOT',
         type VARCHAR(10) NOT NULL,
-        content TEXT,
+        uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (projectID) REFERENCES projectData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -1750,4 +1748,15 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
+    $sql = "CREATE TABLE company_folders(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        companyID INT(6) UNSIGNED,
+        name VARCHAR(155) NOT NULL,
+        FOREIGN KEY (companyID) REFERENCES companyData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    }
 }
