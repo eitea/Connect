@@ -1,6 +1,8 @@
-<?php require dirname(__DIR__).DIRECTORY_SEPARATOR.'header.php'; enableToProject($userID); ?>
-
 <?php
+require dirname(__DIR__).DIRECTORY_SEPARATOR.'header.php';
+require dirname(dirname(__DIR__)) . "/plugins/aws/autoload.php";
+enableToProject($userID);
+
 if(!isset($_GET['p'])){ include dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php'; die('Invalid access'); }
 $projectID = intval($_GET['p']);
 
@@ -20,6 +22,7 @@ function insert_access_user($userID, $privateKey){
         echo $conn->error;
     }
 }
+
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(isset($_POST['saveGeneral'])){
         $hours = floatval(test_input($_POST['project_hours']));
@@ -74,7 +77,22 @@ if($projectRow['publicKey']){
             $nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
             $project_symmetric = sodium_crypto_box_open(mb_substr($cipher_symmetric, 24, null, '8bit'), $nonce, $project_private.base64_decode($projectRow['publicKey']));
         } catch(Exception $e){
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e->getMessage.'</div>';
+        }
+        $result = $conn->query("SELECT endpoint, awskey, secret FROM archiveconfig WHERE isActive = 'TRUE' LIMIT 1");
+        if($result && ($row = $result->fetch_assoc())){
+            $link_id = (getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])) ? substr($servername, 0, 8) : $identifier;
+            try{
+                $s3 = new Aws\S3\S3Client(array(
+                    'version' => 'latest',
+                    'region' => '',
+                    'endpoint' => $row['endpoint'],
+                    'use_path_style_endpoint' => true,
+                    'credentials' => array('key' => $row['awskey'], 'secret' => $row['secret'])
+                ));
+            } catch(Exception $e){
+                echo $e->getMessage();
+            }
         }
     } else {
         if($conn->error){
@@ -156,7 +174,65 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             showError($lang['ERROR_MISSING_FIELDS']);
         }
     }
+
+    if(!empty($_POST['delete-file'])){
+        $x = test_input($_POST['delete-file']);
+        $bucket = $link_id .'_uploads';
+        try{
+            $s3->deleteObject(['Bucket' => $bucket, 'Key' => $x]);
+
+            $conn->query("DELETE FROM project_archive WHERE projectID = $projectID AND uniqID = '$x'");
+            if($conn->error){ showError($conn->error); } else { showSuccess($lang['OK_DELETE']); }
+        } catch(Exception $e){
+            echo $e->getMessage();
+        }
+    }
+    if(!empty($_POST['add-new-file']) && isset($_FILES['new-file-upload'])){
+        $file_info = pathinfo($_FILES['new-file-upload']['name']);
+        $ext = strtolower($file_info['extension']);
+        $filetype = $_FILES['new-file-upload']['type'];
+        $accepted_types = ['application/msword', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'text/plain', 'application/pdf', 'application/zip',
+        'application/x-zip-compressed', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'multipart/x-zip',
+        'application/x-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        if (!in_array($ext, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'zip'])){
+            showError('Ungültige Dateiendung: '.$ext);
+        } elseif(!in_array($filetype, $accepted_types)) {
+            showError('Ungültiger Dateityp: '.$filetype);
+        } elseif ($_FILES['new-file-upload']['size'] > 15000000) { //15mb max
+            showError('Die maximale Dateigröße wurde überschritten (15 MB)');
+        } elseif(empty($s3)) {
+            showError("Es konnte keine S3 Verbindung hergestellt werden. Stellen Sie sicher, dass unter den Archiv Optionen eine gültige Verbindung gespeichert wurde.");
+        } else {
+            $parent = test_input($_POST['add-new-file']);
+            try{
+                $hashkey = uniqid('', true); //23 chars
+                $bucket = $link_id .'_uploads';
+                if(!$s3->doesBucketExist($bucket)){
+                    $result = $s3->createBucket(['ACL' => 'private', 'Bucket' => $bucket]);
+                    if($result) showSuccess("Bucket $bucket Created");
+                }
+                $file_encrypt = simple_encryption(file_get_contents($_FILES['new-file-upload']['tmp_name']), $project_symmetric);
+                //$_FILES['file']['name']
+                $s3->putObject(array(
+                    'Bucket' => $bucket,
+                    'Key' => $hashkey,
+                    'Body' => $file_encrypt
+                ));
+
+                $filename = test_input($file_info['filename']);
+                $conn->query("INSERT INTO project_archive (projectID, name, parent_directory, type, uniqID) VALUES ($projectID, '$filename', '$parent', '$ext', '$hashkey')");
+                if($conn->error){ showError($conn->error); } else { showSuccess($lang['OK_UPLOAD']); }
+            } catch(Exception $e){
+                echo $e->getTraceAsString();
+                echo '<br><hr><br>';
+                echo $e->getMessage();
+            }
+        }
+    } elseif(!empty($_POST['add-new-file'])){
+        showError('No File Selected '.$_FILES['new-file-upload']['error']);
+    }
 } //endif POST #2
+
 ?>
 
 <form method="POST">
@@ -224,7 +300,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <?php echo $projectRow['publicKey']; ?>
             </div>
             <div class="col-sm-4">
-                <input type="hidden" name="personal" value="<?php echo $project_private."\n".$projectRow['publicKey']; ?>" />
+                <input type="hidden" name="personal" value="<?php echo base64_encode($project_private)."\n".$projectRow['publicKey']; ?>" />
                 <button type="submit" class="btn btn-warning" name="">Schlüsselpaar Downloaden</button>
             </div>
         </div>
@@ -298,69 +374,114 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </div>
     <br><hr>
 
-    <h4>Dateifreigabe
-        <div class="page-header-button-group">
-            <div class="btn-group"><a class="dropdown-toggle" data-toggle="dropdown">Hinzufügen</a>
-                <ul class="dropdown-menu">
-                    <li><a data-toggle="modal" data-target="#new-folder">Ordner</a></li>
-                    <li><input class="fileInput" type="file" id="uploadFile" multiple ><label class="lbl" for="uploadFile" >File</label></input></li>
-                    <li><a href="#">Text</a></li>
-                </ul>
+    <?php if(!empty($s3)) : ?>
+        <h4>Dateifreigabe
+            <div class="page-header-button-group">
+                <div class="btn-group"><a class="btn btn-default dropdown-toggle" data-toggle="dropdown" title="Hochladen..."><i class="fa fa-upload"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a data-toggle="modal" data-target="#modal-new-folder">Neuer Ordner</a></li>
+                        <li><a data-toggle="modal" data-target="#modal-new-file">File</a></li>
+                        <!--li><a data-toggle="modal" data-target="#modal-new-text">Text</a></li-->
+                    </ul>
+                </div>
+            </div>
+        </h4><br>
+
+        <?php
+        $result = $conn->query("SELECT name FROM company_folders WHERE companyID = ".$projectRow['companyID']." AND name NOT IN
+            ( SELECT name FROM project_archive WHERE projectID = $projectID AND parent_directory = 'ROOT') ");
+        echo $conn->error;
+        while($result && ($row = $result->fetch_assoc())){
+            $conn->query("INSERT INTO project_archive(projectID, name, parent_directory, type) VALUES($projectID, '".$row['name']."', 'ROOT', 'folder')"); echo $conn->error;
+        }
+        function drawFolder($parent_structure, $visibility = true){
+            global $conn;
+            global $projectID;
+            $html = '<div id="folder-'.$parent_structure.'" >';
+            if(!$visibility) $html = substr_replace($html, 'style="display:none"', -1, 0);
+
+            if($parent_structure != 'ROOT') $html .= '<div class="row"><div class="col-xs-1"><i class="fa fa-arrow-left"></i></div>
+            <div class="col-xs-3"><button class="btn btn-link tree-node-back" data-parent="'.$parent_structure.'">Zurück</button></div></div>';
+            $subfolder = '';
+            $result = $conn->query("SELECT id, name, uploadDate, type, uniqID FROM project_archive WHERE projectID = $projectID AND parent_directory = '$parent_structure' ORDER BY type <> 'folder', type ASC ");
+            echo $conn->error;
+            while($result && ($row = $result->fetch_assoc())){
+                $html .= '<div class="row">';
+                if($row['type'] == 'folder'){
+                    $html .= '<div class="col-xs-1"><i class="fa fa-folder-open-o"></i></div>
+                    <div class="col-xs-4"><a class="folder-structure" data-child="'.$row['id'].'" data-parent="'.$parent_structure.'" >'.$row['name'].'</a></div><div class="col-xs-4">'.$row['uploadDate'].'</div>';
+                    $subfolder .= drawFolder($row['id'], false);
+                } else {
+                    $html .= '<div class="col-xs-1"><i class="fa fa-file-o"></i></div>
+                    <div class="col-xs-4">'.$row['name'].'</div><div class="col-xs-4">'.$row['uploadDate'].'</div>
+                    <div class="col-xs-3"><form method="POST"><button type="submit" class="btn btn-default" name="delete-file" value="'.$row['uniqID'].'"><i class="fa fa-trash-o"></i></button></form></div>';
+                }
+                $html .= '</div>';
+            }
+            $html .= '</div>';
+            $html .= $subfolder;
+            return $html;
+        }
+
+        echo drawFolder('ROOT');
+        ?>
+
+        <div id="modal-new-folder" class="modal fade">
+            <div class="modal-dialog modal-content modal-sm">
+                <form method="POST">
+                    <div class="modal-header h4">Neuer Ordner</div>
+                    <div class="modal-body">
+                        <label>Name</label>
+                        <input type="text" name="new-folder-name" class="form-control" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-warning modal-new" name="add-new-folder" value="ROOT"><?php echo $lang['ADD']; ?></button>
+                    </div>
+                </form>
             </div>
         </div>
-    </h4><br>
-
-    <?php
-    $result = $conn->query("SELECT name FROM company_folders WHERE companyID = ".$projectRow['companyID']." AND name NOT IN
-        ( SELECT name FROM project_archive WHERE projectID = $projectID AND parent_directory = 'ROOT') ");
-    echo $conn->error;
-    while($result && ($row = $result->fetch_assoc())){
-        $conn->query("INSERT INTO project_archive(projectID, name, parent_directory, type) VALUES($projectID, '".$row['name']."', 'ROOT', 'folder')"); echo $conn->error;
-    }
-
-    function drawFolder($parent_structure){
-        global $conn;
-        global $projectID;
-        //folders
-        $result = $conn->query("SELECT id, name, uploadDate FROM project_archive WHERE projectID = $projectID AND parent_directory = '$parent_structure' AND type = 'folder' "); echo $conn->error;
-        while($result && ($row = $result->fetch_assoc())){
-            //text, file, s3File, s3Text, folder
-            $html .= '<div class="row"><div class="col-xs-1"><i class="fa fa-folder-open-o"></i></div>
-            <div class="col-xs-4"><a data-toggle="collapse" data-parent="#parent-'.$parent_structure.'" href="#child-'.$row['id'].'">'.$row['name'].'</a></div>
-            <div class="col-xs-4">'.$row['uploadDate'].'</div></div>';
-            $html .= drawFolder($row['id']);
-        }
-        //files
-        $result = $conn->query("SELECT name, uploadDate, uniqID FROM project_archive WHERE projectID = $projectID AND parent_directory = '$parent_structure' AND type != 'folder' "); echo $conn->error;
-        while($result && ($row = $result->fetch_assoc())){
-            $html .= $row['name'];
-        }
-        return $html;
-    }
-    echo drawFolder('ROOT');
-    ?>
-
-
-    <div id="new-folder" class="modal fade">
-        <div class="modal-dialog modal-content modal-sm">
-            <form method="POST">
-                <div class="modal-header h4">Neuer Ordner</div>
-                <div class="modal-body">
-                    <label>Name</label>
-                    <input type="text" name="new-folder-name" class="form-control" />
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button  id="new-folder-parent" type="submit" class="btn btn-warning" name="add-new-folder"><?php echo $lang['ADD']; ?></button>
-                </div>
-            </form>
+        <div id="modal-new-file" class="modal fade">
+            <div class="modal-dialog modal-content modal-sm">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="modal-header h4">File Hochladen</div>
+                    <div class="modal-body">
+                        <label class="btn btn-default">
+                            Datei Auswählen
+                            <input type="file" name="new-file-upload"  accept="application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint, text/plain, application/pdf,.doc, .docx" style="display:none" >
+                        </label>
+                        <small>Max. 15MB<br>Text, PDF, .Zip und Office</small>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-warning modal-new" name="add-new-file" value="ROOT"><?php echo $lang['ADD']; ?></button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
 
-    <script>
-    $('#new-folder').on('show.bs.modal', function (event){
-        $('#new-folder-parent').val($(event.relatedTarget).data('parent'));
-    });
-    </script>
+        <script>
+        var grandParent = ['ROOT'];
+        $('.tree-node-back').click(function(){
+            var grandPa = grandParent.pop();
+            $('#folder-'+ $(this).data('parent')).hide();
+            $('#folder-'+ grandPa).fadeIn();
+            changeUploadPlace(grandPa);
+        });
+        $('.folder-structure').click(function(event){
+            $('#folder-'+ $(this).data('parent')).hide();
+            $('#folder-'+ $(this).data('child')).fadeIn();
+            grandParent.push($(this).data('parent'));
+            changeUploadPlace($(this).data('child'));
+        });
+        function changeUploadPlace(place){
+            $('.modal-new').val(place);
+        }
+        </script>
+    <?php else: ?>
+        <h4>Dateifreigabe</h4>
+        <div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Es konnte keine Verbindung zu einer S3 Schnittstelle hergestellt werden.
+        Um den Dateiupload nutzen zu können, überprüfen Sie bitte Ihre Archiv Optionen</div>
+    <?php endif; //s3 ?>
 <?php endif; //key ?>
 <?php require dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php'; ?>
