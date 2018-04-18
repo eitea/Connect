@@ -225,7 +225,7 @@ if (sizeof($missingBookingsArray) == 0) {
                 <!-- Project Messages -->
                 <div id="projectMessages<?php echo $x; ?>" class="tab-pane fade"><br>
                     <!-- User bar -->
-                    <div id="user_bar<?php echo $x; ?>" style="background-color: whitesmoke; border: 1px gainsboro solid; border-bottom: none; max-height: 10vh; padding: 10px;"></div>
+                    <div id="subject_bar<?php echo $x; ?>" style="background-color: whitesmoke; border: 1px gainsboro solid; border-bottom: none; max-height: 10vh; padding: 10px;"></div>
                     
                     <!-- Messages -->
                     <div class="pre-scrollable" id="messages<?php echo $x; ?>" style="background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh; padding-top: 5px">
@@ -241,12 +241,13 @@ if (sizeof($missingBookingsArray) == 0) {
                             </div>
                         </form>
 
+
                         <script>
                             messageLimit<?php echo $x; ?> = 10;
 
                             // auto resize
                             $('#message<?php echo $x; ?>, #sendButton<?php echo $x; ?>').on('change keyup keydown paste cut click', function (event) {
-                                $("#message").height(0).height(this.scrollHeight/1.4);
+                                $("#message<?php echo $x; ?>").height(0).height(this.scrollHeight/1.4);
                             }).find('textarea').change();
                                         
                             // send on enter
@@ -254,7 +255,7 @@ if (sizeof($missingBookingsArray) == 0) {
                             $("#message<?php echo $x; ?>").keydown(function(event) {
                                 //shift + enter?
                                 if(shiftPressed<?php echo $x ?> && event.which == 13) {
-                                    $(this).append("<br>");
+                                    $("#message<?php echo $x; ?>").append("<br>");
                                 } else {
                                     // update shiftPressed when not pressed shift+enter
                                     if(event.which == 16) shiftPressed<?php echo $x ?> = true; else shiftPressed<?php echo $x ?> = false;
@@ -263,7 +264,7 @@ if (sizeof($missingBookingsArray) == 0) {
                                 if(event.which == 13 && !shiftPressed<?php echo $x ?>){
                                     event.preventDefault();
 
-                                    if($(this).val().trim().length != 0){
+                                    if($("#message<?php echo $x; ?>").val().trim().length != 0){
                                         messageLimit<?php echo $x; ?>++;
                                         sendMessage("<?php echo $x; ?>", "<?php echo $projectname ?>", $("#message<?php echo $x; ?>").val(), "#messages<?php echo $x; ?>", messageLimit<?php echo $x; ?>);
                                         $("#message<?php echo $x; ?>").val("")
@@ -292,7 +293,7 @@ if (sizeof($missingBookingsArray) == 0) {
                                 if($(this).scrollTop() == 0){
                                     $(this).scrollTop(1);
                                     messageLimit<?php echo $x; ?> += 1
-                                    getMessages("<?php echo $x; ?>", "<?php echo $projectname ?>", "messages<?php echo $x; ?>", true, messageLimit<?php echo $x; ?>);
+                                    getMessages("<?php echo $x; ?>", "<?php echo $projectname ?>", "#messages<?php echo $x; ?>", false, messageLimit<?php echo $x; ?>);
                                 }
 
                             })
@@ -307,23 +308,14 @@ if (sizeof($missingBookingsArray) == 0) {
                     </div>
 
                     <script>
-
-                        window.onload = function() {
-                            if (window.jQuery) {  
-                                // jQuery is loaded  
-                                console.log("Yeah!");
-                            } else {
-                                // jQuery is not loaded
-                                console.log("Doesn't Work");
-                            }
-                        }
-
-                    getMessages("<?php echo $x; ?>", "<?php echo $projectname ?>", "messages<?php echo $x; ?>", true, 10);
+                    intervalID<?php echo $x; ?> = setInterval(function() {
+                        getMessages("<?php echo $x; ?>", "<?php echo $projectname ?>", "#messages<?php echo $x; ?>", true, 10);
+                    }, 1000);
+                   
 
                     // subject = Taskbezeichnung + ID
                     function getMessages(taskID, taskName, target, scroll = false, limit = 50) {
                         if(taskID.length == 0 || taskName.length == 0) {
-                            console.log("invalid getMessages!")
                             return;
                         }
 
@@ -338,12 +330,14 @@ if (sizeof($missingBookingsArray) == 0) {
                             success: function (response) {
                                 $(target).html(response);
 
+                                // set the subject_bar
+                                $("#subject_bar<?php echo $x; ?>").html(taskName);
+
                                 //Scroll down
-                                //if (scroll) $(target).scrollTop($(target)[0].scrollHeight)
+                                if (scroll) $(target).scrollTop($(target)[0].scrollHeight)
                             },
                             error: function (response) {
                                 $(target).html(response);
-                                console.log("err response: " + response)
                             },
                         });
                     }
@@ -362,7 +356,7 @@ if (sizeof($missingBookingsArray) == 0) {
                             },
                             type: 'GET',
                             success: function (response) {
-                                getMessages("<?php echo $x; ?>", "<?php echo "$projectname" ?>", "messages<?php echo $x; ?>", true, limit);
+                                getMessages("<?php echo $x; ?>", "<?php echo "$projectname" ?>", "#messages<?php echo $x; ?>", true, limit);
                             },
                         })
                     }
@@ -503,6 +497,8 @@ if (sizeof($missingBookingsArray) == 0) {
                 <?php endif; ?>
             </div>
         </div>
+
+
         <div class="modal-footer">
             <form method="POST">
                 <div class="pull-left"><?php echo $x; ?></div>
