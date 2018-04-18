@@ -2523,7 +2523,15 @@ if($row['version'] < 148){
     }
 }
 
-//if($row['version'] < 149){}
+if($row['version'] < 149) {
+    $conn->query("ALTER TABLE dsgvo_training_questions ADD COLUMN version INT(6) DEFAULT 1");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>DSGVO Training: Question Version';
+    }
+}
+
 //if($row['version'] < 150){}
 //if($row['version'] < 151){}
 //if($row['version'] < 152){}

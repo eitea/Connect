@@ -124,7 +124,7 @@ while($row_question = $result_questions->fetch_assoc()){
                 $("#timeElement").hide()
                 clearInterval(timerID);
                 $.ajax({
-                    url: 'ajaxQuery/AJAX_validateTrainingSurvey.php',
+                    url: 'ajaxQuery/ajax_dsgvo_training_user_submit.php',
                     data: { result: JSON.stringify(result.data),test:true },
                     type: 'post',
                     success: function (resp) {

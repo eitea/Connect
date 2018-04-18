@@ -99,43 +99,22 @@ while ($result && ($row = $result->fetch_assoc())) {
     $available_users[] = $row['userID'];
 }
 $validation_output = $error_output = '';
-$result = $conn->query(
+$result = $conn->query( /* Test if user has any questions */
     "SELECT count(*) count FROM (
-        SELECT userID FROM dsgvo_training_user_relations tur LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND NOT EXISTS (
-             SELECT userID
-             FROM dsgvo_training_completed_questions
-             LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
-             LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-             WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day)
-             OR dsgvo_training.answerEveryNDays = 0 )
-         )
+        SELECT userID FROM dsgvo_training_user_relations tur LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID
         UNION
         SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID
-        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND NOT EXISTS (
-             SELECT userID
-             FROM dsgvo_training_completed_questions
-             LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
-             LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-             WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day)
-             OR dsgvo_training.answerEveryNDays = 0 )
-         ) 
+        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID
         UNION
         SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations INNER JOIN relationship_company_client ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
-        LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID WHERE relationship_company_client.userID = $userID AND NOT EXISTS (
-             SELECT userID
-             FROM dsgvo_training_completed_questions
-             LEFT JOIN dsgvo_training_questions dtq ON dtq.id = dsgvo_training_completed_questions.questionID
-             LEFT JOIN dsgvo_training ON dsgvo_training.id = dtq.trainingID
-             WHERE questionID = dtq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day)
-             OR dsgvo_training.answerEveryNDays = 0 )
-         )
+        LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID WHERE relationship_company_client.userID = $userID
     ) temp"
 );
-echo $conn->error;
+$error_output .= showError($conn->error, 1);
 $userHasUnansweredSurveys = $userHasSurveys = 0;
 if($result) $userHasUnansweredSurveys = $userHasSurveys = intval($result->fetch_assoc()["count"]) !== 0;
 if(!$userHasSurveys){
-    $result = $conn->query(
+    $result = $conn->query( /* Test if user has unanswered questions to answer */
         "SELECT count(*) count FROM (
             SELECT userID FROM dsgvo_training_user_relations tur
             LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID
@@ -145,7 +124,7 @@ if(!$userHasSurveys){
                  FROM dsgvo_training_completed_questions
                  LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
                  LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-                 WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
+                 WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
                  )
             UNION
             SELECT tr.userID userID FROM dsgvo_training_team_relations dtr
@@ -157,7 +136,7 @@ if(!$userHasSurveys){
                  FROM dsgvo_training_completed_questions
                  LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
                  LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-                 WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
+                 WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
                  )
             UNION
             SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations 
@@ -169,15 +148,15 @@ if(!$userHasSurveys){
                 FROM dsgvo_training_completed_questions
                 LEFT JOIN dsgvo_training_questions dtq ON dtq.id = dsgvo_training_completed_questions.questionID
                 LEFT JOIN dsgvo_training ON dsgvo_training.id = dtq.trainingID
-                WHERE questionID = dtq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
+                WHERE questionID = dtq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
             )
         ) temp"
     );
-    echo $conn->error;
+    $error_output .= showError($conn->error, 1);
     if($result) $userHasSurveys = intval($result->fetch_assoc()["count"]) !== 0;
 }
 $userHasUnansweredOnLoginSurveys = false;
-if($userHasUnansweredSurveys){
+if($userHasUnansweredSurveys){ /* Test if user has unanswered questions that should be shown after checkin */
     $result = $conn->query(
         "SELECT count(*) count FROM (
             SELECT userID FROM dsgvo_training_user_relations tur INNER JOIN dsgvo_training t on t.id = tur.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
@@ -185,7 +164,7 @@ if($userHasUnansweredSurveys){
                 FROM dsgvo_training_completed_questions
                 LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
                 LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-                WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
+                WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
              )
             UNION
             SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID INNER JOIN dsgvo_training t on t.id = dtr.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
@@ -193,7 +172,7 @@ if($userHasUnansweredSurveys){
                 FROM dsgvo_training_completed_questions
                 LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
                 LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-                WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
+                WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
              )
             UNION
             SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations 
@@ -206,13 +185,14 @@ if($userHasUnansweredSurveys){
                 FROM dsgvo_training_completed_questions
                 LEFT JOIN dsgvo_training_questions dtq ON dtq.id = dsgvo_training_completed_questions.questionID
                 LEFT JOIN dsgvo_training ON dsgvo_training.id = dtq.trainingID
-                WHERE questionID = dtq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
+                WHERE questionID = dtq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
             )
         ) temp"
     );
-    echo $conn->error;
+    $error_output .= showError($conn->error, 1);
     $userHasUnansweredOnLoginSurveys = intval($result->fetch_assoc()["count"]) !== 0;
 }
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['stampIn']) || isset($_POST['stampOut'])) {
         require __DIR__ . "/misc/ckInOut.php";
@@ -220,7 +200,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             checkIn($userID);
             $validation_output = showInfo($lang['INFO_CHECKIN'], 1);
         } elseif (isset($_POST['stampOut'])) {
-            $error_output = checkOut($userID, intval($_POST['stampOut']));
+            $error_output .= checkOut($userID, intval($_POST['stampOut']));
             $validation_output = showInfo($lang['INFO_CHECKOUT'], 1);
         }
     }
@@ -238,7 +218,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if(!$conn->error){
                 $validation_output = showSuccess('Password successfully changed. '.$userPasswordHash, 1);
             } else {
-                $validation_output = showErrorg($conn->error, 1);
+                $validation_output = showError($conn->error, 1);
             }
         } else {
             $validation_output  = showError($output, 1);

@@ -1016,7 +1016,7 @@ function reviewChange(event,id){
 }
 $(".openDoneSurvey").click(function(){ // answer already done surveys/trainings again
     $.ajax({
-        url:'ajaxQuery/AJAX_getTrainingSurvey.php',
+        url:'ajaxQuery/ajax_dsgvo_training_user_generate.php',
         data:{done:true},
         type: 'get',
         success : function(resp){

@@ -66,7 +66,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $trainingID = intval($_POST['addQuestion']);
         $title = test_input($_POST["title"]);
         $text = $_POST["question"]; // todo: test input
-        $stmt = $conn->prepare("INSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES($trainingID, ?, '$title')");
+        $version = 1;
+        $stmt = $conn->prepare("INSERT INTO dsgvo_training_questions (trainingID, text, title, version) VALUES ($trainingID, ?, '$title', $version)");
         if ($conn->error) {
             showError($conn->error);
         } else {
@@ -90,12 +91,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $questionID = intval($_POST["editQuestion"]);
         $title = test_input($_POST["title"]);
         $text = $_POST["question"]; //todo: test input
-        $stmt = $conn->prepare("UPDATE dsgvo_training_questions SET text = ?, title = '$title' WHERE id = $questionID");
+        $version = intval($_POST["version"]);
+        $stmt = $conn->prepare("UPDATE dsgvo_training_questions SET text = ?, title = '$title', version = $version WHERE id = $questionID");
         showError($conn->error);
         $stmt->bind_param("s", $text);
         $stmt->execute();
         $conn->query("SELECT trainingID FROM dsgvo_training_questions WHERE id = $questionID");
-
         if ($stmt->error) {
             showError($stmt->error);
         } else {
@@ -517,7 +518,7 @@ function setCurrentModal(data, type, url){
    });
 }
 $("button[name=editQuestion]").click(function(){
-    setCurrentModal({questionID: $(this).val()},'get', 'ajaxQuery/AJAX_dsgvoQuestionEdit.php')
+    setCurrentModal({questionID: $(this).val()},'get', 'ajaxQuery/ajax_dsgvo_training_question_edit.php')
 })
 $("button[name=editTraining]").click(function(){
     setCurrentModal({trainingID: $(this).val()},'get', 'ajaxQuery/ajax_dsgvo_training_edit.php')
@@ -538,7 +539,7 @@ $("button[name=export]").click(function(){
     setCurrentModal({operation:"export",module: $(this).val()}, 'post', 'ajaxQuery/ajax_dsgvo_training_import_export.php')
 })
 $("button[name=testTraining]").click(function(){
-    setCurrentModal({trainingID: $(this).val()}, 'post', 'ajaxQuery/AJAX_dsgvoTrainingTest.php')
+    setCurrentModal({trainingID: $(this).val()}, 'post', 'ajaxQuery/ajax_dsgvo_training_user_generate_play.php')
 })
 $("button[name=editModule]").click(function(){
     setCurrentModal({moduleID: $(this).val()},'get', 'ajaxQuery/AJAX_dsgvoModuleEdit.php')

@@ -1478,6 +1478,7 @@ function create_tables($conn) {
         title varchar(100),
         text varchar(2000),
         trainingID INT(6),
+        version INT(6) DEFAULT 1,
         PRIMARY KEY (id),
         FOREIGN KEY (trainingID) REFERENCES dsgvo_training(id) ON UPDATE CASCADE ON DELETE CASCADE
     )";

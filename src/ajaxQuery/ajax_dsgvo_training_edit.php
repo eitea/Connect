@@ -54,8 +54,6 @@ while($result && ($row = $result->fetch_assoc())){
                 }
                 ?>
             </select>
-            <label>Version</label>
-            <input type="number" class="form-control" name="version" placeholder="1" min="1" step="1" value="<?php echo $version ?>" />
             <label>Zugeordnete Personen</label>
             <label><?php echo $lang["EMPLOYEE"]; ?>/Team/Mandant*</label>
                 <select class="select2-team-icons required-field" name="employees[]" multiple="multiple">
