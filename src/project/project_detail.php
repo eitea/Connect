@@ -30,7 +30,59 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
             $stmt->close();
         }
+    } elseif(isset($_POST['reKey'])){
+        $keyPair = sodium_crypto_box_keypair();
+        $new_private = sodium_crypto_box_secretkey($keyPair);
+        $new_public = sodium_crypto_box_publickey($keyPair);
+        //outdate and insert
+        $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$projectID'"); echo $conn->error;
+        $result = $conn->query("SELECT userID, publicPGPKey FROM relationship_project_user r LEFT JOIN UserData ON r.userID = UserData.id WHERE projectID = $projectID");
+        while($result && ($row = $result->fetch_assoc())){
+            $user_public = base64_decode($row['publicPGPKey']);
+            $nonce = random_bytes(24);
+            $private_encrypt = $nonce . sodium_crypto_box($new_private, $nonce, $new_private.$new_public);
+            $conn->query("INSERT INTO security_access(userID, module, privateKey, optionalID) VALUES ($userID, 'PRIVATE_PROJECT', '".base64_encode($private_encrypt)."', '$projectID')");
+            echo $conn->error .' - access error<br>';
+        }
+        $result = $conn->query("SELECT id, symmetricKey, publicKey FROM security_projects WHERE projectID = $projectID AND outDated = 'FALSE' LIMIT 1"); echo $conn->error;
+        if($row = $result->fetch_assoc()){
+            $symmetric_cipher = base64_decode($row['symmetricKey']);
+            //TODO: decrypt old symmetric key or re-encrypt all old data.
+        } else {
+            $symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
+        }
+        //outdate and insert
+        $conn->query("UPDATE security_projects SET outDated = 'TRUE' WHERE projectID = $projectID"); echo $conn->error;
+        $symmetric_encrypted = base64_encode($nonce . sodium_crypto_box($symmetric, $nonce, $private.$public));
+        $conn->query("INSERT INTO security_projects (projectID, publicKey, symmetricKey) VALUES ($projectID, $new_public, $symmetric_encrypted)");
     }
+    if(isset($_POST['hire'])){
+        if(!empty($_POST['userID'])){
+            $stmt = $conn->prepare("INSERT INTO relationship_project_user (projectID, userID, access, expirationDate) VALUES($projectID, ?, ?, ?)"); echo $conn->error;
+            $stmt->bind_param('iss', $x, $access, $date);
+            for($i = 0; $i < count($_POST['userID']); $i++){
+                $x = intval($_POST['userID'][$i]);
+                $access = test_input($_POST['userAccess'][$i], 1);
+                $date = test_Date($_POST['userExpiration'][$i], 'Y-m-d') ? $_POST['userExpiration'][$i] : '0000-00-00';
+                $stmt->execute();
+                echo $stmt->error;
+            }
+            $stmt->close();
+        }
+        if(!empty($_POST['externID'])){
+            $stmt = $conn->prepare("INSERT INTO relationship_project_extern (projectID, userID, access, expirationDate) VALUES($projectID, ?, ?, ?)"); echo $conn->error;
+            $stmt->bind_param('iss', $x, $access, $date);
+            for($i = 0; $i < count($_POST['externID']); $i++){
+                $x = intval($_POST['externID'][$i]);
+                $access = test_input($_POST['externAccess'][$i], 1);
+                $date = test_Date($_POST['externExpiration'][$i], 'Y-m-d') ? $_POST['externExpiration'][$i] : '0000-00-00';
+                $stmt->execute();
+                echo $stmt->error;
+            }
+            $stmt->close();
+        }
+    }
+
     if(!empty($_POST['removeUser'])){
         $x = intval($_POST['removeUser']);
         $conn->query("DELETE FROM relationship_project_user WHERE userID = $x AND projectID = $projectID");
