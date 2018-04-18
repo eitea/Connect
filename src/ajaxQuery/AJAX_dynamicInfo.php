@@ -141,7 +141,7 @@ if (sizeof($missingBookingsArray) == 0) {
                 <li class="active"><a data-toggle="tab" href="#projectDescription<?php echo $x; ?>">Beschreibung</a></li>
                 <li><a data-toggle="tab" href="#projectInfoBookings<?php echo $x; ?>">Buchungen</a></li>
                 <li><a data-toggle="tab" href="#projectInfoLogs<?php echo $x; ?>">Logs</a></li>
-                <li><a data-toggle="tab" href="#projectMessages<?php echo $x; ?>">Messages</a></li>
+                <li><a data-toggle="tab" href="#projectMessages<?php echo $x; ?>" id="projectMessagesTab<?php echo $x; ?>">Messages</a></li>
                 <?php if($showMissingBookings): ?><li><a data-toggle="tab" href="#projectForgottenBooking<?php echo $x; ?>">Zeit nachbuchen</a></li><?php endif; ?>
             </ul>
             <div class="tab-content">
@@ -224,13 +224,11 @@ if (sizeof($missingBookingsArray) == 0) {
 
                 <!-- Project Messages -->
                 <div id="projectMessages<?php echo $x; ?>" class="tab-pane fade"><br>
-                    <!-- User bar -->
+                    <!-- Subject bar -->
                     <div id="subject_bar<?php echo $x; ?>" style="background-color: whitesmoke; border: 1px gainsboro solid; border-bottom: none; max-height: 10vh; padding: 10px;"></div>
                     
                     <!-- Messages -->
-                    <div class="pre-scrollable" id="messages<?php echo $x; ?>" style="background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh; padding-top: 5px">
-                    asdfasdfasdf
-                    </div>
+                    <div class="pre-scrollable" id="messages<?php echo $x; ?>" style="background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh; padding-top: 5px"></div>
 
                     <!-- Response Field -->
                     <div id="chatinput<?php echo $x; ?>" style="padding-top: 5px;">
@@ -244,6 +242,19 @@ if (sizeof($missingBookingsArray) == 0) {
 
                         <script>
                             messageLimit<?php echo $x; ?> = 10;
+                            intervalID<?php echo $x; ?> = setInterval(function() {
+                                getMessages("<?php echo $x; ?>", "<?php echo $projectname ?>", "#messages<?php echo $x; ?>", false, 10);
+                            }, 1000);
+
+                            // scroll down when the tab gets shown
+                            $("#projectMessagesTab<?php echo $x; ?>").on('shown.bs.tab', function (e) {
+                                $("#messages<?php echo $x; ?>").scrollTop($("#messages<?php echo $x; ?>")[0].scrollHeight)
+                            });
+
+                            // remove the interval, when leaving the tab
+                            $("#projectMessagesTab<?php echo $x; ?>").on('hide.bs.tab', function (e) {
+                                clearInterval(intervalID<?php echo $x; ?>);
+                            });
 
                             // auto resize
                             $('#message<?php echo $x; ?>, #sendButton<?php echo $x; ?>').on('change keyup keydown paste cut click', function (event) {
@@ -304,66 +315,58 @@ if (sizeof($missingBookingsArray) == 0) {
                                     window.onbeforeunload = null;
                                 });
                             });
+
+                            //###############################
+                            //         AJAX Scripts
+                            //###############################
+                            function getMessages(taskID, taskName, target, scroll = false, limit = 50) {
+                                if(taskID.length == 0 || taskName.length == 0) {
+                                    return;
+                                }
+
+                                $.ajax({
+                                    url: 'ajaxQuery/AJAX_postGetMessage.php',
+                                    data: {
+                                        taskID: taskID,
+                                        taskName: taskName,
+                                        limit: limit,
+                                    },
+                                    type: 'GET',
+                                    success: function (response) {
+                                        $(target).html(response);
+
+                                        // set the subject_bar
+                                        $("#subject_bar<?php echo $x; ?>").html(taskName);
+
+                                        //Scroll down
+                                        if (scroll) $(target).scrollTop($(target)[0].scrollHeight)
+                                    },
+                                    error: function (response) {
+                                        $(target).html(response);
+                                    },
+                                });
+                            }
+
+                            function sendMessage(taskID, taskName, message, target, limit = 50) {
+                                if(taskID.length == 0 || taskName.length == 0 || message.length == 0){
+                                    return;
+                                }
+
+                                $.ajax({
+                                    url: 'ajaxQuery/AJAX_postSendMessage.php',
+                                    data: {
+                                        taskID: taskID,
+                                        taskName: taskName,
+                                        message: message,
+                                    },
+                                    type: 'GET',
+                                    success: function (response) {
+                                        getMessages("<?php echo $x; ?>", "<?php echo "$projectname" ?>", "#messages<?php echo $x; ?>", true, limit);
+                                    },
+                                })
+                            }
                         </script>
                     </div>
-
-                    <script>
-                    // scroll down when the tab gets shown
-                    $("#messages<?php echo $x; ?>").scrollTop($("#messages<?php echo $x; ?>")[0].scrollHeight)
-                    
-                    intervalID<?php echo $x; ?> = setInterval(function() {
-                        getMessages("<?php echo $x; ?>", "<?php echo $projectname ?>", "#messages<?php echo $x; ?>", false, 10);
-                    }, 1000);
-                   
-
-                    // subject = Taskbezeichnung + ID
-                    function getMessages(taskID, taskName, target, scroll = false, limit = 50) {
-                        if(taskID.length == 0 || taskName.length == 0) {
-                            return;
-                        }
-
-                        $.ajax({
-                            url: 'ajaxQuery/AJAX_postGetMessage.php',
-                            data: {
-                                taskID: taskID,
-                                taskName: taskName,
-                                limit: limit,
-                            },
-                            type: 'GET',
-                            success: function (response) {
-                                $(target).html(response);
-
-                                // set the subject_bar
-                                $("#subject_bar<?php echo $x; ?>").html(taskName);
-
-                                //Scroll down
-                                if (scroll) $(target).scrollTop($(target)[0].scrollHeight)
-                            },
-                            error: function (response) {
-                                $(target).html(response);
-                            },
-                        });
-                    }
-
-                    function sendMessage(taskID, taskName, message, target, limit = 50) {
-                        if(taskID.length == 0 || taskName.length == 0 || message.length == 0){
-                            return;
-                        }
-
-                        $.ajax({
-                            url: 'ajaxQuery/AJAX_postSendMessage.php',
-                            data: {
-                                taskID: taskID,
-                                taskName: taskName,
-                                message: message,
-                            },
-                            type: 'GET',
-                            success: function (response) {
-                                getMessages("<?php echo $x; ?>", "<?php echo "$projectname" ?>", "#messages<?php echo $x; ?>", true, limit);
-                            },
-                        })
-                    }
-                    </script>
                 </div>
 
                 <?php if($showMissingBookings): ?>
