@@ -6,15 +6,23 @@ enableToProject($userID);
 if(!isset($_GET['p'])){ include dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php'; die('Invalid access'); }
 $projectID = intval($_GET['p']);
 
-function insert_access_user($userID, $privateKey){
+function insert_access_user($userID, $privateKey, $external = false){
     global $conn;
     global $projectID;
-    $result = $conn->query("SELECT publicPGPKey FROM UserData WHERE id = $userID");
+    if($external) {
+        $result = $conn->query("SELECT publicPGPKey FROM UserData WHERE id = $userID");
+    } else {
+        $result = $conn->query("SELECT publicPGPKey FROM external_users WHERE id = $userID");
+    }
     if($result && ($row = $result->fetch_assoc())){
         $user_public = base64_decode($row['publicPGPKey']);
         $nonce = random_bytes(24);
         $private_encrypt = $nonce . sodium_crypto_box($privateKey, $nonce, $privateKey.$user_public);
-        $conn->query("INSERT INTO security_access(userID, module, privateKey, optionalID) VALUES ($userID, 'PRIVATE_PROJECT', '".base64_encode($private_encrypt)."', '$projectID')");
+        if($external){
+            $conn->query("INSERT INTO security_external_access(externalID, module, privateKey, optionalID) VALUES ($userID, 'PRIVATE_PROJECT', '".base64_encode($private_encrypt)."', '$projectID')");
+        } else {
+            $conn->query("INSERT INTO security_access(userID, module, privateKey, optionalID) VALUES ($userID, 'PRIVATE_PROJECT', '".base64_encode($private_encrypt)."', '$projectID')");
+        }
         if($conn->error){
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
         }
@@ -157,6 +165,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $x = intval($_POST['externID'][$i]);
                 $stmt->execute();
                 echo $stmt->error;
+                insert_access_user($x, $project_private, 1);
             }
             $stmt->close();
         }

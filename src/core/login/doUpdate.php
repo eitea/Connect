@@ -2580,7 +2580,7 @@ if($row['version'] < 149){
 if($row['version'] < 150){
     $conn->query("ALTER TABLE project_archive ADD COLUMN uniqID VARCHAR(30)");
     //5ad4376e05226
-    $conn->query("ALTER TABLE mailingOptions feedbackRecipient VARCHAR(50) DEFAULT 'connect@eitea.at'");
+    $conn->query("ALTER TABLE mailingOptions MODIFY COLUMN feedbackRecipient VARCHAR(50) DEFAULT 'connect@eitea.at'");
     $conn->query("UPDATE mailingOptions SET feedbackRecipient = 'connect@eitea.at'");
     $conn->query("ALTER TABLE mailingOptions ADD COLUMN senderName VARCHAR(50) DEFAULT NULL");
 
