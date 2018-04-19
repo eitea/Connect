@@ -139,10 +139,10 @@ if(!$userHasSurveys){
                  WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
                  )
             UNION
-            SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations 
+            SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations
             INNER JOIN relationship_company_client ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
-            LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID 
-            WHERE relationship_company_client.userID = $userID 
+            LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID
+            WHERE relationship_company_client.userID = $userID
             AND NOT EXISTS (
                 SELECT userID
                 FROM dsgvo_training_completed_questions
@@ -178,11 +178,11 @@ if($userHasUnansweredSurveys){ /* Test if user has unanswered questions that sho
                     WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
                  )
                 UNION
-                SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations 
+                SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations
                 INNER JOIN relationship_company_client ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
                 INNER JOIN dsgvo_training on dsgvo_training.id = dsgvo_training_company_relations.trainingID
-                LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID 
-                WHERE relationship_company_client.userID = $userID 
+                LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID
+                WHERE relationship_company_client.userID = $userID
                 AND dsgvo_training.onLogin = 'TRUE' AND NOT EXISTS (
                     SELECT userID
                     FROM dsgvo_training_completed_questions
@@ -197,7 +197,7 @@ if($userHasUnansweredSurveys){ /* Test if user has unanswered questions that sho
     }else{
         $userHasUnansweredOnLoginSurveys = false;
     }
-    
+
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -719,18 +719,18 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   <li><a <?php if ($this_page == 'home.php') {echo $setActiveLink;}?> href="../user/home"><i class="fa fa-home"></i> <span><?php echo $lang['OVERVIEW']; ?></span></a></li>
                   <li><a <?php if ($this_page == 'timeCalcTable.php') {echo $setActiveLink;}?> href="../user/time"><i class="fa fa-clock-o"></i> <span><?php echo $lang['VIEW_TIMESTAMPS']; ?></span></a></li>
                   <li><a <?php if ($this_page == 'makeRequest.php') {echo $setActiveLink;}?> href="../user/request"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['REQUESTS']; ?></span></a></li>
-                  
+
                   <li>
                     <a <?php if ($this_page == 'post.php') {echo $setActiveLink;}?> href="../social/post">
                         <span id="globalMessagingBadge" class="badge pull-right" style="display: none"></span>
                         <i class="fa fa-commenting-o"></i><?php echo $lang['MESSAGING']; ?>
                     </a>
-                                    
+
                     <script>
                     $( document ).ready(function() {
                         setInterval(function(){udpateBadge("#globalMessagingBadge")}, 1000);
                     });
-                                            
+
                     function udpateBadge(target) {
                         $.ajax({
                             url: 'ajaxQuery/AJAX_postGetAlerts.php',
@@ -748,7 +748,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     }
                     </script>
                   </li>
-                
+
 
                   <!-- User-Section: BOOKING -->
                   <?php if ($canBook == 'TRUE' && $showProjectBookingLink): ?>
@@ -782,8 +782,8 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           <div id="collapse-core" role="tabpanel" class="panel-collapse collapse">
             <div class="panel-body">
               <ul class="nav navbar-nav">
+                  <li><a <?php if ($this_page == 'securitySettings.php') {echo $setActiveLink;}?> href="../system/security">Security</a></li>
                   <li>
-                      <a <?php if ($this_page == 'securitySettings.php') {echo $setActiveLink;}?> href="../system/security">Security</a>
                       <a id="coreUserToggle" href="#" data-toggle="collapse" data-target="#toggleUsers" data-parent="#sidenav01" class="collapse in">
                           <span><?php echo $lang['USERS']; ?></span> <i class="fa fa-caret-down"></i>
                       </a>
@@ -842,13 +842,14 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           </div>
         </div>
         <?php
-        if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register.php" || $this_page == "deactivatedUsers.php" || $this_page == "checkinLogs.php" || $this_page == "securitySettings.php" ){
+        if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register.php" || $this_page == "deactivatedUsers.php" || $this_page == "checkinLogs.php"){
           echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-        } elseif($this_page == "options_report.php" || $this_page == "editHolidays.php" || $this_page == "options_advanced.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "options_password.php" || $this_page == 'options_archive.php' || $this_page == 'resticBackup.php'){
+        } elseif($this_page == "options_report.php" || $this_page == "editHolidays.php" || $this_page == "options_advanced.php" || $this_page == "taskScheduler.php"
+        || $this_page == "pullGitRepo.php" || $this_page == "options_password.php" || $this_page == 'options_archive.php' || $this_page == 'resticBackup.php'){
           echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
         } elseif($this_page == "editCompanies.php" || $this_page == "new_Companies.php"){
           echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-        } elseif($this_page == "download_sql.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php") {
+        } elseif($this_page == "download_sql.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php" || $this_page == "securitySettings.php") {
           echo "<script>document.getElementById('adminOption_CORE').click();</script>";
         }
         ?>

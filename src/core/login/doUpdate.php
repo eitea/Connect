@@ -2584,9 +2584,31 @@ if($row['version'] < 150) {
     } else {
         echo '<br>DSGVO Training: Question Version';
     }
-}
 
-if($row['version'] < 151){
+    $conn->query("ALTER TABLE project_archive ADD COLUMN uniqID VARCHAR(30)");
+    //5ad4376e05226
+    $conn->query("ALTER TABLE mailingOptions MODIFY COLUMN feedbackRecipient VARCHAR(50) DEFAULT 'connect@eitea.at'");
+    $conn->query("UPDATE mailingOptions SET feedbackRecipient = 'connect@eitea.at'");
+    $conn->query("ALTER TABLE mailingOptions ADD COLUMN senderName VARCHAR(50) DEFAULT NULL");
+
+    $sql = "CREATE TABLE security_external_access(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        externalID INT(6) UNSIGNED,
+        module VARCHAR(50) NOT NULL,
+        optionalID VARCHAR(32),
+        privateKey VARCHAR(150) NOT NULL,
+        recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        FOREIGN KEY (externalID) REFERENCES external_users(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Extern: Security Access';
+    }
+
     $sql = "CREATE TABLE dsgvo_training_user_suspension (
         userID INT(6) UNSIGNED,
         last_suspension DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -2594,13 +2616,14 @@ if($row['version'] < 151){
         PRIMARY KEY (userID),
         FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
     )";
-	if(!$conn->query($sql)){
+    if(!$conn->query($sql)){
         echo $conn->error;
     }else{
         echo '<br>DSGVO Training: User Suspension';
     }
 }
 
+//if($row['version'] < 151){}
 //if($row['version'] < 152){}
 
 // ------------------------------------------------------------------------------
