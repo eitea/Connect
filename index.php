@@ -25,6 +25,7 @@ $routes = array(
 
   'project/view' => 'project/project_view.php',                     'project/csvDownload' => 'project/csvDownload.php',          'project/pdfDownload' => 'project/pdfDownload.php',
   'project/log' => 'project/audit_projectBookings.php',             'project/options' => 'project/options.php',                  'project/detail' => 'project/project_detail.php',
+  'project/detailDownload' => 'project/download_archiveObject.php',
 
   'report/designer' => 'report/templateSelect.php',                 'report/downloadTem' => 'report/templateDownload.php',       'report/editTemp' => 'report/templateEdit.php',
   'report/previewTem' => 'report/templatePreview.php',

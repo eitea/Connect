@@ -2576,8 +2576,32 @@ if($row['version'] < 149){
     $conn->query("ALTER TABLE project_archive DROP COLUMN content");
 }
 
-$conn->query("ALTER TABLE project_archive ADD COLUMN uniqID VARCHAR(30)");
-//if($row['version'] < 150){}
+
+if($row['version'] < 150){
+    $conn->query("ALTER TABLE project_archive ADD COLUMN uniqID VARCHAR(30)");
+    //5ad4376e05226
+    $conn->query("ALTER TABLE mailingOptions feedbackRecipient VARCHAR(50) DEFAULT 'connect@eitea.at'");
+    $conn->query("UPDATE mailingOptions SET feedbackRecipient = 'connect@eitea.at'");
+    $conn->query("ALTER TABLE mailingOptions ADD COLUMN senderName VARCHAR(50) DEFAULT NULL");
+
+    $sql = "CREATE TABLE security_external_access(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        externalID INT(6) UNSIGNED,
+        module VARCHAR(50) NOT NULL,
+        optionalID VARCHAR(32),
+        privateKey VARCHAR(150) NOT NULL,
+        recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        FOREIGN KEY (externalID) REFERENCES external_users(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Extern: Security Access';
+    }
+}
 //if($row['version'] < 151){}
 //if($row['version'] < 152){}
 

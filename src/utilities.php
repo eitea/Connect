@@ -180,6 +180,7 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
 }
 
 function mc_status(){
+    //TODO: this should be checked with module (security_modules) and user access (security_access)..
     static $encrypt = null;
     if($encrypt === null){
         global $conn;

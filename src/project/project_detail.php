@@ -397,6 +397,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         function drawFolder($parent_structure, $visibility = true){
             global $conn;
             global $projectID;
+            global $project_symmetric;
             $html = '<div id="folder-'.$parent_structure.'" >';
             if(!$visibility) $html = substr_replace($html, 'style="display:none"', -1, 0);
 
@@ -414,7 +415,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 } else {
                     $html .= '<div class="col-xs-1"><i class="fa fa-file-o"></i></div>
                     <div class="col-xs-4">'.$row['name'].'</div><div class="col-xs-4">'.$row['uploadDate'].'</div>
-                    <div class="col-xs-3"><form method="POST"><button type="submit" class="btn btn-default" name="delete-file" value="'.$row['uniqID'].'"><i class="fa fa-trash-o"></i></button></form></div>';
+                    <div class="col-xs-3">
+                    <form method="POST" style="display:inline"><button type="submit" class="btn btn-default" name="delete-file" value="'.$row['uniqID'].'">
+                    <i class="fa fa-trash-o"></i></button></form>
+                    <form method="POST" style="display:inline" action="detailDownload" target="_blank">
+                    <input type="hidden" name="symmetricKey" value="'.base64_encode($project_symmetric).'" />
+                    <button type="submit" class="btn btn-default" name="download-file" value="'.$row['uniqID'].'"><i class="fa fa-download"></i></button>
+                    </form></div>';
                 }
                 $html .= '</div>';
             }
@@ -422,7 +429,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $html .= $subfolder;
             return $html;
         }
-
         echo drawFolder('ROOT');
         ?>
 
