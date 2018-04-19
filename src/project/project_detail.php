@@ -12,7 +12,7 @@ function insert_access_user($userID, $privateKey, $external = false){
     if($external) {
         $result = $conn->query("SELECT publicPGPKey FROM UserData WHERE id = $userID");
     } else {
-        $result = $conn->query("SELECT publicPGPKey FROM external_users WHERE id = $userID");
+        $result = $conn->query("SELECT publicKey FROM external_users WHERE id = $userID");
     }
     if($result && ($row = $result->fetch_assoc())){
         $user_public = base64_decode($row['publicPGPKey']);
