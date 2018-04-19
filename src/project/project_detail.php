@@ -86,7 +86,7 @@ if($projectRow['publicKey']){
             $nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
             $project_symmetric = sodium_crypto_box_open(mb_substr($cipher_symmetric, 24, null, '8bit'), $nonce, $project_private.base64_decode($projectRow['publicKey']));
         } catch(Exception $e){
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e->getMessage.'</div>';
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e->getMessage().'</div>';
         }
     } else {
         if($conn->error){

@@ -35,7 +35,7 @@ if(isset($_POST['add']) && !empty($_POST['name']) && !empty($_POST['filterClient
         $conn->query("INSERT INTO security_projects (projectID, publicKey, symmetricKey) VALUES($projectID, '".base64_encode($public)."', '$symmetric_encrypted')");
         echo $conn->error;
         $nonce = random_bytes(24);
-        $private_encrypt = base64_encode($nonce . sodium_crypto_box(base64_encode($private), $nonce, $private.base64_decode($publicKey)));
+        $private_encrypt = base64_encode($nonce . sodium_crypto_box($private, $nonce, $private.base64_decode($publicKey)));
         $conn->query("INSERT INTO security_access (userID, module, privateKey, optionalID) VALUES($userID, 'PRIVATE_PROJECT', '$private_encrypt', $projectID)");
         if($conn->error){
             showError($conn->error);
