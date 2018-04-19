@@ -1,15 +1,48 @@
 <?php
 session_start();
-isset($_POST["result"]) or die("no result");
 isset($_SESSION["userid"]) or die("no user logged in");
+$userID = $_SESSION['userid'];
 
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "connection.php";
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "language.php";
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "utilities.php";
 
-$userID = $_SESSION['userid'];
+if (isset($_POST["suspend"])) {
+    $result = $conn->query("SELECT suspension_count FROM dsgvo_training_user_suspension WHERE userID = $userID");
+    if ($result && $result->num_rows == 0) {
+        $allowSuspension = true;
+        $suspensionLeft = 3;
+    } else {
+        $row = $result->fetch_assoc();
+        $suspensionLeft = 3 - intval($row["suspension_count"]);
+        $allowSuspension = intval($suspensionLeft) > 0;
+    }
+    if ($allowSuspension) {
+        $suspensionLeft--;
+        $conn->query("INSERT INTO dsgvo_training_user_suspension (suspension_count, userID) VALUES (1,$userID) ON DUPLICATE KEY UPDATE suspension_count = suspension_count + 1, last_suspension = CURRENT_TIMESTAMP");
+        if ($conn->error) {
+            echo $conn->error;
+        } else {
+            switch ($suspensionLeft) {
+                case 0:
+                    echo "Erfolgreich aufgeschoben. Es sind keine weiteren Aufschiebungen erlaubt";
+                    break;
+                case 1:
+                    echo "Erfolgreich aufgeschoben. Sie können noch 1 Aufschiebung durchführen";
+                    break;
+                default:
+                    echo "Erfolgreich aufgeschoben. Sie können noch $suspensionLeft Aufschiebungen durchführen";
+            }
+        }
+    } else {
+        echo "Keine weiteren Aufschiebungen erlaubt";
+    }
+    die();
+}
+
+isset($_POST["result"]) or die("no result");
 $result = json_decode($_POST["result"]);
-$test = false;
+$test = false; // test is true when a user submits a training with the play button
 if (isset($_POST["test"]) && $_POST["test"] == true) {
     $test = true;
 }
@@ -90,6 +123,9 @@ foreach ($result as $formVal => $answer) {
     }
     $question_result->free();
 }
+
+// since the user answered the survey, suspension can be reset
+$conn->query("UPDATE dsgvo_training_user_suspension SET suspension_count = 0 WHERE userID = $userID");
 ?>
 
 <script src="plugins/chartsjs/Chart.min.js"></script>

@@ -1530,6 +1530,17 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
+    $sql = "CREATE TABLE dsgvo_training_user_suspension (
+        userID INT(6) UNSIGNED,
+        last_suspension DATETIME DEFAULT CURRENT_TIMESTAMP,
+        suspension_count INT(6) DEFAULT 0,
+        PRIMARY KEY (userID),
+        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+	if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
     $sql = "CREATE TABLE archive_folders (
         folderid INT(6) NOT NULL,
         userid INT(6) NOT NULL,

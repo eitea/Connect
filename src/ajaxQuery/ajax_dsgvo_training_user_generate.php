@@ -13,6 +13,10 @@ if(isset($_REQUEST["onLogin"])){
 if(isset($_REQUEST["done"])){
     $doneSurveys = true;
 }
+
+$result = $conn->query("SELECT userID FROM dsgvo_training_user_suspension WHERE userID = $userID AND suspension_count >= 3");
+$allowSuspension = !$result || $result->num_rows == 0;
+
 $result = $conn->query(
     "SELECT count(*) count FROM (
         SELECT userID FROM dsgvo_training_user_relations tur
@@ -218,6 +222,9 @@ if(!$hasQuestions){
             </div>
             <div class="modal-footer">
                 <button data-toggle="modal" data-target="#explain-surveys" class="btn btn-default" type="button">Hilfe</a>
+                <?php if($onLogin && $allowSuspension): ?>
+                  <button type="button" class="btn btn-warning" id="suspend_trainings_btn">Um einen Tag aufschieben</button> 
+                <?php endif; ?>
                 <?php if(!$onLogin): ?>  <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button> <?php endif; ?>
             </div>
         </div>
@@ -281,6 +288,21 @@ if(!$hasQuestions){
             survey.onCurrentPageChanged.add(timerCallback);
             timerID = window.setInterval(timerCallback, 1000);
             $("#surveyElement").Survey({ model: survey });
+            $("#suspend_trainings_btn").click(function(){
+                $.ajax({
+                    url: 'ajaxQuery/ajax_dsgvo_training_user_submit.php',
+                    data: { suspend: "true" },
+                    type: 'post',
+                    success: function (resp) {
+                        showSuccess(resp)
+                        $(".survey-modal").modal("hide");
+                    },
+                    error: function (resp) { 
+                        showError(resp)
+                        $(".survey-modal").modal("hide");
+                    }
+                });
+            })
     </script>
     <script>
         function setLinkTargets(){

@@ -2586,7 +2586,21 @@ if($row['version'] < 150) {
     }
 }
 
-//if($row['version'] < 151){}
+if($row['version'] < 151){
+    $sql = "CREATE TABLE dsgvo_training_user_suspension (
+        userID INT(6) UNSIGNED,
+        last_suspension DATETIME DEFAULT CURRENT_TIMESTAMP,
+        suspension_count INT(6) DEFAULT 0,
+        PRIMARY KEY (userID),
+        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+	if(!$conn->query($sql)){
+        echo $conn->error;
+    }else{
+        echo '<br>DSGVO Training: User Suspension';
+    }
+}
+
 //if($row['version'] < 152){}
 
 // ------------------------------------------------------------------------------
