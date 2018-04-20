@@ -313,6 +313,21 @@ $stmt_company_relationship->bind_param('i', $x);
               </div>
               <div class="row">
                   <div class="col-md-2">
+                    <?php echo $lang['GENDER']; ?>:
+                  </div>
+                  <div class="col-md-2">
+                    <label>
+                      <input type="radio" name="gender" value="female" <?php if($row['gender'] == 'female'){echo 'checked';} ?> ><i class="fa fa-venus"></i><?php echo $lang['GENDER_TOSTRING']['female']; ?> <br>
+                    </label>
+                  </div>
+                  <div class="col-md-2">
+                    <label>
+                      <input type="radio" name="gender" value="male" <?php if($row['gender'] == 'male'){echo 'checked';} ?> ><i class="fa fa-mars"></i><?php echo $lang['GENDER_TOSTRING']['male']; ?>
+                    </label>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-2">
                     <?php echo $lang['SUPERVISOR']; ?>:
                   </div>
                   <div class="col-md-3">
@@ -326,8 +341,11 @@ $stmt_company_relationship->bind_param('i', $x);
                     ?>
                     </select>
                   </div>
-                  <div class="col-md-4 text-right">
-                    <label><?php echo "Last Password Change: ".(date_create($row['lastPswChange'])->format('d.m.Y')); ?></label>
+                  <div class="col-md-2">
+                    <?php echo 'Letzte Passwort Änderung:'; ?>
+                  </div>
+                  <div class="col-md-2">
+                      <?php echo date('d.m.Y', strtotime($row['lastPswChange'])); ?>
                   </div>
                   <div class="col-md-3" >
                     <button type="button" class="btn btn-danger btn-block" onClick="forcePswChange(<?php echo $x; ?>,event)" ><?php echo "Force Password Change"; ?></button>
@@ -342,18 +360,11 @@ $stmt_company_relationship->bind_param('i', $x);
                           <?php echo str_replace('<option value="'.$row['companyID'].'" ', '<option selected value="'.$row['companyID'].'" ', $selection_main_company); ?>
                       </select>
                   </div>
-                  <div class="col-md-2 text-right">
-                    <?php echo $lang['GENDER']; ?>:
-                  </div>
                   <div class="col-md-2">
-                    <label>
-                      <input type="radio" name="gender" value="female" <?php if($row['gender'] == 'female'){echo 'checked';} ?> ><i class="fa fa-venus"></i><?php echo $lang['GENDER_TOSTRING']['female']; ?> <br>
-                    </label>
+                    <?php echo 'Letzter Login:'; ?>
                   </div>
-                  <div class="col-md-2">
-                    <label>
-                      <input type="radio" name="gender" value="male" <?php if($row['gender'] == 'male'){echo 'checked';} ?> ><i class="fa fa-mars"></i><?php echo $lang['GENDER_TOSTRING']['male']; ?>
-                    </label>
+                  <div class="col-md-5">
+                      <?php if($row['lastLogin']) echo date('d.m.Y H:i', strtotime($row['lastLogin']) + $timeToUTC * 3600); //5ac7126421a8b ?>
                   </div>
               </div>
               <div class="row">

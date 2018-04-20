@@ -26,6 +26,7 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
             $_SESSION['timeToUTC'] = intval($_POST['funZone']);
             $_SESSION['filterings'] = array();
             $_SESSION['color'] = $row['color'];
+            $conn->query("UPDATE UserData SET lastLogin = UTC_TIMESTAMP WHERE id = ".$row['id']); //5ac7126421a8b
             //check key pairs
             if(!$row['privatePGPKey']){
                 $keyPair = sodium_crypto_box_keypair();

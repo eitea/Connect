@@ -87,41 +87,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $accept = false;
     }
 
-    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = 'FALSE';
-    $canBook = $canStamp = $canEdit = $canUseSocialMedia = 'FALSE';
-    if(isset($_POST['isCoreAdmin'])){
-      $isCoreAdmin = 'TRUE';
-    }
-    if(isset($_POST['isTimeAdmin'])){
-      $isTimeAdmin = 'TRUE';
-    }
-    if(isset($_POST['isProjectAdmin'])){
-      $isProjectAdmin = 'TRUE';
-    }
-    if(isset($_POST['isReportAdmin'])){
-      $isReportAdmin = 'TRUE';
-    }
-    if(isset($_POST['isERPAdmin'])){
-      $isERPAdmin = 'TRUE';
-    }
-    if(isset($_POST['isFinanceAdmin'])){
-      $isFinanceAdmin = 'TRUE';
-    }
-    if(isset($_POST['isDSGVOAdmin'])){
-      $isDSGVOAdmin = 'TRUE';
-    }
-    if(isset($_POST['canStamp'])){
-      $canStamp = 'TRUE';
-    }
-    if(isset($_POST['canStamp']) && isset($_POST['canBook'])){
-      $canBook = 'TRUE';
-    }
-    if(isset($_POST['canEditTemplates'])){
-      $canEdit = 'TRUE';
-    }
-    if(isset($_POST['canUseSocialMedia'])){
-      $canUseSocialMedia = 'TRUE';
-    }
     if(isset($_POST['create'])){
       if($accept){
         //send accessdata if user gets created
@@ -166,8 +131,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         //create user
         $psw = password_hash($pass, PASSWORD_BCRYPT);
-        $sql = "INSERT INTO $userTable (firstname, lastname, psw, gender, email, beginningDate, real_email)
-        VALUES ('$firstname', '$lastname', '$psw', '$gender', '$email', '$begin', '$recipients');";
+        $sql = "INSERT INTO $userTable (firstname, lastname, psw, gender, email, beginningDate, real_email, forcedPwdChange)
+        VALUES ('$firstname', '$lastname', '$psw', '$gender', '$email', '$begin', '$recipients', 1);";
         if($conn->query($sql)){
           $curID = mysqli_insert_id($conn);
           echo mysqli_error($conn);
@@ -178,8 +143,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $conn->query($sql);
           echo mysqli_error($conn);
           //create roletable
-          $sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isProjectAdmin, isTimeAdmin, isReportAdmin, isERPAdmin, isFinanceAdmin, isDSGVOAdmin, canStamp, canBook, canEditTemplates, canUseSocialMedia)
-          VALUES($curID, '$isCoreAdmin', '$isProjectAdmin', '$isTimeAdmin', '$isReportAdmin', '$isERPAdmin', '$isFinanceAdmin', '$isDSGVOAdmin', '$canStamp', '$canBook', '$canEdit', '$canUseSocialMedia');";
+          $sql = "INSERT INTO $roleTable (userID, canStamp, canUseSocialMedia) VALUES($curID, 'TRUE', 'TRUE');";
           $conn->query($sql);
           echo mysqli_error($conn);
           //create socialprofile
@@ -281,27 +245,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
       </div>
       <div class="col-md-3">
-        <?php echo $lang['ADMIN_MODULES']; ?>: <br>
-        <div class="checkbox">
-          <label><input type="checkbox" name="isCoreAdmin" /><?php echo $lang['ADMIN_CORE_OPTIONS'];?></label><br>
-          <label><input type="checkbox" name="isTimeAdmin" /><?php echo $lang['ADMIN_TIME_OPTIONS']; ?></label><br>
-          <label><input type="checkbox" name="isProjectAdmin" /><?php echo $lang['ADMIN_PROJECT_OPTIONS']; ?></label><br>
-          <label><input type="checkbox" name="isReportAdmin" /><?php echo $lang['REPORTS']; ?></label><br>
-          <label><input type="checkbox" name="isERPAdmin" />ERP</label><br>
-          <label><input type="checkbox" name="isFinanceAdmin" /><?php echo $lang['FINANCES']; ?></label><br>
-          <label><input type="checkbox" name="isDSGVOAdmin" />DSGVO</label>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <?php echo $lang['USER_MODULES']; ?>: <br>
-        <div class="checkbox">
-          <label><input type="checkbox" checked name="canStamp"><?php echo $lang['CAN_CHECKIN']; ?></label><br>
-          <label><input type="checkbox" name="canBook"><?php echo $lang['CAN_BOOK']; ?></label><br>
-          <label><input type="checkbox" name="canEditTemplates"><?php echo $lang['CAN_EDIT_TEMPLATES']; ?></label><br>
-          <label><input type="checkbox" name="canUseSocialMedia"><?php echo $lang['CAN_USE_SOCIAL_MEDIA']; ?></label><br>
-        </div>
-      </div>
-      <div class="col-md-3">
         <?php echo $lang['COMPANIES']; ?>: <br>
         <div class="checkbox">
           <?php
@@ -315,7 +258,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </div>
     </div>
     <br><br>
-    <div class=container-fluid>
+    <div class="container-fluid">
       <div class="col-md-3">
         <div class="input-group">
           <span class="input-group-addon">Mon</span>
