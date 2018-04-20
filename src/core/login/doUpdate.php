@@ -2618,13 +2618,16 @@ if($row['version'] < 150) {
     )";
     if(!$conn->query($sql)){
         echo $conn->error;
-    }else{
+    } else {
         echo '<br>DSGVO Training: User Suspension';
     }
 }
 
-//if($row['version'] < 151){}
-//if($row['version'] < 152){}
+if($row['version'] < 151){
+    $conn->query("ALTER TABLE UserData ADD COLUMN lastLogin DATETIME DEFAULT NULL"); //5ac7126421a8b
+}
+
+// if($row['version'] < 152){}
 
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';
