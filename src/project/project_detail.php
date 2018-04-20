@@ -69,10 +69,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 } //endif POST
 
 
-$result = $conn->query("SELECT p.*, c.companyID, s.publicKey, s.symmetricKey, c.name AS clientName FROM projectData p LEFT JOIN clientData c ON p.clientID = c.id
+$result = $conn->query("SELECT p.*, c.companyID, s.publicKey, s.symmetricKey, c.name AS clientName FROM projectData p INNER JOIN clientData c ON p.clientID = c.id
 LEFT JOIN security_projects s ON s.projectID = p.id AND s.outDated = 'FALSE' WHERE p.id = $projectID LIMIT 1");
 if(!$result){ include dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php'; die($conn->error); }
+
 $projectRow = $result->fetch_assoc();
+if(!$projectRow) { include dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php'; die($lang['ERROR_UNEXPECTED']); }
+
 if($projectRow['publicKey']){
     $result = $conn->query("SELECT privateKey FROM security_access WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$projectID' AND userID = $userID AND outDated = 'FALSE' LIMIT 1");
     if($result && ($row = $result->fetch_assoc())){
@@ -345,25 +348,32 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     <h4>Benutzer <div class="page-header-button-group">
         <button type="button" class="btn btn-default" data-toggle="modal" data-target=".add-member" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
     </div></h4>
+<?php if($projectRow['creator']): ?>
+    <div class="row">
+        <div class="col-sm-2">Besitzer</div>
+        <div class="col-sm-6"><?php echo $userID_toName[$projectRow['creator']]; ?></div>
+    </div>
+<?php endif; ?>
     <form method="POST">
         <div class="row">
-            <div class="col-xs-6 h5">Intern</div>
-            <div class="col-xs-6 h5">Extern</div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
+            <div class="col-sm-6">
+                <h5>Intern</h5>
                 <?php
                 $result = $conn->query("SELECT userID FROM relationship_project_user WHERE projectID = $projectID"); echo $conn->error;
                 while($result && ($row = $result->fetch_assoc())){
                     echo '<button type="submit" name="removeUser" value="'.$row['userID'].'" class="btn btn-empty" title="Entfernen"><i class="fa fa-times" style="color:red"></i></button>';
                     echo $userID_toName[$row['userID']] .'<br>';
                 }
-
+                ?>
+            </div>
+            <div class="col-sm-6">
+                <h5>Extern</h5>
+                <?php
                 $result = $conn->query("SELECT userID, firstname, lastname FROM relationship_project_extern INNER JOIN external_users e ON userID = e.id
                 INNER JOIN contactPersons c ON c.id = e.contactID WHERE projectID = $projectID"); echo $conn->error;
                 while($result && ($row = $result->fetch_assoc())){
                     echo '<button type="submit" name="removeExtern" value="'.$row['userID'].'" class="btn btn-empty" title="Entfernen"><i class="fa fa-times" style="color:red"></i></button>';
-                    echo $userID_toName[$row['userID']] .'<br>';
+                    echo $row['firstname'].' '.$row['lastname'] .'<br>';
                 }
                 ?>
             </div>

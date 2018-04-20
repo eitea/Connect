@@ -320,7 +320,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       if($filterings['company']){$companyQuery = "AND companyData.id = ".$filterings['company']; }
       if($filterings['client']){$clientQuery = "AND clientData.id = ".$filterings['client']; }
       if($filterings['project']){$projectQuery = "AND projectData.id = ".$filterings['project']; }
-      if($filterings['users']){$userQuery = "AND UserData.id IN (".implode(', ', $filterings['users']).')'; }
+      if($filterings['users']){$userQuery = "AND UserData.id IN (".implode(', ', $filterings['users']).")"; }
       if($filterings['bookings'][0] == '2'){$chargedQuery = "AND $projectBookingTable.booked = 'TRUE' "; } elseif($filterings['bookings'][0] == '1'){$chargedQuery= " AND $projectBookingTable.booked = 'FALSE' "; }
       if(!$filterings['bookings'][1]){$breakQuery = "AND $projectBookingTable.bookingType != 'break' "; } //projectID == NULL
       if(!$filterings['bookings'][2]){$driveQuery = "AND $projectBookingTable.bookingType != 'drive' "; }
@@ -331,11 +331,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <div class="dropdown">
         <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" title="PDF Download"><i class="fa fa-download"></i> PDF</button>
         <ul class="dropdown-menu">
-          <?php
-          echo "<li><button type='submit' name='templateID' value='-1' class='btn' style='background:none'>".$lang['OVERVIEW']."</button></li>";
-          $res = $conn->query("SELECT * FROM $pdfTemplateTable");
-          while($res && ($row = $res->fetch_assoc())){ echo "<li><button type='submit' name='templateID' value='".$row['id']."' class='btn' style='background:none'>".$row['name']."</button></li>"; }
-          ?>
+            <li><button type="submit" name="templateID" value="-1" class="btn btn-empty">Detallierte <?php echo $lang['OVERVIEW']; ////5ac72a2d8a093 ?></button></li>
+            <li><button type="submit" name="templateID" value="-2" class="btn btn-empty"><?php echo $lang['OVERVIEW']; ////5ac72a2d8a093 ?></button></li>
         </ul>
       </div>
     </form>

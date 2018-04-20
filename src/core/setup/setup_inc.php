@@ -41,7 +41,8 @@ function create_tables($conn) {
         privatePGPKey VARCHAR(150) NULL,
         birthday DATE,
         displayBirthday ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        companyID INT(6) UNSIGNED
+        companyID INT(6) UNSIGNED,
+        lastLogin DATETIME DEFAULT NULL
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);

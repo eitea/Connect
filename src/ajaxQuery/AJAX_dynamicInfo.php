@@ -35,6 +35,12 @@ if($useRow){
     $showMissingBookings = false;
 }
 
+$result = $conn->query("SELECT DISTINCT companyID FROM relationship_company_client WHERE userID = $userID OR $userID = 1");
+$available_companies = array('-1'); //care
+while ($result && ($row = $result->fetch_assoc())) {
+    $available_companies[] = $row['companyID'];
+}
+
 if($showMissingBookings){
     echo $conn->error;
     $occupation = array('bookingID' => $useRow['id'], 'dynamicID' => $x, 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage']);

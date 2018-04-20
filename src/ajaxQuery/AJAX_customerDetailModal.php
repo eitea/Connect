@@ -79,10 +79,11 @@ FROM contactPersons LEFT JOIN position ON position.id = position LEFT JOIN exter
                                     <th><?php echo $lang['ADDITIONAL_FIELDS']; ?></th>
                                     <th><?php echo $lang['HOURS']; ?></th>
                                     <th><?php echo $lang['HOURLY_RATE']; ?></th>
+                                    <th></th>
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $result_p = $conn->query("SELECT name, status, hours, hourlyPrice, field_1, field_2, field_3 FROM projectData WHERE clientID = $x");
+                                    $result_p = $conn->query("SELECT id, name, status, hours, hourlyPrice, field_1, field_2, field_3 FROM projectData WHERE clientID = $x");
                                     while ($row_p = $result_p->fetch_assoc()) {
                                         $productive = $row_p['status'] ? '<i class="fa fa-tags"></i>' : '';
                                         echo '<tr>';
@@ -111,6 +112,8 @@ FROM contactPersons LEFT JOIN position ON position.id = position LEFT JOIN exter
                                         echo '</td>';
                                         echo '<td>' . $row_p['hours'] . '</td>';
                                         echo '<td>' . $row_p['hourlyPrice'] . '</td>';
+                                        //5ad46a0e150ec
+                                        echo '<td><a type="button" class="btn btn-default" href="../project/detail?p='.$row_p['id'].'" title="Bearbeiten"><i class="fa fa-pencil"></i></a></td>';
                                         echo '</tr>';
                                     }
                                     ?>

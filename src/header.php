@@ -52,7 +52,6 @@ $result = $conn->query("SELECT psw, lastPswChange, forcedPwdChange, publicPGPKey
 if($result && ($userdata = $result->fetch_assoc())) {
     $userPasswordHash = $userdata['psw'];
     $publicKey = $userdata['publicPGPKey'];
-    $forcedPwdChange = ($userdata['forcedPwdChange'] === '1');
 } else {
     echo $conn->error;
 }
@@ -221,7 +220,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if(strcmp($password, $_POST['passwordConfirm']) == 0 && match_passwordpolicy($password, $output)){
             $userPasswordHash = password_hash($password, PASSWORD_BCRYPT);
             $private_encrypted = simple_encryption($privateKey, $password);
-            $conn->query("UPDATE UserData SET psw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP, privatePGPKey = '$private_encrypted' WHERE id = '$userID';");
+            $conn->query("UPDATE UserData SET psw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP, privatePGPKey = '$private_encrypted', forcedPwdChange = 0 WHERE id = '$userID';");
             if(!$conn->error){
                 $validation_output = showSuccess('Password successfully changed. '.$userPasswordHash, 1);
             } else {
@@ -829,6 +828,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             <li><a <?php if ($this_page == 'options_archive.php') {echo $setActiveLink;}?> href="../system/archive"><span><?php echo $lang['ARCHIVE'] . ' ' . $lang['OPTIONS'] ?></span></a></li>
                             <li><a <?php if ($this_page == 'taskScheduler.php') {echo $setActiveLink;}?> href="../system/tasks"><span><?php echo $lang['TASK_SCHEDULER']; ?> </span></a></li>
                             <li><a <?php if ($this_page == 'download_sql.php') {echo $setActiveLink;}?> href="../system/backup"><span> DB Backup</span></a></li>
+                            <li><a <?php if ($this_page == 'templateSelect.php') {echo $setActiveLink;}?> href="../report/designer"><span>Report Designer</span> </a></li>
                             <?php if (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])): ?>
                                 <li><a <?php if ($this_page == 'upload_database.php') {echo $setActiveLink;}?> href="../system/restore"><span> <?php echo $lang['DB_RESTORE']; ?></span> </a></li>
                                 <li><a <?php if ($this_page == 'pullGitRepo.php') {echo $setActiveLink;}?> href="../system/update"><span>Git Update</span></a></li>
@@ -845,7 +845,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
         if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register.php" || $this_page == "deactivatedUsers.php" || $this_page == "checkinLogs.php"){
           echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
         } elseif($this_page == "options_report.php" || $this_page == "editHolidays.php" || $this_page == "options_advanced.php" || $this_page == "taskScheduler.php"
-        || $this_page == "pullGitRepo.php" || $this_page == "options_password.php" || $this_page == 'options_archive.php' || $this_page == 'resticBackup.php'){
+        || $this_page == "pullGitRepo.php" || $this_page == "options_password.php" || $this_page == 'options_archive.php' || $this_page == 'resticBackup.php' || $this_page == 'templateSelect.php' ){
           echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
         } elseif($this_page == "editCompanies.php" || $this_page == "new_Companies.php"){
           echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
@@ -905,30 +905,8 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           } ?>
       <?php endif; ?>
 
-      <!-- Section Four: REPORTS -->
-      <?php if ($isReportAdmin == 'TRUE' || $canEditTemplates == 'TRUE'): ?>
-        <div class="panel panel-default panel-borderless">
-          <div class="panel-heading" role="tab">
-            <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-report"  id="adminOption_REPORT"><i class="fa fa-caret-down pull-right"></i>
-            <i class="fa fa-bar-chart"></i><?php echo $lang['REPORTS']; ?>
-            </a>
-          </div>
-          <div id="collapse-report" class="panel-collapse collapse" role="tabpanel" >
-            <div class="panel-body">
-              <ul class="nav navbar-nav">
-              <?php if ($isReportAdmin == 'TRUE'): ?>
-                <li><a target="_blank" href="../report/send"><span> Send E-Mails </span></a></li>
-                <li><a <?php if ($this_page == 'report_productivity.php') {echo $setActiveLink;}?> href="../report/productivity"><span><?php echo $lang['PRODUCTIVITY']; ?></span></a></li>
-              <?php endif;?>
-                <li><a <?php if ($this_page == 'templateSelect.php') {echo $setActiveLink;}?> href="../report/designer"><span>Report Designer</span> </a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <?php if ($this_page == "report_productivity.php" || $this_page == 'templateSelect.php') {
-            echo "<script>$('#adminOption_REPORT').click();</script>";
-        } ?>
-      <?php endif; ?>
+      <!-- Section Four: REPORTS    !! REMOVED 5aa0dafd9fbf0 !! -->
+
       <!-- Section Five: ERP -->
       <?php if ($isERPAdmin == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
@@ -1163,11 +1141,11 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <?php
       $result = $conn->query("SELECT expiration, expirationDuration, expirationType FROM policyData"); echo $conn->error;
       $row = $result->fetch_assoc();
-      if($row['expiration'] == 'TRUE' || $forcedPwdChange){ //can a password expire?
+      if($row['expiration'] == 'TRUE' || $userdata['forcedPwdChange']){ //can a password expire?
           $pswDate = date('Y-m-d', strtotime("+".$row['expirationDuration']." months", strtotime($userdata['lastPswChange'])));
-          if(timeDiff_Hours($pswDate, getCurrentTimestamp()) > 0 || $forcedPwdChange){ //has my password actually expired?
+          if(timeDiff_Hours($pswDate, getCurrentTimestamp()) > 0 || $userdata['forcedPwdChange']){ //has my password actually expired?
               showError('<strong>Your Password has expired. </strong> Please change it by clicking on the gears in the top right corner.');
-              if($row['expirationType'] == 'FORCE' || $forcedPwdChange){ //force the change
+              if($row['expirationType'] == 'FORCE' || $userdata['forcedPwdChange']){ //force the change
                   include 'footer.php';
                   die();
               }
