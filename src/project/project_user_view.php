@@ -1,5 +1,6 @@
 <?php
 $activeTab = '';
+die('Seite befindet sich wegen sicherheitstechnischen Gründen noch im Umbau')
 ?>
 <div class="page-header h4">Meine Projekte</div>
 <div class="container-fluid panel-group" id="accordion">
