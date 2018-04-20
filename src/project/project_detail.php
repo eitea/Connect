@@ -69,10 +69,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 } //endif POST
 
 
-$result = $conn->query("SELECT p.*, c.companyID, s.publicKey, s.symmetricKey, c.name AS clientName FROM projectData p LEFT JOIN clientData c ON p.clientID = c.id
+$result = $conn->query("SELECT p.*, c.companyID, s.publicKey, s.symmetricKey, c.name AS clientName FROM projectData p INNER JOIN clientData c ON p.clientID = c.id
 LEFT JOIN security_projects s ON s.projectID = p.id AND s.outDated = 'FALSE' WHERE p.id = $projectID LIMIT 1");
 if(!$result){ include dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php'; die($conn->error); }
+
 $projectRow = $result->fetch_assoc();
+if(!$projectRow) { include dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php'; die($lang['ERROR_UNEXPECTED']); }
+
 if($projectRow['publicKey']){
     $result = $conn->query("SELECT privateKey FROM security_access WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$projectID' AND userID = $userID AND outDated = 'FALSE' LIMIT 1");
     if($result && ($row = $result->fetch_assoc())){

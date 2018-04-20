@@ -109,7 +109,7 @@ if(!$result || $result->num_rows <= 0){
                 echo '<tr>';
                 echo '<td><input type="checkbox" name="index[]" value='. $row['id'].' /></td>';
                 echo '<td>'.$productive.'</td>';
-                echo '<td><a href="../system/company?cmp='.$row['companyID'].'"  class="btn btn-link">'.$row['companyName'] .'</a></td>';
+                echo '<td><a href="../system/company?cmp='.$row['companyID'].'" class="btn btn-link">'.$row['companyName'] .'</a></td>';
                 echo '<td><a href="../system/clients?cmp='.$row['companyID'].'&custID='.$row['clientID'].'" class="btn btn-link">'. $row['clientName'] .'</a></td>';
                 echo '<td>'. $row['name'] .'</td>';
                 echo '<td>';
