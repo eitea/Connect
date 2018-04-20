@@ -453,6 +453,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
         echo $conn->error;
         while($result && ($row = $result->fetch_assoc())){
             $x = $row['projectid'];
+            $projectName = $row['projectname'];
 
             //$rowStyle = ($row['activity'] && $row['activity'] != 'VIEWED') ? 'style="color:#1689e7; font-weight:bold;"' : '';
             echo '<tr>';
@@ -520,6 +521,10 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 }
             }
             if($filterings['tasks'] == 'ACTIVE_PLANNED') echo '<label><input type="checkbox" name="icalID[]" value="'.$x.'" checked /> .ical</label>';
+            
+            // always show the messages button (5ac63505c0ecd)
+            echo "<button type='button' class='btn btn-default' title='Nachrichten' data-toggle='modal' data-target='#messages-$x'><i class='fa fa-commenting-o'></i></button>";
+
             echo '</td>';
             echo '</tr>';
 
@@ -549,6 +554,107 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 }
                 $modals .= '</div></form></div></div>';
             }
+
+            //########################################
+            //      messages modal (5ac63505c0ecd)
+            //########################################
+            $modals .= '<div id="messages-'.$x.'" class="modal fade" style="z-index:1500;">
+                <div class="modal-dialog modal-content modal-lg"><form method="POST" autocomplete="off">
+
+                <div class="modal-header h4">'.$lang["MESSAGES"].'</div>
+
+                <div class="modal-body">';
+
+            // AJAX scripts must be here or a reference error will be shown
+            $modals .= '    
+                <script>
+                messageLimit'.$x.' = 10;
+                intervalID'.$x.' = setInterval(function() {
+                    getMessages("'.$x.'", "#messages-div-'.$x.'", false, 10);
+                }, 1000);
+
+                // AJAX Scripts
+                function getMessages(taskID, target, scroll = false, limit = 50) {
+                    if(taskID.length == 0) {
+                        return;
+                    }
+                
+                    $.ajax({
+                        url: "ajaxQuery/AJAX_postGetMessage.php",
+                        data: {
+                            taskID: taskID,
+                            limit: limit,
+                        },
+                        type: "GET",
+                        success: function (response) {
+                            if(response != "no messages") {
+                                $(target).html(response);
+                    
+                                //Scroll down
+                                if (scroll) $(target).scrollTop($(target)[0].scrollHeight)
+                            }
+                        },
+                        error: function (response) {
+                            $(target).html(response);
+                        },
+                    });
+                }
+
+                function sendMessage(taskID, taskName, message, target, limit = 50) {
+                    if(taskID.length == 0 || message.length == 0){
+                        return;
+                    }
+                
+                    $.ajax({
+                        url: "ajaxQuery/AJAX_postSendMessage.php",
+                        data: {
+                            taskID: taskID,
+                            taskName: taskName,
+                            message: message,
+                        },
+                        type: "GET",
+                        success: function (response) {
+                            getMessages("'.$x.'", target, true, messageLimit'.$x.');
+                        },
+                    })
+                }
+                </script>
+                ';
+
+            // message div and textinput field
+            $modals .= '
+                <div class="pre-scrollable" id="messages-div-'.$x.'" style="background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh; padding-top: 5px"></div>
+                <input type="text" required class="form-control" id="message-'.$x.'" name="message" placeholder="'.$lang["TYPE_A_MESSAGE"].'"/><br>';
+
+            // styling
+            $modals .= '<script>
+                // scroll down when the tab gets shown
+                $(document).on("shown.bs.modal", "#messages-'.$x.'", function (e) {
+                    $("#messages-div-'.$x.'").scrollTop($("#messages-div-'.$x.'")[0].scrollHeight)
+                });
+
+                //scroll
+                $("#messages-div-'.$x.'").scroll(function(){
+                    if($(this).scrollTop() == 0){
+                        $(this).scrollTop(1);
+                        messageLimit'.$x.' += 1        
+                        getMessages("'.$x.'", "#messages-div-'.$x.'", false, messageLimit'.$x.');
+                    }
+                });
+                
+                //submit
+                $( "#messages-'.$x.'" ).submit(function( event ) {
+                    event.preventDefault();
+                    messageLimit'.$x.'++;
+                    sendMessage("'.$x.'", "'.$projectName.'", $("#message-'.$x.'").val(), "#messages-div-'.$x.'", messageLimit'.$x.');
+                    $("#message-'.$x.'").val("");
+                  });
+                </script>';
+            //footer  
+            $modals .= '</div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-warning" type="submit" title="'.$lang["SEND"].'" name="task-plan" value="'.$x.'">'.$lang["SEND"].'</button>
+                </div></form></div></div>';
+
         }
         ?>
         <!--training-->

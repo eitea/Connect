@@ -39,7 +39,13 @@ if (isset($_GET["partner"], $_GET["subject"]) && !empty($_SESSION["userid"])) {
 
     // get the messages
     $result = $conn->query("SELECT * FROM (SELECT * FROM taskmessages INNER JOIN UserData ON UserData.id = taskmessages.userID WHERE ( taskID = $taskID and taskName = '$taskName' ) ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC");
-}else {
+} elseif(isset($_GET["taskID"]) && !empty($_SESSION["userid"])) {    // no taskname available in dynamicProjects.php
+    $taskView = true;
+    $taskID = intval($_GET["taskID"]);
+
+    // get the messages
+    $result = $conn->query("SELECT * FROM (SELECT * FROM taskmessages INNER JOIN UserData ON UserData.id = taskmessages.userID WHERE ( taskID = $taskID) ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC");
+} else {
     die('Invalid Request');
 }
 
