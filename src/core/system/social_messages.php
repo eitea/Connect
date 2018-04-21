@@ -275,7 +275,6 @@
                     $(document).ready(function() {
                         $(":input", document.chatInputForm).bind("click", function() {
                             window.onbeforeunload = null;
-                            console.log(window.onbeforeunload);
                         });
                     });
                 </script>
@@ -379,7 +378,7 @@ function deleteSubject(partner, subject) {
 }
 
 function udpateBadge(target, menu, partner, subject) {
-    if(partner == -1 || subject.length == 0) {
+    if(partner == -1) {
         return;
     }
 

@@ -225,7 +225,7 @@ if (sizeof($missingBookingsArray) == 0) {
                 <!-- Project Messages -->
                 <div id="projectMessages<?php echo $x; ?>" class="tab-pane fade"><br>
                     <!-- Subject bar -->
-                    <div id="subject_bar<?php echo $x; ?>" style="background-color: whitesmoke; border: 1px gainsboro solid; border-bottom: none; max-height: 10vh; padding: 10px;"></div>
+                    <div id="subject_bar<?php echo $x; ?>" style="background-color: whitesmoke; border: 1px gainsboro solid; border-bottom: none; max-height: 10vh; padding: 10px;"><?php echo $projectname; ?></div>
                     
                     <!-- Messages -->
                     <div class="pre-scrollable" id="messages<?php echo $x; ?>" style="background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh; padding-top: 5px"></div>
@@ -333,13 +333,14 @@ if (sizeof($missingBookingsArray) == 0) {
                                     },
                                     type: 'GET',
                                     success: function (response) {
-                                        $(target).html(response);
+                                        if(response != "no messages"){
+                                            $(target).html(response);
 
-                                        // set the subject_bar
-                                        $("#subject_bar<?php echo $x; ?>").html(taskName);
-
-                                        //Scroll down
-                                        if (scroll) $(target).scrollTop($(target)[0].scrollHeight)
+                                            //Scroll down
+                                            if (scroll) $("#messages<?php echo $x; ?>").scrollTop($("#messages<?php echo $x; ?>")[0].scrollHeight)
+                                        }else{
+                                            $(target).html('<div style="padding: 20px" class="text-center">No messages available</div>')
+                                        }
                                     },
                                     error: function (response) {
                                         $(target).html(response);
@@ -361,7 +362,7 @@ if (sizeof($missingBookingsArray) == 0) {
                                     },
                                     type: 'GET',
                                     success: function (response) {
-                                        getMessages("<?php echo $x; ?>", "<?php echo "$projectname" ?>", "#messages<?php echo $x; ?>", true, limit);
+                                        getMessages("<?php echo $x; ?>", "<?php echo $projectname ?>", "#messages<?php echo $x; ?>", true, limit);
                                     },
                                 })
                             }

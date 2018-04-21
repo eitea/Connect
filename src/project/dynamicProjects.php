@@ -559,7 +559,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             //      messages modal (5ac63505c0ecd)
             //########################################
             $modals .= '<div id="messages-'.$x.'" class="modal fade" style="z-index:1500;">
-                <div class="modal-dialog modal-content modal-lg"><form method="POST" autocomplete="off">
+                <div class="modal-dialog modal-content modal-md"><form method="POST" autocomplete="off">
 
                 <div class="modal-header h4">'.$lang["MESSAGES"].'</div>
 
@@ -568,11 +568,6 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             // AJAX scripts must be here or a reference error will be shown
             $modals .= '    
                 <script>
-                messageLimit'.$x.' = 10;
-                intervalID'.$x.' = setInterval(function() {
-                    getMessages("'.$x.'", "#messages-div-'.$x.'", false, 10);
-                }, 1000);
-
                 // AJAX Scripts
                 function getMessages(taskID, target, scroll = false, limit = 50) {
                     if(taskID.length == 0) {
@@ -588,11 +583,18 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                         type: "GET",
                         success: function (response) {
                             if(response != "no messages") {
+                                $("#subject_bar'.$x.'").show();
+                                $("#messages-div-'.$x.'").show();
+
                                 $(target).html(response);
-                    
+
                                 //Scroll down
-                                if (scroll) $(target).scrollTop($(target)[0].scrollHeight)
-                            }
+                                if (scroll) $(target).scrollTop($(target)[0].scrollHeight)                
+                            }else{
+                                // hide the messages div and subject bar, when no messages available
+                                $("#subject_bar'.$x.'").hide();
+                                $("#messages-div-'.$x.'").hide();
+                            }    
                         },
                         error: function (response) {
                             $(target).html(response);
@@ -621,16 +623,33 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 </script>
                 ';
 
-            // message div and textinput field
+            // subject bar, message div and textinput field
             $modals .= '
-                <div class="pre-scrollable" id="messages-div-'.$x.'" style="background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh; padding-top: 5px"></div>
-                <input type="text" required class="form-control" id="message-'.$x.'" name="message" placeholder="'.$lang["TYPE_A_MESSAGE"].'"/><br>';
+                <div id="subject_bar'.$x.'" style="background-color: whitesmoke; border: 1px gainsboro solid; border-bottom: none; max-height: 10vh; padding: 10px;">'.$projectName.' - ' .$x.'</div>
+                <div id="messages-div-'.$x.'" class="pre-scrollable" style="background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh; padding-top: 5px"></div>
+                <input id="message-'.$x.'" type="text" required class="form-control" name="message" placeholder="'.$lang["TYPE_A_MESSAGE"].'"/><br>';
 
             // styling
             $modals .= '<script>
-                // scroll down when the tab gets shown
+                // immediately get the messages, so theres no delay
+                $(document).on("show.bs.modal", "#messages-'.$x.'", function (e) {
+                    getMessages("'.$x.'", "#messages-div-'.$x.'", true, 10);
+
+                    messageLimit'.$x.' = 10;
+                    buttonIntervalID'.$x.' = setInterval(function() {
+                        getMessages("'.$x.'", "#messages-div-'.$x.'", false, messageLimit'.$x.');
+                    }, 1000);
+                });
+
+                // always scroll down (when the modal gets reopened)
                 $(document).on("shown.bs.modal", "#messages-'.$x.'", function (e) {
-                    $("#messages-div-'.$x.'").scrollTop($("#messages-div-'.$x.'")[0].scrollHeight)
+                    $("#messages-div-'.$x.'").scrollTop($("#messages-div-'.$x.'")[0].scrollHeight)             
+                });
+
+                // clear the interval
+                $(document).on("hidden.bs.modal", "#messages-'.$x.'", function (e) {
+                    clearInterval(buttonIntervalID'.$x.');
+                    window.onbeforeunload = null;
                 });
 
                 //scroll

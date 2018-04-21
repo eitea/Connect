@@ -32,32 +32,33 @@ if (isset($_GET["partner"], $_GET["subject"]) && !empty($_SESSION["userid"])) {
     // get the messages
     $sql = "SELECT * FROM (SELECT * FROM messages WHERE (( userID = $userID AND partnerID = $partner ) OR ( userID = $partner AND partnerID = $userID )) AND subject = '$subject' ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC";
     $result = $conn->query($sql);
-} elseif(isset($_GET["taskID"], $_GET["taskName"]) && !empty($_SESSION["userid"])) {
-    $taskView = true;
-    $taskID = intval($_GET["taskID"]);
-    $taskName = test_input($_GET["taskName"]);
-
-    // get the messages
-    $result = $conn->query("SELECT * FROM (SELECT * FROM taskmessages INNER JOIN UserData ON UserData.id = taskmessages.userID WHERE ( taskID = $taskID and taskName = '$taskName' ) ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC");
-} elseif(isset($_GET["taskID"]) && !empty($_SESSION["userid"])) {    // no taskname available in dynamicProjects.php
+} elseif(isset($_GET["taskID"]) && !empty($_SESSION["userid"])) {
     $taskView = true;
     $taskID = intval($_GET["taskID"]);
 
-    // get the messages
-    $result = $conn->query("SELECT * FROM (SELECT * FROM taskmessages INNER JOIN UserData ON UserData.id = taskmessages.userID WHERE ( taskID = $taskID) ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC");
+    if(isset($_GET["taskName"])){
+        $taskName = test_input($_GET["taskName"]);
+        $result = $conn->query("SELECT * FROM (SELECT * FROM taskmessages INNER JOIN UserData ON UserData.id = taskmessages.userID WHERE ( taskID = $taskID and taskName = '$taskName' ) ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC");
+    } else {
+        $result = $conn->query("SELECT * FROM (SELECT * FROM taskmessages INNER JOIN UserData ON UserData.id = taskmessages.userID WHERE ( taskID = $taskID) ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC");
+    }
 } else {
     die('Invalid Request');
 }
 
 // check the result
 if (!$result || $result->num_rows == 0) {
-    echo "no messages\t" . $taskID . "\t" . $taskName;
+    echo "no messages";
 } else {
     // process the result
     while ($row = $result->fetch_assoc()) {
         $message = $row["message"];
-        $firstname = $row["firstname"];
-        $lastname = $row["lastname"];
+        
+        if($taskView) { // firstname and lastname not available in normal query
+            $firstname = $row["firstname"];
+            $lastname = $row["lastname"];
+        }
+
         $pull = $row["userID"] == $userID ? "pull-right":"pull-left";       // left or right side?
         $color = $row["userID"] == $userID ? "#c7f4a4" : "#whitesmoke";     //dcf8c6
 
