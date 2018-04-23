@@ -41,7 +41,8 @@ function create_tables($conn) {
         privatePGPKey VARCHAR(150) NULL,
         birthday DATE,
         displayBirthday ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        companyID INT(6) UNSIGNED
+        companyID INT(6) UNSIGNED,
+        lastLogin DATETIME DEFAULT NULL
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -511,8 +512,8 @@ function create_tables($conn) {
         smtpSecure ENUM('', 'tls', 'ssl') DEFAULT 'tls',
         sender VARCHAR(50) DEFAULT 'noreplay@mail.com',
         enableEmailLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        senderName VARCHAR(50) DEFAULT NULL COMMENT 'Absendername',
-        feedbackRecipient VARCHAR(50) DEFAULT 'office@eitea.at',
+        senderName VARCHAR(50) DEFAULT NULL,
+        feedbackRecipient VARCHAR(50) DEFAULT 'connect@eitea.at',
         isDefault TINYINT(1) NOT NULL DEFAULT 1
     )";
     if (!$conn->query($sql)) {
@@ -1473,6 +1474,7 @@ function create_tables($conn) {
         title varchar(100),
         text varchar(2000),
         trainingID INT(6),
+        version INT(6) DEFAULT 1,
         PRIMARY KEY (id),
         FOREIGN KEY (trainingID) REFERENCES dsgvo_training(id) ON UPDATE CASCADE ON DELETE CASCADE
     )";
@@ -1523,6 +1525,17 @@ function create_tables($conn) {
         lastAnswered DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (questionID, userID),
         FOREIGN KEY (questionID) REFERENCES dsgvo_training_questions(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+	if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
+    $sql = "CREATE TABLE dsgvo_training_user_suspension (
+        userID INT(6) UNSIGNED,
+        last_suspension DATETIME DEFAULT CURRENT_TIMESTAMP,
+        suspension_count INT(6) DEFAULT 0,
+        PRIMARY KEY (userID),
         FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
     )";
 	if(!$conn->query($sql)){
@@ -1634,21 +1647,6 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
-    $conn->query("CREATE TABLE dsgvo_vv_logs (
-        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        user_id INT(6) UNSIGNED,
-        log_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        short_description VARCHAR(100) NOT NULL,
-        scope VARCHAR(100),
-        long_description VARCHAR(500),
-        FOREIGN KEY (user_id) REFERENCES UserData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-    )");
-    if($conn->error){
-        echo $conn->error;
-    }
-
     $sql = "CREATE TABLE security_projects(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         projectID INT(6) UNSIGNED,
@@ -1669,6 +1667,22 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
+
+    $conn->query("CREATE TABLE dsgvo_vv_logs (
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        user_id INT(6) UNSIGNED,
+        log_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        short_description VARCHAR(100) NOT NULL,
+        scope VARCHAR(100),
+        long_description VARCHAR(500),
+        FOREIGN KEY (user_id) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )");
+    if($conn->error){
+        echo $conn->error;
+    }
+
     $sql = "CREATE TABLE external_users(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         contactID INT(6) UNSIGNED,
@@ -1679,6 +1693,22 @@ function create_tables($conn) {
         entryDate DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
         lastPswChange DATETIME DEFAULT NULL,
         FOREIGN KEY (contactID) REFERENCES contactPersons(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
+    $sql = "CREATE TABLE security_external_access(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        externalID INT(6) UNSIGNED,
+        module VARCHAR(50) NOT NULL,
+        optionalID VARCHAR(32),
+        privateKey VARCHAR(150) NOT NULL,
+        recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        FOREIGN KEY (externalID) REFERENCES external_users(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
     )";

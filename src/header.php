@@ -52,7 +52,6 @@ $result = $conn->query("SELECT psw, lastPswChange, forcedPwdChange, publicPGPKey
 if($result && ($userdata = $result->fetch_assoc())) {
     $userPasswordHash = $userdata['psw'];
     $publicKey = $userdata['publicPGPKey'];
-    $forcedPwdChange = ($userdata['forcedPwdChange'] === '1');
 } else {
     echo $conn->error;
 }
@@ -99,43 +98,22 @@ while ($result && ($row = $result->fetch_assoc())) {
     $available_users[] = $row['userID'];
 }
 $validation_output = $error_output = '';
-$result = $conn->query(
+$result = $conn->query( /* Test if user has any questions */
     "SELECT count(*) count FROM (
-        SELECT userID FROM dsgvo_training_user_relations tur LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND NOT EXISTS (
-             SELECT userID
-             FROM dsgvo_training_completed_questions
-             LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
-             LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-             WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day)
-             OR dsgvo_training.answerEveryNDays = 0 )
-         )
+        SELECT userID FROM dsgvo_training_user_relations tur LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID
         UNION
         SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID
-        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND NOT EXISTS (
-             SELECT userID
-             FROM dsgvo_training_completed_questions
-             LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
-             LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-             WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day)
-             OR dsgvo_training.answerEveryNDays = 0 )
-         ) 
+        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID
         UNION
         SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations INNER JOIN relationship_company_client ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
-        LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID WHERE relationship_company_client.userID = $userID AND NOT EXISTS (
-             SELECT userID
-             FROM dsgvo_training_completed_questions
-             LEFT JOIN dsgvo_training_questions dtq ON dtq.id = dsgvo_training_completed_questions.questionID
-             LEFT JOIN dsgvo_training ON dsgvo_training.id = dtq.trainingID
-             WHERE questionID = dtq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day)
-             OR dsgvo_training.answerEveryNDays = 0 )
-         )
+        LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID WHERE relationship_company_client.userID = $userID
     ) temp"
 );
-echo $conn->error;
+$error_output .= showError($conn->error, 1);
 $userHasUnansweredSurveys = $userHasSurveys = 0;
 if($result) $userHasUnansweredSurveys = $userHasSurveys = intval($result->fetch_assoc()["count"]) !== 0;
 if(!$userHasSurveys){
-    $result = $conn->query(
+    $result = $conn->query( /* Test if user has unanswered questions to answer */
         "SELECT count(*) count FROM (
             SELECT userID FROM dsgvo_training_user_relations tur
             LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID
@@ -145,7 +123,7 @@ if(!$userHasSurveys){
                  FROM dsgvo_training_completed_questions
                  LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
                  LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-                 WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
+                 WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
                  )
             UNION
             SELECT tr.userID userID FROM dsgvo_training_team_relations dtr
@@ -157,62 +135,70 @@ if(!$userHasSurveys){
                  FROM dsgvo_training_completed_questions
                  LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
                  LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-                 WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
+                 WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
                  )
             UNION
-            SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations 
+            SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations
             INNER JOIN relationship_company_client ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
-            LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID 
-            WHERE relationship_company_client.userID = $userID 
+            LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID
+            WHERE relationship_company_client.userID = $userID
             AND NOT EXISTS (
                 SELECT userID
                 FROM dsgvo_training_completed_questions
                 LEFT JOIN dsgvo_training_questions dtq ON dtq.id = dsgvo_training_completed_questions.questionID
                 LEFT JOIN dsgvo_training ON dsgvo_training.id = dtq.trainingID
-                WHERE questionID = dtq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
+                WHERE questionID = dtq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
             )
         ) temp"
     );
-    echo $conn->error;
+    $error_output .= showError($conn->error, 1);
     if($result) $userHasSurveys = intval($result->fetch_assoc()["count"]) !== 0;
 }
 $userHasUnansweredOnLoginSurveys = false;
-if($userHasUnansweredSurveys){
-    $result = $conn->query(
-        "SELECT count(*) count FROM (
-            SELECT userID FROM dsgvo_training_user_relations tur INNER JOIN dsgvo_training t on t.id = tur.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
-                SELECT userID
-                FROM dsgvo_training_completed_questions
-                LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
-                LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-                WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
-             )
-            UNION
-            SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID INNER JOIN dsgvo_training t on t.id = dtr.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
-                SELECT userID
-                FROM dsgvo_training_completed_questions
-                LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
-                LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-                WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
-             )
-            UNION
-            SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations 
-            INNER JOIN relationship_company_client ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
-            INNER JOIN dsgvo_training on dsgvo_training.id = dsgvo_training_company_relations.trainingID
-            LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID 
-            WHERE relationship_company_client.userID = $userID 
-            AND dsgvo_training.onLogin = 'TRUE' AND NOT EXISTS (
-                SELECT userID
-                FROM dsgvo_training_completed_questions
-                LEFT JOIN dsgvo_training_questions dtq ON dtq.id = dsgvo_training_completed_questions.questionID
-                LEFT JOIN dsgvo_training ON dsgvo_training.id = dtq.trainingID
-                WHERE questionID = dtq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
-            )
-        ) temp"
-    );
-    echo $conn->error;
-    $userHasUnansweredOnLoginSurveys = intval($result->fetch_assoc()["count"]) !== 0;
+if($userHasUnansweredSurveys){ /* Test if user has unanswered questions that should be shown after checkin */
+    $result = $conn->query("SELECT suspension_count FROM dsgvo_training_user_suspension WHERE userID = $userID AND TIMESTAMPDIFF(DAY, last_suspension, CURRENT_TIMESTAMP) = 0"); // test if user has suspended surveys for today
+    $surveysAreSuspended = $result && $result->num_rows != 0;
+    if(!$surveysAreSuspended){
+        $result = $conn->query(
+            "SELECT count(*) count FROM (
+                SELECT userID FROM dsgvo_training_user_relations tur INNER JOIN dsgvo_training t on t.id = tur.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
+                    SELECT userID
+                    FROM dsgvo_training_completed_questions
+                    LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
+                    LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
+                    WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
+                 )
+                UNION
+                SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID INNER JOIN dsgvo_training t on t.id = dtr.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
+                    SELECT userID
+                    FROM dsgvo_training_completed_questions
+                    LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
+                    LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
+                    WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
+                 )
+                UNION
+                SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations
+                INNER JOIN relationship_company_client ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
+                INNER JOIN dsgvo_training on dsgvo_training.id = dsgvo_training_company_relations.trainingID
+                LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID
+                WHERE relationship_company_client.userID = $userID
+                AND dsgvo_training.onLogin = 'TRUE' AND NOT EXISTS (
+                    SELECT userID
+                    FROM dsgvo_training_completed_questions
+                    LEFT JOIN dsgvo_training_questions dtq ON dtq.id = dsgvo_training_completed_questions.questionID
+                    LEFT JOIN dsgvo_training ON dsgvo_training.id = dtq.trainingID
+                    WHERE questionID = dtq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
+                )
+            ) temp"
+        );
+        $error_output .= showError($conn->error, 1);
+        $userHasUnansweredOnLoginSurveys = intval($result->fetch_assoc()["count"]) !== 0;
+    }else{
+        $userHasUnansweredOnLoginSurveys = false;
+    }
+
 }
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['stampIn']) || isset($_POST['stampOut'])) {
         require __DIR__ . "/misc/ckInOut.php";
@@ -220,7 +206,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             checkIn($userID);
             $validation_output = showInfo($lang['INFO_CHECKIN'], 1);
         } elseif (isset($_POST['stampOut'])) {
-            $error_output = checkOut($userID, intval($_POST['stampOut']));
+            $error_output .= checkOut($userID, intval($_POST['stampOut']));
             $validation_output = showInfo($lang['INFO_CHECKOUT'], 1);
         }
     }
@@ -234,11 +220,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if(strcmp($password, $_POST['passwordConfirm']) == 0 && match_passwordpolicy($password, $output)){
             $userPasswordHash = password_hash($password, PASSWORD_BCRYPT);
             $private_encrypted = simple_encryption($privateKey, $password);
-            $conn->query("UPDATE UserData SET psw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP, privatePGPKey = '$private_encrypted' WHERE id = '$userID';");
+            $conn->query("UPDATE UserData SET psw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP, privatePGPKey = '$private_encrypted', forcedPwdChange = 0 WHERE id = '$userID';");
             if(!$conn->error){
                 $validation_output = showSuccess('Password successfully changed. '.$userPasswordHash, 1);
             } else {
-                $validation_output = showErrorg($conn->error, 1);
+                $validation_output = showError($conn->error, 1);
             }
         } else {
             $validation_output  = showError($output, 1);
@@ -732,18 +718,18 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   <li><a <?php if ($this_page == 'home.php') {echo $setActiveLink;}?> href="../user/home"><i class="fa fa-home"></i> <span><?php echo $lang['OVERVIEW']; ?></span></a></li>
                   <li><a <?php if ($this_page == 'timeCalcTable.php') {echo $setActiveLink;}?> href="../user/time"><i class="fa fa-clock-o"></i> <span><?php echo $lang['VIEW_TIMESTAMPS']; ?></span></a></li>
                   <li><a <?php if ($this_page == 'makeRequest.php') {echo $setActiveLink;}?> href="../user/request"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['REQUESTS']; ?></span></a></li>
-                  
+
                   <li>
                     <a <?php if ($this_page == 'post.php') {echo $setActiveLink;}?> href="../social/post">
                         <span id="globalMessagingBadge" class="badge pull-right" style="display: none"></span>
                         <i class="fa fa-commenting-o"></i><?php echo $lang['MESSAGING']; ?>
                     </a>
-                                    
+
                     <script>
                     $( document ).ready(function() {
                         setInterval(function(){udpateBadge("#globalMessagingBadge")}, 1000);
                     });
-                                            
+
                     function udpateBadge(target) {
                         $.ajax({
                             url: 'ajaxQuery/AJAX_postGetAlerts.php',
@@ -760,7 +746,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     }
                     </script>
                   </li>
-                
+
 
                   <!-- User-Section: BOOKING -->
                   <?php if ($canBook == 'TRUE' && $showProjectBookingLink): ?>
@@ -794,8 +780,8 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           <div id="collapse-core" role="tabpanel" class="panel-collapse collapse">
             <div class="panel-body">
               <ul class="nav navbar-nav">
+                  <li><a <?php if ($this_page == 'securitySettings.php') {echo $setActiveLink;}?> href="../system/security">Security</a></li>
                   <li>
-                      <a <?php if ($this_page == 'securitySettings.php') {echo $setActiveLink;}?> href="../system/security">Security</a>
                       <a id="coreUserToggle" href="#" data-toggle="collapse" data-target="#toggleUsers" data-parent="#sidenav01" class="collapse in">
                           <span><?php echo $lang['USERS']; ?></span> <i class="fa fa-caret-down"></i>
                       </a>
@@ -841,6 +827,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             <li><a <?php if ($this_page == 'options_archive.php') {echo $setActiveLink;}?> href="../system/archive"><span><?php echo $lang['ARCHIVE'] . ' ' . $lang['OPTIONS'] ?></span></a></li>
                             <li><a <?php if ($this_page == 'taskScheduler.php') {echo $setActiveLink;}?> href="../system/tasks"><span><?php echo $lang['TASK_SCHEDULER']; ?> </span></a></li>
                             <li><a <?php if ($this_page == 'download_sql.php') {echo $setActiveLink;}?> href="../system/backup"><span> DB Backup</span></a></li>
+                            <li><a <?php if ($this_page == 'templateSelect.php') {echo $setActiveLink;}?> href="../report/designer"><span>Report Designer</span> </a></li>
                             <?php if (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])): ?>
                                 <li><a <?php if ($this_page == 'upload_database.php') {echo $setActiveLink;}?> href="../system/restore"><span> <?php echo $lang['DB_RESTORE']; ?></span> </a></li>
                                 <li><a <?php if ($this_page == 'pullGitRepo.php') {echo $setActiveLink;}?> href="../system/update"><span>Git Update</span></a></li>
@@ -854,13 +841,14 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           </div>
         </div>
         <?php
-        if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register.php" || $this_page == "deactivatedUsers.php" || $this_page == "checkinLogs.php" || $this_page == "securitySettings.php" ){
+        if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register.php" || $this_page == "deactivatedUsers.php" || $this_page == "checkinLogs.php"){
           echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-        } elseif($this_page == "options_report.php" || $this_page == "editHolidays.php" || $this_page == "options_advanced.php" || $this_page == "taskScheduler.php" || $this_page == "pullGitRepo.php" || $this_page == "options_password.php" || $this_page == 'options_archive.php' || $this_page == 'resticBackup.php'){
+        } elseif($this_page == "options_report.php" || $this_page == "editHolidays.php" || $this_page == "options_advanced.php" || $this_page == "taskScheduler.php"
+        || $this_page == "pullGitRepo.php" || $this_page == "options_password.php" || $this_page == 'options_archive.php' || $this_page == 'resticBackup.php' || $this_page == 'templateSelect.php' ){
           echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
         } elseif($this_page == "editCompanies.php" || $this_page == "new_Companies.php"){
           echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-        } elseif($this_page == "download_sql.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php") {
+        } elseif($this_page == "download_sql.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php" || $this_page == "securitySettings.php") {
           echo "<script>document.getElementById('adminOption_CORE').click();</script>";
         }
         ?>
@@ -916,30 +904,8 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           } ?>
       <?php endif; ?>
 
-      <!-- Section Four: REPORTS -->
-      <?php if ($isReportAdmin == 'TRUE' || $canEditTemplates == 'TRUE'): ?>
-        <div class="panel panel-default panel-borderless">
-          <div class="panel-heading" role="tab">
-            <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-report"  id="adminOption_REPORT"><i class="fa fa-caret-down pull-right"></i>
-            <i class="fa fa-bar-chart"></i><?php echo $lang['REPORTS']; ?>
-            </a>
-          </div>
-          <div id="collapse-report" class="panel-collapse collapse" role="tabpanel" >
-            <div class="panel-body">
-              <ul class="nav navbar-nav">
-              <?php if ($isReportAdmin == 'TRUE'): ?>
-                <li><a target="_blank" href="../report/send"><span> Send E-Mails </span></a></li>
-                <li><a <?php if ($this_page == 'report_productivity.php') {echo $setActiveLink;}?> href="../report/productivity"><span><?php echo $lang['PRODUCTIVITY']; ?></span></a></li>
-              <?php endif;?>
-                <li><a <?php if ($this_page == 'templateSelect.php') {echo $setActiveLink;}?> href="../report/designer"><span>Report Designer</span> </a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <?php if ($this_page == "report_productivity.php" || $this_page == 'templateSelect.php') {
-            echo "<script>$('#adminOption_REPORT').click();</script>";
-        } ?>
-      <?php endif; ?>
+      <!-- Section Four: REPORTS    !! REMOVED 5aa0dafd9fbf0 !! -->
+
       <!-- Section Five: ERP -->
       <?php if ($isERPAdmin == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
@@ -1174,11 +1140,11 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <?php
       $result = $conn->query("SELECT expiration, expirationDuration, expirationType FROM policyData"); echo $conn->error;
       $row = $result->fetch_assoc();
-      if($row['expiration'] == 'TRUE' || $forcedPwdChange){ //can a password expire?
+      if($row['expiration'] == 'TRUE' || $userdata['forcedPwdChange']){ //can a password expire?
           $pswDate = date('Y-m-d', strtotime("+".$row['expirationDuration']." months", strtotime($userdata['lastPswChange'])));
-          if(timeDiff_Hours($pswDate, getCurrentTimestamp()) > 0 || $forcedPwdChange){ //has my password actually expired?
+          if(timeDiff_Hours($pswDate, getCurrentTimestamp()) > 0 || $userdata['forcedPwdChange']){ //has my password actually expired?
               showError('<strong>Your Password has expired. </strong> Please change it by clicking on the gears in the top right corner.');
-              if($row['expirationType'] == 'FORCE' || $forcedPwdChange){ //force the change
+              if($row['expirationType'] == 'FORCE' || $userdata['forcedPwdChange']){ //force the change
                   include 'footer.php';
                   die();
               }

@@ -966,6 +966,9 @@ $lang_ger['OK_ADD'] = 'Eintrag wurde hinzugefügt.';
 $lang_eng['OK_IMPORT'] = 'Entry was imported.';
 $lang_ger['OK_IMPORT'] = 'Eintrag wurde importiert.';
 
+$lang_eng['OK_UPLOAD'] = 'File was successfully uploaded';
+$lang_ger['OK_UPLOAD'] = 'Datei wurde erfolgreich hochgeladen';
+
 $lang_eng['OPTIONS'] = 'Options';
 $lang_ger['OPTIONS'] = 'Optionen';
 

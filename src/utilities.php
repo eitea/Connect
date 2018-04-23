@@ -180,6 +180,7 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
 }
 
 function mc_status(){
+    //TODO: this should be checked with module (security_modules) and user access (security_access)..
     static $encrypt = null;
     if($encrypt === null){
         global $conn;
@@ -355,6 +356,7 @@ function getFilledOutTemplate($templateID, $bookingQuery = "") {
         $sql = "SELECT $projectTable.id AS projectID,
     $clientTable.id AS clientID,
     $clientTable.name AS clientName,
+    $companyTable.name AS companyName,
     $projectTable.name AS projectName,
     $projectBookingTable.*,
     $projectBookingTable.id AS projectBookingID,
@@ -386,7 +388,7 @@ function getFilledOutTemplate($templateID, $bookingQuery = "") {
             $start = carryOverAdder_Hours($row['start'], $row['timeToUTC']);
             $end = carryOverAdder_Hours($row['end'], $row['timeToUTC']);
 
-            $html_bookings .= '<tr><td>' . $row['clientName'] . '</td>';
+            $html_bookings .= '<tr><td>' . $row['companyName'].' - '.$row['clientName'] . '</td>'; //5acc434437ddf
             $html_bookings .= '<td>' . $row['projectName'] . '</td>';
             $html_bookings .= '<td>' . substr($start, 0, 10) . '</td>';
             $html_bookings .= '<td>' . substr($start, 11, 5) . '</td><td>' . substr($end, 11, 5) . '</td>';

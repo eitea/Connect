@@ -206,7 +206,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
 
     if(!empty($_POST['saveRoles'])){
-        $x = intval($_POST['saveRoles']);
+        $activeTab = $x = intval($_POST['saveRoles']);
         $isDSGVOAdmin = isset($_POST['isDSGVOAdmin']) ? 'TRUE' : 'FALSE';
         $isCoreAdmin = isset($_POST['isCoreAdmin']) ? 'TRUE' : 'FALSE';
         $isDynamicProjectsAdmin = isset($_POST['isDynamicProjectsAdmin']) ? 'TRUE' : 'FALSE';
@@ -231,9 +231,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         canUseSuppliers = '$canUseSuppliers', canEditClients = '$canEditClients', canEditSuppliers = '$canEditSuppliers', canUseWorkflow = '$canUseWorkflow' WHERE userID = '$x'");
 
         if($conn->error){
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$error.'</div>';
+            showError($conn->error);
         } else {
-            echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+            showSuccess($lang['OK_SAVE']);
         }
     }
 }

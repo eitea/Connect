@@ -2550,7 +2550,6 @@ if($row['version'] < 148){
     }
 }
 
-// 5ac63505c0ecd
 if($row['version'] < 149){
     $sql = "CREATE TABLE taskmessages(
         userID INT(6) UNSIGNED,
@@ -2567,10 +2566,58 @@ if($row['version'] < 149){
         echo '<br>Task Messages hinzugefügt';
     }
 }
-//if($row['version'] < 150){}
-//if($row['version'] < 151){}
-//if($row['version'] < 152){}
-//if($row['version'] < 153){}
+
+if($row['version'] < 150) {
+    $conn->query("ALTER TABLE dsgvo_training_questions ADD COLUMN version INT(6) DEFAULT 1");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>DSGVO Training: Question Version';
+    }
+
+    $conn->query("ALTER TABLE project_archive ADD COLUMN uniqID VARCHAR(30)");
+    //5ad4376e05226
+    $conn->query("ALTER TABLE mailingOptions MODIFY COLUMN feedbackRecipient VARCHAR(50) DEFAULT 'connect@eitea.at'");
+    $conn->query("UPDATE mailingOptions SET feedbackRecipient = 'connect@eitea.at'");
+    $conn->query("ALTER TABLE mailingOptions ADD COLUMN senderName VARCHAR(50) DEFAULT NULL");
+
+    $sql = "CREATE TABLE security_external_access(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        externalID INT(6) UNSIGNED,
+        module VARCHAR(50) NOT NULL,
+        optionalID VARCHAR(32),
+        privateKey VARCHAR(150) NOT NULL,
+        recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        FOREIGN KEY (externalID) REFERENCES external_users(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Extern: Security Access';
+    }
+
+    $sql = "CREATE TABLE dsgvo_training_user_suspension (
+        userID INT(6) UNSIGNED,
+        last_suspension DATETIME DEFAULT CURRENT_TIMESTAMP,
+        suspension_count INT(6) DEFAULT 0,
+        PRIMARY KEY (userID),
+        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>DSGVO Training: User Suspension';
+    }
+}
+
+if($row['version'] < 151){
+    $conn->query("ALTER TABLE UserData ADD COLUMN lastLogin DATETIME DEFAULT NULL"); //5ac7126421a8b
+}
+
+// if($row['version'] < 152){}
 
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';

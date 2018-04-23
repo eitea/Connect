@@ -7,7 +7,7 @@ $(".openSurvey").click(function(){
 })
 function openSurveyModal(){
   $.ajax({
-        url:'ajaxQuery/AJAX_getTrainingSurvey.php',
+        url:'ajaxQuery/ajax_dsgvo_training_user_generate.php',
         data:{<?php echo $userHasUnansweredOnLoginSurveys?"onLogin:true":"" ?>},
         type: 'get',
         success : function(resp){
