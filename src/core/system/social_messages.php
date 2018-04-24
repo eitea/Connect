@@ -212,17 +212,14 @@
             <div id="chatinput" style="display: none; padding-top: 5px;">
                 <form name="chatInputForm" autocomplete="off">
                     <div class="input-group">
-                        <textarea id="message" wrap="hard" placeholder="Type a message" class="form-control" style="height: 3.6vh; max-height: 11vh; resize: none; "></textarea>
-                        <span class="input-group-btn"><button id="sendButton" class="btn btn-default" type="submit" style="height: 3.6vh"><?php echo $lang['SEND'] ?></button></span>
+                        <!-- TODO: set resize to none and create a js listerner to auto resize the textarea -->
+                        <textarea id="message" wrap="hard" placeholder="Type a message" class="form-control" style="max-height: 11vh; resize: vertical;"></textarea>
+                        <span id="sendButton" class="input-group-addon btn btn-default" type="submit"><?php echo $lang['SEND'] ?></span>
                     </div>
                 </form>
 
                 <script>
-                    // auto resize
-                    $('#message, #sendButton').on('change keyup keydown paste cut click', function (event) {
-                        $("#message").height(0).height(this.scrollHeight/1.4);
-                    }).find('textarea').change();
-                                
+                                                        
                     // send on enter
                     var shiftPressed = false;
                     $("#message").keydown(function(event) {

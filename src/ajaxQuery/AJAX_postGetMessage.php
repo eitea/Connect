@@ -13,9 +13,7 @@ if (isset($_GET["partner"], $_GET["subject"]) && !empty($_SESSION["userid"])) {
     // message has been seen
     $conn->query("UPDATE messages SET seen = 'TRUE' WHERE ( userID = $partner AND partnerID = $userID ) AND subject = '$subject'");
 
-    // its needed to select the usernames for 
-
-    // get the name of the partner
+    // its needed to select the usernames for - get the name of the partner
     $sql = "SELECT firstname, lastname FROM UserData WHERE id = '{$partner}' GROUP BY id";
     $result = $conn->query($sql);
     $row = $result->fetch_assoc();
@@ -80,6 +78,20 @@ if (!$result || $result->num_rows == 0) {
         if((!empty($partner_firstname) || !empty($partner_lastname)) && !$taskView) 
             $partner_name = $partner_firstname . " " . $partner_lastname;
         
+
+        //TODO: decrypt message
+
+        // Testing: 
+        // RX1gCMdnGcM5+2CMSEnoRx4XzxwqidP7/rwO3XwcsGQ=
+        //showError("Private key: " . $privateKey);
+
+        //  jgoLsRNAdiUC3oReQUnZBnxLm7Z26h99Q7GC
+        //showError("Encrypted string: " . simple_encryption("Testmessage", $privateKey));
+
+        // Decrypt: 
+        //showError("Decrypted string: " . simple_decryption("jgoLsRNAdiUC3oReQUnZBnxLm7Z26h99Q7GC", $privateKey));
+        
+
         if($lastdate != $date):
         ?>
         
