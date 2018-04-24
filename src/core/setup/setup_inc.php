@@ -1651,7 +1651,6 @@ function create_tables($conn) {
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         projectID INT(6) UNSIGNED,
         userID INT(6) UNSIGNED,
-        privateKey VARCHAR(150) NOT NULL,
         publicKey VARCHAR(150) NOT NULL,
         symmetricKey VARCHAR(150) NOT NULL,
         recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

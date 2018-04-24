@@ -2627,6 +2627,8 @@ if($row['version'] < 151){
     $conn->query("ALTER TABLE UserData ADD COLUMN lastLogin DATETIME DEFAULT NULL"); //5ac7126421a8b
 }
 
+$conn->query("ALTER TABLE security_projects DROP COLUMN privateKey");
+
 // if($row['version'] < 152){}
 
 // ------------------------------------------------------------------------------

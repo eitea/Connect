@@ -196,7 +196,6 @@ if($userHasUnansweredSurveys){ /* Test if user has unanswered questions that sho
     }else{
         $userHasUnansweredOnLoginSurveys = false;
     }
-
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -449,7 +448,7 @@ if ($_SESSION['color'] == 'light') {
                    openSearchModal()
                }
             })
-        })
+        });
         const openSearchModal = _.throttle(function() {
             $.ajax({
                 url:'ajaxQuery/AJAX_getSearch.php',
@@ -466,7 +465,7 @@ if ($_SESSION['color'] == 'light') {
                     $("#searchModal input[name='search']").focus();
                 }
             });
-        },1000, {leading:true,trailing:false})
+        },1000, {leading:true,trailing:false});
   </script>
 
   <!-- modal -->
@@ -743,11 +742,17 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                                     $(target).hide();
                                 }
                             },
-                        })
+                        });
                     }
                     </script>
                   </li>
-
+				  <?php
+				  $result = $conn->query("SELECT projectID FROM relationship_project_user WHERE userID = $userID AND (expirationDate = '0000-00-00' OR DATE(expirationDate) > CURRENT_TIMESTAMP )");
+				  echo $conn->error;
+				  if($result && $result->num_rows > 0){
+					  echo '<li><a href="../project/public"><span class="badge pull-right">'.$result->num_rows.'</span> <i class="fa fa-tags"></i>'.$lang['PROJECTS'].'</a></li>';
+				  }
+				  ?>
 
                   <!-- User-Section: BOOKING -->
                   <?php if ($canBook == 'TRUE' && $showProjectBookingLink): ?>

@@ -23,7 +23,6 @@ function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$refe
             $allHours += intval($t) / 60;
         }
     }
-
     if($current < $allHours){
         $yellowBar = $current/($allHours+0.0001);
         $greenBar = 1-$yellowBar;

@@ -89,7 +89,7 @@ if($projectRow['publicKey']){
             $nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
             $project_symmetric = sodium_crypto_box_open(mb_substr($cipher_symmetric, 24, null, '8bit'), $nonce, $project_private.base64_decode($projectRow['publicKey']));
         } catch(Exception $e){
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e->getMessage.'</div>';
+            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
         }
     } else {
         if($conn->error){
@@ -165,6 +165,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             while($result && ($row = $result->fetch_assoc())){
                 insert_access_user($row['userID'], $new_private);
             }
+
             $result = $conn->query("SELECT userID FROM relationship_project_extern WHERE projectID = $projectID AND userID != $userID"); echo $conn->error;
             while($result && ($row = $result->fetch_assoc())){
                 insert_access_user($row['userID'], $new_private, 1);

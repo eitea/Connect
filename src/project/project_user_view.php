@@ -1,6 +1,5 @@
 <?php
 $activeTab = '';
-die('Seite befindet sich wegen sicherheitstechnischen Gründen noch im Umbau')
 ?>
 <div class="page-header h4">Meine Projekte</div>
 <div class="container-fluid panel-group" id="accordion">
@@ -31,8 +30,6 @@ die('Seite befindet sich wegen sicherheitstechnischen Gründen noch im Umbau')
         } catch(Exception $e){
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e->getMessage().'</div>';
         }
-
-        //if there is a public key, there is an access, there is an upload:
         $result = $conn->query("SELECT endpoint, awskey, secret FROM archiveconfig WHERE isActive = 'TRUE' LIMIT 1");
         if($result && ($row = $result->fetch_assoc())){
             $link_id = (getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])) ? substr($servername, 0, 8) : $identifier;
@@ -44,10 +41,13 @@ die('Seite befindet sich wegen sicherheitstechnischen Gründen noch im Umbau')
                     'use_path_style_endpoint' => true,
                     'credentials' => array('key' => $row['awskey'], 'secret' => $row['secret'])
                 ));
-            } catch(Exception $e){
+            }catch(Exception $e){
                 echo $e->getMessage();
             }
-        }
+        } else {
+			include dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php';
+			die("No S3 Access found");
+		}
     ?>
         <div class="panel panel-default">
             <div class="panel-heading" role="tab" id="heading<?php echo $projectID; ?>">

@@ -36,22 +36,27 @@ if(isset($_POST['add']) && !empty($_POST['name']) && !empty($_POST['filterClient
         echo $conn->error;
 
         $nonce = random_bytes(24);
-        $private_encrypt = base64_encode($nonce . sodium_crypto_box(base64_encode($private), $nonce, $private.base64_decode($publicKey)));
+        $private_encrypt = base64_encode($nonce . sodium_crypto_box($private, $nonce, $private.base64_decode($publicKey)));
         $conn->query("INSERT INTO security_access (userID, module, privateKey, optionalID) VALUES($userID, 'PRIVATE_PROJECT', '$private_encrypt', $projectID)");
         if($conn->error){
             showError($conn->error);
         } else {
+			$conn->query("INSERT INTO relationship_project_user(projectID, userID, access) VALUES($projectID, $userID, 'WRITE') "); echo $conn->error;
             showSuccess($lang['OK_ADD']);
         }
+
     }
 }
+
 if(isset($_POST['delete']) && isset($_POST['index'])) {
     $index = $_POST["index"];
     foreach ($index as $x) {
         $x = intval($x);
         if (!$conn->query("DELETE FROM projectData WHERE id = $x;")) {
             echo mysqli_error($conn);
-        }
+        } else {
+			$conn->query("DELETE FROM security_projects WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$x'");
+		}
     }
     if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
 }

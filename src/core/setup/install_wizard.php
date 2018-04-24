@@ -80,6 +80,8 @@ if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['a
             $err .= $conn->error;
         }
     }
+} elseif(empty($_POST['accept_licence'])){
+	$err = '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Um fortfahren zu können müssen die Lizenzbedingungen gelesen und akzeptiert werden.</div>';
 }
  ?>
 <!DOCTYPE html>
