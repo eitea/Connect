@@ -100,6 +100,7 @@ if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['a
     <script src='plugins/select2/js/select2.min.js'></script>
 
     <link href="plugins/homeMenu/homeMenu.css" rel="stylesheet" />
+	<link href="plugins/homeMenu/homeMenu_metro.css" rel="stylesheet" />
     <title>Setup Connect</title>
 </head>
 <body>
@@ -118,60 +119,64 @@ if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['a
             the Software will perform substantially in accordance with the functional specifications set forth in the documentation. The software is provided "as is", without warranty of any kind, express or implied.
         </div>
     </div>
-    <div class="container">
-        <div class="page-header h3">Einstellungen</div>
-        <?php if(isset($accept) && $accept): ?>
-            <div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>Schlüssel wurden erstellt</div>
-            <form method="POST" target="_blank" action="keys">
-                <input type="hidden" name="personal" value="<?php echo $content_personal; ?>" >
-                <input type="hidden" name="company" value="<?php echo $content_company; ?>" >
-                <button type="submit" class="btn btn-warning">Schlüssel Herunterladen</button>
-                <br>
-                <small> Diese Datei beinhaltet Sicherheitskopien Ihrer Zugangschlüssel und sollte von Ihnen stets sicher verwahrt werden.<br>
-                Empfohlen wird eine ausgedruckte Version geschützt zu lagern und die digitale Datei dabei im Anschluss zu vernichten. <br>
-                Bei Verlust oder Betrug übernimmt der Provider keine Haftung. </small>
-            </form>
-        <?php elseif(isset($accept)):
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$err.'</div>';
-        endif; ?>
-        <?php if($firstTimeWizard): //the wizard has run successfully ?>
-            <div class="row text-right">
-                <a href="../user/home" class="btn btn-warning" >Weiter</a>
-            </div>
-        <?php else: ?>
-            Hallo!<br>
-            Ihre Connect Umgebung steht Ihnen in kürze bereit. Sie müssen nur noch ihr gewünschtes Login-Kennwort eingeben und können dann die Einstellungen überprüfen.<br>
-            Falls Sie hilfe benötigen, suchen sie einfach nach diesem Symbol <i class="fa fa-question-circle-o"></i> um mehr Informationen zu erhalten.<br>
-            Wir wünschen Ihnen viel Erfolg.<br>
-            <br><hr><br>
-            <form method="POST">
-                <div class="row">
-                    <div class="col-md-4">
-                        <label>Neues Passwort</label>
-                        <input type="password" name="encryption_pass" class="form-control" />
-                    </div>
-                    <div class="col-md-4">
-                        <label>Neues Passwort Bestätigen</label>
-                        <input type="password" name="encryption_pass_confirm" class="form-control" />
-                    </div>
-                </div>
-                <br><hr><br>
-                <h4>Verschlüsselung</h4>
-                <div class="row">
-                    <div class="col-md-4">
-                        <label><input type="checkbox" checked name="wizard_encryption" value="1"> Aktivieren</label>
-                    </div>
-                </div>
-                <br><hr><br>
-                <div class="col-sm-12 text-center" style="height:250px; overflow-y:auto;">
-                    <?php echo nl2br(file_get_contents(dirname(dirname(dirname(__DIR__))).DIRECTORY_SEPARATOR.'LICENSE')); ?>
-                </div>
-                <label><input type="checkbox" name="accept_licence" value="1" /> Gelesen und Akzeptiert</label>
-                <br>
-                <div class="row text-right">
-                    <button type="submit" class="btn btn-warning">Weiter</button>
-                </div>
-            </form>
-        <?php endif; ?>
+	<div id="sidemenu" class="affix-sidebar sidebar-nav">
+	</div>
+    <div class="affix-content">
+		<div class="container">
+	        <div class="page-header h3">Einstellungen</div>
+	        <?php if(isset($accept) && $accept): ?>
+	            <div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>Schlüssel wurden erstellt</div>
+	            <form method="POST" target="_blank" action="keys">
+	                <input type="hidden" name="personal" value="<?php echo $content_personal; ?>" >
+	                <input type="hidden" name="company" value="<?php echo $content_company; ?>" >
+	                <button type="submit" class="btn btn-warning">Schlüssel Herunterladen</button>
+	                <br>
+	                <small> Diese Datei beinhaltet Sicherheitskopien Ihrer Zugangschlüssel und sollte von Ihnen stets sicher verwahrt werden.<br>
+	                Empfohlen wird eine ausgedruckte Version geschützt zu lagern und die digitale Datei dabei im Anschluss zu vernichten. <br>
+	                Bei Verlust oder Betrug übernimmt der Provider keine Haftung. </small>
+	            </form>
+	        <?php elseif(isset($accept)):
+	            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$err.'</div>';
+	        endif; ?>
+	        <?php if($firstTimeWizard): //the wizard has run successfully ?>
+	            <div class="row text-right">
+	                <a href="../user/home" class="btn btn-warning" >Weiter</a>
+	            </div>
+	        <?php else: ?>
+	            Hallo!<br>
+	            Ihre Connect Umgebung steht Ihnen in kürze bereit. Sie müssen nur noch ihr gewünschtes Login-Kennwort eingeben und können dann die Einstellungen überprüfen.<br>
+	            Falls Sie hilfe benötigen, suchen sie einfach nach diesem Symbol <i class="fa fa-question-circle-o"></i> um mehr Informationen zu erhalten.<br>
+	            Wir wünschen Ihnen viel Erfolg.<br>
+	            <br><hr><br>
+	            <form method="POST">
+	                <div class="row">
+	                    <div class="col-md-4">
+	                        <label>Neues Passwort</label>
+	                        <input type="password" name="encryption_pass" class="form-control" />
+	                    </div>
+	                    <div class="col-md-4">
+	                        <label>Neues Passwort Bestätigen</label>
+	                        <input type="password" name="encryption_pass_confirm" class="form-control" />
+	                    </div>
+	                </div>
+	                <br><hr><br>
+	                <h4>Verschlüsselung</h4>
+	                <div class="row">
+	                    <div class="col-md-4">
+	                        <label><input type="checkbox" checked name="wizard_encryption" value="1"> Aktivieren</label>
+	                    </div>
+	                </div>
+	                <br><hr><br>
+	                <div class="col-sm-12 text-center" style="height:250px; overflow-y:auto;">
+	                    <?php echo nl2br(file_get_contents(dirname(dirname(dirname(__DIR__))).DIRECTORY_SEPARATOR.'LICENSE')); ?>
+	                </div>
+	                <label><input type="checkbox" name="accept_licence" value="1" /> Gelesen und Akzeptiert</label>
+	                <br>
+	                <div class="row text-right">
+	                    <button type="submit" class="btn btn-warning">Weiter</button>
+	                </div>
+	            </form>
+	        <?php endif; ?>
+		</div>
     </div>
 </body>
