@@ -7,5 +7,4 @@ if(!isset($_GET['p'])){ include dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php
 $projectID = intval($_GET['p']);
 require __DIR__.DIRECTORY_SEPARATOR.'project_detail_include.php';
 
-
 require dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php';
