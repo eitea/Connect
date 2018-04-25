@@ -209,6 +209,8 @@ ini_set('max_execution_time',999);
             $conn->query("INSERT INTO mailingOptions (host, port) VALUES('127.0.0.1', '80')");
             //insert restic backup configuration
             $conn->query("INSERT INTO resticconfiguration () VALUES ()");
+			//insert default folders
+			$conn->query("INSERT INTO company_folders(companyID, name) SELECT id, 'Uploads' FROM companyData");
 
             //insert holidays
             $icsFile = file_get_contents(__DIR__ .'/Feiertage.txt');

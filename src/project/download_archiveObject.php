@@ -19,7 +19,7 @@ if($result && ($row = $result->fetch_assoc())){
         ));
 
         $object = $s3->getObject(array(
-            'Bucket' => $link_id .'_uploads',
+            'Bucket' => $link_id .'-uploads',
             'Key' => $fileKey,
         ));
     } catch(Exception $e){

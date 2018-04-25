@@ -2321,13 +2321,9 @@ if($row['version'] < 144){
     $sql = "CREATE TABLE security_projects(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         projectID INT(6) UNSIGNED,
-        userID INT(6) UNSIGNED,
         privateKey VARCHAR(150) NOT NULL,
         recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        FOREIGN KEY (userID) REFERENCES UserData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
         FOREIGN KEY (projectID) REFERENCES projectData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -2550,7 +2546,6 @@ if($row['version'] < 148){
     }
 }
 
-
 if($row['version'] < 149){
     $conn->query("CREATE TABLE company_folders(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -2585,7 +2580,7 @@ if($row['version'] < 150) {
         echo '<br>DSGVO Training: Question Version';
     }
 
-    $conn->query("ALTER TABLE project_archive ADD COLUMN uniqID VARCHAR(30)");
+    $conn->query("ALTER TABLE project_archive ADD COLUMN uniqID VARCHAR(30) UNIQUE");
     //5ad4376e05226
     $conn->query("ALTER TABLE mailingOptions MODIFY COLUMN feedbackRecipient VARCHAR(50) DEFAULT 'connect@eitea.at'");
     $conn->query("UPDATE mailingOptions SET feedbackRecipient = 'connect@eitea.at'");

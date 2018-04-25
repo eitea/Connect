@@ -221,7 +221,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $private_encrypted = simple_encryption($privateKey, $password);
             $conn->query("UPDATE UserData SET psw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP, privatePGPKey = '$private_encrypted', forcedPwdChange = 0 WHERE id = '$userID';");
             if(!$conn->error){
-                $validation_output = showSuccess('Password successfully changed. '.$userPasswordHash, 1);
+                $validation_output = showSuccess('Password successfully changed.', 1);
+				$userdata['forcedPwdChange'] = false;
             } else {
                 $validation_output = showError($conn->error, 1);
             }
@@ -726,7 +727,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 
                     <script>
                     $( document ).ready(function() {
-                        setInterval(function(){udpateBadge("#globalMessagingBadge")}, 1000);
+                        setInterval(function(){udpateBadge("#globalMessagingBadge")}, 10000); //10 seconds
                     });
 
                     function udpateBadge(target) {
@@ -750,7 +751,9 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 				  $result = $conn->query("SELECT projectID FROM relationship_project_user WHERE userID = $userID AND (expirationDate = '0000-00-00' OR DATE(expirationDate) > CURRENT_TIMESTAMP )");
 				  echo $conn->error;
 				  if($result && $result->num_rows > 0){
-					  echo '<li><a href="../project/public"><span class="badge pull-right">'.$result->num_rows.'</span> <i class="fa fa-tags"></i>'.$lang['PROJECTS'].'</a></li>';
+					  echo '<li><a href="../project/public"';
+					  if ($this_page == 'project_public.php') {echo $setActiveLink;}
+					  echo '><span class="pull-right"><small>'.$result->num_rows.'</small></span><i class="fa fa-tags"></i>'.$lang['PROJECTS'].'</a></li>';
 				  }
 				  ?>
 

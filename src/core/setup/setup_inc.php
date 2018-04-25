@@ -1382,16 +1382,14 @@ function create_tables($conn) {
         echo $conn->error;
     }
     $sql = "CREATE TABLE archiveconfig(
+		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		name VARCHAR(150) NOT NULL,
         endpoint VARCHAR(50),
         awskey VARCHAR(50),
-        secret VARCHAR(50)
+        secret VARCHAR(50),
+		isActive ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
     )";
     if (!$conn->query($sql)) {
-        echo $conn->error;
-    }
-
-    $sql = "INSERT INTO archiveconfig VALUES (null,null,null)";
-    if(!$conn->query($sql)){
         echo $conn->error;
     }
 
@@ -1650,14 +1648,10 @@ function create_tables($conn) {
     $sql = "CREATE TABLE security_projects(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         projectID INT(6) UNSIGNED,
-        userID INT(6) UNSIGNED,
         publicKey VARCHAR(150) NOT NULL,
         symmetricKey VARCHAR(150) NOT NULL,
         recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        FOREIGN KEY (userID) REFERENCES UserData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
         FOREIGN KEY (projectID) REFERENCES projectData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -1665,7 +1659,6 @@ function create_tables($conn) {
     if(!$conn->query($sql)){
         echo $conn->error;
     }
-
 
     $conn->query("CREATE TABLE dsgvo_vv_logs (
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -1763,6 +1756,7 @@ function create_tables($conn) {
 
     $sql = "CREATE TABLE project_archive(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		uniqID VARCHAR(30) UNIQUE,
         projectID INT(6) UNSIGNED,
         name VARCHAR(120) NOT NULL,
         parent_directory VARCHAR(120) NOT NULL DEFAULT 'ROOT',
