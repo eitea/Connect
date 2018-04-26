@@ -249,6 +249,12 @@ if(!empty($_POST['delete-file'])){
     }
 } //endif post
 
+if(!empty($_SESSION['external_id'])){
+	$tableName = 'relationship_project_extern';
+} else {
+	$tableName = 'relationship_project_user';
+}
+
 if($isProjectAdmin == 'TRUE'){
 	$result = $conn->query("SELECT id FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")");
 	if(!$result || $result->num_rows <= 0){
@@ -285,11 +291,6 @@ echo $conn->error
         </thead>
         <tbody>
 			<?php
-			if(!empty($_SESSION['external_id'])){
-				$tableName = 'relationship_project_extern';
-			} else {
-				$tableName = 'relationship_project_user';
-			}
 			 while($result_outer && ($row = $result_outer->fetch_assoc())){
 				 echo '<tr class="clicker" value="'.$row['id'].'">';
 				 echo '<td>'.$row['companyName'] .'</td>';
