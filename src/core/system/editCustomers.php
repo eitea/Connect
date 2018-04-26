@@ -450,13 +450,6 @@ WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clie
             }
             echo '</td>';
             echo '</tr>';
-            // echo '<tr>
-            // <td style="padding:0; border:0;" colspan="5" id="clicker-row-'.$row['id'].'"></td>
-            // <td style="padding:0; border:0;display:none;"></td>
-            // <td style="padding:0; border:0;display:none;"></td>
-            // <td style="padding:0; border:0;display:none;"></td>
-            // <td style="padding:0; border:0;display:none;"></td>
-            // </tr>';
         }
         ?>
     </tbody>

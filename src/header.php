@@ -900,7 +900,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   <div class="panel-body">
                       <ul class="nav navbar-nav">
                           <?php if ($isProjectAdmin == 'TRUE'): ?>
-                              <li><a <?php if ($this_page == 'project_view.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['PROJECTS']; ?></span></a></li>
+                              <li><a <?php if ($this_page == 'project_public.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['PROJECTS']; ?></span></a></li>
                               <li><a <?php if ($this_page == 'audit_projectBookings.php') {echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
                           <?php endif; ?>
                           <li><a <?php if ($this_page == 'options.php') {echo $setActiveLink;}?> href="../project/options"><span>Workflow</span></a></li>
@@ -908,7 +908,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   </div>
               </div>
           </div>
-          <?php if ($this_page == 'project_view.php' || $this_page == 'project_detail.php' || $this_page == "audit_projectBookings.php" || $this_page == "options.php") {
+          <?php if ($this_page == 'project_detail.php' || $this_page == "audit_projectBookings.php" || $this_page == "options.php") {
               echo "<script>$('#adminOption_PROJECT').click();</script>";
           } ?>
       <?php endif; ?>

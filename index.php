@@ -23,7 +23,7 @@ $routes = array(
 	'time/view' => 'time/time_projects.php',                          'time/corrections' => 'time/time_adjusts.php',               'time/travels' => 'time/time_travel.php',
 	'time/vacations' => 'time/time_vacation.php',                     'time/check' => 'time/adminTodos.php',                       'time/requests' => 'time/time_requests.php',
 
-	'project/view' => 'project/project_view.php',                     'project/csvDownload' => 'project/csvDownload.php',          'project/pdfDownload' => 'project/pdfDownload.php',
+	'project/view' => 'project/project_public.php',                   'project/csvDownload' => 'project/csvDownload.php',          'project/pdfDownload' => 'project/pdfDownload.php',
 	'project/log' => 'project/audit_projectBookings.php',             'project/options' => 'project/options.php',                  'project/detail' => 'project/project_detail.php',
 	'project/detailDownload' => 'project/download_archiveObject.php', 'project/public' => 'project/project_public.php',
 
