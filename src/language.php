@@ -888,6 +888,9 @@ $lang_ger['MESSAGE_SENT'] = 'Nachricht wurde verschickt!';
 $lang_eng['MESSAGES_DELETED'] = 'Messages have been deleted!';
 $lang_ger['MESSAGES_DELETED'] = 'Nachrichten wurden gelöscht!';
 
+$lang_eng['TYPE_A_MESSAGE'] = 'Type a message';
+$lang_ger['TYPE_A_MESSAGE'] = 'Gib eine Nachricht ein';
+
 $lang_eng['NEW'] = 'New';
 $lang_ger['NEW'] = 'Neu';
 

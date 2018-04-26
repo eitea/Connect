@@ -122,7 +122,7 @@ function create_tables($conn) {
         field_1 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         field_2 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         field_3 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        creator INT(6),
+        creator INT(6)
         FOREIGN KEY (clientID) REFERENCES clientData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -1761,7 +1761,7 @@ function create_tables($conn) {
         name VARCHAR(120) NOT NULL,
         parent_directory VARCHAR(120) NOT NULL DEFAULT 'ROOT',
         type VARCHAR(10) NOT NULL,
-        uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+        content TEXT,
         FOREIGN KEY (projectID) REFERENCES projectData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -1770,13 +1770,14 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
-    $sql = "CREATE TABLE company_folders(
-        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        companyID INT(6) UNSIGNED,
-        name VARCHAR(155) NOT NULL,
-        FOREIGN KEY (companyID) REFERENCES companyData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
+    // 5ac63505c0ecd
+    $sql = "CREATE TABLE taskmessages(
+        userID INT(6) UNSIGNED,
+        taskID varchar(100),
+        taskName varchar(100),
+        message TEXT,
+        picture MEDIUMBLOB,
+        sent DATETIME DEFAULT CURRENT_TIMESTAMP
     )";
     if (!$conn->query($sql)) {
         echo $conn->error;

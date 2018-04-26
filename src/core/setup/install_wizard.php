@@ -50,7 +50,7 @@ if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['a
             }
 
             if($accept){ //module and access
-                $modules = ['TIMES', 'PROJECTS', 'REPORTS', 'ERP', 'FINANCES', 'DSGVO', 'ARCHIVE'];
+                $modules = ['TIME', 'PROJECT', 'REPORT', 'ERP', 'FINANCE', 'DSGVO', 'ARCHIVE'];
                 foreach($modules as $module){
                     $keyPair = sodium_crypto_box_keypair();
                     $private = sodium_crypto_box_secretkey($keyPair);

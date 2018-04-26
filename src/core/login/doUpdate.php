@@ -2456,7 +2456,7 @@ if($row['version'] < 146){
         name VARCHAR(120) NOT NULL,
         parent_directory VARCHAR(120) NOT NULL DEFAULT 'ROOT',
         type VARCHAR(10) NOT NULL,
-        uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+        content TEXT,
         FOREIGN KEY (projectID) REFERENCES projectData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -2546,30 +2546,22 @@ if($row['version'] < 148){
     }
 }
 
+// 5ac63505c0ecd
 if($row['version'] < 149){
-    $conn->query("CREATE TABLE company_folders(
-        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        companyID INT(6) UNSIGNED,
-        name VARCHAR(155) NOT NULL,
-        FOREIGN KEY (companyID) REFERENCES companyData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-    )");
-    if($conn->error){
+    $sql = "CREATE TABLE taskmessages(
+        userID INT(6) UNSIGNED,
+        taskID varchar(100),
+        taskName varchar(100),
+        message TEXT,
+        picture MEDIUMBLOB,
+        sent DATETIME DEFAULT CURRENT_TIMESTAMP
+    )";
+    $conn->query($sql);
+    if (!$conn->error) {
         echo $conn->error;
     } else {
-        echo '<br>Mandant: Ordnerstruktur';
+        echo '<br>Task Messages hinzugefügt';
     }
-
-    $conn->query("INSERT INTO company_folders(companyID, name) SELECT id, 'Uploads' FROM companyData");
-    if($conn->error){
-        echo $conn->error;
-    } else {
-        echo '<br>Mandant: Upload folder';
-    }
-
-    $conn->query("ALTER TABLE project_archive ADD COLUMN uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP");
-    $conn->query("ALTER TABLE project_archive DROP COLUMN content");
 }
 
 if($row['version'] < 150) {

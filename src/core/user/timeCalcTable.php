@@ -183,7 +183,7 @@ if(isset($_POST['request_submit'])){
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default"data-dismiss="modal" >Cancel</button>
-          <button type="submit" class="btn btn-warning" name="request_submit" value="<?php echo $calculator->indecesIM[$i].' '.$calculator->date[$i]; ?>"><?php echo $lang['MAKE_REQUEST']; ?></button>
+          <button type="submit" class="btn btn-warning" name="request_submit" value="<?php echo $calculator->indecesIM[$i].' '.$calculator->date[$i]; ?>"><?php echo $lang['REQUESTS']; ?></button>
         </div>
       </div>
     </div>
@@ -257,7 +257,7 @@ if(isset($_POST['request_submit'])){
                       }
                       echo "</select>";
                       echo '</td>';
-                      echo '<td><button type="submit" class="btn btn-warning" name="splits_save" value="'.$x.'">'.$lang['MAKE_REQUEST'].'</button></td><td></td>';
+                      echo '<td><button type="submit" class="btn btn-warning" name="splits_save" value="'.$x.'">'.$lang['REQUESTS'].'</button></td><td></td>';
                       echo '</tr>';
                     }
                   }
