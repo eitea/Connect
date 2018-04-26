@@ -1,6 +1,7 @@
 <?php
 require dirname(__DIR__) . DIRECTORY_SEPARATOR.'connection.php';
-require dirname(__DIR__) . "/language.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR.'utilities.php';
+require dirname(__DIR__) . DIRECTORY_SEPARATOR.'/language.php';
 require dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.'aws'.DIRECTORY_SEPARATOR.'autoload.php';
 $projectID = intval($_GET['projectID']);
 
@@ -40,7 +41,30 @@ if($projectRow['publicKey']){
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
         }
     } else {
-		echo $conn->error;
+		if($conn->error){
+			echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.__LINE__.'</div>';
+		} else {
+			$result = $conn->query("SELECT privateKey FROM security_access WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$projectID'");
+			if($result->num_rows > 0){
+				echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Sie besitzen keinen Zugriff auf dieses Projekt.Nur der Projektersteller kann Ihnen diesen Zugriff gewähren.</div><hr>';
+			} else {
+				//no one has access to this, but a keypair exists. re-key it.
+				$keyPair = sodium_crypto_box_keypair();
+				$new_private = sodium_crypto_box_secretkey($keyPair);
+				$new_public = sodium_crypto_box_publickey($keyPair);
+				$symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
+				$projectRow['publicKey'] = base64_encode($new_public);
+				$project_private = $new_private;
+				$project_symmetric = $symmetric;
+				$nonce = random_bytes(24);
+				$symmetric_encrypted = base64_encode($nonce . sodium_crypto_box($symmetric, $nonce, $new_private.$new_public));
+				$conn->query("UPDATE security_projects SET outDated = 'TRUE' WHERE projectID = $projectID"); echo $conn->error;
+				$conn->query("INSERT INTO security_projects (projectID, publicKey, symmetricKey) VALUES ('$projectID', '".base64_encode($new_public)."', '$symmetric_encrypted')"); echo $conn->error;
+				insert_access_user($projectID, $userID, $new_private);
+				$conn->query("INSERT INTO relationship_project_user(projectID, userID, access) VALUES($projectID, $userID, 'WRITE')");
+				showSuccess("Fehlender access wurde hinzugefügt.");
+			}
+		}
 	}
 	//if there is a public key, there is an access, there is an upload:
 	$result = $conn->query("SELECT endpoint, awskey, secret FROM archiveconfig WHERE isActive = 'TRUE' LIMIT 1");
@@ -185,7 +209,7 @@ if($projectRow['publicKey']){
 			                            <?php
 			                            $res_addmem = $conn->query("SELECT id, firstname, lastname FROM UserData WHERE id NOT IN (SELECT DISTINCT userID FROM relationship_project_user WHERE projectID = $projectID)");
 			                            while ($res_addmem && ($row_addmem = $res_addmem->fetch_assoc())) {
-			                                echo '<option value="'.$row_addmem['id'].'" >'.$row['firstname'].' '.$row['lastname'].'</option>';
+			                                echo '<option value="'.$row_addmem['id'].'" >'.$row_addmem['firstname'].' '.$row_addmem['lastname'].'</option>';
 			                            }
 			                            ?>
 			                        </select>
