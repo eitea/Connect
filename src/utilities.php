@@ -575,6 +575,30 @@ function convToUTF8($text) {
     }
     return $buf;
 }
+//this is here because of reasons.
+function insert_access_user($projectID, $userID, $privateKey, $external = false){
+	global $conn;
+	if($external) {
+		$result = $conn->query("SELECT publicKey AS publicPGPKey FROM external_users WHERE id = $userID");
+	} else {
+		$result = $conn->query("SELECT publicPGPKey FROM UserData WHERE id = $userID");
+	}
+	if($result && ($row = $result->fetch_assoc())){
+		$user_public = base64_decode($row['publicPGPKey']);
+		$nonce = random_bytes(24);
+		$private_encrypt = $nonce . sodium_crypto_box($privateKey, $nonce, $privateKey.$user_public);
+		if($external){
+			$conn->query("INSERT INTO security_external_access(externalID, module, privateKey, optionalID) VALUES ($userID, 'PRIVATE_PROJECT', '".base64_encode($private_encrypt)."', '$projectID')");
+		} else {
+			$conn->query("INSERT INTO security_access(userID, module, privateKey, optionalID) VALUES ($userID, 'PRIVATE_PROJECT', '".base64_encode($private_encrypt)."', '$projectID')");
+		}
+		if($conn->error){
+			echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.__LINE__.'</div>';
+		}
+	} else {
+		echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.__LINE__.'</div>';
+	}
+}
 
 function util_strip_prefix($subject, $prefix) {
     if (substr($subject, 0, strlen($prefix)) == $prefix) {

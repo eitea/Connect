@@ -61,29 +61,7 @@ if($isProjectAdmin == 'TRUE' && $_SERVER['REQUEST_METHOD'] == 'POST'){
 }
 
 require dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.'aws'.DIRECTORY_SEPARATOR.'autoload.php';
-function insert_access_user($projectID, $userID, $privateKey, $external = false){
-	global $conn;
-	if($external) {
-		$result = $conn->query("SELECT publicKey AS publicPGPKey FROM external_users WHERE id = $userID");
-	} else {
-		$result = $conn->query("SELECT publicPGPKey FROM UserData WHERE id = $userID");
-	}
-	if($result && ($row = $result->fetch_assoc())){
-		$user_public = base64_decode($row['publicPGPKey']);
-		$nonce = random_bytes(24);
-		$private_encrypt = $nonce . sodium_crypto_box($privateKey, $nonce, $privateKey.$user_public);
-		if($external){
-			$conn->query("INSERT INTO security_external_access(externalID, module, privateKey, optionalID) VALUES ($userID, 'PRIVATE_PROJECT', '".base64_encode($private_encrypt)."', '$projectID')");
-		} else {
-			$conn->query("INSERT INTO security_access(userID, module, privateKey, optionalID) VALUES ($userID, 'PRIVATE_PROJECT', '".base64_encode($private_encrypt)."', '$projectID')");
-		}
-		if($conn->error){
-			echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.__LINE__.'</div>';
-		}
-	} else {
-		echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.__LINE__.'</div>';
-	}
-}
+
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0); //set_filter requirement
 $bucket = $identifier .'-uploads'; //no uppercase, no underscores, no ending dashes, no adjacent special chars
 
@@ -119,6 +97,26 @@ if(!empty($_POST['delete-file'])){
 } elseif(!empty($_POST['saveThisProject'])){
 	$active_modal = $x = intval($_POST['saveThisProject']);
 
+	//decrypt the projects private key
+	$result = $conn->query("SELECT privateKey, s.publicKey, s.symmetricKey FROM security_access LEFT JOIN security_projects s ON (s.projectID = optionalID AND s.outDated = 'FALSE')
+	WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$x' AND userID = $userID AND security_access.outDated = 'FALSE' LIMIT 1");
+	if($result && ($row = $result->fetch_assoc()) && $row['publicKey'] && $row['privateKey']){
+		$keypair = base64_decode($privateKey).base64_decode($row['publicKey']);
+		$cipher = base64_decode($row['privateKey']);
+		$nonce = mb_substr($cipher, 0, 24, '8bit');
+		$encrypted = mb_substr($cipher, 24, null, '8bit');
+		try {
+			$project_private = sodium_crypto_box_open($encrypted, $nonce, $keypair);
+			$cipher_symmetric = base64_decode($row['symmetricKey']);
+			$nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
+			$project_symmetric = sodium_crypto_box_open(mb_substr($cipher_symmetric, 24, null, '8bit'), $nonce, $project_private.base64_decode($row['publicKey']));
+		} catch(Exception $e){
+			echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
+		}
+	} else {
+		showError($conn->error." - No Access");
+	}
+
 	if(isset($_POST['saveGeneral'])){
 		$hours = floatval(test_input($_POST['project_hours']));
 		$hourlyPrice = floatval(test_input($_POST['project_hourlyPrice']));
@@ -151,29 +149,29 @@ if(!empty($_POST['delete-file'])){
 				if($conn->error){ showError($conn->error); } else { showSuccess($lang['SAVE']); }
 			}
 		}
-	} elseif(isset($_POST['hire'])){
-        if(!empty($_POST['userID'])){
-            $stmt = $conn->prepare("INSERT INTO relationship_project_user (projectID, userID, access, expirationDate) VALUES($x, ?, 'READ', '0000-00-00')"); echo $conn->error;
-            $stmt->bind_param('i', $val);
-            for($i = 0; $i < count($_POST['userID']); $i++){
-                $val = intval($_POST['userID'][$i]);
-                $stmt->execute();
-                echo $stmt->error;
-                insert_access_user($x, $val, $project_private);
-            }
-            $stmt->close();
-        }
-        if(!empty($_POST['externID'])){
-            $stmt = $conn->prepare("INSERT INTO relationship_project_extern (projectID, userID, access, expirationDate) VALUES($x, ?, 'READ', '0000-00-00')"); echo $conn->error;
-            $stmt->bind_param('i', $val);
-            for($i = 0; $i < count($_POST['externID']); $i++){
-                $val = intval($_POST['externID'][$i]);
-                $stmt->execute();
-                echo $stmt->error;
-                insert_access_user($x, $val, $project_private, 1);
-            }
-            $stmt->close();
-        }
+	} elseif(isset($_POST['hire']) && $project_private){
+		if(!empty($_POST['userID'])){
+			$stmt = $conn->prepare("INSERT INTO relationship_project_user (projectID, userID, access, expirationDate) VALUES($x, ?, 'READ', '0000-00-00')"); echo $conn->error;
+			$stmt->bind_param('i', $val);
+			for($i = 0; $i < count($_POST['userID']); $i++){
+				$val = intval($_POST['userID'][$i]);
+				insert_access_user($x, $val, $project_private);
+				$stmt->execute();
+				echo $stmt->error;
+			}
+			$stmt->close();
+		}
+		if(!empty($_POST['externID'])){
+			$stmt = $conn->prepare("INSERT INTO relationship_project_extern (projectID, userID, access, expirationDate) VALUES($x, ?, 'READ', '0000-00-00')"); echo $conn->error;
+			$stmt->bind_param('i', $val);
+			for($i = 0; $i < count($_POST['externID']); $i++){
+				$val = intval($_POST['externID'][$i]);
+				insert_access_user($x, $val, $project_private, 1);
+				$stmt->execute();
+				echo $stmt->error;
+			}
+			$stmt->close();
+		}
     } elseif(!empty($_POST['removeUser'])){
 		$val = intval($_POST['removeUser']);
 		$conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$x' AND userID = $val");
@@ -191,7 +189,7 @@ if(!empty($_POST['delete-file'])){
 		} else {
 			echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
 		}
-	} elseif(!empty($_POST['add-new-file']) && isset($_FILES['new-file-upload'])){
+	} elseif($project_symmetric && !empty($_POST['add-new-file']) && isset($_FILES['new-file-upload'])){
 		$file_info = pathinfo($_FILES['new-file-upload']['name']);
 		$ext = strtolower($file_info['extension']);
 		$filetype = $_FILES['new-file-upload']['type'];
@@ -249,6 +247,12 @@ if(!empty($_POST['delete-file'])){
     }
 } //endif post
 
+if(!empty($_SESSION['external_id'])){
+	$tableName = 'relationship_project_extern';
+} else {
+	$tableName = 'relationship_project_user';
+}
+
 if($isProjectAdmin == 'TRUE'){
 	$result = $conn->query("SELECT id FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")");
 	if(!$result || $result->num_rows <= 0){
@@ -257,10 +261,10 @@ if($isProjectAdmin == 'TRUE'){
 	    echo '</div>';
 	    include dirname(__DIR__) . "/misc/new_client_buttonless.php";
 	}
-	$result_outer = $conn->query("SELECT p.name, p.id, clientData.companyID, clientData.name AS clientName, companyData.name AS companyName
+	$result_outer = $conn->query("SELECT p.name, p.id, p.status, clientData.companyID, clientData.name AS clientName, companyData.name AS companyName
         FROM projectData p INNER JOIN clientData ON clientData.id = p.clientID INNER JOIN companyData ON companyData.id = clientData.companyID WHERE 1 $query");
 } else {
-	$result_outer = $conn->query("SELECT p.name, p.id, companyData.name AS companyName, clientData.name AS clientName FROM $tableName t LEFT JOIN projectData p ON p.id = t.projectID
+	$result_outer = $conn->query("SELECT p.name, p.id, p.status, companyData.name AS companyName, clientData.name AS clientName FROM $tableName t LEFT JOIN projectData p ON p.id = t.projectID
 		INNER JOIN clientData ON clientData.id = p.clientID INNER JOIN companyData ON companyData.id = clientData.companyID WHERE t.userID = $userID");
 }
 echo $conn->error
@@ -285,12 +289,8 @@ echo $conn->error
         </thead>
         <tbody>
 			<?php
-			if(!empty($_SESSION['external_id'])){
-				$tableName = 'relationship_project_extern';
-			} else {
-				$tableName = 'relationship_project_user';
-			}
 			 while($result_outer && ($row = $result_outer->fetch_assoc())){
+				 $productive = $row['status'] == 'checked' ? '<i class="fa fa-tags"></i>' : '';
 				 echo '<tr class="clicker" value="'.$row['id'].'">';
 				 echo '<td>'.$row['companyName'] .'</td>';
 				 echo '<td>'. $row['clientName'] .'</td>';
