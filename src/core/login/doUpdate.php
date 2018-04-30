@@ -2621,8 +2621,42 @@ if($row['version'] < 152){
     if (!$conn->query($sql)) {
         echo $conn->error;
     } else {
-        echo '<br>Bigger Task Description (Max. 15MB)';
+        echo '<br>Bigger Training Questions (16MiB)';
     } 
+
+    $result = $conn->query("SELECT id FROM dsgvo_vv_templates WHERE type = 'app'");
+    $stmt = $conn->prepare("INSERT INTO dsgvo_vv_template_settings(templateID, opt_name, opt_descr) VALUES(?, ?, ?)");
+    $stmt->bind_param("iss", $templateID, $opt, $descr);
+    
+    if($result && ($row = $result->fetch_assoc())){
+        $templateID = $row["id"];
+
+        $descr = '';
+        $opt = 'EXTRA_DAN';
+        $stmt->execute();
+
+        $descr = '';
+        $opt = 'EXTRA_FOLGE_CHOICE';
+        $stmt->execute();
+
+        $descr = '';
+        $opt = 'EXTRA_FOLGE_DATE';
+        $stmt->execute();
+
+        $descr = '';
+        $opt = 'EXTRA_FOLGE_REASON';
+        $stmt->execute();
+
+        $descr = '';
+        $opt = 'EXTRA_DOC_CHOICE';
+        $stmt->execute();
+
+    }
+    if($conn->error){
+        echo $conn->error;
+    }else{
+        echo 'DSGVO: Extra VV fields';
+    }
 }
 
 // ------------------------------------------------------------------------------

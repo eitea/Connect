@@ -22,7 +22,7 @@ $company = $vv_row['companyID'];
 $matrix_result = $conn->query("SELECT id FROM dsgvo_vv_data_matrix WHERE companyID = $company");
 if($matrix_result){
     if($matrix_result->num_rows === 0){
-        showError("Diese Firma hat keine Matrix in den Einstellungen. <a href='data-matrix'>Hier klicken</a>, um eine zu erstellen.");
+        showError("Diese Firma hat keine Matrix in den Einstellungen. Zum Erstellen <a href='data-matrix'>hier klicken</a>.");
     }
     $matrixID = $matrix_result->fetch_assoc()["id"];
 }else{
@@ -31,6 +31,7 @@ if($matrix_result){
 
 $stmt_insert_vv_log = $conn->prepare("INSERT INTO dsgvo_vv_logs (user_id,short_description,long_description,scope) VALUES ($userID,?,?,?)");
 showError($conn->error);
+$last_encryption_error = "";
 $stmt_insert_vv_log->bind_param("sss", $stmt_insert_vv_log_short_description, $stmt_insert_vv_log_long_description, $stmt_insert_vv_log_scope);
 function insertVVLog($short,$long){
     global $stmt_insert_vv_log;
@@ -39,11 +40,12 @@ function insertVVLog($short,$long){
     global $stmt_insert_vv_log_scope;
     global $userID;
     global $privateKey;
+    global $last_encryption_error;
     $stmt_insert_vv_log_short_description = secure_data('DSGVO', $short, 'encrypt', $userID, $privateKey);
     $stmt_insert_vv_log_long_description = secure_data('DSGVO', $long, 'encrypt', $userID, $privateKey, $encryptionError);
     $stmt_insert_vv_log_scope = secure_data('DSGVO', "VV", 'encrypt', $userID, $privateKey, $encryptionError);
     if($encryptionError){
-        showError($encryptionError);
+        $last_encryption_error = showError($encryptionError, true); // only show last error because consecutive errors are usually the same
     }
     $stmt_insert_vv_log->execute();
     showError($stmt_insert_vv_log->error);
@@ -237,29 +239,58 @@ if(isset($settings['DESCRIPTION'])):
 </div>
 <?php
 $settings = getSettings('EXTRA_%');
+
+function update_or_insert_extra (&$settings, $name){
+    global $userID;
+    global $privateKey;
+    global $stmt_update_setting;
+    global $stmt_insert_setting;
+    global $valID;
+    global $setting_encrypt;
+    global $setID;
+    if(isset($_POST[$name])){
+        $settings[$name]['setting'] = $setting = strip_tags($_POST[$name]);
+        $valID = $settings[$name]['valID'];
+        $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
+        if($valID){
+            $stmt_update_setting->execute();
+        }else{
+            $setID = $settings[$name]['id'];
+            $stmt_insert_setting->execute();
+        }
+    }
+}
+
 if(isset($settings['EXTRA_DVR'])){
+    update_or_insert_extra($settings, "EXTRA_DVR");
+    update_or_insert_extra($settings, "EXTRA_DAN");
     echo '<div class="col-md-7">';
     echo '<div class="panel panel-default">';
     echo '<div class="panel-heading">'.$settings['EXTRA_DVR']['descr'].' '.mc_status().'</div>';
     echo '<div class="row"><div class="col-sm-6 bold">DVR-Nummer</div><div class="col-sm-6"><input type="text" name="EXTRA_DVR" value="'.$settings['EXTRA_DVR']['setting'].'" class="form-control"></div></div>';
-    echo '<div class="row"><div class="col-sm-6 bold">DAN-Nummer</div><div class="col-sm-6"><input type="text" name="EXTRA_DVR" value="'.$settings['EXTRA_DVR']['setting'].'" class="form-control"></div></div>';
+    echo '<div class="row"><div class="col-sm-6 bold">DAN-Nummer</div><div class="col-sm-6"><input type="text" name="EXTRA_DAN" value="'.$settings['EXTRA_DAN']['setting'].'" class="form-control"></div></div>';
     echo '</div></div>';
 }
 if(isset($settings['EXTRA_FOLGE'])){
+    update_or_insert_extra($settings, "EXTRA_FOLGE_CHOICE");
+    update_or_insert_extra($settings, "EXTRA_FOLGE_DATE");
+    update_or_insert_extra($settings, "EXTRA_FOLGE_REASON");
     echo '<div class="col-md-7">';
     echo '<div class="panel panel-default">';
     echo '<div class="panel-heading">'.$settings['EXTRA_FOLGE']['descr'].' '.mc_status().'</div>';
-    echo '<div class="row"><div class="col-sm-2"><input type="radio" name="EXTRA_FOLGE_CHOICE" value="1">Ja</div><div class="col-sm-2"><input type="radio" name="EXTRA_FOLGE_CHOICE" value="0">Nein</div></div>';
-    echo '<div class="row"><div class="col-sm-6 bold">Wenn Ja, wann?</div><div class="col-sm-6"><input type="text" name="EXTRA_FOLGE_DATE" class="form-control datepicker"></div></div>';
-    echo '<div class="row"><div class="col-sm-6 bold">Wenn Nein, warum?</div><div class="col-sm-6"><input type="text" name="EXTRA_FOLGE_REASON" class="form-control"></div></div>';
+    echo '<div class="row"><div class="col-sm-2"><input type="radio" name="EXTRA_FOLGE_CHOICE" value="1" '.(intval($settings['EXTRA_FOLGE_CHOICE']['setting']) === 1?"checked":"").'>Ja</div><div class="col-sm-2"><input type="radio" name="EXTRA_FOLGE_CHOICE" value="0" '.(intval($settings['EXTRA_FOLGE_CHOICE']['setting']) === 0?"checked":"").'>Nein</div></div>';
+    echo '<div class="row"><div class="col-sm-6 bold">Wenn Ja, wann?</div><div class="col-sm-6"><input type="text" name="EXTRA_FOLGE_DATE" class="form-control datepicker" value="'.$settings['EXTRA_FOLGE_DATE']['setting'].'"></div></div>';
+    echo '<div class="row"><div class="col-sm-6 bold">Wenn Nein, warum?</div><div class="col-sm-6"><input type="text" name="EXTRA_FOLGE_REASON" class="form-control" value="'.$settings['EXTRA_FOLGE_REASON']['setting'].'"></div></div>';
     echo '</div></div>';
 }
 if(isset($settings['EXTRA_DOC'])){
+    update_or_insert_extra($settings, "EXTRA_DOC_CHOICE");
+    update_or_insert_extra($settings, "EXTRA_DOC");
     echo '<div class="col-md-7">';
     echo '<div class="panel panel-default">';
     echo '<div class="panel-heading">'.$settings['EXTRA_DOC']['descr'].' '.mc_status().'</div>';
-    echo '<div class="row"><div class="col-sm-2"><input type="radio" name="EXTRA_DOC_CHOICE" value="1">Ja</div><div class="col-sm-2"><input type="radio" name="EXTRA_DOC_CHOICE" value="0">Nein</div></div>';
-    echo '<div class="row"><div class="col-sm-6 bold">Wo befindet sich diese?</div><div class="col-sm-6"><input type="text" name="EXTRA_DOC" class="form-control"></div></div>';
+    echo '<div class="row"><div class="col-sm-2"><input type="radio" name="EXTRA_DOC_CHOICE" value="1" '.(intval($settings['EXTRA_DOC_CHOICE']['setting']) === 1?"checked":"").'>Ja</div><div class="col-sm-2"><input type="radio" name="EXTRA_DOC_CHOICE" value="0" '.(intval($settings['EXTRA_DOC_CHOICE']['setting']) === 0?"checked":"").'>Nein</div></div>';
+    echo '<div class="row"><div class="col-sm-6 bold">Wo befindet sich diese?</div><div class="col-sm-6"><input type="text" name="EXTRA_DOC" class="form-control" value="'.$settings['EXTRA_DOC']['setting'].'"></div></div>';
     echo '</div></div>';
 }
 ?>
@@ -444,7 +475,7 @@ if(isset($settings['EXTRA_DOC'])){
                  <?php
             }else{
                 ?>
-                Diese Firma hat keine Matrix in den Einstellungen. <a href='../system/data-matrix'>Hier klicken</a>, um eine zu erstellen.
+                Diese Firma hat keine Matrix in den Einstellungen. Zum Erstellen <a href='../system/data-matrix'>hier klicken</a>.
                 <?php
             }
             ?>
@@ -533,4 +564,5 @@ if(isset($settings['EXTRA_DOC'])){
         toggleCustomerChooser(true);
     })
 </script>
+<?php echo $last_encryption_error; ?>
 <?php include dirname(__DIR__) . '/footer.php'; ?>
