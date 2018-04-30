@@ -2321,13 +2321,9 @@ if($row['version'] < 144){
     $sql = "CREATE TABLE security_projects(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         projectID INT(6) UNSIGNED,
-        userID INT(6) UNSIGNED,
         privateKey VARCHAR(150) NOT NULL,
         recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        FOREIGN KEY (userID) REFERENCES UserData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
         FOREIGN KEY (projectID) REFERENCES projectData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -2460,7 +2456,7 @@ if($row['version'] < 146){
         name VARCHAR(120) NOT NULL,
         parent_directory VARCHAR(120) NOT NULL DEFAULT 'ROOT',
         type VARCHAR(10) NOT NULL,
-        uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+        content TEXT,
         FOREIGN KEY (projectID) REFERENCES projectData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -2550,31 +2546,22 @@ if($row['version'] < 148){
     }
 }
 
-
+// 5ac63505c0ecd
 if($row['version'] < 149){
-    $conn->query("CREATE TABLE company_folders(
-        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        companyID INT(6) UNSIGNED,
-        name VARCHAR(155) NOT NULL,
-        FOREIGN KEY (companyID) REFERENCES companyData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-    )");
-    if($conn->error){
+    $sql = "CREATE TABLE taskmessages(
+        userID INT(6) UNSIGNED,
+        taskID varchar(100),
+        taskName varchar(100),
+        message TEXT,
+        picture MEDIUMBLOB,
+        sent DATETIME DEFAULT CURRENT_TIMESTAMP
+    )";
+    $conn->query($sql);
+    if (!$conn->error) {
         echo $conn->error;
     } else {
-        echo '<br>Mandant: Ordnerstruktur';
+        echo '<br>Task Messages hinzugefügt';
     }
-
-    $conn->query("INSERT INTO company_folders(companyID, name) SELECT id, 'Uploads' FROM companyData");
-    if($conn->error){
-        echo $conn->error;
-    } else {
-        echo '<br>Mandant: Upload folder';
-    }
-
-    $conn->query("ALTER TABLE project_archive ADD COLUMN uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP");
-    $conn->query("ALTER TABLE project_archive DROP COLUMN content");
 }
 
 if($row['version'] < 150) {
@@ -2584,9 +2571,31 @@ if($row['version'] < 150) {
     } else {
         echo '<br>DSGVO Training: Question Version';
     }
-}
 
-if($row['version'] < 151){
+    $conn->query("ALTER TABLE project_archive ADD COLUMN uniqID VARCHAR(30) UNIQUE");
+    //5ad4376e05226
+    $conn->query("ALTER TABLE mailingOptions MODIFY COLUMN feedbackRecipient VARCHAR(50) DEFAULT 'connect@eitea.at'");
+    $conn->query("UPDATE mailingOptions SET feedbackRecipient = 'connect@eitea.at'");
+    $conn->query("ALTER TABLE mailingOptions ADD COLUMN senderName VARCHAR(50) DEFAULT NULL");
+
+    $sql = "CREATE TABLE security_external_access(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        externalID INT(6) UNSIGNED,
+        module VARCHAR(50) NOT NULL,
+        optionalID VARCHAR(32),
+        privateKey VARCHAR(150) NOT NULL,
+        recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        FOREIGN KEY (externalID) REFERENCES external_users(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+        echo '<br>Extern: Security Access';
+    }
+
     $sql = "CREATE TABLE dsgvo_training_user_suspension (
         userID INT(6) UNSIGNED,
         last_suspension DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -2594,14 +2603,20 @@ if($row['version'] < 151){
         PRIMARY KEY (userID),
         FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
     )";
-	if(!$conn->query($sql)){
+    if(!$conn->query($sql)){
         echo $conn->error;
-    }else{
+    } else {
         echo '<br>DSGVO Training: User Suspension';
     }
 }
 
-//if($row['version'] < 152){}
+if($row['version'] < 151){
+    $conn->query("ALTER TABLE UserData ADD COLUMN lastLogin DATETIME DEFAULT NULL"); //5ac7126421a8b
+}
+
+$conn->query("ALTER TABLE security_projects DROP COLUMN privateKey");
+
+// if($row['version'] < 152){}
 
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';

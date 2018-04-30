@@ -19,6 +19,15 @@ if (isset($_GET["partner"], $_GET["subject"], $_GET["message"]) && !empty($_SESS
     else
         showError($conn->error);
         
+} elseif(isset($_GET["taskID"], $_GET["taskName"], $_GET["message"]) && !empty($_SESSION["userid"])) {
+    $taskID = test_input($_GET["taskID"]);
+    $taskName = test_input($_GET["taskName"]);
+    $message = test_input($_GET["message"]);
+
+    require dirname(__DIR__) . "/connection.php";
+
+    $conn->query("INSERT INTO taskmessages (userID, taskID, taskName, message) VALUES ($userID, '$taskID', '$taskName', '$message')");
+    echo $conn->error;
 } else {
     die('Invalid Request');
 }

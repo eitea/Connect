@@ -269,7 +269,8 @@ if($result && ($row = $result->fetch_assoc())){
     $prev_row = $row;
     if($result && ($row = $result->fetch_assoc())){
         do {
-            if($prev_row['userID'] != $row['userID'] || timeDiff_Hours($prev_row['time'], $row['time']) > 36){ //cut chain
+			$timeDiff = timeDiff_Hours($prev_row['time'], $row['time']);
+            if($prev_row['userID'] != $row['userID'] || $timeDiff > 36 || $timeDiff < 0){ //cut chain
                 $title = 'Abwesend: ' . $userID_toName[$prev_row['userID']];
                 $end = substr(carryOverAdder_Hours($prev_row['time'],24), 0, 10); //adding hours would display '5a' for 5am.
                 $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '#81e8e5'}";

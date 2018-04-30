@@ -3,7 +3,9 @@
 <?php enableToTemplate($userID); ?>
 
 <div class="page-header">
-  <h3><?php echo $lang['TEMPLATES']; ?></h3>
+  <h3><?php echo $lang['TEMPLATES']; ?><div class="page-header-button-group">
+      <a class="btn btn-default" target="_blank" href="../report/send"><span> Send E-Mails </span></a>
+  </div></h3>
 </div>
 
 <?php

@@ -9,12 +9,11 @@ require dirname(__DIR__) . "/Calculators/IntervalCalculator.php";
 $filterQuery = $_POST['filterQuery'];
 $templateID = $_POST['templateID'];
 
-if($templateID < 0) include __DIR__ . "/download_overview.php";
+if($templateID == -1) include __DIR__ . "/download_overview.php";
+if($templateID == -2) include __DIR__ . "/download_overview_invoice.php";
 
-$html = getFilledOutTemplate($templateID, $filterQuery); //query must contain WHERE clause
-
-//prepend css
-$html = '<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><link href="plugins/homeMenu/template.css" rel="stylesheet" /></head>' .$html;
+$html = '<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><link href="plugins/homeMenu/template.css" rel="stylesheet" /></head>';
+$html .= getFilledOutTemplate($templateID, $filterQuery); //query must contain WHERE clause
 
 //replace all occuring relative paths with absolute paths in the html
 $doc = new DOMDocument();
@@ -47,4 +46,5 @@ $dompdf = new Dompdf($options);
 $dompdf->loadHtml($html, 'UTF-8');
 $dompdf->render();
 $dompdf->stream("sample.pdf", array("Attachment"=>0));
+
 ?>

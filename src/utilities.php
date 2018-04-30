@@ -185,6 +185,7 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
 }
 
 function mc_status(){
+    //TODO: this should be checked with module (security_modules) and user access (security_access)..
     static $encrypt = null;
     if($encrypt === null){
         global $conn;
@@ -360,6 +361,7 @@ function getFilledOutTemplate($templateID, $bookingQuery = "") {
         $sql = "SELECT $projectTable.id AS projectID,
     $clientTable.id AS clientID,
     $clientTable.name AS clientName,
+    $companyTable.name AS companyName,
     $projectTable.name AS projectName,
     $projectBookingTable.*,
     $projectBookingTable.id AS projectBookingID,
@@ -391,7 +393,7 @@ function getFilledOutTemplate($templateID, $bookingQuery = "") {
             $start = carryOverAdder_Hours($row['start'], $row['timeToUTC']);
             $end = carryOverAdder_Hours($row['end'], $row['timeToUTC']);
 
-            $html_bookings .= '<tr><td>' . $row['clientName'] . '</td>';
+            $html_bookings .= '<tr><td>' . $row['companyName'].' - '.$row['clientName'] . '</td>'; //5acc434437ddf
             $html_bookings .= '<td>' . $row['projectName'] . '</td>';
             $html_bookings .= '<td>' . substr($start, 0, 10) . '</td>';
             $html_bookings .= '<td>' . substr($start, 11, 5) . '</td><td>' . substr($end, 11, 5) . '</td>';
@@ -577,6 +579,30 @@ function convToUTF8($text) {
         }
     }
     return $buf;
+}
+//this is here because of reasons.
+function insert_access_user($projectID, $userID, $privateKey, $external = false){
+	global $conn;
+	if($external) {
+		$result = $conn->query("SELECT publicKey AS publicPGPKey FROM external_users WHERE id = $userID");
+	} else {
+		$result = $conn->query("SELECT publicPGPKey FROM UserData WHERE id = $userID");
+	}
+	if($result && ($row = $result->fetch_assoc())){
+		$user_public = base64_decode($row['publicPGPKey']);
+		$nonce = random_bytes(24);
+		$private_encrypt = $nonce . sodium_crypto_box($privateKey, $nonce, $privateKey.$user_public);
+		if($external){
+			$conn->query("INSERT INTO security_external_access(externalID, module, privateKey, optionalID) VALUES ($userID, 'PRIVATE_PROJECT', '".base64_encode($private_encrypt)."', '$projectID')");
+		} else {
+			$conn->query("INSERT INTO security_access(userID, module, privateKey, optionalID) VALUES ($userID, 'PRIVATE_PROJECT', '".base64_encode($private_encrypt)."', '$projectID')");
+		}
+		if($conn->error){
+			echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.__LINE__.'</div>';
+		}
+	} else {
+		echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.__LINE__.'</div>';
+	}
 }
 
 function util_strip_prefix($subject, $prefix) {

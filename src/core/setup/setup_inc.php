@@ -41,7 +41,8 @@ function create_tables($conn) {
         privatePGPKey VARCHAR(150) NULL,
         birthday DATE,
         displayBirthday ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        companyID INT(6) UNSIGNED
+        companyID INT(6) UNSIGNED,
+        lastLogin DATETIME DEFAULT NULL
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -121,7 +122,7 @@ function create_tables($conn) {
         field_1 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         field_2 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         field_3 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        creator INT(6),
+        creator INT(6)
         FOREIGN KEY (clientID) REFERENCES clientData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -511,8 +512,8 @@ function create_tables($conn) {
         smtpSecure ENUM('', 'tls', 'ssl') DEFAULT 'tls',
         sender VARCHAR(50) DEFAULT 'noreplay@mail.com',
         enableEmailLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        senderName VARCHAR(50) DEFAULT NULL COMMENT 'Absendername',
-        feedbackRecipient VARCHAR(50) DEFAULT 'office@eitea.at',
+        senderName VARCHAR(50) DEFAULT NULL,
+        feedbackRecipient VARCHAR(50) DEFAULT 'connect@eitea.at',
         isDefault TINYINT(1) NOT NULL DEFAULT 1
     )";
     if (!$conn->query($sql)) {
@@ -1381,16 +1382,14 @@ function create_tables($conn) {
         echo $conn->error;
     }
     $sql = "CREATE TABLE archiveconfig(
+		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		name VARCHAR(150) NOT NULL,
         endpoint VARCHAR(50),
         awskey VARCHAR(50),
-        secret VARCHAR(50)
+        secret VARCHAR(50),
+		isActive ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
     )";
     if (!$conn->query($sql)) {
-        echo $conn->error;
-    }
-
-    $sql = "INSERT INTO archiveconfig VALUES (null,null,null)";
-    if(!$conn->query($sql)){
         echo $conn->error;
     }
 
@@ -1646,6 +1645,21 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
+    $sql = "CREATE TABLE security_projects(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        projectID INT(6) UNSIGNED,
+        publicKey VARCHAR(150) NOT NULL,
+        symmetricKey VARCHAR(150) NOT NULL,
+        recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        FOREIGN KEY (projectID) REFERENCES projectData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
     $conn->query("CREATE TABLE dsgvo_vv_logs (
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         user_id INT(6) UNSIGNED,
@@ -1661,26 +1675,6 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
-    $sql = "CREATE TABLE security_projects(
-        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        projectID INT(6) UNSIGNED,
-        userID INT(6) UNSIGNED,
-        privateKey VARCHAR(150) NOT NULL,
-        publicKey VARCHAR(150) NOT NULL,
-        symmetricKey VARCHAR(150) NOT NULL,
-        recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        FOREIGN KEY (userID) REFERENCES UserData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-        FOREIGN KEY (projectID) REFERENCES projectData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-    )";
-    if(!$conn->query($sql)){
-        echo $conn->error;
-    }
-
     $sql = "CREATE TABLE external_users(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         contactID INT(6) UNSIGNED,
@@ -1691,6 +1685,22 @@ function create_tables($conn) {
         entryDate DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
         lastPswChange DATETIME DEFAULT NULL,
         FOREIGN KEY (contactID) REFERENCES contactPersons(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
+    $sql = "CREATE TABLE security_external_access(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        externalID INT(6) UNSIGNED,
+        module VARCHAR(50) NOT NULL,
+        optionalID VARCHAR(32),
+        privateKey VARCHAR(150) NOT NULL,
+        recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        FOREIGN KEY (externalID) REFERENCES external_users(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
     )";
@@ -1746,11 +1756,12 @@ function create_tables($conn) {
 
     $sql = "CREATE TABLE project_archive(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		uniqID VARCHAR(30) UNIQUE,
         projectID INT(6) UNSIGNED,
         name VARCHAR(120) NOT NULL,
         parent_directory VARCHAR(120) NOT NULL DEFAULT 'ROOT',
         type VARCHAR(10) NOT NULL,
-        uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+        content TEXT,
         FOREIGN KEY (projectID) REFERENCES projectData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -1759,13 +1770,14 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
-    $sql = "CREATE TABLE company_folders(
-        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        companyID INT(6) UNSIGNED,
-        name VARCHAR(155) NOT NULL,
-        FOREIGN KEY (companyID) REFERENCES companyData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
+    // 5ac63505c0ecd
+    $sql = "CREATE TABLE taskmessages(
+        userID INT(6) UNSIGNED,
+        taskID varchar(100),
+        taskName varchar(100),
+        message TEXT,
+        picture MEDIUMBLOB,
+        sent DATETIME DEFAULT CURRENT_TIMESTAMP
     )";
     if (!$conn->query($sql)) {
         echo $conn->error;

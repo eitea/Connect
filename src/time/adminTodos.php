@@ -322,7 +322,10 @@ if($result && $result->num_rows > 0):
 
   <!--ILLEGAL TIMESTAMPS -------------------------------------------------------------------------->
   <?php
-  $result = $conn->query("SELECT * FROM logs WHERE (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) > 22 OR TIMESTAMPDIFF(MINUTE, time, timeEnd) < 0");
+  $sql = "SELECT $userTable.firstname, $userTable.lastname, $logTable.* FROM $logTable
+  INNER JOIN $userTable ON $userTable.id = $logTable.userID
+  WHERE (TIMESTAMPDIFF(MINUTE, time, timeEnd)/60) > 22 OR TIMESTAMPDIFF(MINUTE, time, timeEnd) < 0";
+  $result = $conn->query($sql);
   if($result && $result->num_rows > 0):
   ?>
     <h4><?php echo $lang['ILLEGAL_TIMESTAMPS']; ?>:</h4>
@@ -348,7 +351,7 @@ if($result && $result->num_rows > 0):
         <?php
         while($row = $result->fetch_assoc()){
           echo '<tr>';
-          echo '<td>'. $userID_toName[$row['userID']] .'</td>';
+          echo '<td>'. $row['firstname'] .' '. $row['lastname'] .'</td>';
           echo '<td>'. $lang['ACTIVITY_TOSTRING'][$row['status']] .'</td>';
           echo '<td>'. carryOverAdder_Hours($row['time'], $row['timeToUTC']) .' - ' . carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']) .'</td>';
           echo '<td>'. number_format(timeDiff_Hours($row['time'], $row['timeEnd']), 2, '.', '') .'</td>';
@@ -366,8 +369,8 @@ if($result && $result->num_rows > 0):
 
 <!--ILLEGAL LUNCHBREAK -------------------------------------------------------------------------->
   <?php
-  $sql = "SELECT l1.*, pauseAfterHours, hoursOfRest FROM logs l1
-  INNER JOIN intervalData ON l1.userID = intervalData.userID
+  $sql = "SELECT l1.*, firstname, lastname, pauseAfterHours, hoursOfRest FROM logs l1
+  INNER JOIN UserData ON l1.userID = UserData.id INNER JOIN intervalData ON UserData.id = intervalData.userID
   WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) > (pauseAfterHours * 60)
   AND hoursOfRest * 60 > (SELECT IFNULL(SUM(TIMESTAMPDIFF(MINUTE, start, end)),0) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = l1.indexIM)";
 
@@ -395,7 +398,7 @@ if($result && $result->num_rows > 0):
         <?php
         while($row = $result->fetch_assoc()){
           echo '<tr>';
-          echo '<td>'. $userID_toName[$row['userID']] .'</td>';
+          echo '<td>'. $row['firstname'] .' ' . $row['lastname'] .'</td>';
           echo '<td>'. carryOverAdder_Hours($row['time'], $row['timeToUTC']) .' - ' . carryOverAdder_Hours($row['timeEnd'], $row['timeToUTC']) .'</td>';
           echo '<td>'. number_format(timeDiff_Hours($row['time'], $row['timeEnd']), 2, '.', '') .'</td>';
           echo '<td><input type="checkbox" name="lunchbreakIndeces[]" value='.$row['indexIM'].' ></td>';

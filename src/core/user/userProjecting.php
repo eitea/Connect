@@ -228,6 +228,7 @@ $result = $conn->query("SELECT *, $projectTable.name AS projectName, $projectBoo
                         <th></th>
                         <th>Start</th>
                         <th><?php echo $lang['END']; ?></th>
+                        <?php if(count($available_companies) > 2) echo '<th>'.$lang['COMPANY'].'</th>'; ?>
                         <th><?php echo $lang['CLIENT']; ?></th>
                         <th><?php echo $lang['PROJECT']; ?></th>
                         <th>Info</th>
@@ -235,10 +236,12 @@ $result = $conn->query("SELECT *, $projectTable.name AS projectName, $projectBoo
                     </thead>
                     <tbody>
                         <?php
-                        $sql = "SELECT *, $projectTable.name AS projectName, $projectBookingTable.id AS bookingTableID FROM $projectBookingTable
-                        LEFT JOIN $projectTable ON ($projectBookingTable.projectID = $projectTable.id)
-                        LEFT JOIN $clientTable ON ($projectTable.clientID = $clientTable.id)
-                        WHERE $projectBookingTable.timestampID = $indexIM ORDER BY end, start;";
+                        $sql = "SELECT p.*, clientData.companyID, projectData.name AS projectName, p.id AS bookingTableID, companyData.name AS companyName, clientData.name AS clientName
+                        FROM projectBookingData p
+                        LEFT JOIN projectData ON (p.projectID = projectData.id)
+                        LEFT JOIN clientData ON (projectData.clientID = clientData.id)
+                        LEFT JOIN companyData ON companyData.id = clientData.companyID
+                        WHERE p.timestampID = $indexIM ORDER BY end, start;";
                         $result = mysqli_query($conn, $sql);
                         if($result && $result->num_rows > 0){
                             $numRows = $result->num_rows;
@@ -280,7 +283,8 @@ $result = $conn->query("SELECT *, $projectTable.name AS projectName, $projectBoo
                                 echo "<td><i class='$icon'></i></td>";
                                 echo '<td>'. substr(carryOverAdder_Hours($row['start'],$timeToUTC), 11, 5) ."</td>";
                                 echo '<td>'. substr(carryOverAdder_Hours($row['end'], $timeToUTC), 11, 5) ."</td>";
-                                echo '<td>'. $row['name'] .'</td>';
+                                if(count($available_companies) > 2) echo '<td>'.$row['companyName'].'</td>'; //5acc434437ddf
+                                echo '<td>'. $row['clientName'] .'</td>';
                                 echo '<td>'. $row['projectName'] .'</td>';
                                 echo '<td style="text-align:left">'. $row['infoText'] .'</td>';
                                 echo '<td style="text-align:left">';
@@ -296,6 +300,8 @@ $result = $conn->query("SELECT *, $projectTable.name AS projectName, $projectBoo
                                 $sql = "DELETE FROM $projectBookingTable WHERE id = " . $row['bookingTableID'];
                                 $conn->query($sql);
                             }
+                        } else {
+                            showError($conn->error);
                         }
                         ?>
                     </tbody>
@@ -392,7 +398,7 @@ $result = $conn->query("SELECT *, $projectTable.name AS projectName, $projectBoo
     <div class="row">
         <div class="col-md-6">
             <div class="input-group">
-                <input type="time" class="form-control" readonly onkeypress="return event.keyCode != 13;" name="start" value="<?php echo substr($start,0,5); ?>" >
+                <input type="time" class="form-control dont-remember" readonly onkeypress="return event.keyCode != 13;" name="start" value="<?php echo substr($start,0,5); ?>" >
                 <span class="input-group-addon"> - </span>
                 <input type="time" class="form-control timepicker" onkeypress="return event.keyCode != 13;"  name="end" value="<?php echo $end; ?>" />
                 <div class="input-group-btn">

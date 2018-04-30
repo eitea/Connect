@@ -5,19 +5,19 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(isset($_POST['addConfig'])){
         if (!empty($_POST['server']) && !empty($_POST['name'])) {
             $server = test_input($_POST['server']);
-            $aKey = test_input($_POST['aKey'], 1);
-            $sKey = test_input($_POST['sKey'], 1);
+            $aKey = test_input($_POST['aKey']);
+            $sKey = test_input($_POST['sKey']);
             $name = test_input($_POST['name']);
             try{
                 $test = new Aws\S3\S3Client(array(
                     'version' => 'latest',
-                    'region' => '',
+                    'region' => 'us-east-1',
                     'endpoint' => $server,
                     'use_path_style_endpoint' => true,
-                    'credentials' => array('key' => $aKey, 'secret' => $sKey)
+                    'credentials' => ['key' => $aKey, 'secret' => $sKey]
                 ));
                 $test->listBuckets();
-                $conn->query("UPDATE archiveConfig SET active = 'FALSE'"); //set them all to false.
+                $conn->query("UPDATE archiveConfig SET isActive = 'FALSE'"); //set them all to false.
                 $conn->query("INSERT INTO archiveconfig (endpoint,awskey,secret,isActive,name) VALUES ('$server','$aKey','$sKey', 'TRUE','$name')");
             } catch(Exception $e) {
                 echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
@@ -58,7 +58,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     </thead>
     <tbody id="tableContent">
         <?php
-        $configs = $conn->query("SELECT id, name, endpoint, awskey, isActive FROM archiveconfig");
+        $configs = $conn->query("SELECT id, name, endpoint, awskey, isActive FROM archiveconfig"); echo $conn->error;
         while($row = $configs->fetch_assoc()){
             $checked = '';
             if($row['isActive']=="TRUE") $checked = 'checked';
