@@ -413,3 +413,10 @@ span.select2.select2-container.select2-container--default {
   width:100%;
   z-index:1000;
 }
+
+/* Training */
+.survey-modal img {
+  max-width: 100%;
+  /* max-height: max-content; */
+  height: auto;
+}

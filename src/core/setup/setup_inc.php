@@ -1470,7 +1470,7 @@ function create_tables($conn) {
     $sql = "CREATE TABLE dsgvo_training_questions (
         id int(6) NOT NULL AUTO_INCREMENT,
         title varchar(100),
-        text varchar(2000),
+        text MEDIUMTEXT,
         trainingID INT(6),
         version INT(6) DEFAULT 1,
         PRIMARY KEY (id),

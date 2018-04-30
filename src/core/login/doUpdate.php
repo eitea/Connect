@@ -2616,7 +2616,14 @@ if($row['version'] < 151){
 
 $conn->query("ALTER TABLE security_projects DROP COLUMN privateKey");
 
-// if($row['version'] < 152){}
+if($row['version'] < 152){
+    $sql = "ALTER TABLE dsgvo_training_questions CHANGE `text` `text` MEDIUMTEXT";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Bigger Task Description (Max. 15MB)';
+    } 
+}
 
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';
