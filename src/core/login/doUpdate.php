@@ -2671,6 +2671,39 @@ if($row['version'] < 152){
         echo '<br>DSGVO VV: Data matrix unit';
     }
 
+    // erp_settings in doUpdate.php:1060 is different than in setup_inc.php:807
+    // Values are taken from doUpdate.php:1085 
+    //   clientNum, clientStep, supplierNum, supplierStep
+    //   '1000'   , '1'       , '1000'     , '1'
+    $conn->query("SELECT clientNum FROM erp_settings");
+    if($conn->error){ // add missing field
+        $conn->query("ALTER TABLE erp_settings ADD COLUMN clientNum VARCHAR(12)");
+        echo $conn->error;
+        $conn->query("UPDATE erp_settings SET clientNum = '1000'");
+        echo $conn->error;
+    }
+    $conn->query("SELECT clientStep FROM erp_settings");
+    if($conn->error){ // add missing field
+        $conn->query("ALTER TABLE erp_settings ADD COLUMN clientStep INT(2)");
+        echo $conn->error;
+        $conn->query("UPDATE erp_settings SET clientStep = '1'");
+        echo $conn->error;
+    }
+    $conn->query("SELECT supplierNum FROM erp_settings");
+    if($conn->error){ // add missing field
+        $conn->query("ALTER TABLE erp_settings ADD COLUMN supplierNum VARCHAR(12)");
+        echo $conn->error;
+        $conn->query("UPDATE erp_settings SET supplierNum = '1000'");
+        echo $conn->error;
+    }
+    $conn->query("SELECT supplierStep FROM erp_settings");
+    if($conn->error){ // add missing field
+        $conn->query("ALTER TABLE erp_settings ADD COLUMN supplierStep INT(2)");
+        echo $conn->error;
+        $conn->query("UPDATE erp_settings SET supplierStep = '1'");
+        echo $conn->error;
+    }
+
 }
 
 // ------------------------------------------------------------------------------

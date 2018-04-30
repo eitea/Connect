@@ -816,6 +816,10 @@ function create_tables($conn) {
         yourOrder VARCHAR(30),
         ourSign VARCHAR(30),
         ourMessage VARCHAR(30),
+        clientNum VARCHAR(12),
+        clientStep INT(2),
+        supplierNum VARCHAR(12),
+        supplierStep INT(2),
         FOREIGN KEY (companyID) REFERENCES companyData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
