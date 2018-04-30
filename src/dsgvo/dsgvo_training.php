@@ -304,14 +304,15 @@ showError($conn->error);
             <span data-container="body" data-toggle="tooltip" title="Hinzufügen eines neuen Sets (Container für Module)">
                 <button type="button" data-toggle="modal" data-target="#newModuleModal" class="btn btn-default"><i class="fa fa-cubes"></i> neuses Set</button>
             </span>
-            <span data-container="body" data-toggle="tooltip" title="Hinzufügen eines neuen Moduls (Container für Fragen)">
-            <button type="button" data-toggle="modal" data-target="#newTrainingModal" class="btn btn-default"><i class="fa fa-cube"></i> neues Modul</button>
-            </span>
+            <!-- Moved to panels -->
+            <!-- <span data-container="body" data-toggle="tooltip" title="Hinzufügen eines neuen Moduls (Container für Fragen)">
+                <button type="button" data-toggle="modal" data-target="#newTrainingModal" class="btn btn-default"><i class="fa fa-cube"></i> neues Modul</button>
+            </span> -->
             <span data-container="body" data-toggle="tooltip" title="Importieren von exportierten Sets">
-            <button type="button" name="importExport" value="import" class="btn btn-default"><i class="fa fa-upload"></i> Import</button>
+                <button type="button" name="importExport" value="import" class="btn btn-default"><i class="fa fa-upload"></i> Import</button>
             </span>
             <span data-container="body" data-toggle="tooltip" title="Exportieren aller Sets">
-            <button type="button" name="importExport" value="export" class="btn btn-default"><i class="fa fa-download"></i> Export</button>
+                <button type="button" name="importExport" value="export" class="btn btn-default"><i class="fa fa-download"></i> Export</button>
             </span>
         </div>
     </h3>
@@ -332,6 +333,9 @@ showError($conn->error);
     </span>
     <div class="col-xs-6 text-right">
         <form method="post">
+            <span data-container="body" data-toggle="tooltip" title="Hinzufügen eines neuen Moduls">
+                <button type="button" style="background:none;border:none;color:black;" name="addTraining" value="<?php echo $moduleID; ?>"><i class="fa fa-plus"></i></button>
+            </span>
             <span data-container="body" data-toggle="tooltip" title="Set bearbeiten">                   
                 <button type="button" style="background:none;border:none;color:black;" name="editModule" value="<?php echo $moduleID; ?>"><i class="fa fa-pencil-square-o"></i></button>
             </span>   
@@ -543,6 +547,9 @@ $("button[name=testTraining]").click(function(){
 })
 $("button[name=editModule]").click(function(){
     setCurrentModal({moduleID: $(this).val()},'get', 'ajaxQuery/AJAX_dsgvoModuleEdit.php')
+})
+$("button[name=addTraining]").click(function(){
+    setCurrentModal({moduleID: $(this).val()},'get', 'ajaxQuery/ajax_dsgvo_training_training_add.php')
 })
 </script>
 
