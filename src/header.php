@@ -601,9 +601,6 @@ if ($_SESSION['color'] == 'light') {
                         <label><input type="radio" name="feedback_type" value="Problem" checked><?php echo $lang['FEEDBACK_PROBLEM']; ?></label>
                     </div>
                     <div class="radio">
-                        <label><input type="radio" name="feedback_type" value="Bug"><?php echo $lang['FEEDBACK_BUG']; ?></label>
-                    </div>
-                    <div class="radio">
                         <label><input type="radio" name="feedback_type" value="Additional Feature"><?php echo $lang['FEEDBACK_FEATURES']; ?></label>
                     </div>
                     <div class="radio">
@@ -618,8 +615,28 @@ if ($_SESSION['color'] == 'light') {
                     </div>
                     <div id="screenshot"> <!-- image will be placed here -->
                     </div>
+                    <div class="modal fade" id="submitted-data-info">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">Übermittelte Daten </div>
+                                <div class="modal-body">
+                                    <ul class="list-group">
+                                        <li class="list-group-item">User ID</li>
+                                        <li class="list-group-item">Feedbacktyp</li>
+                                        <li class="list-group-item">Aktuelle URL</li>
+                                        <li class="list-group-item">Connect ID</li>
+                                        <li class="list-group-item">Nachricht</li>
+                                    </ul>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" onclick="$('#submitted-data-info').modal('hide');">OK</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#submitted-data-info">Übermittelte Daten</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
                     <button type="submit" class="btn btn-warning" name="giveFeedback"><?php echo $lang['GIVE_FEEDBACK']; ?></button>
                 </div>
