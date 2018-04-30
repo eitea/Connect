@@ -64,15 +64,17 @@ while($result && ($row = $result->fetch_assoc())){
                     if(in_array($row['id'], $userArray)){
                         $selected = 'selected';
                     }
-                    echo '<option value="user;'.$row['id'].'" data-icon="user" '.$selected.' >'.$row['firstname'].' '.$row['lastname'].'</option>';
+                    echo '<option title="Benutzer" value="user;'.$row['id'].'" data-icon="user" '.$selected.' >'.$row['firstname'].' '.$row['lastname'].'</option>';
                 }
-                $result = $conn->query("SELECT id, name FROM $teamTable");
+                $result = $conn->query("SELECT id, name, isDepartment FROM $teamTable");
                 while ($result && ($row = $result->fetch_assoc())) {
                     $selected = '';
                     if(in_array($row['id'], $teamArray)){
                         $selected = 'selected';
                     }
-                    echo '<option value="team;'.$row['id'].'" data-icon="group" '.$selected.' >'.$row['name'].'</option>';
+                    $icon = $row["isDepartment"] === 'TRUE' ? "share-alt" : "group";
+                    $type = $row["isDepartment"] === 'TRUE' ? "Abteilung" : "Team";                    
+                    echo '<option title="'.$type.'" value="team;'.$row['id'].'" data-icon="'.$icon.'" '.$selected.' >'.$row['name'].'</option>';
                 }
                 $result = $conn->query("SELECT id, name FROM $companyTable");
                 while ($row = $result->fetch_assoc()) {
@@ -80,7 +82,7 @@ while($result && ($row = $result->fetch_assoc())){
                     if(in_array($row['id'], $companyArray)){
                         $selected = 'selected';
                     }
-                    echo '<option value="company;'.$row['id'].'" data-icon="building" '.$selected.' >'.$row['name'].'</option>';
+                    echo '<option title="Mandant" value="company;'.$row['id'].'" data-icon="building" '.$selected.' >'.$row['name'].'</option>';
                 }
                 ?>
             </select><br>
