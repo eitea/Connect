@@ -38,7 +38,7 @@ function showError(message){
         mouse_over: "pause",
         animate: {
             enter: 'animated bounceInRight',
-            exit: 'animated bounceOutUp'
+            exit: 'animated fadeOutRight'
         },
     });
 }
@@ -54,7 +54,7 @@ function showWarning(message){
         mouse_over: "pause",
         animate: {
             enter: 'animated bounceInRight',
-            exit: 'animated bounceOutUp'
+            exit: 'animated fadeOutRight'
         },
     });
 }
@@ -70,7 +70,7 @@ function showInfo(message){
         mouse_over: "pause",
         animate: {
             enter: 'animated bounceInRight',
-            exit: 'animated bounceOutUp'
+            exit: 'animated fadeOutRight'
         },
     });
 }
@@ -86,7 +86,7 @@ function showSuccess(message){
         mouse_over: "pause",
         animate: {
             enter: 'animated bounceInRight',
-            exit: 'animated bounceOutUp'
+            exit: 'animated fadeOutRight'
         },
     });
 }

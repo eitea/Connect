@@ -1170,6 +1170,8 @@ function create_tables($conn) {
         opt_name VARCHAR(30) NOT NULL,
         opt_descr VARCHAR(350) NOT NULL,
         opt_status VARCHAR(15) NOT NULL DEFAULT 'ACTIVE',
+        opt_duration INT(6) DEFAULT 0,
+        opt_unit INT(6) DEFAULT 0,
         UNIQUE KEY (matrixID,opt_name),
         FOREIGN KEY (matrixID) REFERENCES dsgvo_vv_data_matrix(id)
         ON UPDATE CASCADE

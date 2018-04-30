@@ -17,6 +17,10 @@ if (isset($_POST['company_id'])) {
     }
 }
 
+function isNumberOrUnit($var){
+    return !((strpos($var, '_NUMBER') === false) && (strpos($var, '_UNIT') === false));
+}
+
 $stmt_insert_vv_log = $conn->prepare("INSERT INTO dsgvo_vv_logs (user_id,short_description,long_description,scope) VALUES ($userID,?,?,?)");
 showError($conn->error);
 $stmt_insert_vv_log->bind_param("sss", $stmt_insert_vv_log_short_description, $stmt_insert_vv_log_long_description, $stmt_insert_vv_log_scope);
@@ -119,13 +123,19 @@ if (isset($_POST['delete_setting']) && isset($matrixID)) {
 }
 
 if (isset($_POST['save_all']) && isset($matrixID)) {
-    $stmt = $conn->prepare("UPDATE dsgvo_vv_data_matrix_settings SET opt_descr = ? WHERE matrixID = $matrixID AND opt_name = ?");
+    $stmt = $conn->prepare("UPDATE dsgvo_vv_data_matrix_settings SET opt_descr = ?, opt_duration = ?, opt_unit = ? WHERE matrixID = $matrixID AND opt_name = ?");
     showError($conn->error);
-    $stmt->bind_param("ss", $descr, $setting);
+    $stmt->bind_param("siis", $descr, $duration, $unit, $setting);
     $affected_rows = 0;
     foreach ($_POST as $name => $value) {
+        if(isNumberOrUnit($name)) continue;
         $setting = test_input($name);
         $descr = test_input($value);
+        $duration = $unit = 0;
+        if(isset($_POST["${name}_NUMBER"],$_POST["${name}_UNIT"])){
+            $duration = intval($_POST["${name}_NUMBER"]);
+            $unit = intval($_POST["${name}_UNIT"]);
+        }
         if (substr($setting, 0, 9) == 'APP_GROUP' || substr($setting, 0, 8) == 'APP_CAT_') {
             if (!empty($descr)) {
                 $stmt->execute();
@@ -213,14 +223,14 @@ while ($result && $row = $result->fetch_assoc()) {
                                     </span>
                                 </div>
                                 <br>
-                                <label>Datenkategorien der gesammelten personenbezogenen Daten</label>
+                                <label>Datenkategorien der gesammelten personenbezogenen Daten mit Löschfristen</label>
                                 <br>
                             </div>
                         </div>
                         <div class="col-sm-offset-1">
                             <?php
 $j = 1;
-    $cat_result = $conn->query("SELECT opt_name, opt_descr FROM dsgvo_vv_data_matrix_settings WHERE matrixID = $matrixID AND opt_name LIKE 'APP_CAT_$num%'");
+    $cat_result = $conn->query("SELECT opt_name, opt_descr, opt_unit, opt_duration FROM dsgvo_vv_data_matrix_settings WHERE matrixID = $matrixID AND opt_name LIKE 'APP_CAT_$num%'");
     $jnum = 1;
     while ($cat_row = $cat_result->fetch_assoc()) {
         $jnum = util_strip_prefix($cat_row['opt_name'], 'APP_CAT_' . $num . '_');
@@ -234,13 +244,28 @@ $j = 1;
         $fieldID++;
 
         ?>
-                                <div class="col-sm-6 ">
+                                <div class="col-xs-12 ">
                                     <div class="input-group">
                                         <span class="input-group-addon">
                                             <?php echo $fieldID; ?>
                                         </span>
-                                        <input type="text" class="form-control" maxlength="350" name="<?php echo $cat_row['opt_name']; ?>" value="<?php echo $cat_row['opt_descr']; ?>"
-                                        />
+                                        <input style="width: 33.333%;" type="text" class="form-control" maxlength="350" name="<?php echo $cat_row['opt_name']; ?>" value="<?php echo $cat_row['opt_descr']; ?>" />
+                                        <select style="width: 33.333%;" class="form-control duration-number-select" name="<?php echo $cat_row['opt_name']; ?>_NUMBER" >
+                                                <option value="default">im Vorgang beschrieben</option>
+                                                    <?php
+                                                        for ($i = 1;$i<=30;++$i) {
+                                                            $selected = (intval($cat_row['opt_duration']) === $i)?"selected":"";
+                                                            echo "<option $selected value='$i'>$i</option>";
+                                                        }
+                                                    ?>
+                                            </select>
+                                            <select style="width: 33.333%;" class="form-control duration-unit-select" name="<?php echo $cat_row['opt_name']; ?>_UNIT" >
+                                                <option value="default">im Vorgang beschrieben</option>
+                                                <option value="1" <?php echo (intval($cat_row['opt_unit']) === 1)?"selected":"" ?>>Tag(e)</option>
+                                                <option value="2" <?php echo (intval($cat_row['opt_unit']) === 2)?"selected":"" ?>>Woche(n)</option>
+                                                <option value="3" <?php echo (intval($cat_row['opt_unit']) === 3)?"selected":"" ?>>Monat(e)</option>
+                                                <option value="4" <?php echo (intval($cat_row['opt_unit']) === 4)?"selected":"" ?>>Jahr(e)</option>
+                                            </select>
                                         <span class="input-group-btn">
                                             <button type="button" onclick="delete_setting('<?php echo $cat_row['opt_name']; ?>')" class="btn btn-danger">
                                                 <i class="fa fa-trash-o"></i>
@@ -308,6 +333,32 @@ $j = 1;
                 form.appendChild(field);
                 document.body.appendChild(form);
                 form.submit();
+            }
+
+            $(".duration-number-select").change(function(event){
+                var name = event.target.name.replace("_NUMBER",""); // eg APP_CAT_1_2
+                if(event.target.value == "default"){
+                    resetBothSelects(name)
+                }else{
+                    // debugger;
+                    if($("[name="+name+"_UNIT]").val() == "default"){
+                        $("[name="+name+"_UNIT]").val(1);
+                    }
+                }
+            })
+            $(".duration-unit-select").change(function(event){
+                var name = event.target.name.replace("_UNIT",""); // eg APP_CAT_1_2
+                if(event.target.value == "default"){
+                    resetBothSelects(name)
+                }else{
+                    if($("[name="+name+"_NUMBER]").val() == "default"){
+                        $("[name="+name+"_NUMBER]").val(1);
+                    }
+                }
+            })
+            function resetBothSelects(baseName){
+                $("[name="+baseName+"_NUMBER]").val("default");
+                $("[name="+baseName+"_UNIT]").val("default");
             }
 
         </script>

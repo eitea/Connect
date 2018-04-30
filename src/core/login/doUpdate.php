@@ -2657,6 +2657,20 @@ if($row['version'] < 152){
     }else{
         echo 'DSGVO: Extra VV fields';
     }
+
+    $conn->query("ALTER TABLE dsgvo_vv_data_matrix_settings ADD COLUMN opt_duration INT(6) DEFAULT 0");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>DSGVO VV: Data matrix duration';
+    }
+    $conn->query("ALTER TABLE dsgvo_vv_data_matrix_settings ADD COLUMN opt_unit INT(6) DEFAULT 0");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>DSGVO VV: Data matrix unit';
+    }
+
 }
 
 // ------------------------------------------------------------------------------
