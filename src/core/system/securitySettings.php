@@ -64,6 +64,26 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
             $stmt->close();
             echo $conn->error;
+
+            $stmt = $conn->prepare("UPDATE dsgvo_vv_logs SET short_description = ?, long_description = ?, scope = ? WHERE id = ?"); echo $stmt->error;
+            $stmt->bind_param('sssi', $short_description, $long_description, $scope, $id);
+            $result = $conn->query("SELECT id, short_description, long_description, scope FROM documents"); echo $conn->error;
+            while($result && ($row = $result->fetch_assoc())){
+                $id = $row['id'];
+                if($decrypt){
+                    $short_description = simple_decryption($row['short_description'], $symmetric);
+                    $long_description = simple_decryption($row['long_description'], $symmetric);
+                    $scope = simple_decryption($row['scope'], $symmetric);
+                } else {
+                    $short_description = simple_encryption($row['short_description'], $symmetric);
+                    $long_description = simple_encryption($row['long_description'], $symmetric);
+                    $scope = simple_encryption($row['scope'], $symmetric);
+                }
+                $stmt->execute();
+            }
+            $stmt->close();
+
+
         } elseif($module == 'ERP'){
             $stmt = $conn->prepare("UPDATE products SET name = ?, description = ? WHERE id = ?"); echo $stmt->error;
             $stmt->bind_param('ssi', $name, $text, $id);
