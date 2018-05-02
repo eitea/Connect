@@ -179,20 +179,29 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
     return $message;
 }
 
-function mc_status(){
-    //TODO: this should be checked with module (security_modules) and user access (security_access)..
+function mc_status($module = ''){
     static $encrypt = null;
     if($encrypt === null){
         global $conn;
         $encrypt = false;
-        $result = $conn->query("SELECT activeEncryption FROM configurationData");
-        if($result && ($row = $result->fetch_assoc()) && $row['activeEncryption'] == 'TRUE') $encrypt = true;
+        $result = $conn->query("SELECT activeEncryption FROM configurationData WHERE activeEncryption = 'TRUE'");
+        if($result && $result->num_rows) $encrypt = true;
     }
-    if($encrypt){
-         return '<i class="fa fa-lock text-success" aria-hidden="true" title="Encryption Aktiv"></i>';
-    } else {
-        return '<i class="fa fa-unlock text-danger" aria-hidden="true" title="Encryption Inaktiv"></i>';
+	$active_icon = '<i class="fa fa-lock text-success" aria-hidden="true" title="Encryption Aktiv"></i>';
+	$inactive_icon = '<i class="fa fa-unlock text-danger" aria-hidden="true" title="Encryption Inaktiv"></i>';
+	if($encrypt){
+		if($module){
+			$result = $conn->query("SELECT id FROM security_modules WHERE module = '$module' AND outDated = 'FALSE'");
+			if($result && $result->num_rows){
+				global $userID;
+				$result = $conn->query("SELECT id FROM security_access WHERE module = '$module' AND outDated = 'FALSE' AND userID = $userID");
+				if($result && $result->num_rows) return $active_icon;
+			}
+			return $inactive_icon;
+		}
+		return $active_icon;
     }
+	return $inactive_icon;
 }
 
 /*

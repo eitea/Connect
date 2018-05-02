@@ -204,7 +204,8 @@ ini_set('max_execution_time',999);
             $sql = "INSERT INTO configurationData (bookingTimeBuffer, cooldownTimer, version) VALUES (5, 2, $VERSION_NUMBER)";
             $conn->query($sql);
             //insert ERP numbers
-            $conn->query("INSERT INTO erp_settings (erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, companyID) VALUES (1, 1, 1, 1, 1, 1, 1)");
+			$conn->query("INSERT INTO erp_settings (companyID, erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, yourSign, yourOrder, ourSign, ourMessage, clientNum, clientStep, supplierNum, supplierStep)
+			SELECT companyID, erp_ang, erp_aub, erp_re, erp_lfs, erp_gut, erp_stn, yourSign, yourOrder, ourSign, ourMessage, '1000', '1', '1000', '1' FROM erpNumbers");
             //insert mail options
             $conn->query("INSERT INTO mailingOptions (host, port) VALUES('127.0.0.1', '80')");
             //insert restic backup configuration

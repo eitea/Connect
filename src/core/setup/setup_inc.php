@@ -805,20 +805,24 @@ function create_tables($conn) {
     }
 
     $sql = "CREATE TABLE erp_settings(
-        companyID INT(6) UNSIGNED,
-        erp_ang INT(5) DEFAULT 1,
-        erp_aub INT(5) DEFAULT 1,
-        erp_re INT(5) DEFAULT 1,
-        erp_lfs INT(5) DEFAULT 1,
-        erp_gut INT(5) DEFAULT 1,
-        erp_stn INT(5) DEFAULT 1,
-        yourSign VARCHAR(30),
-        yourOrder VARCHAR(30),
-        ourSign VARCHAR(30),
-        ourMessage VARCHAR(30),
-        FOREIGN KEY (companyID) REFERENCES companyData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
+		companyID INT(6) UNSIGNED,
+		erp_ang INT(5) DEFAULT 1,
+		erp_aub INT(5) DEFAULT 1,
+		erp_re INT(5) DEFAULT 1,
+		erp_lfs INT(5) DEFAULT 1,
+		erp_gut INT(5) DEFAULT 1,
+		erp_stn INT(5) DEFAULT 1,
+		yourSign VARCHAR(30),
+		yourOrder VARCHAR(30),
+		ourSign VARCHAR(30),
+		ourMessage VARCHAR(30),
+		clientNum VARCHAR(12),
+		clientStep INT(2),
+		supplierNum VARCHAR(12),
+		supplierStep INT(2),
+		FOREIGN KEY (companyID) REFERENCES companyData(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
