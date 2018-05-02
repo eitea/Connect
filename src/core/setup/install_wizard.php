@@ -71,7 +71,7 @@ if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['a
             }
 
             if($accept){
-                $conn->query("UPDATE configurationData SET firstTimeWizard = 'TRUE'");
+                $conn->query("UPDATE configurationData SET firstTimeWizard = 'TRUE', activeEncryption = 'TRUE'");
                 $firstTimeWizard = true;
             } else {
                 $err .= $conn->error;

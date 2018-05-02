@@ -1961,12 +1961,6 @@ if ($row['version'] < 136) {
     }
 }
 if($row['version'] < 137){
-    $sql = "ALTER TABLE roles ADD canUseArchive ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL";
-    if (!$conn->query($sql)) {
-        echo $conn->error;
-    } else {
-        echo '<br>Archive User Module';
-    }
     $sql = "ALTER TABLE archiveconfig ADD name VARCHAR(30) NOT NULL DEFAULT 'NO_NAME'";
     if (!$conn->query($sql)) {
         echo $conn->error;
@@ -2614,9 +2608,25 @@ if($row['version'] < 151){
     $conn->query("ALTER TABLE UserData ADD COLUMN lastLogin DATETIME DEFAULT NULL"); //5ac7126421a8b
 }
 
-$conn->query("ALTER TABLE security_projects DROP COLUMN privateKey");
+if($row['version'] < 152){
+	$conn->query("ALTER TABLE security_projects DROP COLUMN privateKey");
+	//security_company -> build security_modules
+	//security_access -> build access to company
 
-// if($row['version'] < 152){}
+	//same with User Access
+
+	$sql = "ALTER TABLE roles ADD canUseArchive ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL";
+	if (!$conn->query($sql)) {
+		echo $conn->error;
+	} else {
+		echo '<br>Archive User Module';
+	}
+
+}
+
+// if($row['version'] < 153)
+// if($row['version'] < 154)
+// if($row['version'] < 155)
 
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';

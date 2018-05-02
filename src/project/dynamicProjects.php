@@ -309,7 +309,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $nextDate = $series->get_next_date();
                 $series = base64_encode(serialize($series));
                 // PROJECT
-				$end = '0000-00-00 00:00:00'; //temp fix for invalid end value (probs NULL)
+				$end = '0000-00-00'; //temp fix for invalid end value (probs NULL)
                 $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
                     projectpriority, projectparent, projectowner, projectleader, projectnextdate, projectseries, projectpercentage, estimatedHours, level, projecttags, isTemplate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->bind_param("ssbiiissssisiisbisiss", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $null, $percentage, $estimate, $skill, $tags, $isTemplate);

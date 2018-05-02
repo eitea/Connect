@@ -177,8 +177,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         foreach($all_modules as $module => $val){
             //if module is encrypted but is now un-checked
             if(array_key_exists($module, $encrypted_modules) && !array_key_exists($module, $temp)){
+				//decrypt module user has access to
                 $result = $conn->query("SELECT module, privateKey FROM security_access WHERE userID = $userID AND outDated = 'FALSE' AND module = '$module' ORDER BY recentDate LIMIT 1");
-                //decrypt module user has access to
                 if($result && ($row = $result->fetch_assoc()) && array_key_exists($module, $encrypted_modules)){
                     $cipher_private_module = base64_decode($row['privateKey']);
                     $result = $conn->query("SELECT publicPGPKey, symmetricKey FROM security_modules WHERE module = '$module' AND outDated = 'FALSE'");
@@ -197,7 +197,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                         if($symmetric){
                             secure_module($module, $symmetric, 1); //decrypt
 
-                            $conn->query("UPDATE security_company SET outDated = 'TRUE' WHERE module = '$module'");
                             $conn->query("UPDATE security_modules SET outDated = 'TRUE' WHERE module = '$module'");
                             $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = '$module'");
 
@@ -219,12 +218,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     if(!empty($_POST['saveRoles'])){
         $activeTab = $x = intval($_POST['saveRoles']);
-        $isDSGVOAdmin = isset($_POST['isDSGVOAdmin']) ? 'TRUE' : 'FALSE';
+        $isDSGVOAdmin = 'FALSE';
         $isCoreAdmin = isset($_POST['isCoreAdmin']) ? 'TRUE' : 'FALSE';
         $isDynamicProjectsAdmin = isset($_POST['isDynamicProjectsAdmin']) ? 'TRUE' : 'FALSE';
         $isProjectAdmin = isset($_POST['isProjectAdmin']) ? 'TRUE' : 'FALSE';
         $isReportAdmin = isset($_POST['isReportAdmin']) ? 'TRUE' : 'FALSE';
-        $isERPAdmin = isset($_POST['isERPAdmin']) ? 'TRUE' : 'FALSE';
+        $isERPAdmin = 'FALSE';
         $isFinanceAdmin = isset($_POST['isFinanceAdmin']) ? 'TRUE' : 'FALSE';
         $canStamp = isset($_POST['canStamp']) ? 'TRUE' : 'FALSE';
         $canEditTemplates = isset($_POST['canEditTemplates']) ? 'TRUE' : 'FALSE';
@@ -236,6 +235,76 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $canEditClients = isset($_POST['canEditClients']) ? 'TRUE' : 'FALSE';
         $canEditSuppliers = isset($_POST['canEditSuppliers']) ? 'TRUE' : 'FALSE';
         $canUseWorkflow = isset($_POST['canUseWorkflow']) ? 'TRUE' : 'FALSE'; //5ab7ae7596e5c
+
+		if(isset($_POST['isDSGVOAdmin'])){
+			$isDSGVOAdmin = 'TRUE';
+			$result = $conn->query("SELECT u.publicPGPKey, module FROM UserData u LEFT JOIN security_access ON userID = u.id AND module = 'DSGVO' AND outDated = 'FALSE' WHERE u.id = $x");
+			if($result && ($row = $result->fetch_assoc()) && !$row['module']){
+				$user_public = base64_decode($row['publicPGPKey']);
+				//grant which can be granted
+				$result = $conn->query("SELECT s.privateKey, m.publicPGPKey FROM security_access s, security_modules m
+					WHERE m.outDated = 'FALSE' AND m.module = 'DSGVO'
+					AND s.userID = $userID AND s.outDated = 'FALSE' AND s.module = 'DSGVO' LIMIT 1");
+				if($result && ($row = $result->fetch_assoc()) && array_key_exists('DSGVO', $encrypted_modules)){
+
+					$cipher_private_module = base64_decode($row['privateKey']);
+					$nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
+        			$cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
+					$private = sodium_crypto_box_open($cipher_private_module, $nonce, base64_decode($privateKey).base64_decode($row['publicPGPKey']));
+
+		            $nonce = random_bytes(24);
+		            $access_private_encrypted = base64_encode($nonce . sodium_crypto_box($private, $nonce, $private.$user_public));
+
+					$conn->query("INSERT INTO security_access(userID, module, privateKey) VALUES($x, 'DSGVO', '$access_private_encrypted')");
+					if($conn->error){
+						showError($conn->error);
+					} else {
+						showSuccess("DSGVO Schlüssel wurde hinzugefügt");
+					}
+				} else {
+					showError($conn->error);
+				}
+			} else {
+				showError($conn->error);
+			}
+		} else {
+			$conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'DSGVO' AND userID = $x");
+		}
+
+		if(isset($_POST['isERPAdmin'])){
+			$isERPAdmin = 'TRUE';
+			$result = $conn->query("SELECT u.publicPGPKey, module FROM UserData u LEFT JOIN security_access ON userID = u.id AND module = 'ERP' AND outDated = 'FALSE' WHERE u.id = $x");
+			if($result && ($row = $result->fetch_assoc()) && !$row['module']){
+				$user_public = base64_decode($row['publicPGPKey']);
+				//grant which can be granted
+				$result = $conn->query("SELECT s.privateKey, m.publicPGPKey FROM security_access s, security_modules m
+					WHERE m.outDated = 'FALSE' AND m.module = 'ERP'
+					AND s.userID = $userID AND s.outDated = 'FALSE' AND s.module = 'ERP' LIMIT 1");
+				if($result && ($row = $result->fetch_assoc()) && array_key_exists('ERP', $encrypted_modules)){
+
+					$cipher_private_module = base64_decode($row['privateKey']);
+					$nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
+        			$cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
+					$private = sodium_crypto_box_open($cipher_private_module, $nonce, base64_decode($privateKey).base64_decode($row['publicPGPKey']));
+
+		            $nonce = random_bytes(24);
+		            $access_private_encrypted = base64_encode($nonce . sodium_crypto_box($private, $nonce, $private.$user_public));
+
+					$conn->query("INSERT INTO security_access(userID, module, privateKey) VALUES($x, 'ERP', '$access_private_encrypted')");
+					if($conn->error){
+						showError($conn->error);
+					} else {
+						showSuccess("ERP Schlüssel wurde hinzugefügt");
+					}
+				} else {
+					showError($conn->error);
+				}
+			} else {
+				showError($conn->error);
+			}
+		} else {
+			$conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'ERP' AND userID = $x");
+		}
 
         $conn->query("UPDATE roles SET isDSGVOAdmin = '$isDSGVOAdmin', isCoreAdmin = '$isCoreAdmin', isDynamicProjectsAdmin = '$isDynamicProjectsAdmin', isTimeAdmin = '$isTimeAdmin',
         isProjectAdmin = '$isProjectAdmin', isReportAdmin = '$isReportAdmin', isERPAdmin = '$isERPAdmin', isFinanceAdmin = '$isFinanceAdmin', canStamp = '$canStamp',
