@@ -10,6 +10,7 @@ $result = $conn->query("SELECT activeEncryption FROM configurationData");
 if(!$result) die($lang['ERROR_UNEXPECTED']);
 $config_row = $result->fetch_assoc();
 
+$all_modules = array('TIMES' => false, 'PROJECTS' => false, 'REPORTS' => false, 'ERP' => true, 'FINANCES' => false, 'DSGVO' => true); //setup/install_wizard.php
 $encrypted_modules = array();
 $result = $conn->query("SELECT DISTINCT module, outDated FROM security_modules WHERE outDated = 'FALSE'");
 while($row = $result->fetch_assoc()){
@@ -98,11 +99,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
     }
 
-
-    if(isset($_POST['activate_encryption'])){
-        if($config_row['activeEncryption'] == 'FALSE'){
-            //activate encrytpion
-            $accept = true;
+    if(isset($_POST['saveSecurity'])){
+        if(isset($_POST['activate_encryption']) && $config_row['activeEncryption'] == 'FALSE'){
             $key_downloads = array();
             $result = $conn->query("SELECT id FROM companyData"); echo $conn->error;
             if(!$result) $accept = false;
@@ -118,13 +116,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $conn->query("INSERT INTO security_company(userID, companyID, privateKey) VALUES ($userID, 1, '".base64_encode($encrypted)."')"); echo $conn->error;
                 if($conn->error) $accept = false;
             }
-            if($accept && !empty($_POST['module_encrypt'])){ //module
-                $stmt = $conn->prepare("INSERT INTO security_modules(module, publicPGPKey, symmetricKey) VALUES (?, ?, ?)");
-                $stmt->bind_param("sss", $module, $public, $encrypted);
-                $stmt_access = $conn->prepare("INSERT INTO security_access(userID, module, privateKey) VALUES(?, ?, ?)");
-                $stmt_access->bind_param("iss", $access_user, $module, $access_private_encrypted);
-                foreach($_POST['module_encrypt'] as $module){
-                    $module = test_input($module, true);
+        }
+        if(isset($_POST['activate_encryption']) && !empty($_POST['module_encrypt'])){
+            //see if modules were added and encrypt those
+            $stmt = $conn->prepare("INSERT INTO security_modules(module, publicPGPKey, symmetricKey) VALUES (?, ?, ?)");
+            $stmt->bind_param("sss", $module, $public, $encrypted);
+            $stmt_access = $conn->prepare("INSERT INTO security_access(userID, module, privateKey) VALUES(?, ?, ?)");
+            $stmt_access->bind_param("iss", $access_user, $module, $access_private_encrypted);
+            foreach($_POST['module_encrypt'] as $module){
+                $module = test_input($module, true);
+                if(!array_key_exists($module, $encrypted_modules)){
+                    $accept = true;
                     $keyPair = sodium_crypto_box_keypair();
                     $private = sodium_crypto_box_secretkey($keyPair);
                     $public = sodium_crypto_box_publickey($keyPair);
@@ -134,7 +136,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     $encrypted = base64_encode($nonce . sodium_crypto_box($symmetric, $nonce, $private.$public));
                     $public = base64_encode($public);
                     $stmt->execute();
-                    if($conn->error) $accept = false;
+                    if($stmt->error) $accept = false;
 
                     if($accept){ //access
                         secure_module($module, $symmetric);
@@ -145,63 +147,73 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                             $access_private_encrypted = base64_encode($nonce . sodium_crypto_box($private, $nonce, $private.$user_public));
                             $access_user = $row['id'];
                             $stmt_access->execute();
-                            echo $conn->error;
+                            echo $stmt_access->error;
                         }
+                        $encrypted_modules[$row['module']] = 'FALSE';
+                        showSuccess($module . ' was encrypted');
                     } else {
-                        echo $conn->error;
-                    }
-                }
-                $stmt->close();
-                $stmt_access->close();
-                $conn->query("UPDATE configurationData SET activeEncryption = 'TRUE'");
-            }
-            if($accept){
-                echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>O.K.</div>';
-            } else {
-                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
-            }
-        } else {
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Feature yet to be implemented</div>';
-            //TODO: see if any modules were added, and encrypt those
-
-
-            //TODO: see if modules were removed, and decrypt them.
-        }
-    }
-    if(empty($_POST['activate_encryption']) && $config_row['activeEncryption'] == 'TRUE'){
-        $result = $conn->query("SELECT module, privateKey FROM security_access WHERE userID = $userID AND outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
-        //decrypt modules user has access to
-        while($result && ($row = $result->fetch_assoc())){
-            if(array_key_exists($row['module'], $encrypted_modules)){
-                $cipher_private_module = base64_decode($row['privateKey']);
-                $result = $conn->query("SELECT publicPGPKey, symmetricKey FROM security_modules WHERE outDated = 'FALSE'");
-                if($result && ($row = $result->fetch_assoc())){
-                    $public_module = base64_decode($row['publicPGPKey']);
-                    $cipher_symmetric = base64_decode($row['symmetricKey']);
-                    //decrypt access
-                    $nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
-                    $cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
-                    $private_module = sodium_crypto_box_open($cipher_private_module, $nonce, $privateKey.$public_module);
-                    //decrypt module
-                    $nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
-                    $cipher_symmetric = mb_substr($cipher_symmetric, 24, null, '8bit');
-                    $symmetric = sodium_crypto_box_open($cipher_symmetric, $nonce, $private_module.$public_module);
-
-                    if($symmetric){
-                        secure_module($row['module'], $symmetric);
-
-                        $conn->query("UPDATE security_company SET outDated = 'TRUE' WHERE module = ".$row['module']);
-                        $conn->query("UPDATE security_modules SET outDated = 'TRUE' WHERE module = ".$row['module']);
-                        $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = ".$row['module']);
+                        showError($stmt->error);
                     }
                 }
             }
+            $stmt->close();
+            $stmt_access->close();
+            $conn->query("UPDATE configurationData SET activeEncryption = 'TRUE'");
+            if($conn->error){
+                showError($conn->error);
+            } elseif($config_row['activeEncryption'] == 'FALSE') {
+                $config_row['activeEncryption'] = 'TRUE';
+                showSuccess('Verschlüsselung wurde aktiviert');
+            }
         }
 
+        //see if modules were removed, and decrypt them
+        $temp = array();
+        if(isset($_POST['module_encrypt'])){
+            foreach($_POST['module_encrypt'] as $module){
+                $temp[$module] = true;
+            }
+        }
+        foreach($all_modules as $module => $val){
+            //if module is encrypted but is now un-checked
+            if(array_key_exists($module, $encrypted_modules) && !array_key_exists($module, $temp)){
+                $result = $conn->query("SELECT module, privateKey FROM security_access WHERE userID = $userID AND outDated = 'FALSE' AND module = '$module' ORDER BY recentDate LIMIT 1");
+                //decrypt module user has access to
+                if($result && ($row = $result->fetch_assoc()) && array_key_exists($module, $encrypted_modules)){
+                    $cipher_private_module = base64_decode($row['privateKey']);
+                    $result = $conn->query("SELECT publicPGPKey, symmetricKey FROM security_modules WHERE outDated = 'FALSE'");
+                    if($result && ($row = $result->fetch_assoc())){
+                        $public_module = base64_decode($row['publicPGPKey']);
+                        $cipher_symmetric = base64_decode($row['symmetricKey']);
+                        //access
+                        $nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
+                        $cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
+                        $private_module = sodium_crypto_box_open($cipher_private_module, $nonce, base64_decode($privateKey).$public_module);
+                        //module
+                        $nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
+                        $cipher_symmetric = mb_substr($cipher_symmetric, 24, null, '8bit');
+                        $symmetric = sodium_crypto_box_open($cipher_symmetric, $nonce, $private_module.$public_module);
 
-        if(count($encrypted_modules) == 0) $conn->query("UPDATE configurationData SET activeEncryption = 'FALSE'");
-        if(count($encrypted_modules) < $result->num_rows){
-            showError('');
+                        if($symmetric){
+                            secure_module($module, $symmetric, 1); //decrypt
+
+                            $conn->query("UPDATE security_company SET outDated = 'TRUE' WHERE module = '$module'");
+                            $conn->query("UPDATE security_modules SET outDated = 'TRUE' WHERE module = '$module'");
+                            $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = '$module'");
+
+                            unset($encrypted_modules[$module]);
+                            showSuccess($module . ' was decrypted');
+                        }
+                    }
+                } else {
+                    if($conn->error) showError($conn->error);
+                    showError("Module Access not available; you cannot decrypt this module");
+                }
+            }
+        } //endfor
+        if(count($encrypted_modules) == 0){
+            $conn->query("UPDATE configurationData SET activeEncryption = 'FALSE'");
+            $config_row['activeEncryption'] = 'FALSE';
         }
     }
 
@@ -250,7 +262,7 @@ if(!empty($key_downloads)){
 
 <form method="POST">
     <div class="page-header"><h3>Security Einstellungen  <div class="page-header-button-group">
-        <button type="submit" class="btn btn-default" title="<?php echo $lang['SAVE']; ?>"><i class="fa fa-floppy-o"></i></button>
+        <button type="submit" class="btn btn-default" title="<?php echo $lang['SAVE']; ?>" name="saveSecurity"><i class="fa fa-floppy-o"></i></button>
     </div></h3></div>
 
     <h4>Verschlüsselung <a role="button" data-toggle="collapse" href="#password_info_encryption"> <i class="fa fa-info-circle"> </i> </a></h4><br>
@@ -260,12 +272,14 @@ if(!empty($key_downloads)){
         <div class="col-sm-4"><label><input id="activate_encryption" type="checkbox" <?php if($config_row['activeEncryption'] == 'TRUE') echo 'checked'; ?> name="activate_encryption" value="1" /> Aktiv</label></div>
     </div>
     <div id="module-checkboxes" <?php if($config_row['activeEncryption'] == 'FALSE') echo 'style="display:none"'; ?> class="row">
-        <div class="col-md-3"><label><input disabled type="checkbox" <?php if(array_key_exists('TIME', $encrypted_modules)) echo 'checked'; ?> name="module_encrypt[]" value="TIME" /> Zeiterfassung</label></div>
-        <div class="col-md-3"><label><input disabled type="checkbox" <?php if(array_key_exists('PROJECT', $encrypted_modules)) echo 'checked'; ?> name="module_encrypt[]" value="PROJECT" /> Projekte</label></div>
-        <div class="col-md-3"><label><input disabled type="checkbox" <?php if(array_key_exists('REPORT', $encrypted_modules)) echo 'checked'; ?> name="module_encrypt[]" value="REPORT" /> Berichte</label></div>
-        <div class="col-md-3"><label><input type="checkbox" <?php if(array_key_exists('ERP', $encrypted_modules)) echo 'checked'; ?> name="module_encrypt[]" value="ERP" /> ERP</label></div>
-        <div class="col-md-3"><label><input disabled type="checkbox" <?php if(array_key_exists('FINANCE', $encrypted_modules)) echo 'checked'; ?> name="module_encrypt[]" value="FINANCE" /> Finanzen</label></div>
-        <div class="col-md-3"><label><input type="checkbox" <?php if(array_key_exists('DSGVO', $encrypted_modules)) echo 'checked'; ?> name="module_encrypt[]" value="DSGVO" /> DSGVO</label></div>
+        <?php
+        foreach($all_modules as $module => $val){
+            $disabled = $val ? '' : 'disabled';
+            $checked = ($val && array_key_exists($module, $encrypted_modules)) ? 'checked' : '';
+            $lang[$module] = isset($lang[$module]) ? $lang[$module] : $module;
+            echo '<div class="col-md-3"><label><input '.$disabled.' type="checkbox" '.$checked.' name="module_encrypt[]" value="'.$module.'" />'.$lang[$module].'</label></div>';
+        }
+        ?>
     </div>
 </form>
 

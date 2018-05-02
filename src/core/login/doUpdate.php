@@ -2456,7 +2456,7 @@ if($row['version'] < 146){
         name VARCHAR(120) NOT NULL,
         parent_directory VARCHAR(120) NOT NULL DEFAULT 'ROOT',
         type VARCHAR(10) NOT NULL,
-        content TEXT,
+        uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (projectID) REFERENCES projectData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE

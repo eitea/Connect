@@ -195,7 +195,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
      $forall = !empty($_POST['field_add_forall']) ? 'TRUE' : 'FALSE';
      $conn->query("INSERT INTO $companyExtraFieldsTable (id, companyID, name, isActive, isRequired, isForAllProjects, description) VALUES ($id_save, $cmpID, '$name', '$active', '$required', '$forall', '$description')");
    } else {
-     echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert">&times;</a>'.$lang['ERROR_UNEXPECTED'].'</div>';
+       showError($lang['ERROR_UNEXPECTED'].$conn->error);
    }
  } elseif(isset($_POST['addFinanceAccount'])){
     if(!empty($_POST['addFinance_name']) && !empty($_POST['addFinance_num']) && $_POST['addFinance_num'] < 2999 && $_POST['addFinance_num'] > 2000){
@@ -207,148 +207,164 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       if(isset($_POST['addOption'])) $opt = 'CONT';
       $conn->query("INSERT INTO accounts (companyID, num, name, manualBooking, options) VALUES('$cmpID', $num, '$name', '$ggk', '$opt')");
       if($conn->error){
-        echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_DUPLICATE'].$conn->error.'</div>';
+          showError($lang['ERROR_DUPLICATE'].$conn->error);
       } else {
-        echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
+        showSuccess($lang['OK_ADD']);
       }
     } else {
-      echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
+        showError($lang['ERROR_INVALID_DATA']);
     }
   } elseif(isset($_POST['saveFinances']) && isset($_POST['finance_istVersteuerer'])){
     $val = 'FALSE';
     if($_POST['finance_istVersteuerer']) $val = 'TRUE';
     $conn->query("UPDATE companyData SET istVersteuerer = '$val' WHERE id = $cmpID");
     if($conn->error){
-      echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+      showError($conn->error);
     } else {
-      echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+      showSuccess($lang['OK_SAVE']);
     }
   } elseif(!empty($_POST['turnBookingOn'])){
     $val = intval($_POST['turnBookingOn']);
     $conn->query("UPDATE accounts SET manualBooking = 'TRUE' WHERE id = $val AND companyID IN (".implode(', ', $available_companies).")");
     if($conn->error){
-      echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+      showError($conn->error);
     } else {
-      echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+      showSuccess($lang['OK_SAVE']);
     }
   } elseif(!empty($_POST['turnBookingOff'])){
     $val = intval($_POST['turnBookingOff']);
     $conn->query("UPDATE accounts SET manualBooking = 'FALSE' WHERE id = $val AND companyID IN (".implode(', ', $available_companies).")");
     if($conn->error){
-      echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+      showError($conn->error);
     } else {
-      echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+      showSuccess($lang['OK_SAVE']);
     }
-  }
+} elseif(!empty($_POST['add_folder_name'])){
+    $val = test_input($_POST['add_folder_name']);
+    $conn->query("INSERT INTO company_folders(name, companyID) VALUES ('$val', $cmpID)");
+    if($conn->error){
+      showError($conn->error);
+    } else {
+      showSuccess($lang['OK_ADD']);
+    }
+} elseif(!empty($_POST['folder_delete'])){
+    $val = intval($_POST['folder_delete']);
+    $conn->query("DELETE FROM company_folders WHERE id = $val AND companyID = $cmpID");
+    if($conn->error){
+        showError($conn->error);
+    } else{
+        showSuccess($lang['OK_DELETE']);
+    }
+}
 
-  if(isset($_FILES['csvUpload']) && !$_FILES['csvUpload']['error']){
+if(isset($_FILES['csvUpload']) && !$_FILES['csvUpload']['error']){
     //validate uploaded file
     function convSet($s){
-      $s = preg_replace("~[^A-Za-z0-9\-!:.,$()+öäüÖÄÜß ]~", "", $s);
-      return trim(iconv(mb_detect_encoding($s), "UTF-8", $s));
+        $s = preg_replace("~[^A-Za-z0-9\-!:.,$()+öäüÖÄÜß ]~", "", $s);
+        return trim(iconv(mb_detect_encoding($s), "UTF-8", $s));
     }
     $error = '';
     $file_info = pathinfo($_FILES['csvUpload']['name']);
     $ext = strtolower($file_info['extension']);
     if(strtolower($file_info['extension']) != 'csv'){ $error = "Invalid file Extension"; }
     if(!$error){
-      $file = fopen($_FILES['csvUpload']['tmp_name'], "r");
-      if(!$file) {$error = 'Could not open file'; }
+        $file = fopen($_FILES['csvUpload']['tmp_name'], "r");
+        if(!$file) {$error = 'Could not open file'; }
     }
     if(!$error){
-      $i = 0;
-      if(isset($_POST['uploadClients']) || isset($_POST['uploadSuppliers'])){
-        $isSupplier = 'TRUE';
-        if(isset($_POST['uploadClients'])) $isSupplier = 'FALSE';
-        $stmt_client = $conn->prepare("INSERT INTO clientData (name, companyID, clientNumber, isSupplier) VALUES (?, $cmpID, ?, '$isSupplier')");
-        $stmt_client_detail = $conn->prepare("INSERT INTO clientInfoData (clientID, name, firstname, title, nameAddition, gender, address_Street, address_Country, address_Country_Postal,
-        address_Country_City, address_Addition, phone, fax_number, debitNumber, datev, accountName, taxnumber, taxArea, vatnumber, customerGroup, creditLimit, lastFaktura, karenztage,
-        warning1, warning2, warning3) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ");
-        if(!$conn->error && !$stmt_client->error && !$stmt_client_detail->error){
-          $stmt_client->bind_param("ss", $name, $num);
-          $stmt_client_detail->bind_param("issssssssssssiisssssdsiddd", $clientID, $lastname, $firstname, $title, $nameAddition, $gender, $street, $country, $postal, $city, $addressAddition, $phone, $fax, $debit, $datev, $accountName, $taxNum, $taxArea, $uid, $customerGroup, $creditLimit, $faktura, $karenztage, $warn1, $warn2, $warn3);
+        $i = 0;
+        if(isset($_POST['uploadClients']) || isset($_POST['uploadSuppliers'])){
+            $isSupplier = 'TRUE';
+            if(isset($_POST['uploadClients'])) $isSupplier = 'FALSE';
+            $stmt_client = $conn->prepare("INSERT INTO clientData (name, companyID, clientNumber, isSupplier) VALUES (?, $cmpID, ?, '$isSupplier')");
+            $stmt_client_detail = $conn->prepare("INSERT INTO clientInfoData (clientID, name, firstname, title, nameAddition, gender, address_Street, address_Country, address_Country_Postal,
+            address_Country_City, address_Addition, phone, fax_number, debitNumber, datev, accountName, taxnumber, taxArea, vatnumber, customerGroup, creditLimit, lastFaktura, karenztage,
+            warning1, warning2, warning3) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ");
+            if(!$conn->error && !$stmt_client->error && !$stmt_client_detail->error){
+                $stmt_client->bind_param("ss", $name, $num);
+                $stmt_client_detail->bind_param("issssssssssssiisssssdsiddd", $clientID, $lastname, $firstname, $title, $nameAddition, $gender, $street, $country, $postal, $city, $addressAddition, $phone, $fax, $debit, $datev, $accountName, $taxNum, $taxArea, $uid, $customerGroup, $creditLimit, $faktura, $karenztage, $warn1, $warn2, $warn3);
+            } else {
+                echo $conn->error .' err1<br>';
+                echo $stmt_client->error .' err2<br>';
+                echo $stmt_client_detail->error .' err3<br>';
+            }
+            fgetcsv($file); //skip 1st line
+            while(($line = fgetcsv($file, 0, ";")) !== false){
+                if(empty($line)) continue;
+                if(empty($line[0])) continue;
+                $name = convSet($line[0]);
+                $num = $line[1];
+                $res = $conn->query("SELECT id FROM clientData WHERE clientNumber = '$num' AND isSupplier = '$isSupplier' "); echo $conn->error;
+                if($res && $res->num_rows > 0){
+                    $row = $res->fetch_assoc();
+                    $clientID = $row['id'];
+                    $conn->query("UPDATE clientData SET name = '$name' WHERE id = $clientID"); echo $conn->error;
+                    $conn->query("DELETE FROM clientInfoData WHERE clientID = $clientID"); echo $conn->error;
+                } else {
+                    $stmt_client->execute();
+                    $clientID = $conn->insert_id;
+                }
+                $firstname = convSet($line[2]);
+                $lastname = convSet($line[3]);
+                $title = convSet($line[4]);
+                $nameAddition = convSet($line[5]);
+                $gender = in_array($line[6], array('male', 'female')) ? $line[6] : 'male';
+                $street = convSet($line[7]);
+                $postal = $line[8];
+                $city = convSet($line[9]);
+                $country = convSet($line[10]);
+                $addressAddition = convSet($line[11]);
+                $phone = $line[12];
+                $fax = $line[13];
+                $debit = intval($line[14]);
+                $datev = intval($line[15]);
+                $accountName = convSet($line[16]);
+                $taxNum = $line[17];
+                $taxArea = convSet($line[18]);
+                $uid = $line[19];
+                $customerGroup = $line[20];
+                $creditLimit = floatval($line[21]);
+                $faktura = empty(trim($line[22])) ? '0000-00-00 00:00:00' : $line[22];
+                $karenztage = intval($line[23]);
+                $warn1 = floatval($line[24]);
+                $warn2 = floatval($line[25]);
+                $warn3 = floatval($line[26]);
+                $stmt_client_detail->execute();
+                $i++;
+            }
+            $stmt_client->close();
+            $stmt_client_detail->close();
+        } elseif(isset($_POST['uploadArticles'])){
+            $stmt = $conn->prepare("INSERT INTO articles(name, description, price, unit, cash, purchase, taxID) VALUES(?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssdssdi", $name, $descr, $price, $unit, $cash, $purchase, $taxID);
+            fgetcsv($file); //skip 1st line
+            while(($line= fgetcsv($file, 0, ';')) !== false){
+                if(empty($line)) continue;
+                $name = convSet($line[0]);
+                $descr = convSet($line[1]);
+                $price = floatval($line[2]);
+                $unit = convSet($line[3]);
+                $cash = $line[4];
+                $purchase = floatval($line[5]);
+                $taxID = intval($line[6]);
+                if($name && $price){
+                    $i++;
+                    $stmt->execute();
+                }
+            }
+            $stmt->close();
         } else {
-          echo $conn->error .' err1<br>';
-          echo $stmt_client->error .' err2<br>';
-          echo $stmt_client_detail->error .' err3<br>';
+            echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPECTED'].'</div>';
         }
-        fgetcsv($file); //skip 1st line
-        while(($line = fgetcsv($file, 0, ";")) !== false){
-          if(empty($line)) continue;
-          if(empty($line[0])) continue;
-          $name = convSet($line[0]);
-          $num = $line[1];
-          $res = $conn->query("SELECT id FROM clientData WHERE clientNumber = '$num' AND isSupplier = '$isSupplier' "); echo $conn->error;
-          if($res && $res->num_rows > 0){
-            $row = $res->fetch_assoc();
-            $clientID = $row['id'];
-            $conn->query("UPDATE clientData SET name = '$name' WHERE id = $clientID"); echo $conn->error;
-            $conn->query("DELETE FROM clientInfoData WHERE clientID = $clientID"); echo $conn->error;
-          } else {
-            $stmt_client->execute();
-            $clientID = $conn->insert_id;
-          }
-          $firstname = convSet($line[2]);
-          $lastname = convSet($line[3]);
-          $title = convSet($line[4]);
-          $nameAddition = convSet($line[5]);
-          $gender = in_array($line[6], array('male', 'female')) ? $line[6] : 'male';
-          $street = convSet($line[7]);
-          $postal = $line[8];
-          $city = convSet($line[9]);
-          $country = convSet($line[10]);
-          $addressAddition = convSet($line[11]);
-          $phone = $line[12];
-          $fax = $line[13];
-          $debit = intval($line[14]);
-          $datev = intval($line[15]);
-          $accountName = convSet($line[16]);
-          $taxNum = $line[17];
-          $taxArea = convSet($line[18]);
-          $uid = $line[19];
-          $customerGroup = $line[20];
-          $creditLimit = floatval($line[21]);
-          $faktura = empty(trim($line[22])) ? '0000-00-00 00:00:00' : $line[22];
-          $karenztage = intval($line[23]);
-          $warn1 = floatval($line[24]);
-          $warn2 = floatval($line[25]);
-          $warn3 = floatval($line[26]);
-          $stmt_client_detail->execute();
-          $i++;
+        if($conn->error){
+            echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+        } else {
+            echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$i.' '.$lang['OK_SAVE'].'</div>';
         }
-        $stmt_client->close();
-        $stmt_client_detail->close();
-      } elseif(isset($_POST['uploadArticles'])){
-        $stmt = $conn->prepare("INSERT INTO articles(name, description, price, unit, cash, purchase, taxID) VALUES(?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssdssdi", $name, $descr, $price, $unit, $cash, $purchase, $taxID);
-        fgetcsv($file); //skip 1st line
-        while(($line= fgetcsv($file, 0, ';')) !== false){
-          if(empty($line)) continue;
-          $name = convSet($line[0]);
-          $descr = convSet($line[1]);
-          $price = floatval($line[2]);
-          $unit = convSet($line[3]);
-          $cash = $line[4];
-          $purchase = floatval($line[5]);
-          $taxID = intval($line[6]);
-          if($name && $price){
-            $i++;
-            $stmt->execute();
-          }
-        }
-        $stmt->close();
-      } else {
-        echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPECTED'].'</div>';
-      }
-      if($conn->error){
-        echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
-      } else {
-        echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$i.' '.$lang['OK_SAVE'].'</div>';
-      }
     } else {
-      echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$error.'</div>';
+        echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$error.'</div>';
     }
-  }
+}
 
 } //end POST
 
@@ -1194,6 +1210,49 @@ $row = $result->fetch_assoc();
     </div>
   </div>
   <br>
+</div>
+<br>
+<div class="page-seperated-section">
+    <h4>Projekte Standardordner
+        <div class="page-header-button-group">
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-folder" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
+        </div>
+    </h4>
+    <div class="container-fluid">
+        <table class="table table-hover">
+            <thead><tr>
+                <th>Name</th>
+                <th></th>
+            </tr></thead>
+            <tbody>
+                <?php
+                $result = $conn->query("SELECT id, name FROM company_folders WHERE companyID = $cmpID");
+                while($result && ($row = $result->fetch_assoc())){
+                    echo '<tr>';
+                    echo '<td>'.$row['name'].'</td>';
+                    echo '<td><form method="POST"><button type="submit" class="btn btn-default" name="folder_delete" value="'.$row['id'].'"><i class="fa fa-trash-o"></i></button></form></td>';
+                    echo '</tr>';
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="add-folder" class="modal fade">
+        <div class="modal-dialog modal-content modal-sm">
+            <form method="POST">
+                <div class="modal-header h4">Neuer Ordner</div>
+                <div class="modal-body">
+                    <label>Name</label>
+                    <input type="text" name="add_folder_name" class="form-control" placeholder="Name..."/>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning"><?php echo $lang['ADD']; ?></button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <br><br>
