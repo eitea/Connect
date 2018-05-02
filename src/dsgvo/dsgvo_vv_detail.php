@@ -113,11 +113,15 @@ if(isset($settings['DESCRIPTION'])):
         $valID = $settings['DESCRIPTION']['valID'];
         if($valID){
             $stmt_update_setting->execute();
-            insertVVLog("UPDATE","Update description for Procedure Directory $vvID to '$setting'");
+            if($stmt_update_setting->affected_rows > 0){
+                $escaped_setting = test_input($setting);
+                insertVVLog("UPDATE","Update description for Procedure Directory $vvID to '$escaped_setting'");
+            }
         } else {
             $setID = $settings['DESCRIPTION']['id'];
             $stmt_insert_setting->execute();
-            insertVVLog("INSERT","Insert description for Procedure Directory $vvID as '$setting'");
+            $escaped_setting = test_input($setting);
+            insertVVLog("INSERT","Insert description for Procedure Directory $vvID as '$escaped_setting'");
         }
         if($conn->error){
             showError($conn->error);
@@ -165,11 +169,15 @@ if(isset($settings['DESCRIPTION'])):
                 $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
                 if($valID){
                     $stmt_update_setting->execute();
-                    insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$setting'");
+                    if($stmt_update_setting->affected_rows > 0){
+                        $escaped_setting = test_input($setting);                    
+                        insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$escaped_setting'");
+                    }
                 } else {
                     $setID = $val['id'];
                     $stmt_insert_setting->execute();
-                    insertVVLog("INSERT","Insert '$key' for Procedure Directory $vvID as '$setting'");
+                    $escaped_setting = test_input($setting);
+                    insertVVLog("INSERT","Insert '$key' for Procedure Directory $vvID as '$escaped_setting'");
                 }
             }
             echo '<div class="row">';
@@ -208,11 +216,15 @@ if(isset($settings['DESCRIPTION'])):
                             $valID = $val['valID'];
                             if($valID){
                                 $stmt_update_setting->execute();
-                                insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$setting'");
+                                if($stmt_update_setting->affected_rows > 0){
+                                    $escaped_setting = test_input($setting);
+                                    insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$escaped_setting'");
+                                }
                             } else {
                                 $setID = $val['id'];
                                 $stmt_insert_setting->execute();
-                                insertVVLog("INSERT","Insert '$key' for Procedure Directory $vvID as '$setting'");
+                                $escaped_setting = test_input($setting);
+                                insertVVLog("INSERT","Insert '$key' for Procedure Directory $vvID as '$escaped_setting'");
                             }
                         }
                         $arr = explode("|",$val['setting'],2);
@@ -248,15 +260,22 @@ function update_or_insert_extra (&$settings, $name){
     global $valID;
     global $setting_encrypt;
     global $setID;
+    global $vvID;
     if(isset($_POST[$name])){
         $settings[$name]['setting'] = $setting = strip_tags($_POST[$name]);
         $valID = $settings[$name]['valID'];
         $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
         if($valID){
             $stmt_update_setting->execute();
+            if($stmt_update_setting->affected_rows > 0){
+                $escaped_setting = test_input($setting);
+                insertVVLog("UPDATE","Update '$name' for Procedure Directory $vvID to '$escaped_setting'");
+            }
         }else{
             $setID = $settings[$name]['id'];
             $stmt_insert_setting->execute();
+            $escaped_setting = test_input($setting);
+            insertVVLog("INSERT","Insert '$name' for Procedure Directory $vvID as '$escaped_setting'");
         }
     }
 }
@@ -357,7 +376,8 @@ if(isset($settings['EXTRA_DOC'])){
                     $stmt = $stmt_insert_setting;
                 }
                 $stmt->execute();
-                insertVVLog("INSERT","Add new category '$setting' for Procedure Directory $vvID");
+                $escaped_setting = test_input($setting);                
+                insertVVLog("INSERT","Add new category '$escaped_setting' for Procedure Directory $vvID");
                 if($stmt->error){
                     showError($stmt->error);
                 } else {
@@ -415,18 +435,25 @@ if(isset($settings['EXTRA_DOC'])){
                                 $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
                                 if($valID){ //update to true if checked and exists
                                     $stmt_update_setting_matrix->execute();
-                                    insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$setting'");
+                                    if($stmt_update_setting_matrix->affected_rows > 0){
+                                        $escaped_setting = test_input($setting);            
+                                        insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$escaped_setting'");
+                                    }
                                 } else { //insert with true if checked and not exists
                                     $cat = '';
                                     $setID = $catVal['id'];
                                     $stmt_insert_setting_matrix->execute();
-                                    insertVVLog("INSERT","Insert '$key' for Procedure Directory $vvID as '$setting'");
+                                    $escaped_setting = test_input($setting);            
+                                    insertVVLog("INSERT","Insert '$key' for Procedure Directory $vvID as '$escaped_setting'");
                                 }
                             } elseif($valID && $catVal['setting']) { //set to false only if not checked, exists and saved as true (anything else is false anyways)
                                 $catVal['setting'] = $setting = '0';
                                 $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
                                 $stmt_update_setting_matrix->execute();
-                                insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$setting'");
+                                if($stmt_update_setting_matrix->affected_rows > 0){
+                                    $escaped_setting = test_input($setting);
+                                    insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$escaped_setting'");
+                                }
                             }
                         }
                         $fieldID ++;
@@ -447,12 +474,16 @@ if(isset($settings['EXTRA_DOC'])){
                                     if($j){
                                         $valID = $headVal['valID'][$j];
                                         $stmt_update_setting->execute();
-                                        insertVVLog("UPDATE","Update Value '$valID' for Procedure Directory $vvID to '$setting'");
+                                        if($stmt_update_setting->affected_rows > 0){
+                                            $escaped_setting = test_input($setting);            
+                                            insertVVLog("UPDATE","Update Value '$valID' for Procedure Directory $vvID to '$escaped_setting'");
+                                        }
                                     } else {
                                         $cat = $catKey;
                                         $setID = $headVal['id'];
                                         $stmt_insert_setting->execute();
-                                        insertVVLog("INSERT","Insert Value '$valID' for Procedure Directory $vvID as '$setting'");
+                                        $escaped_setting = test_input($setting);            
+                                        insertVVLog("INSERT","Insert Value '$valID' for Procedure Directory $vvID as '$escaped_setting'");
                                     }
                                 } elseif($j && $headVal['setting'][$j]){
                                     $valID = $headVal['valID'][$j];
@@ -460,7 +491,10 @@ if(isset($settings['EXTRA_DOC'])){
                                     $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
                                     $checked = '';
                                     $stmt_update_setting->execute();
-                                    insertVVLog("UPDATE","Update Value '$valID' for Procedure Directory $vvID to '$setting'");
+                                    if($stmt_update_setting->affected_rows > 0){
+                                        $escaped_setting = test_input($setting);            
+                                        insertVVLog("UPDATE","Update Value '$valID' for Procedure Directory $vvID to '$escaped_setting'");
+                                    }
                                     showError($stmt_update_setting->error);
                                 }
                             }

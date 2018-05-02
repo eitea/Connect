@@ -77,7 +77,7 @@ $("#copyToClipboardBtn").click(function(){
                 <input type="checkbox" name="replace_old" value="TRUE"> Alte Sets/Module/Fragen überschreiben
             </label>
         </div>
-        <textarea name="jsonImport" id="importArea" class="form-control" rows="10" placeholder="JSON data here" style="max-width:100%;min-width:100%;height:60vh;"></textarea>
+        <textarea name="jsonImport" id="importArea" class="form-control" rows="10" placeholder="JSON Text hier einfügen" style="max-width:100%;min-width:100%;height:60vh;"></textarea>
         <br><div id="jsonError"></div>
     </div>
     <div class="modal-footer">
