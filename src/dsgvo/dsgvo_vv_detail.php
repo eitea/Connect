@@ -299,7 +299,7 @@ if(isset($settings['EXTRA_DOC'])){
 <div class="col-md-12">
     <div class="panel panel-default">
         <div class="panel-heading">Auflistung der verarbeiteten Datenfelder und deren Übermittlung</div>
-        <div class="panel-body">
+        <div class="panel-body" style="overflow-x: auto;">
             <?php
             $str_heads = $space = $space_key = '';
             $heading = getSettings('APP_HEAD_%', true);
@@ -336,7 +336,7 @@ if(isset($settings['EXTRA_DOC'])){
                             $client = ' (an '.$result->fetch_assoc()["name"].') ';
                         }
                     }
-                    $str_heads .= '<th data-toggle="tooltip" data-container="body" data-placement="left" title="'.$tooltip.$client.'"><div class="btn-group"><button type="button" class="btn btn-link" data-toggle="dropdown">'.$val['setting'][0].'</button>
+                    $str_heads .= '<th style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;max-width:100px;" data-toggle="tooltip" data-container="body" data-placement="left" title="'.$val['setting'][0].': '.$tooltip.$client.'"><div class="btn-group"><button type="button" class="btn btn-link" data-toggle="dropdown">'.$val['setting'][0].'</button>
                     <ul class="dropdown-menu"><li><button type="submit" class="btn btn-link" name="delete_cat" value="'.$val['valID'][0].'">Löschen</button></li></ul></div></th>';
                 } else {
                     $space_key = !$space ? $key : $space_key;
@@ -475,7 +475,7 @@ if(isset($settings['EXTRA_DOC'])){
                  <?php
             }else{
                 ?>
-                Diese Firma hat keine Matrix in den Einstellungen. Zum Erstellen <a href='../system/data-matrix'>hier klicken</a>.
+                Diese Firma hat keine Matrix in den Einstellungen. Zum Erstellen <a href='../dsgvo/data-matrix'>hier klicken</a>.
                 <?php
             }
             ?>

@@ -134,7 +134,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <div class="panel panel-default">
             <div class="panel-heading">Auflistung der verarbeiteten Datenfelder und deren Übermittlung</div>
             <div class="panel-body">
-                Aus den <a href="../system/data-matrix"><?php echo $lang['DATA_MATRIX']; ?> Einstellungen</a> übernommen.
+                Aus den <a href="../dsgvo/data-matrix"><?php echo $lang['DATA_MATRIX']; ?> Einstellungen</a> übernommen.
             </div>
         </div>
     </div>

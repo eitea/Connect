@@ -217,8 +217,8 @@ foreach ($available_companies as $company) {
     $routesGER[] = array("name" => "Verfahrensverzeichnis ($name)", "url" => "../dsgvo/vv?n=$companyID", "tags" => array("DSGVO Verfahren", "VV"));
     $routesENG[] = array("name" => "Email Templates ($name)", "url" => "../dsgvo/templates?n=$companyID", "tags" => array("DSGVO Emails"));
     $routesGER[] = array("name" => "Email Vorlagen ($name)", "url" => "../dsgvo/templates?n=$companyID", "tags" => array("DSGVO Emails", "DSGVO Vorlagen"));
-    $routesENG[] = array("name" => "Data Matrix ($name)", "url" => "../system/data-matrix?n=$companyID", "tags" => array("DSGVO Data Matrix", "DSGVO Templates" ));
-    $routesGER[] = array("name" => "Datenmatrix ($name)", "url" => "../system/data-matrix?n=$companyID", "tags" => array("DSGVO Datenmatrix", "DSGVO Vorlagen"));
+    $routesENG[] = array("name" => "Data Matrix ($name)", "url" => "../dsgvo/data-matrix?n=$companyID", "tags" => array("DSGVO Data Matrix", "DSGVO Templates" ));
+    $routesGER[] = array("name" => "Datenmatrix ($name)", "url" => "../dsgvo/data-matrix?n=$companyID", "tags" => array("DSGVO Datenmatrix", "DSGVO Vorlagen"));
     $routesENG[] = array("name" => "Procedure Directory - Templates ($name)", "url" => "../dsgvo/vtemplates?n=$companyID", "tags" => array("DSGVO Procedure Templates"));
     $routesGER[] = array("name" => "Verfahrensverzeichnis - Templates ($name)", "url" => "../dsgvo/vtemplates?n=$companyID", "tags" => array("DSGVO Verfahrensverzeichnis Vorlagen"));
     $routesENG[] = array("name" => "Trainings ($name)", "url" => "../dsgvo/training?n=$companyID", "tags" => array("DSGVO Trainings"));
