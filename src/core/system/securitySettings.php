@@ -149,7 +149,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                             $stmt_access->execute();
                             echo $stmt_access->error;
                         }
-                        $encrypted_modules[$row['module']] = 'FALSE';
+                        $encrypted_modules[$row['module']] = 'FALSE'; //saves outDated value
                         showSuccess($module . ' was encrypted');
                     } else {
                         showError($stmt->error);
@@ -181,7 +181,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 //decrypt module user has access to
                 if($result && ($row = $result->fetch_assoc()) && array_key_exists($module, $encrypted_modules)){
                     $cipher_private_module = base64_decode($row['privateKey']);
-                    $result = $conn->query("SELECT publicPGPKey, symmetricKey FROM security_modules WHERE outDated = 'FALSE'");
+                    $result = $conn->query("SELECT publicPGPKey, symmetricKey FROM security_modules WHERE module = '$module' AND outDated = 'FALSE'");
                     if($result && ($row = $result->fetch_assoc())){
                         $public_module = base64_decode($row['publicPGPKey']);
                         $cipher_symmetric = base64_decode($row['symmetricKey']);

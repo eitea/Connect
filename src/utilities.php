@@ -135,15 +135,21 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
     if(!$symmetric && $userID && $privateKey){
         $result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND module = '$module' AND outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
         if($result && ( $row=$result->fetch_assoc() )){
+			//echo $row['privateKey'] .' --private access<br>';
             $cipher_private_module = base64_decode($row['privateKey']);
-            $result = $conn->query("SELECT publicPGPKey, symmetricKey FROM security_modules WHERE outDated = 'FALSE'");
+			//echo ($cipher_private_module) .' --private key module<br>';
+            $result = $conn->query("SELECT publicPGPKey, symmetricKey FROM security_modules WHERE module = '$module' AND outDated = 'FALSE'");
             if($result && ( $row=$result->fetch_assoc() )){
                 $public_module = base64_decode($row['publicPGPKey']);
                 $cipher_symmetric = base64_decode($row['symmetricKey']);
                 //decrypt access
                 $nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
                 $cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
+
+				//echo base64_encode($privateKey) .' --keypairsize : '.strlen($privateKey.$public_module ).'<br>';
+				//echo base64_encode($public_module);
                 $private_module = sodium_crypto_box_open($cipher_private_module, $nonce, $privateKey.$public_module);
+
                 //decrypt module
                 $nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
                 $cipher_symmetric = mb_substr($cipher_symmetric, 24, null, '8bit');

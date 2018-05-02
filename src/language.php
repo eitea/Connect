@@ -710,8 +710,8 @@ $lang_eng['INFO_ENCRYPTION'] = 'By encrypting your Data, only certain users with
                                 <br><label class="btn btn-sm btn-danger" >Warning</label> This feature is still in development and may not function properly. Generating a backup is recommended. Use with caution.';
 $lang_ger['INFO_ENCRYPTION'] = 'Durch die Verschlüsselung der sensiblen Daten werden explizite Lese-rechte vergeben. <br>
                                 Da jeder Schlüssel Rollen-spezifisch angepasst wird, stellen Sie vorher bitte sicher, dass jeder Benutzer die richtigen Zugriffsrechte besitzt.<br>
-                                <br><label class="btn btn-sm btn-danger" >Warnung</label> Dieses feature befindet sich noch in der Entwicklungphase und könnte daher unter Umständen nicht ordnungsgemäß funktionieren.
-                                Es wird empfohlen davor ein Backup zu generieren.';
+                                <br><span style="color:red">Dieses feature befindet sich noch in der Entwicklungphase und könnte daher unter Umständen nicht ordnungsgemäß funktionieren.
+                                Es wird empfohlen ein Backup zu machen.</span>';
 
 $lang_eng['INFO_EXPIRATION'] = 'Passwords with valid expiration settings will be invalid once the set timespan has expired. This timespan is defined in months. <br>
                                 Once a password has expired, the corresponding user will receive a notification with a warning. <br>
