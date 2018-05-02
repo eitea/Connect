@@ -186,9 +186,9 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
 }
 
 function mc_status($module = ''){
+	global $conn;
     static $encrypt = null;
     if($encrypt === null){
-        global $conn;
         $encrypt = false;
         $result = $conn->query("SELECT activeEncryption FROM configurationData WHERE activeEncryption = 'TRUE'");
         if($result && $result->num_rows) $encrypt = true;
