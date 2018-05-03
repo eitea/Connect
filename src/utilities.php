@@ -189,8 +189,8 @@ function mc_status($module = ''){
         $result = $conn->query("SELECT activeEncryption FROM configurationData WHERE activeEncryption = 'TRUE'");
         if($result && $result->num_rows) $encrypt = true;
     }
-	$active_icon = '<i class="fa fa-lock text-success" aria-hidden="true" title="Encryption Aktiv"></i>';
-	$inactive_icon = '<i class="fa fa-unlock text-danger" aria-hidden="true" title="Encryption Inaktiv"></i>';
+	$active_icon = '<i class="fa fa-lock text-success" aria-hidden="true" title="Encryption Aktiv. Verwendeter Schlüssel: '.$module.'"></i>';
+	$inactive_icon = '<i class="fa fa-unlock text-danger" aria-hidden="true" title="Encryption Inaktiv. Vorbereiteter Schlüssel: '.$module.'"></i>';
 	if($encrypt){
 		if($module){
 			$result = $conn->query("SELECT id FROM security_modules WHERE module = '$module' AND outDated = 'FALSE'");
