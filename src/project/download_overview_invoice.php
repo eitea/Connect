@@ -128,7 +128,7 @@ while($result && ($row = $result->fetch_assoc())){
     $pdf->MultiColCell($w[1],$h, date('d.m.Y', $A));
     $pdf->Cell($w[2],$h, sprintf('%.2f', $projectTime), 0, '', 'R');
 
-    $sum += $projectTime;
+    $sum += $projectTime; //5aeaefea49a8c
     $y[] = $pdf->MultiColCell($w[3],$h,iconv('UTF-8', 'windows-1252', $projectText));
 
     $pdf->Ln();
