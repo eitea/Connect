@@ -2707,9 +2707,40 @@ if($row['version'] < 152){
     }
 }
 
-// if($row['version'] < 153)
-// if($row['version'] < 154)
-// if($row['version'] < 155)
+if($row['version'] < 153){
+	$conn->query("CREATE TABLE security_users(
+		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		userID INT(6) UNSIGNED,
+		publicKey VARCHAR(150) NOT NULL,
+		privateKey VARCHAR(150) NOT NULL,
+		recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+		FOREIGN KEY (userID) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+	)");
+	if($conn->error){
+        echo $conn->error;
+    } else {
+		$conn->query("INSERT INTO security_users (userID, publicKey, privateKey) SELECT id, publicPGPKey, privatePGPKey FROM UserData WHERE publicPGPKey IS NOT NULL"); echo $conn->error;
+		$conn->query("ALTER TABLE UserData DROP COLUMN publicPGPKey");echo $conn->error;
+		$conn->query("ALTER TABLE UserData DROP COLUMN privatePGPKey");echo $conn->error;
+        echo '<br>Security: Users';
+    }
+
+	$conn->query("INSERT INTO security_access(userID, module, optionalID, privateKey) SELECT userID, 'COMPANY', companyID, privateKey FROM security_company");
+	$conn->query("DELETE FROM security_company");
+	$conn->query("ALTER TABLE security_company ADD COLUMN publicKey VARCHAR(150) NOT NULL");
+	$conn->query("ALTER TABLE security_company ADD COLUMN symmetricKey VARCHAR(150) NOT NULL");
+	$conn->query("ALTER TABLE security_company DROP COLUMN privateKey");
+	$conn->query("ALTER TABLE security_company DROP FOREIGN KEY security_company_ibfk_1");
+	$conn->query("ALTER TABLE security_company DROP COLUMN userID");
+
+	$conn->query("ALTER TABLE companyData DROP COLUMN publicPGPKey");
+
+}
+// if($row['version'] < 154){}
+// if($row['version'] < 155){}
 
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';

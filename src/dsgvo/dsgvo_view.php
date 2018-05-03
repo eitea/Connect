@@ -265,7 +265,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             echo '<button type="button" name="setSelect" value="' . $row['id'] . '" data-toggle="modal" data-target="#send-as-mail" class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';
             echo '</form></td>';
             echo '</tr>';
-            $doc_selects .= '<option value="' . $row['id'] . '" >' . $row['name'] .' - '. $row['version']. '</option>';
+			//5ae9c3361c57c
+            $doc_selects .= '<option value="' . $row['id'] . '" >' . secure_data('DSGVO', $row['name'], 'decrypt')  .' - '. $row['version']. '</option>';
         }
         ?>
     </tbody>
@@ -288,7 +289,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $res = $conn->query("SELECT id, name FROM clientData WHERE companyID = $cmpID");
                             if ($res && $res->num_rows > 1) {echo '<option value="0">...</option>';}
                             while ($res && ($row_fc = $res->fetch_assoc())) {
-                                echo "<option value='" . $row_fc['id'] . "' >" . $row_fc['name'] . "</option>";
+                                echo "<option value='" . $row_fc['id'] . "' >" . $row_fc['name']. "</option>";
                                 $filterClient = $row['id'];
                             }
                             ?>

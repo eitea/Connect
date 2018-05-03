@@ -37,8 +37,6 @@ function create_tables($conn) {
         forcedPwdChange TINYINT(1) NOT NULL DEFAULT 0,
         erpOption VARCHAR(10) DEFAULT 'TRUE',
         strikeCount INT(3) DEFAULT 0,
-        publicPGPKey VARCHAR(150) NULL,
-        privatePGPKey VARCHAR(150) NULL,
         birthday DATE,
         displayBirthday ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
         companyID INT(6) UNSIGNED,
@@ -91,8 +89,7 @@ function create_tables($conn) {
         detailMiddle VARCHAR(120),
         detailRight VARCHAR(120),
         uid VARCHAR(20),
-        istVersteuerer ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        publicPGPKey VARCHAR(150)
+        istVersteuerer ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -1635,14 +1632,11 @@ function create_tables($conn) {
 
     $sql = "CREATE TABLE security_company(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        userID INT(6) UNSIGNED,
         companyID INT(6) UNSIGNED NOT NULL,
-        privateKey VARCHAR(150) NOT NULL,
+		publicKey VARCHAR(150) NOT NULL,
+		symmetricKey VARCHAR(150) NOT NULL,
         recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        FOREIGN KEY (userID) REFERENCES UserData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
         FOREIGN KEY (companyID) REFERENCES companyData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -1797,6 +1791,21 @@ function create_tables($conn) {
         sent DATETIME DEFAULT CURRENT_TIMESTAMP
     )";
     if (!$conn->query($sql)) {
+        echo $conn->error;
+    }
+
+	$sql = "CREATE TABLE security_users(
+		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		userID INT(6) UNSIGNED,
+		publicKey VARCHAR(150) NOT NULL,
+		privateKey VARCHAR(150) NOT NULL,
+		recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+		FOREIGN KEY (userID) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+	)";
+	if (!$conn->query($sql)) {
         echo $conn->error;
     }
 }

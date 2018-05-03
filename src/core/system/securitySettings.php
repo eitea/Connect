@@ -120,20 +120,31 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
 
     if(isset($_POST['saveSecurity'])){
+		if(isset($_POST['company'])){
+			$result = $conn->query("SELECT id FROM companyData");
+			while($row = $result->fetch_assoc()){
+				//just completely delete the relationship from table to avoid duplicate entries.
+				$conn->query("DELETE FROM $companyToUserRelationshipTable WHERE userID = $x AND companyID = " . $row['id']);
+				if(in_array($row['id'], $_POST['company'])){  //if company is checked, insert again
+					$conn->query("INSERT INTO $companyToUserRelationshipTable (companyID, userID) VALUES (".$row['id'].", $x)");
+				}
+			}
+		}
         if(isset($_POST['activate_encryption']) && $config_row['activeEncryption'] == 'FALSE'){
             $key_downloads = array();
             $result = $conn->query("SELECT id FROM companyData"); echo $conn->error;
             if(!$result) $accept = false;
             while($result && ($row = $result->fetch_assoc())){
-                $companyID = $row['id'];
-                $keyPair = sodium_crypto_box_keypair();
+				$keyPair = sodium_crypto_box_keypair();
                 $private = sodium_crypto_box_secretkey($keyPair);
                 $public = sodium_crypto_box_publickey($keyPair);
                 $key_downloads[] = base64_encode($private)." \n".base64_encode($public);
-                $conn->query("UPDATE companyData SET publicPGPKey = '".base64_encode($public)."' WHERE id = $companyID"); echo $conn->error;
+				$symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
+				$symmetric_encrypted = $nonce . sodium_crypto_box($symmetric, $nonce, $private.$public);
+                $conn->query("INSERT INTO security_company (companyID, publicKey, symmetricKey) VALUES (".$row['id'].", '".base64_encode($public)."', '".base64_encode($symmetric_encrypted)."') ");
                 $nonce = random_bytes(24);
                 $encrypted = $nonce . sodium_crypto_box($private, $nonce, $private.base64_decode($publicKey));
-                $conn->query("INSERT INTO security_company(userID, companyID, privateKey) VALUES ($userID, 1, '".base64_encode($encrypted)."')"); echo $conn->error;
+                $conn->query("INSERT INTO security_access(userID, module, optionalID, privateKey) VALUES ($userID, 'COMPANY',".$row['id']." , '".base64_encode($encrypted)."')");
                 if($conn->error) $accept = false;
             }
         }
@@ -339,6 +350,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
 }
 
+$selection_company  = '';
+$result = $conn->query("SELECT id, name FROM companyData");
+while($row = $result->fetch_assoc()){
+    $selection_company .= '<div class="col-md-3"><label><input type="checkbox" name="company[]" value="'.$row['id'].'" />' . $row['name'] .'</label><br></div>';
+}
+
+$stmt_company_relationship = $conn->prepare("SELECT companyID FROM relationship_company_client WHERE userID = ?");
+$stmt_company_relationship->bind_param('i', $x);
+
 if(!empty($key_downloads)){
     echo '<form method="POST" target="_blank" action="../setup/keys">';
     foreach($key_downloads as $dKey){
@@ -390,6 +410,22 @@ if(!empty($key_downloads)){
             <div id="collapse<?php echo $x; ?>" class="panel-collapse collapse <?php if($x == $activeTab) echo 'in'; ?>">
                 <div class="panel-body">
                     <form method="POST">
+						<h4><?php echo $lang['COMPANIES']; ?>:</h4>
+						<div class="row checkbox">
+							<?php
+							$selection_company_checked = $selection_company;
+							$stmt_company_relationship->execute();
+							$result_relation = $stmt_company_relationship->get_result();
+							while($row_relation = $result_relation->fetch_assoc()){
+								$needle = 'value="'.$row_relation['companyID'].'"';
+								if(strpos($selection_company_checked, $needle) !== false){
+									$selection_company_checked = str_replace($needle, $needle.' checked ', $selection_company_checked);
+								}
+							}
+							echo $selection_company_checked;
+							?>
+							<div class="col-md-12"><small>*<?php echo $lang['INFO_COMPANYLESS_USERS']; ?></small></div>
+						</div>
                         <h4><?php echo $lang['ADMIN_MODULES']; ?></h4>
                         <div class="row checkbox">
                             <div class="col-md-3">

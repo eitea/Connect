@@ -29,21 +29,23 @@ if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['a
             $content_personal = $private." \n".base64_encode($admin_public);
             $private_encrypt = simple_encryption($private, $_POST['encryption_pass']);
             $_SESSION['privateKey'] = $private;
-            $conn->query("UPDATE UserData SET psw = '$hash', publicPGPKey = '".base64_encode($admin_public)."', privatePGPKey = '".$private_encrypt."'  WHERE id = $userID");
+            $conn->query("UPDATE UserData SET psw = '$hash' WHERE id = $userID");
+			$conn->query("INSERT INTO security_users (userID, publicKey, privateKey) VALUES ($userID, '".base64_encode($admin_public)."', '".$private_encrypt."')");
             if($conn->error) $accept = false;
 
             //company PAIR
             $result = $conn->query("SELECT id FROM companyData LIMIT 1");
             if($accept && $result && ($row = $result->fetch_assoc())){
-                $companyID = $row['id'];
                 $keyPair = sodium_crypto_box_keypair();
                 $private = sodium_crypto_box_secretkey($keyPair);
                 $public = sodium_crypto_box_publickey($keyPair);
                 $content_company = base64_encode($private)." \n".base64_encode($public);
-                $conn->query("UPDATE companyData SET publicPGPKey = '".base64_encode($public)."' WHERE id = $companyID");
+				$symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
+				$symmetric_encrypted = $nonce . sodium_crypto_box($symmetric, $nonce, $private.$public);
+                $conn->query("INSERT INTO security_company (companyID, publicKey, symmetricKey) VALUES (".$row['id'].", '".base64_encode($public)."', '".base64_encode($symmetric_encrypted)."') ");
                 $nonce = random_bytes(24);
                 $private_encrypt = $nonce . sodium_crypto_box($private, $nonce, $private.$admin_public);
-                $conn->query("INSERT INTO security_company(userID, companyID, privateKey) VALUES ($userID, 1, '".base64_encode($private_encrypt)."')");
+                $conn->query("INSERT INTO security_access(userID, module, optionalID, privateKey) VALUES ($userID, 'COMPANY',".$row['id']." , '".base64_encode($private_encrypt)."')"); //5ae9e3e1e84e5
                 if($conn->error) $accept = false;
             } else {
                 $err .= $conn->error;

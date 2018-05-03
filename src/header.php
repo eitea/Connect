@@ -6,6 +6,7 @@ if (empty($_SESSION['userid'])) {
 $userID = $_SESSION['userid'];
 $timeToUTC = $_SESSION['timeToUTC'];
 $privateKey = $_SESSION['privateKey'];
+$publicKey = $_SESSION['publicPKey'];
 
 $setActiveLink = 'class="active-link"';
 $unlockedPGP = '';
@@ -48,10 +49,9 @@ if ($userID == 1) { //superuser
 if($isERPAdmin == 'TRUE'){
     $canEditClients = $canEditSuppliers = 'TRUE';
 }
-$result = $conn->query("SELECT psw, lastPswChange, forcedPwdChange, publicPGPKey, birthday, displayBirthday FROM UserData WHERE id = $userID");
+$result = $conn->query("SELECT psw, lastPswChange, forcedPwdChange, birthday, displayBirthday FROM UserData WHERE id = $userID");
 if($result && ($userdata = $result->fetch_assoc())) {
     $userPasswordHash = $userdata['psw'];
-    $publicKey = $userdata['publicPGPKey'];
 } else {
     echo $conn->error;
 }
@@ -219,7 +219,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if(strcmp($password, $_POST['passwordConfirm']) == 0 && match_passwordpolicy($password, $output)){
             $userPasswordHash = password_hash($password, PASSWORD_BCRYPT);
             $private_encrypted = simple_encryption($privateKey, $password);
-            $conn->query("UPDATE UserData SET psw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP, privatePGPKey = '$private_encrypted', forcedPwdChange = 0 WHERE id = '$userID';");
+            $conn->query("UPDATE UserData SET psw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP, forcedPwdChange = 0 WHERE id = '$userID';");
+			$conn->query("UPDATE security_users SET privateKey = '$private_encrypted' WHERE outDated = 'FALSE' AND userID = $userID");
             if(!$conn->error){
                 $validation_output = showSuccess('Password successfully changed.', 1);
 				$userdata['forcedPwdChange'] = false;
@@ -752,7 +753,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             url: 'ajaxQuery/AJAX_postGetAlerts.php',
                             type: 'GET',
                             success: function (response) {
-                                if(response != "0"){                                    
+                                if(response != "0"){
                                     $(target).html(response)
                                     $(target).show()
                                 }else {

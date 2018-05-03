@@ -68,7 +68,8 @@ FROM contactPersons LEFT JOIN position ON position.id = position LEFT JOIN exter
                             <h3><?php echo $lang['PROJECTS']; ?>
                               <div class="page-header-button-group">
                                   <button type="submit" class="btn btn-default" name='delete_projects' title="<?php echo $lang['DELETE']; ?>" ><i class="fa fa-trash-o"></i></button>
-                                  <button type="button" class="btn btn-default" title="<?php echo $lang['ADD']; ?>" data-toggle="modal" data-target=".add-project"><i class="fa fa-plus"></i></button>
+
+								  <a type="button" class="btn btn-default" href="../project/view?custID=<?php echo $x; //5ad46a0e150ec ?>" title="Bearbeiten"><i class="fa fa-pencil"></i></a>
                               </div>
                             </h3>
                             <hr>
@@ -79,7 +80,6 @@ FROM contactPersons LEFT JOIN position ON position.id = position LEFT JOIN exter
                                     <th><?php echo $lang['ADDITIONAL_FIELDS']; ?></th>
                                     <th><?php echo $lang['HOURS']; ?></th>
                                     <th><?php echo $lang['HOURLY_RATE']; ?></th>
-                                    <th></th>
                                 </thead>
                                 <tbody>
                                     <?php
@@ -112,8 +112,6 @@ FROM contactPersons LEFT JOIN position ON position.id = position LEFT JOIN exter
                                         echo '</td>';
                                         echo '<td>' . $row_p['hours'] . '</td>';
                                         echo '<td>' . $row_p['hourlyPrice'] . '</td>';
-                                        //5ad46a0e150ec
-                                        echo '<td><a type="button" class="btn btn-default" href="../project/detail?p='.$row_p['id'].'" title="Bearbeiten"><i class="fa fa-pencil"></i></a></td>';
                                         echo '</tr>';
                                     }
                                     ?>

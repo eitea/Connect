@@ -152,25 +152,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               $psw = password_hash($password, PASSWORD_BCRYPT);
               if($x == $userID){
                   $private_encrypt = simple_encryption($privateKey, $_POST['password']);
-                  $conn->query("UPDATE UserData SET psw = '$psw', lastPswChange = UTC_TIMESTAMP, privatePGPKey = '$private_encrypted' WHERE id = '$userID'");
+				  $conn->query("UPDATE security_users SET privateKey = '$private_encrypted' WHERE userID = $userID AND outDated = 'FALSE'");
+                  $conn->query("UPDATE UserData SET psw = '$psw', lastPswChange = UTC_TIMESTAMP WHERE id = '$userID'");
               } else {
-                  //TODO: if encryption is active, check if $userID can give access to all modules this user as (outDated == TRUE). if one is missing, cancel operation.
+				  //hard reset. user will loose ability to decrypt his access with this
                   $keyPair = sodium_crypto_box_keypair();
                   $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
                   $user_public = sodium_crypto_box_publickey($keyPair);
 
                   $private_encrypt = simple_encryption($private, $_POST['encryption_pass']);
-                  $conn->query("UPDATE UserData SET psw = '$psw', lastPswChange = UTC_TIMESTAMP, forcePwdChange = 1, publicPGPKey = '".base64_encode($user_public)."', privatePGPKey = '$private_encrypt' WHERE id = '$x';");
-                  //give user a new key pair.
-                  /*
-                  //cannot re-encrypt keys, nor give access the admin doesnt have.
-                  $result = $conn->query("SELECT id, privateKey, publicPGPKey FROM security_company LEFT JOIN companyData ON companyData.id = security_company.companyID WHERE userID = $x");
-                  while($result && ($row = $result->fetch_assoc())){
-                  }
-                  $result = $conn->query("SELECT id, privateKey FROM security_access WHERE userID = $x");
-                  while($result && ($row = $result->fetch_assoc())){
-                  }
-                  */
+                  $conn->query("UPDATE UserData SET psw = '$psw', lastPswChange = UTC_TIMESTAMP, forcePwdChange = 1 WHERE id = '$x';");
+				  $conn->query("UPDATE security_users SET outDated = 'TRUE' WHERE userID = $x");
+				  $conn->query("INSERT INTO security_users (userID, publicKey, privateKey) VALUES ( $x, '".base64_encode($user_public)."', '$private_encrypt' )");
               }
           } else {
               echo '<div class="alert alert-danger fade in">';
@@ -183,17 +176,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     //update latest interval
     $conn->query("UPDATE $intervalTable SET mon='$mon', tue='$tue', wed='$wed', thu='$thu', fri='$fri', sat='$sat', sun='$sun', vacPerYear='$vacDaysPerYear',
         overTimeLump='$overTimeAll', pauseAfterHours='$pauseAfter', hoursOfRest='$rest' WHERE userID = $x AND endDate IS NULL");
-
-    if(isset($_POST['company'])){
-        $result = $conn->query("SELECT id FROM companyData");
-        while($row = $result->fetch_assoc()){
-            //just completely delete the relationship from table to avoid duplicate entries.
-            $conn->query("DELETE FROM $companyToUserRelationshipTable WHERE userID = $x AND companyID = " . $row['id']);
-            if(in_array($row['id'], $_POST['company'])){  //if company is checked, insert again
-                $conn->query("INSERT INTO $companyToUserRelationshipTable (companyID, userID) VALUES (".$row['id'].", $x)");
-            }
-        }
-    }
 
     echo mysqli_error($conn);
     if($userID == $x){
@@ -219,10 +201,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
 } //end POST
 
-$selection_main_company = $selection_company = '';
+$selection_main_company = '';
 $result = $conn->query("SELECT id, name FROM companyData");
 while($row = $result->fetch_assoc()){
-    $selection_company .= '<div class="col-md-3"><label><input type="checkbox" name="company[]" value="'.$row['id'].'" />' . $row['name'] .'</label><br></div>';
     $selection_main_company .= '<option value="'.$row['id'].'">' . $row['name'] .'</option>';
 }
 $stmt_company_relationship = $conn->prepare("SELECT companyID FROM relationship_company_client WHERE userID = ?");
@@ -278,39 +259,43 @@ $stmt_company_relationship->bind_param('i', $x);
             </form>
 
             <form method="POST">
-              <div class="container-fluid">
-                <div class="form-group">
-                  <div class="input-group">
-                    <span class="input-group-addon" style="min-width:150px"><?php echo $lang['FIRSTNAME'] ?></span>
-                    <input type="text" class="form-control" name="firstname" value="<?php echo $row['firstname']; ?>">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <div class="input-group">
-                    <span class="input-group-addon" style="min-width:150px"><?php echo $lang['LASTNAME'] ?></span>
-                    <input type="text" class="form-control" name="lastname" value="<?php echo $row['lastname']; ?>">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <div class="input-group">
-                    <span class="input-group-addon" style="min-width:150px">Login E-Mail</span>
-                    <input type="text" class="form-control" name="email" value="<?php echo explode('@', $row['email'])[0]; ?>"/>
-                    <span class="input-group-addon" style="min-width:150px">@<?php echo explode('@', $row['email'])[1]; ?></span>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <div class="input-group">
-                    <span class="input-group-addon" style=min-width:150px><?php echo $lang['NEW_PASSWORD']; ?></span>
-                    <input type="password" class="form-control" name="password" placeholder="* * * *">
-                  </div>
-                </div>
-                <div class="form-group">
-                  <div class="input-group">
-                    <span class="input-group-addon" style="min-width:150px"><?php echo $lang['NEW_PASSWORD_CONFIRM']; ?></span>
-                    <input type="password" class="form-control" name="passwordConfirm" placeholder="* * * *">
-                  </div>
-                </div>
-              </div>
+				<div class="container-fluid">
+					<div class="form-group">
+						<div class="input-group">
+							<span class="input-group-addon" style="min-width:150px"><?php echo $lang['FIRSTNAME'] ?></span>
+							<input type="text" class="form-control" name="firstname" value="<?php echo $row['firstname']; ?>">
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="input-group">
+							<span class="input-group-addon" style="min-width:150px"><?php echo $lang['LASTNAME'] ?></span>
+							<input type="text" class="form-control" name="lastname" value="<?php echo $row['lastname']; ?>">
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="input-group">
+							<span class="input-group-addon" style="min-width:150px">Login E-Mail</span>
+							<input type="text" class="form-control" name="email" value="<?php echo explode('@', $row['email'])[0]; ?>"/>
+							<span class="input-group-addon" style="min-width:150px">@<?php echo explode('@', $row['email'])[1]; ?></span>
+						</div>
+					</div>
+				</div>
+				<div class="row form-group">
+					<div class="col-md-6">
+						<div class="input-group">
+							<span class="input-group-addon" style="min-width:150px"><?php echo $lang['NEW_PASSWORD']; ?></span>
+							<input type="password" class="form-control" name="password" placeholder="* * * *">
+						</div>
+						<small>Achtung: Benutzer verliert dadurch jeden seiner Zugriffe.</small>
+					</div>
+					<div class="col-md-6">
+						<div class="input-group">
+							<span class="input-group-addon" style="min-width:150px"><?php echo $lang['NEW_PASSWORD_CONFIRM']; ?></span>
+							<input type="password" class="form-control" name="passwordConfirm" placeholder="* * * *">
+						</div>
+						<small>Zwingt den Benutzer beim 1. Login sein Passwort ändern zu müssen.</small>
+					</div>
+				</div>
               <div class="row">
                   <div class="col-md-2">
                     <?php echo $lang['GENDER']; ?>:
@@ -380,23 +365,7 @@ $stmt_company_relationship->bind_param('i', $x);
                   <input type="text" class="form-control datepicker" name="exitDate" value="<?php echo substr($row['exitDate'],0,10); ?>"/>
                 </div>
               </div>
-              <!-- ROLES MOVED TO SECURITY -->
-              <div class="row">
-                  <div class="col-md-12"><?php echo $lang['COMPANIES']; ?>:</div>
-                    <?php
-                    $selection_company_checked = $selection_company;
-                    $stmt_company_relationship->execute();
-                    $result_relation = $stmt_company_relationship->get_result();
-                    while($row_relation = $result_relation->fetch_assoc()){
-                        $needle = 'value="'.$row_relation['companyID'].'"';
-                        if(strpos($selection_company_checked, $needle) !== false){
-                            $selection_company_checked = str_replace($needle, $needle.' checked ', $selection_company_checked);
-                        }
-                    }
-                    echo $selection_company_checked;
-                    ?>
-                <div class="col-md-12"><small>*<?php echo $lang['INFO_COMPANYLESS_USERS']; ?></small></div>
-              </div>
+              <!-- ROLES AND COMPANY MOVED TO SECURITY -->
               <!-- Interval table -->
               <div class="container-fluid well">
                 <div class="row">
