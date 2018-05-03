@@ -1,6 +1,9 @@
 <?php
 require dirname(__DIR__).DIRECTORY_SEPARATOR.'header.php';
 
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0); //set_filter requirement
+$bucket = $identifier .'-uploads'; //no uppercase, no underscores, no ending dashes, no adjacent special chars
+
 if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
     $filterings['client'] = test_input($_GET['custID']);
 }
@@ -62,8 +65,7 @@ if($isProjectAdmin == 'TRUE' && $_SERVER['REQUEST_METHOD'] == 'POST'){
 
 require dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.'aws'.DIRECTORY_SEPARATOR.'autoload.php';
 
-$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0); //set_filter requirement
-$bucket = $identifier .'-uploads'; //no uppercase, no underscores, no ending dashes, no adjacent special chars
+
 
 $result = $conn->query("SELECT endpoint, awskey, secret FROM archiveconfig WHERE isActive = 'TRUE' LIMIT 1");
 if($result && ($row = $result->fetch_assoc())){
