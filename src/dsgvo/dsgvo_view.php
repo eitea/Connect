@@ -255,7 +255,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $row['version'] .= ' <small>(Basis)</small>';
             }
             echo "<tr $style>";
-            echo '<td>' .mc_status(). secure_data('DSGVO', $row['name'], 'decrypt', $userID, $privateKey, $err) . '</td>';
+            echo '<td>' .mc_status('DSGVO'). secure_data('DSGVO', $row['name'], 'decrypt', $userID, $privateKey, $err) . '</td>';
             //echo $err;
             echo '<td>' . $row['version'] . '</td>';
             echo '<td><form method="POST">';
@@ -335,7 +335,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="modal-dialog modal-content modal-md">
             <div class="modal-header h4"><?php echo $lang['ADD']; ?></div>
             <div class="modal-body">
-                <label>Name <?php echo mc_status(); ?> </label>
+                <label>Name <?php echo mc_status('DSGVO'); ?> </label>
                 <input type="text" class="form-control" name="add_docName" />
             </div>
             <div class="modal-footer">

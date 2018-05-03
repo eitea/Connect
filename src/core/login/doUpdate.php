@@ -1961,12 +1961,6 @@ if ($row['version'] < 136) {
     }
 }
 if($row['version'] < 137){
-    $sql = "ALTER TABLE roles ADD canUseArchive ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL";
-    if (!$conn->query($sql)) {
-        echo $conn->error;
-    } else {
-        echo '<br>Archive User Module';
-    }
     $sql = "ALTER TABLE archiveconfig ADD name VARCHAR(30) NOT NULL DEFAULT 'NO_NAME'";
     if (!$conn->query($sql)) {
         echo $conn->error;
@@ -2456,7 +2450,7 @@ if($row['version'] < 146){
         name VARCHAR(120) NOT NULL,
         parent_directory VARCHAR(120) NOT NULL DEFAULT 'ROOT',
         type VARCHAR(10) NOT NULL,
-        content TEXT,
+        uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (projectID) REFERENCES projectData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -2614,9 +2608,23 @@ if($row['version'] < 151){
     $conn->query("ALTER TABLE UserData ADD COLUMN lastLogin DATETIME DEFAULT NULL"); //5ac7126421a8b
 }
 
-$conn->query("ALTER TABLE security_projects DROP COLUMN privateKey");
-
 if($row['version'] < 152){
+	$conn->query("ALTER TABLE security_projects DROP COLUMN privateKey");
+	//security_company -> build security_modules
+	//security_access -> build access to company
+
+	//same with User Access
+
+	$sql = "ALTER TABLE roles ADD canUseArchive ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL";
+	if (!$conn->query($sql)) {
+		echo $conn->error;
+	} else {
+		echo '<br>Archive User Module';
+	}
+
+}
+
+if($row['version'] < 153){
     $sql = "ALTER TABLE dsgvo_training_questions CHANGE `text` `text` MEDIUMTEXT";
     if (!$conn->query($sql)) {
         echo $conn->error;
@@ -2703,8 +2711,11 @@ if($row['version'] < 152){
         $conn->query("UPDATE erp_settings SET supplierStep = '1'");
         echo $conn->error;
     }
-
 }
+
+// if($row['version'] < 153)
+// if($row['version'] < 154)
+// if($row['version'] < 155)
 
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';

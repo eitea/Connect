@@ -286,11 +286,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 } else {
                     $tags = '';
                 }
-                if ($end == "number") {
-                    $end = $_POST["endnumber"] ?? "";
-                } elseif ($end == "date") {
-                    $end = $_POST["enddate"] ?? "";
-                }
+                // if ($end == "number") {
+                //     $end = $_POST["endnumber"] ?? "";
+                // } elseif ($end == "date") {
+                //     $end = $_POST["enddate"] ?? "";
+                // }
                 $series = $_POST["series"] ?? "once";
                 $series = new ProjectSeries($series, $start, $end);
                 $series->daily_days = (int) $_POST["daily_days"] ?? 1;
@@ -309,6 +309,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $nextDate = $series->get_next_date();
                 $series = base64_encode(serialize($series));
                 // PROJECT
+				$end = '0000-00-00'; //temp fix for invalid end value (probs NULL)
                 $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
                     projectpriority, projectparent, projectowner, projectleader, projectnextdate, projectseries, projectpercentage, estimatedHours, level, projecttags, isTemplate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->bind_param("ssbiiissssisiisbisiss", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $null, $percentage, $estimate, $skill, $tags, $isTemplate);
@@ -520,7 +521,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 }
             }
             if($filterings['tasks'] == 'ACTIVE_PLANNED') echo '<label><input type="checkbox" name="icalID[]" value="'.$x.'" checked /> .ical</label>';
-            
+
             // always show the messages button (5ac63505c0ecd)
             echo "<button type='button' class='btn btn-default' title='Nachrichten' data-toggle='modal' data-target='#messages-$x'><i class='fa fa-commenting-o'></i></button>";
 
@@ -565,14 +566,14 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 <div class="modal-body">';
 
             // AJAX scripts must be here or a reference error will be shown
-            $modals .= '    
+            $modals .= '
                 <script>
                 // AJAX Scripts
                 function getMessages(taskID, target, scroll = false, limit = 50) {
                     if(taskID.length == 0) {
                         return;
                     }
-                
+
                     $.ajax({
                         url: "ajaxQuery/AJAX_postGetMessage.php",
                         data: {
@@ -588,12 +589,12 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                                 $(target).html(response);
 
                                 //Scroll down
-                                if (scroll) $(target).scrollTop($(target)[0].scrollHeight)                
+                                if (scroll) $(target).scrollTop($(target)[0].scrollHeight)
                             }else{
                                 // hide the messages div and subject bar, when no messages available
                                 $("#subject_bar'.$x.'").hide();
                                 $("#messages-div-'.$x.'").hide();
-                            }    
+                            }
                         },
                         error: function (response) {
                             $(target).html(response);
@@ -605,7 +606,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                     if(taskID.length == 0 || message.length == 0){
                         return;
                     }
-                
+
                     $.ajax({
                         url: "ajaxQuery/AJAX_postSendMessage.php",
                         data: {
@@ -642,7 +643,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 
                 // always scroll down (when the modal gets reopened)
                 $(document).on("shown.bs.modal", "#messages-'.$x.'", function (e) {
-                    $("#messages-div-'.$x.'").scrollTop($("#messages-div-'.$x.'")[0].scrollHeight)             
+                    $("#messages-div-'.$x.'").scrollTop($("#messages-div-'.$x.'")[0].scrollHeight)
                 });
 
                 // clear the interval
@@ -655,11 +656,11 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 $("#messages-div-'.$x.'").scroll(function(){
                     if($(this).scrollTop() == 0){
                         $(this).scrollTop(1);
-                        messageLimit'.$x.' += 1        
+                        messageLimit'.$x.' += 1
                         getMessages("'.$x.'", "#messages-div-'.$x.'", false, messageLimit'.$x.');
                     }
                 });
-                
+
                 //submit
                 $( "#messages-'.$x.'" ).submit(function( event ) {
                     event.preventDefault();
@@ -668,7 +669,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                     $("#message-'.$x.'").val("");
                   });
                 </script>';
-            //footer  
+            //footer
             $modals .= '</div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                 <button class="btn btn-warning" type="submit" title="'.$lang["SEND"].'" name="task-plan" value="'.$x.'">'.$lang["SEND"].'</button>
                 </div></form></div></div>';

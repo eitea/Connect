@@ -122,7 +122,7 @@ function create_tables($conn) {
         field_1 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         field_2 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         field_3 ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        creator INT(6)
+        creator INT(6),
         FOREIGN KEY (clientID) REFERENCES clientData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -805,24 +805,24 @@ function create_tables($conn) {
     }
 
     $sql = "CREATE TABLE erp_settings(
-        companyID INT(6) UNSIGNED,
-        erp_ang INT(5) DEFAULT 1,
-        erp_aub INT(5) DEFAULT 1,
-        erp_re INT(5) DEFAULT 1,
-        erp_lfs INT(5) DEFAULT 1,
-        erp_gut INT(5) DEFAULT 1,
-        erp_stn INT(5) DEFAULT 1,
-        yourSign VARCHAR(30),
-        yourOrder VARCHAR(30),
-        ourSign VARCHAR(30),
-        ourMessage VARCHAR(30),
-        clientNum VARCHAR(12),
-        clientStep INT(2),
-        supplierNum VARCHAR(12),
-        supplierStep INT(2),
-        FOREIGN KEY (companyID) REFERENCES companyData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
+		companyID INT(6) UNSIGNED,
+		erp_ang INT(5) DEFAULT 1,
+		erp_aub INT(5) DEFAULT 1,
+		erp_re INT(5) DEFAULT 1,
+		erp_lfs INT(5) DEFAULT 1,
+		erp_gut INT(5) DEFAULT 1,
+		erp_stn INT(5) DEFAULT 1,
+		yourSign VARCHAR(30),
+		yourOrder VARCHAR(30),
+		ourSign VARCHAR(30),
+		ourMessage VARCHAR(30),
+		clientNum VARCHAR(12),
+		clientStep INT(2),
+		supplierNum VARCHAR(12),
+		supplierStep INT(2),
+		FOREIGN KEY (companyID) REFERENCES companyData(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -1231,15 +1231,15 @@ function create_tables($conn) {
         clientprojectid INT(6) UNSIGNED,
         projectcolor VARCHAR(10),
         projectstart DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
-        projectend DATETIME DEFAULT '0000-00-00 00:00.00' NOT NULL,
-        projectstatus ENUM('ACTIVE', 'DEACTIVATED', 'DRAFT', 'COMPLETED', 'REVIEW') DEFAULT 'ACTIVE',
+        projectend VARCHAR(12) DEFAULT '0000-00-00' NOT NULL,
+        projectstatus ENUM('ACTIVE', 'DEACTIVATED', 'DRAFT', 'COMPLETED', 'REVIEW') DEFAULT 'ACTIVE' NOT NULL,
         projectpriority INT(6),
         projectparent VARCHAR(100),
         projectowner INT(6) UNSIGNED,
         projectleader INT(6) UNSIGNED,
         projectnextdate VARCHAR(12),
         projectseries MEDIUMBLOB,
-        projectpercentage INT(3) DEFAULT 0,
+        projectpercentage INT(3) DEFAULT 0 NOT NULL,
         estimatedHours VARCHAR(100) DEFAULT 0 NOT NULL,
         needsreview ENUM('TRUE','FALSE') DEFAULT 'TRUE',
         level INT(3) DEFAULT 0 NOT NULL,
@@ -1767,7 +1767,7 @@ function create_tables($conn) {
         name VARCHAR(120) NOT NULL,
         parent_directory VARCHAR(120) NOT NULL DEFAULT 'ROOT',
         type VARCHAR(10) NOT NULL,
-        content TEXT,
+        uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (projectID) REFERENCES projectData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -1776,6 +1776,17 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
+	$sql = "CREATE TABLE company_folders(
+		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		companyID INT(6) UNSIGNED,
+		name VARCHAR(155) NOT NULL,
+		FOREIGN KEY (companyID) REFERENCES companyData(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+	)";
+	if (!$conn->query($sql)) {
+		echo $conn->error;
+	}
     // 5ac63505c0ecd
     $sql = "CREATE TABLE taskmessages(
         userID INT(6) UNSIGNED,
