@@ -70,8 +70,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $result = $conn->query("SELECT articles.*, taxRates.percentage, taxRates.description AS taxName FROM articles, taxRates WHERE companyID = $cmpID AND taxID = taxRates.id");
       while($result && ($row = $result->fetch_assoc())){
         echo '<tr>';
-        echo '<td>'.mc_status().' '.secure_data('ERP', $row['name'], 'decrypt', $userID, $privateKey).'</td>';
-        echo '<td>'.mc_status().' '.secure_data('ERP', $row['description'], 'decrypt').'</td>';
+        echo '<td>'.mc_status('ERP').' '.secure_data('ERP', $row['name'], 'decrypt', $userID, $privateKey).'</td>';
+        echo '<td>'.mc_status('ERP').' '.secure_data('ERP', $row['description'], 'decrypt').'</td>';
         echo '<td>'.number_format($row['price'],2,',','.').'</td>';
         echo '<td>'.number_format($row['purchase'],2,',','.').'</td>';
         echo $row['cash'] == 'TRUE' ? '<td>'.$lang['YES'].'</td>' : '<td>'.$lang['NO'].'</td>';
@@ -96,10 +96,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <h4 class="modal-title"><?php echo $lang['ADD']; ?></h4>
       </div>
       <div class="modal-body">
-        <label>Name<?php echo mc_status(); ?></label>
+        <label><?php echo mc_status('ERP'); ?>Name</label>
         <input <?php if($isUpdate) echo 'value="'.secure_data('ERP', $update_row['name'], 'decrypt').'" ' ?> type="text" class="form-control required-field" name="add_product_name" placeholder="Name" maxlength="48"/>
         <br>
-        <label><?php echo $lang['DESCRIPTION']; ?><?php echo mc_status(); ?></label>
+        <label><?php echo mc_status('ERP'); ?><?php echo $lang['DESCRIPTION']; ?></label>
         <textarea class="form-control" style='resize:none;overflow:hidden' rows="3" name="add_product_description" maxlength="350"><?php if($isUpdate) echo secure_data('ERP', $update_row['description'], 'decrypt'); ?></textarea>
         <br>
         <div class="row">

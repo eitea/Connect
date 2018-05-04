@@ -110,7 +110,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           if(empty($row['smptSecure'])){
             $mail->SMTPSecure = $row['smtpSecure'];
           }
-          $content = "You have been registered to T-Time. <br> Your login information: <br><br> Login e-mail: $email <br> Password: $pass";
+          $content = "You have been registered to Connect. <br> Your login information: <br><br> Login e-mail: $email <br> Password: $pass";
 
           $mail->Host       = $row['host'];
           $mail->Port       = $row['port'];
@@ -119,13 +119,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
           $mail->addAddress($recipients);
           $mail->isHTML(true);                       // Set email format to HTML
-          $mail->Subject = "Your access to T-Time";
+          $mail->Subject = "Your access to Connect";
           $mail->Body    = $content;
           $mail->AltBody = "If you can read this, your E-Mail provider does not support HTML." . $content;
           $errorInfo = "";
           if(!$mail->send()){
             $errorInfo = $mail->ErrorInfo;
-          }
+		  }
           $conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('$recipients', '$errorInfo')");
         } else { $recipients = ""; }
 
@@ -135,8 +135,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         VALUES ('$firstname', '$lastname', '$psw', '$gender', '$email', '$begin', '$recipients', 1);";
         if($conn->query($sql)){
           $curID = mysqli_insert_id($conn);
-          echo mysqli_error($conn);
           $conn->query("INSERT INTO archive_folders VALUES(0,$curID,'ROOT',-1)");
+		  echo mysqli_error($conn);
           //create interval
           $sql = "INSERT INTO $intervalTable (mon, tue, wed, thu, fri, sat, sun, userID, vacPerYear, overTimeLump, pauseAfterHours, hoursOfrest, startDate)
           VALUES ($mon, $tue, $wed, $thu, $fri, $sat, $sun, $curID, '$vacDaysPerYear', '$overTimeLump','$pauseAfter', '$hoursOfRest', '$begin');";
@@ -157,6 +157,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               $conn->query($sql);
             }
           }
+		  //add keys
+		  $keyPair = sodium_crypto_box_keypair();
+		  $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
+		  $user_public = sodium_crypto_box_publickey($keyPair);
+		  $encrypted = simple_encryption($private, $_POST['tester_pass']);
+		  $conn->query("INSERT INTO security_users(userID, publicKey, privateKey) VALUES($curID, '".base64_encode($user_public)."', '$encrypted')");
+
           if($conn->error){ echo $conn->error; } else {redirect('users');}
         }
       }

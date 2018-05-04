@@ -2493,8 +2493,6 @@ if($row['version'] < 147){
     } else {
         echo '<br>Benutzer: Hauptmandant';
     }
-
-    $conn->query("ALTER TABLE dynamicprojectslogs ADD COLUMN id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY");
 }
 
 if($row['version'] < 148){
@@ -2708,6 +2706,8 @@ if($row['version'] < 152){
 }
 
 if($row['version'] < 153){
+	$conn->query("ALTER TABLE dynamicprojectslogs ADD COLUMN id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY");
+
 	$conn->query("CREATE TABLE security_users(
 		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 		userID INT(6) UNSIGNED,
@@ -2737,7 +2737,6 @@ if($row['version'] < 153){
 	$conn->query("ALTER TABLE security_company DROP COLUMN userID");
 
 	$conn->query("ALTER TABLE companyData DROP COLUMN publicPGPKey");
-
 }
 // if($row['version'] < 154){}
 // if($row['version'] < 155){}

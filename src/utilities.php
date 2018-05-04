@@ -132,7 +132,13 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
     $privateKey = base64_decode($privateKey);
     static $symmetric = false;
     if(!$symmetric && $userID && $privateKey){
-        $result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND module = '$module' AND outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
+		$result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND module = '$module' AND outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
+		if(is_array($module)){
+			$optionalID = $module[1];
+			$module = $module[0];
+			$result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND module = '$module'
+				AND optionalID = '$optionalID' AND outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
+		}
         if($result && ( $row=$result->fetch_assoc() )){
 			//echo $row['privateKey'] .' --private access<br>';
             $cipher_private_module = base64_decode($row['privateKey']);

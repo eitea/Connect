@@ -120,16 +120,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
 
     if(isset($_POST['saveSecurity'])){
-		if(isset($_POST['company'])){
-			$result = $conn->query("SELECT id FROM companyData");
-			while($row = $result->fetch_assoc()){
-				//just completely delete the relationship from table to avoid duplicate entries.
-				$conn->query("DELETE FROM $companyToUserRelationshipTable WHERE userID = $x AND companyID = " . $row['id']);
-				if(in_array($row['id'], $_POST['company'])){  //if company is checked, insert again
-					$conn->query("INSERT INTO $companyToUserRelationshipTable (companyID, userID) VALUES (".$row['id'].", $x)");
-				}
-			}
-		}
         if(isset($_POST['activate_encryption']) && $config_row['activeEncryption'] == 'FALSE'){
             $key_downloads = array();
             $result = $conn->query("SELECT id FROM companyData"); echo $conn->error;
@@ -171,12 +161,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
                     if($accept){ //access
                         secure_module($module, $symmetric);
-                        $result = $conn->query("SELECT publicPGPKey, id FROM UserData LEFT JOIN roles ON userID = id WHERE publicPGPKey IS NOT NULL AND ".$query_access_modules[$module]);
+                        $result = $conn->query("SELECT s.publicKey, s.userID FROM security_users s LEFT JOIN roles ON s.userID = roles.userID WHERE publicKey IS NOT NULL AND ".$query_access_modules[$module]);
                         while($row = $result->fetch_assoc()){
-                            $user_public = base64_decode($row['publicPGPKey']);
+                            $user_public = base64_decode($row['publicKey']);
                             $nonce = random_bytes(24);
                             $access_private_encrypted = base64_encode($nonce . sodium_crypto_box($private, $nonce, $private.$user_public));
-                            $access_user = $row['id'];
+                            $access_user = $row['userID'];
                             $stmt_access->execute();
                             echo $stmt_access->error;
                         }
@@ -267,14 +257,25 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $canEditSuppliers = isset($_POST['canEditSuppliers']) ? 'TRUE' : 'FALSE';
         $canUseWorkflow = isset($_POST['canUseWorkflow']) ? 'TRUE' : 'FALSE'; //5ab7ae7596e5c
 
+		if(isset($_POST['company'])){
+			$result = $conn->query("SELECT id FROM companyData");
+			while($row = $result->fetch_assoc()){
+				//just completely delete the relationship from table to avoid duplicate entries.
+				$conn->query("DELETE FROM $companyToUserRelationshipTable WHERE userID = $x AND companyID = " . $row['id']);
+				if(in_array($row['id'], $_POST['company'])){  //if company is checked, insert again
+					$conn->query("INSERT INTO $companyToUserRelationshipTable (companyID, userID) VALUES (".$row['id'].", $x)");
+				}
+			}
+		}
+
 		if(isset($_POST['isDSGVOAdmin'])){
 			$isDSGVOAdmin = 'TRUE';
-			$result = $conn->query("SELECT u.publicPGPKey, module FROM UserData u LEFT JOIN security_access ON userID = u.id AND module = 'DSGVO' AND outDated = 'FALSE' WHERE u.id = $x");
+			$result = $conn->query("SELECT u.publicKey, module FROM security_users u LEFT JOIN security_access a ON a.userID = u.userID
+				AND module = 'DSGVO' AND a.outDated = 'FALSE' WHERE u.userID = $x AND u.outDated = 'FALSE'");
 			if($result && ($row = $result->fetch_assoc()) && !$row['module']){
-				$user_public = base64_decode($row['publicPGPKey']);
+				$user_public = base64_decode($row['publicKey']);
 				//grant which can be granted
-				$result = $conn->query("SELECT s.privateKey, m.publicPGPKey FROM security_access s, security_modules m
-					WHERE m.outDated = 'FALSE' AND m.module = 'DSGVO'
+				$result = $conn->query("SELECT s.privateKey, m.publicPGPKey FROM security_access s, security_modules m WHERE m.outDated = 'FALSE' AND m.module = 'DSGVO'
 					AND s.userID = $userID AND s.outDated = 'FALSE' AND s.module = 'DSGVO' LIMIT 1");
 				if($result && ($row = $result->fetch_assoc()) && array_key_exists('DSGVO', $encrypted_modules)){
 
@@ -304,9 +305,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 		if(isset($_POST['isERPAdmin'])){
 			$isERPAdmin = 'TRUE';
-			$result = $conn->query("SELECT u.publicPGPKey, module FROM UserData u LEFT JOIN security_access ON userID = u.id AND module = 'ERP' AND outDated = 'FALSE' WHERE u.id = $x");
+			$result = $conn->query("SELECT u.publicKey, module FROM security_users u LEFT JOIN security_access a ON a.userID = u.userID
+				AND module = 'ERP' AND a.outDated = 'FALSE' WHERE u.userID = $x AND u.outDated = 'FALSE'");
 			if($result && ($row = $result->fetch_assoc()) && !$row['module']){
-				$user_public = base64_decode($row['publicPGPKey']);
+				$user_public = base64_decode($row['publicKey']);
 				//grant which can be granted
 				$result = $conn->query("SELECT s.privateKey, m.publicPGPKey FROM security_access s, security_modules m
 					WHERE m.outDated = 'FALSE' AND m.module = 'ERP'

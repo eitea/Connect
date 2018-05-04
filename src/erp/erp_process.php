@@ -241,8 +241,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $prod_row["description"] = $prod_row["description"];
         echo '<tr>';
         echo '<td><input type="text" readonly class="index" name="positions[]" value="'.$prod_row['position'].'" style="border:0;background:0;" size="4" /><input type="hidden" value="'.$prod_row['id'].'" name="positions_id[]"/></td>';
-        echo '<td>'.mc_status().' '.secure_data('ERP', $prod_row['name'], 'decrypt', $userID, $privateKey).'</td>';
-        echo '<td style="max-width:500px;">'.mc_status().' '.secure_data('ERP', $prod_row['description'], 'decrypt').'</td>';
+        echo '<td>'.mc_status('ERP').' '.secure_data('ERP', $prod_row['name'], 'decrypt', $userID, $privateKey).'</td>';
+        echo '<td style="max-width:500px;">'.mc_status('ERP').' '.secure_data('ERP', $prod_row['description'], 'decrypt').'</td>';
         echo '<td>'.$prod_row['price'].'</td>';
         echo '<td>'.$prod_row['quantity'].' '.$prod_row['unit'].'</td>';
         echo '<td>'.intval($prod_row['percentage']).'%</td>';
@@ -365,13 +365,13 @@ $x = $prod_row['id'];
       <div class="modal-header"><h4 class="modal-title"><?php echo $prod_row['name']; ?></h4></div>
       <div class="modal-body">
         <?php if($prod_row['name'] == 'CLEAR_TEXT'): ?>
-          <label>Text<?php echo mc_status(); ?></label>
+          <label><?php echo mc_status('ERP'); ?>Text</label>
           <textarea type="text" class="form-control" maxlength="300" name="update_description_<?php echo $x ?>" ><?php echo $prod_row['description']; ?></textarea>
         <?php else: ?>
-          <label>Name<?php echo mc_status(); ?></label>
+          <label><?php echo mc_status('ERP'); ?>Name</label>
           <input type="text" class="form-control" name="update_name_<?php echo $x ?>" value="<?php echo $prod_row['name']; ?>"/>
           <br>
-            <label><?php echo $lang['DESCRIPTION']; ?><?php echo mc_status(); ?></label>
+            <label><?php echo mc_status('ERP'); ?><?php echo $lang['DESCRIPTION']; ?></label>
             <textarea class="form-control" rows="3" name="update_description_<?php echo $x ?>"><?php echo $prod_row['description']; ?></textarea>
           <br>
           <div class="row">
@@ -433,10 +433,10 @@ $x = $prod_row['id'];
       <h4 class="modal-title"><?php echo $lang['ADD']; ?>: Position</h4>
     </div>
     <div class="modal-body">
-      <label>Name<?php echo mc_status(); ?></label>
+      <label><?php echo mc_status('ERP'); ?>Name</label>
       <input type="text" class="form-control required-field" name="add_product_name" maxlength="48"/>
       <br>
-      <label><?php echo $lang['DESCRIPTION']; ?><?php echo mc_status(); ?></label>
+      <label><?php echo mc_status('ERP'); ?><?php echo $lang['DESCRIPTION']; ?></label>
       <textarea class="form-control" style='resize:none;overflow:hidden' rows="3" name="add_product_description" maxlength="350"></textarea>
       <br>
       <div class="row">
@@ -503,7 +503,7 @@ $x = $prod_row['id'];
 <div class="modal fade add_article">
   <div class="modal-dialog modal-sm modal-content">
     <div class="modal-header">
-      <h4 class="modal-title"><?php echo $lang['CHOOSE_ARTICLE']; ?><?php echo mc_status(); ?></h4>
+      <h4 class="modal-title"><?php echo $lang['CHOOSE_ARTICLE']; ?><?php echo mc_status('ERP'); ?></h4>
     </div>
     <div class="modal-body">
       <select class="js-example-basic-single" name="select_new_product_true" style="min-width:200px" onchange="displayArticle(this.value);">

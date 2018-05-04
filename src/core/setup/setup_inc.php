@@ -1310,6 +1310,7 @@ function create_tables($conn) {
     }
 
     $conn->query("CREATE TABLE dynamicprojectslogs(
+		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         projectid VARCHAR(100) NOT NULL,
         activity VARCHAR(20) NOT NULL,
         logTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
