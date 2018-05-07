@@ -32,13 +32,15 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
 	        if(!$key_res || $key_res->num_rows < 1){
                 $keyPair = sodium_crypto_box_keypair();
                 $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
-                $user_public = sodium_crypto_box_publickey($keyPair);
-                $encrypted = simple_encryption($private, $_POST['tester_pass']);
-                $conn->query("INSERT INTO security_users(userID, publicKey, privateKey) VALUES('".$row['id']."', '".base64_encode($user_public)."', '$encrypted')"); //5ae9e3e1e84e5
+				$user_public = base64_encode(sodium_crypto_box_publickey($keyPair));
+                $encrypted = simple_encryption($private, $_POST['password']);
+                $conn->query("INSERT INTO security_users(userID, publicKey, privateKey) VALUES('".$row['id']."', '$user_public', '$encrypted')"); //5ae9e3e1e84e5
                 $_SESSION['privateKey'] = $private;
+				$_SESSION['publicKey'] = $user_public;
             } else {
 				$key_row = $key_res->fetch_assoc();
 	            $_SESSION['privateKey'] = simple_decryption($key_row['privateKey'], $_POST['tester_pass']);
+				$_SESSION['publicKey'] = $key_row['publicKey'];
             }
             //if core admin
             $result = $conn->query("SELECT userID FROM roles WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'");

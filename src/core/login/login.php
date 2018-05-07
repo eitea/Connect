@@ -38,16 +38,18 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && isset($_POST['lo
             if(function_exists("sodium_crypto_box_keypair")){
                 $keyPair = sodium_crypto_box_keypair();
                 $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
-                $user_public = sodium_crypto_box_publickey($keyPair);
+                $user_public = base64_encode(sodium_crypto_box_publickey($keyPair));
                 $encrypted = simple_encryption($private, $_POST['password']);
-                $conn->query("INSERT INTO security_users(userID, publicKey, privateKey) VALUES('".$row['id']."', '".base64_encode($user_public)."', '$encrypted')"); //5ae9e3e1e84e5
+                $conn->query("INSERT INTO security_users(userID, publicKey, privateKey) VALUES('".$row['id']."', '$user_public', '$encrypted')"); //5ae9e3e1e84e5
                 $_SESSION['privateKey'] = $private;
+				$_SESSION['publicKey'] = $user_public;
             }else{
                 $_SESSION['privateKey'] = "";
             }
         } else {
 			$key_row = $key_res->fetch_assoc();
             $_SESSION['privateKey'] = simple_decryption($key_row['privateKey'], $_POST['password']);
+			$_SESSION['publicKey'] = $key_row['publicKey'];
         }
         //if core admin
         $sql = "SELECT userID FROM roles WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
