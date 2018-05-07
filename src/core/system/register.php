@@ -51,18 +51,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $mail_result = $conn->query("SELECT email FROM $userTable WHERE email = '$email'");
       if($mail_result && $mail_result->num_rows > 0){
         $accept = false;
-        echo '<div class="alert alert-danger fade in"><a href="#" class="close" data-dismiss="alert">&times;</a>'.$lang['ERROR_EXISTING_EMAIL'].'</div>';
+        showError($lang['ERROR_EXISTING_EMAIL']);
       }
     } else {
       $accept = false;
-      echo '<div class="alert alert-danger fade in"><a href="#" class="close" data-dismiss="alert">&times;</a>Invalid E-Mail Address.</div>';
+      showError('Invalid E-Mail Address.');
     }
 
     if(!empty($_POST['yourPas']) && match_passwordpolicy($_POST['yourPas'], $out)){
       $pass = test_input($_POST['yourPas']);
     } else {
       $accept = false;
-      echo '<div class="alert alert-danger fade in"><a href="#" class="close" data-dismiss="alert">&times;</a>Invalid Password.</div>';
+      showError('Invalid Password.');
     }
 
     if(is_numeric($_POST['overTimeLump']) && is_numeric($_POST['pauseAfter']) && is_numeric($_POST['hoursOfRest']) && is_numeric($_POST['vacDaysPerYear'])){
@@ -72,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $hoursOfRest = $_POST['hoursOfRest'];
     } else {
       $accept = false;
-      echo '<div class="alert alert-danger fade in"><a href="#" class="close" data-dismiss="alert">&times;</a>'.$lang['ERROR_INVALID_DATA'].'</div>';
+      showError($lang['ERROR_INVALID_DATA']);
     }
 
     if (is_numeric($_POST['mon']) && is_numeric($_POST['tue']) && is_numeric($_POST['wed']) && is_numeric($_POST['thu']) && is_numeric($_POST['fri']) && is_numeric($_POST['sat']) && is_numeric($_POST['sun'])) {
@@ -110,23 +110,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           if(empty($row['smptSecure'])){
             $mail->SMTPSecure = $row['smtpSecure'];
           }
-          $content = "You have been registered to T-Time. <br> Your login information: <br><br> Login e-mail: $email <br> Password: $pass";
-
-          $mail->Host       = $row['host'];
-          $mail->Port       = $row['port'];
-
-          $mail->setFrom($row['sender']);
-
-          $mail->addAddress($recipients);
-          $mail->isHTML(true);                       // Set email format to HTML
-          $mail->Subject = "Your access to T-Time";
-          $mail->Body    = $content;
-          $mail->AltBody = "If you can read this, your E-Mail provider does not support HTML." . $content;
-          $errorInfo = "";
-          if(!$mail->send()){
-            $errorInfo = $mail->ErrorInfo;
+          $content = "You have been registered to Connect. <br> Your login information: <br><br> Login e-mail: $email <br> Password: $pass";
+          if(empty($row['host']) || empty($row['port'])){
+            showError("No host or port configured in settings");
+            if(isset($_SESSION["LAST_ERRORS"])){
+              array_push($_SESSION["LAST_ERRORS"],showError("No host or port configured in settings",true));
+            }else{
+              $_SESSION["LAST_ERRORS"] = array();
+              array_push($_SESSION["LAST_ERRORS"],showError("No host or port configured in settings",true));
+            }
+          }else{
+            $mail->Host       = $row['host'];
+            $mail->Port       = $row['port'];
+  
+            $mail->setFrom($row['sender']);
+            $mail->Timeout = 60;
+  
+            $mail->addAddress($recipients);
+            $mail->isHTML(true);                       // Set email format to HTML
+            $mail->Subject = "Your access to Connect";
+            $mail->Body    = $content;
+            $mail->AltBody = "If you can read this, your E-Mail provider does not support HTML." . $content;
+            $errorInfo = "";
+            if(!$mail->send()){
+              $errorInfo = $mail->ErrorInfo;
+            }
+            $conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('$recipients', '$errorInfo')");
           }
-          $conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('$recipients', '$errorInfo')");
         } else { $recipients = ""; }
 
         //create user
