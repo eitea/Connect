@@ -2738,6 +2738,24 @@ if($row['version'] < 153){
 
 	$conn->query("ALTER TABLE companyData DROP COLUMN publicPGPKey");
 }
+
+if($row['version'] < 154){
+    $sql = "CREATE TABLE taskmessages(
+        userID INT(6) UNSIGNED,
+        taskID varchar(100),
+        taskName varchar(100),
+        message TEXT,
+        picture MEDIUMBLOB,
+        sent DATETIME DEFAULT CURRENT_TIMESTAMP
+    )";
+    $conn->query($sql);
+    if (!$conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Task Messages';
+    }
+}
+
 // if($row['version'] < 154){}
 // if($row['version'] < 155){}
 
