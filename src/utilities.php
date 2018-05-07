@@ -150,17 +150,13 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
                 //decrypt access
                 $nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
                 $cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
-				//echo base64_encode($privateKey) .' --keypairsize : '.strlen($privateKey.$public_module ).'<br>';
-				//echo base64_encode($public_module);
-				try{
-					$private_module = sodium_crypto_box_open($cipher_private_module, $nonce, $privateKey.$public_module);
-					$nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
-	                $cipher_symmetric = mb_substr($cipher_symmetric, 24, null, '8bit');
-	                $symmetric = sodium_crypto_box_open($cipher_symmetric, $nonce, $private_module.$public_module);
-				} catch(Exception $e){
-					$err = $e;
-					return $message;
-				}
+				echo base64_encode($privateKey) .' --private <br> keypairsize: '.strlen($privateKey.$public_module ).'<br> public--';
+				echo base64_encode($public_module);
+				$private_module = sodium_crypto_box_open($cipher_private_module, $nonce, $privateKey.$public_module);
+				$nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
+				$cipher_symmetric = mb_substr($cipher_symmetric, 24, null, '8bit');
+				$symmetric = sodium_crypto_box_open($cipher_symmetric, $nonce, $private_module.$public_module);
+
                 //decrypt module
                 if($symmetric){
                     if($mode == 'encrypt'){
