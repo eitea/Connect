@@ -15,6 +15,11 @@ require __DIR__ . "/utilities.php";
 require __DIR__ . "/validate.php";
 require __DIR__ . "/language.php";
 
+if (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])){
+	ini_set('display_errors', 1);
+	ini_set('display_startup_errors', 1);
+	error_reporting(E_ALL);
+}
 $result = $conn->query("SELECT * FROM roles WHERE userID = $userID");
 if ($result && $result->num_rows > 0) {
     $row = $result->fetch_assoc();

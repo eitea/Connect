@@ -597,12 +597,12 @@ function convToUTF8($text) {
 function insert_access_user($projectID, $userID, $privateKey, $external = false){
 	global $conn;
 	if($external) {
-		$result = $conn->query("SELECT publicKey AS publicPGPKey FROM external_users WHERE id = $userID");
+		$result = $conn->query("SELECT publicKey FROM external_users WHERE id = $userID");
 	} else {
-		$result = $conn->query("SELECT publicPGPKey FROM UserData WHERE id = $userID");
+		$result = $conn->query("SELECT publicKey FROM security_users WHERE userID = $userID");
 	}
 	if($result && ($row = $result->fetch_assoc())){
-		$user_public = base64_decode($row['publicPGPKey']);
+		$user_public = base64_decode($row['publicKey']);
 		$nonce = random_bytes(24);
 		$private_encrypt = $nonce . sodium_crypto_box($privateKey, $nonce, $privateKey.$user_public);
 		if($external){

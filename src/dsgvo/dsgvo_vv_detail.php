@@ -68,16 +68,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 function getSettings($like, $mults = false, $from_matrix = false){
     global $conn;
     global $vvID;
-    global $templateID;
     global $userID;
     global $privateKey;
     if($from_matrix){ // from matrix, returned id references a tuple in dsgvo_vv_data_matrix_settings
         global $matrixID;
-        $result = $conn->query("SELECT setting, opt_name, opt_descr, category, dsgvo_vv_data_matrix_settings.id, dsgvo_vv_settings.id AS valID, dsgvo_vv_settings.clientID as client
-        FROM dsgvo_vv_data_matrix_settings LEFT JOIN dsgvo_vv_settings ON dsgvo_vv_settings.matrix_setting_id = dsgvo_vv_data_matrix_settings.id AND vv_ID = $vvID WHERE opt_name LIKE '$like' AND dsgvo_vv_data_matrix_settings.matrixID = $matrixID");
+        $result = $conn->query("SELECT setting, opt_name, opt_descr, category, ms.opt_duration, ms.opt_unit, ms.id, vs.id AS valID, vs.clientID AS client
+        FROM dsgvo_vv_data_matrix_settings ms LEFT JOIN dsgvo_vv_settings vs ON vs.matrix_setting_id = ms.id AND vv_ID = $vvID WHERE opt_name LIKE '$like' AND ms.matrixID = $matrixID");
     }else{ // from template
-        $result = $conn->query("SELECT setting, opt_name, opt_descr, category, dsgvo_vv_template_settings.id, dsgvo_vv_settings.id AS valID, dsgvo_vv_settings.clientID as client, dsgvo_vv_settings.setting_id
-        FROM dsgvo_vv_template_settings LEFT JOIN dsgvo_vv_settings ON setting_id = dsgvo_vv_template_settings.id AND vv_ID = $vvID WHERE opt_name LIKE '$like' AND templateID = $templateID ORDER BY dsgvo_vv_settings.setting_id");
+		global $templateID;
+        $result = $conn->query("SELECT setting, opt_name, opt_descr, category, ts.id, vs.id AS valID, vs.clientID AS client, vs.setting_id
+        FROM dsgvo_vv_template_settings ts LEFT JOIN dsgvo_vv_settings vs ON setting_id = ts.id AND vv_ID = $vvID WHERE opt_name LIKE '$like' AND templateID = $templateID ORDER BY vs.setting_id");
     }
     showError($conn->error);
     $settings = array();
@@ -90,9 +90,17 @@ function getSettings($like, $mults = false, $from_matrix = false){
             $settings[$row['opt_name']]['category'][] = $row['category'];
             $settings[$row['opt_name']]['client'][] = $row['client'];
             $settings[$row['opt_name']]['setting_id'][] = $row['setting_id'];
+			if($from_matrix){
+				$settings[$row['opt_name']]['duration'][] = $row['opt_duration'];
+				$settings[$row['opt_name']]['duration_unit'][] = $row['opt_unit'];
+			}
         } else {
             $settings[$row['opt_name']]['setting'] = secure_data('DSGVO', $row['setting'], 'decrypt', $userID, $privateKey);
             $settings[$row['opt_name']]['valID'] = $row['valID'];
+			if($from_matrix){
+				$settings[$row['opt_name']]['duration'] = $row['opt_duration'];
+				$settings[$row['opt_name']]['duration_unit'] = $row['opt_unit'];
+			}
         }
     }
     return $settings;
@@ -170,7 +178,7 @@ if(isset($settings['DESCRIPTION'])):
                 if($valID){
                     $stmt_update_setting->execute();
                     if($stmt_update_setting->affected_rows > 0){
-                        $escaped_setting = test_input($setting);                    
+                        $escaped_setting = test_input($setting);
                         insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$escaped_setting'");
                     }
                 } else {
@@ -192,16 +200,17 @@ if(isset($settings['DESCRIPTION'])):
 <div class="col-md-12">
     <div class="panel panel-default">
         <div class="panel-heading">Generelle organisatorische und technische Maßnahmen zum Schutz der personenbezogenen Daten</div>
+		<br>
+		<p class="text-center"><label for="#matrice-area">Notizen</label></p>
+		<textarea id="matrice-area"></textarea>
+		<br>
         <div class="panel-body">
             <table class="table table-borderless">
                 <thead>
                     <tr>
                         <th></th><!-- number -->
                         <th></th><!-- name -->
-                        <th>Erfüllt</th>
-                        <th>Nicht erfüllt</th>
-                        <th>N/A</th>
-                        <th>Notizen</th>
+                        <th style="width:38%"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -234,13 +243,16 @@ if(isset($settings['DESCRIPTION'])):
                         echo '<tr>';
                         echo '<td class="text-muted">'.$number.'</td>';
                         echo '<td class="bold">'.$val['descr'].'</td>';
-                        $checked = $radioValue == 1 ? 'checked' : '';
-                        echo '<td class="grey text-center"><input type="radio" '.$checked.' name="'.$key.'" value="1" /></td>';
-                        $checked = $radioValue == 2 ? 'checked' : '';
-                        echo '<td class="grey text-center"><input type="radio" '.$checked.' name="'.$key.'" value="2" /></td>';
-                        $checked = $radioValue == 3 ? 'checked' : '';
-                        echo '<td class="grey text-center"><input type="radio" '.$checked.' name="'.$key.'" value="3" /></td>';
-                        echo '<td><input type="text" class="form-control" name="'.$textFieldKey.'" value="'.$textFieldValue.'" /></td>';
+						echo '<td>';
+						echo '';
+						$checked = $radioValue == 1 ? 'checked' : '';
+						echo '<div class="col-sm-4"><input type="radio" '.$checked.' name="'.$key.'" value="1" /> Erfüllt</div>';
+						$checked = $radioValue == 2 ? 'checked' : '';
+						echo '<div class="col-sm-4 text-center"><input type="radio" '.$checked.' name="'.$key.'" value="2" /> Nicht erfüllt</div>';
+						$checked = $radioValue == 3 ? 'checked' : '';
+						echo '<div class="col-sm-4 text-right"><input type="radio" '.$checked.' name="'.$key.'" value="3" /> N/A</div>';
+						echo '<div class="row"><input style="font-size:12px" type="text" class="form-control" name="'.$textFieldKey.'" value="'.$textFieldValue.'" placeholder="Notizen..." /></div>';
+						echo '</td>';
                         echo '</tr>';
                     }
                     ?>
@@ -376,7 +388,7 @@ if(isset($settings['EXTRA_DOC'])){
                     $stmt = $stmt_insert_setting;
                 }
                 $stmt->execute();
-                $escaped_setting = test_input($setting);                
+                $escaped_setting = test_input($setting);
                 insertVVLog("INSERT","Add new category '$escaped_setting' for Procedure Directory $vvID");
                 if($stmt->error){
                     showError($stmt->error);
@@ -410,12 +422,13 @@ if(isset($settings['EXTRA_DOC'])){
             }
             ?>
 
-            <?php  if($matrixID){ ?>
+            <?php  if($matrixID): ?>
             <table class="table table-condensed">
             <thead><tr>
             <th>Gruppierung</th>
             <th>Nr.</th>
             <th>Datenkategorien der gesammelten personenbezogenen Daten</th>
+			<th>Löschfrist</th>
             <th data-toggle="tooltip" data-container="body" data-placement="left" title='Besondere Datenkategorie iSd Art 9 DSGVO'>Art9</th>
             <?php echo $str_heads; ?>
             <th><a data-toggle="modal" data-target="#add-cate" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></a></th>
@@ -436,14 +449,14 @@ if(isset($settings['EXTRA_DOC'])){
                                 if($valID){ //update to true if checked and exists
                                     $stmt_update_setting_matrix->execute();
                                     if($stmt_update_setting_matrix->affected_rows > 0){
-                                        $escaped_setting = test_input($setting);            
+                                        $escaped_setting = test_input($setting);
                                         insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$escaped_setting'");
                                     }
                                 } else { //insert with true if checked and not exists
                                     $cat = '';
                                     $setID = $catVal['id'];
                                     $stmt_insert_setting_matrix->execute();
-                                    $escaped_setting = test_input($setting);            
+                                    $escaped_setting = test_input($setting);
                                     insertVVLog("INSERT","Insert '$key' for Procedure Directory $vvID as '$escaped_setting'");
                                 }
                             } elseif($valID && $catVal['setting']) { //set to false only if not checked, exists and saved as true (anything else is false anyways)
@@ -460,6 +473,7 @@ if(isset($settings['EXTRA_DOC'])){
                         echo '<tr>';
                         echo '<td>'.$fieldID.'</td>';
                         echo '<td>'.$catVal['descr'].'</td>';
+						echo '<td>'.$catVal['duration'].' '.$lang['TIME_UNIT_TOSTRING'][$catVal['duration_unit']].'</td>';
                         $checked = $catVal['setting'] ? 'checked' : '';
                         echo '<td><input type="checkbox" '.$checked.' name="'.$catKey.'" value="1" /></td>';
 
@@ -475,14 +489,14 @@ if(isset($settings['EXTRA_DOC'])){
                                         $valID = $headVal['valID'][$j];
                                         $stmt_update_setting->execute();
                                         if($stmt_update_setting->affected_rows > 0){
-                                            $escaped_setting = test_input($setting);            
+                                            $escaped_setting = test_input($setting);
                                             insertVVLog("UPDATE","Update Value '$valID' for Procedure Directory $vvID to '$escaped_setting'");
                                         }
                                     } else {
                                         $cat = $catKey;
                                         $setID = $headVal['id'];
                                         $stmt_insert_setting->execute();
-                                        $escaped_setting = test_input($setting);            
+                                        $escaped_setting = test_input($setting);
                                         insertVVLog("INSERT","Insert Value '$valID' for Procedure Directory $vvID as '$escaped_setting'");
                                     }
                                 } elseif($j && $headVal['setting'][$j]){
@@ -492,7 +506,7 @@ if(isset($settings['EXTRA_DOC'])){
                                     $checked = '';
                                     $stmt_update_setting->execute();
                                     if($stmt_update_setting->affected_rows > 0){
-                                        $escaped_setting = test_input($setting);            
+                                        $escaped_setting = test_input($setting);
                                         insertVVLog("UPDATE","Update Value '$valID' for Procedure Directory $vvID to '$escaped_setting'");
                                     }
                                     showError($stmt_update_setting->error);
@@ -506,14 +520,9 @@ if(isset($settings['EXTRA_DOC'])){
                 }
                 ?>
                  </table>
-                 <?php
-            }else{
-                ?>
+            <?php else: ?>
                 Diese Firma hat keine Matrix in den Einstellungen. Zum Erstellen <a href='../dsgvo/data-matrix'>hier klicken</a>.
-                <?php
-            }
-            ?>
-
+			<?php endif; ?>
         </div>
     </div>
 </div>
@@ -574,6 +583,7 @@ if(isset($settings['EXTRA_DOC'])){
 </div>
 <?php endif;?>
 </form>
+<script src='../plugins/tinymce/tinymce.min.js'></script>
 <script>
     $('[data-toggle="tooltip"]').tooltip();
 
@@ -588,15 +598,40 @@ if(isset($settings['EXTRA_DOC'])){
 
     $("input[name='add_category_mittlung'][value='heading1']").change(function(event){
         toggleCustomerChooser(true);
-    })
+    });
 
     $("input[name='add_category_mittlung'][value='heading2']").change(function(event){
         toggleCustomerChooser(false);
-    })
+    });
 
     $("input[name='add_category_mittlung'][value='heading3']").change(function(event){
         toggleCustomerChooser(true);
-    })
+    });
+
+	tinymce.init({
+	  selector: '#matrice-area',
+	  height: 150,
+	  menubar: false,
+	  plugins: [
+	    'advlist autolink lists link image charmap print preview anchor',
+	    'searchreplace visualblocks code fullscreen',
+	    'insertdatetime media table contextmenu paste code'
+	  ],
+	  toolbar: 'undo redo | styleselect | outdent indent | bullist table',
+	  relative_urls: false,
+	  content_css: '../plugins/homeMenu/template.css',
+	  init_instance_callback: function (editor) {
+	    editor.on('keyup', function (e) {
+	        var blink = $('.blinking');
+	        blink.attr('class', 'btn btn-warning blinking');
+	        setInterval(function() {
+	        blink.fadeOut(500, function() {
+	            blink.fadeIn(500);
+	        });
+	        }, 1000);
+	    });
+	  }
+	});
 </script>
 <?php echo $last_encryption_error; ?>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

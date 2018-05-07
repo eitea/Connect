@@ -365,13 +365,12 @@ if(isset($_FILES['csvUpload']) && !$_FILES['csvUpload']['error']){
         echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$error.'</div>';
     }
 }
-
 } //end POST
 
-$result = $conn->query("SELECT * FROM companyData WHERE id = $cmpID");
+$result = $conn->query("SELECT c.*, s.publicKey FROM companyData c LEFT JOIN security_company s ON (s.companyID = c.id AND s.outDated = 'FALSE') WHERE c.id = $cmpID");
+echo $conn->error;
 if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['id'], $available_companies)):
 ?>
-
 <div class="page-seperated-body page-header-fixed">
     <div class="page-header page-seperated-section">
         <h3><?php echo $lang['COMPANY'] .' - '.$companyRow['name']; ?>
@@ -416,17 +415,17 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
     <div class="container-fluid">
         <div class="col-sm-4">
             <?php if($companyRow['logo']){echo '<img style="max-width:350px;max-height:200px;" src="data:image/jpeg;base64,'.base64_encode( $companyRow['logo'] ).'"/>';} ?>
-            </div>
-            <div class="col-sm-8">
-                <input type="file" name="fileToUpload"/>
-                <small>Empfohlen 350x200px; Max. 5MB</small>
-            </div>
         </div>
-    </form>
-    <br>
+        <div class="col-sm-8">
+            <input type="file" name="fileToUpload"/>
+            <small>Empfohlen 350x200px; Max. 5MB</small>
+        </div>
+    </div>
+</form>
+<br>
 
-<?php if($companyRow['publicPGPKey']): ?>
-    <div class="page-seperated-section"><h4>Public Key</h4><?php echo $companyRow['publicPGPKey']; ?></div><br>
+<?php if($companyRow['publicKey']): ?>
+    <div class="page-seperated-section"><h4>Public Key</h4><?php echo $companyRow['publicKey']; ?></div><br>
 <?php endif; ?>
 
 <!-- GENERAL -->

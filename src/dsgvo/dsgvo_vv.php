@@ -115,7 +115,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <div class="page-header-fixed">
     <div class="page-header"><h3><?php echo $lang['PROCEDURE_DIRECTORY']; ?>
         <div class="page-header-button-group">
-            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-app">+</button>
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-app">+ neuer Vorgang</button>
             <button type="button" class="btn btn-default" data-toggle="modal" data-target="#list-templates"><?php echo $lang['MANAGE_TEMPLATES']; ?></button>
             <a href="data-matrix?n=<?php echo $cmpID; //5acb74765fddc ?>" class="btn btn-default" ><?php echo $lang['DATA_MATRIX'] ?></a>
         </div>
@@ -135,7 +135,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                         <?php
                         $res = $conn->query("SELECT id, name FROM dsgvo_vv_templates WHERE companyID = $cmpID AND type = 'base' ");
                         while($temp_row = $res->fetch_assoc()){
-                            echo '<option value="'.$temp_row['id'].'">'.$temp_row['name'].'</option>';
+                            echo '<option value="'.$temp_row['id'].'">'.$temp_row['name'].' - Basis</option>';
                         }
                         ?>
                     </select>
@@ -151,7 +151,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $template_select = '';
     $select_result = $conn->query("SELECT id, name FROM dsgvo_vv_templates WHERE companyID = $cmpID AND type = 'app'");
     while($select_row = $select_result->fetch_assoc()){
-        $template_select .=' <option value="'.$select_row['id'].'">'.$select_row['name'].'</option>';
+        $template_select .=' <option value="'.$select_row['id'].'">'.$select_row['name'].' - App</option>';
     }
 
     $result = $conn->query("SELECT dsgvo_vv.id, dsgvo_vv.name, dsgvo_vv.templateID FROM dsgvo_vv, dsgvo_vv_templates WHERE dsgvo_vv_templates.type='app' AND templateID = dsgvo_vv_templates.id AND dsgvo_vv_templates.companyID = $cmpID ORDER BY dsgvo_vv.id");
@@ -164,10 +164,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <div class="panel panel-default">
                     <div class="row">
                         <form method="POST">
-                            <div class="col-sm-7">
+                            <div class="col-sm-5">
                                 <a href="vDetail?v=<?php echo $id ?>&n=<?php echo $cmpID; ?>" class="btn btn-link"><?php echo $name; ?></a>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-5">
                                 <div class="input-group">
                                     <select name="template_id" class="js-example-basic-single">
                                         <?php echo str_replace('<option value="'.$row['templateID'].'"', '<option selected value="'.$row['templateID'].'"' , $template_select); ?>
@@ -294,4 +294,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         </div>
     </div>
 </div>
+
+<script>
+$("button[name='delete_app']").click(function() {
+    return confirm("Are you sure you want to delete this item?");
+});
+</script>
 <?php include dirname(__DIR__) . '/footer.php'; ?>
