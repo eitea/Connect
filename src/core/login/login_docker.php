@@ -28,15 +28,17 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
             $_SESSION['color'] = $row['color'];
             $conn->query("UPDATE UserData SET lastLogin = UTC_TIMESTAMP WHERE id = ".$row['id']); //5ac7126421a8b
             //check key pairs
-            if(!$row['privatePGPKey']){
+			$key_res = $conn->query("SELECT privateKey, publicKey FROM security_users WHERE outDated = 'FALSE' AND userID = ".$row['id']);
+	        if(!$key_res || $key_res->num_rows < 1){
                 $keyPair = sodium_crypto_box_keypair();
                 $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
                 $user_public = sodium_crypto_box_publickey($keyPair);
                 $encrypted = simple_encryption($private, $_POST['tester_pass']);
-                $conn->query("UPDATE UserData SET publicPGPKey = '".base64_encode($user_public)."', privatePGPKey = '".$encrypted."'  WHERE id = ".$row['id']);
+                $conn->query("INSERT INTO security_users(userID, publicKey, privateKey) VALUES('".$row['id']."', '".base64_encode($user_public)."', '$encrypted')"); //5ae9e3e1e84e5
                 $_SESSION['privateKey'] = $private;
             } else {
-                $_SESSION['privateKey'] = simple_decryption($row['privatePGPKey'], $_POST['tester_pass']);
+				$key_row = $key_res->fetch_assoc();
+	            $_SESSION['privateKey'] = simple_decryption($key_row['privateKey'], $_POST['password']);
             }
             //if core admin
             $result = $conn->query("SELECT userID FROM roles WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'");

@@ -6,9 +6,12 @@ if (empty($_SESSION['userid'])) {
 $userID = $_SESSION['userid'];
 $timeToUTC = $_SESSION['timeToUTC'];
 $privateKey = $_SESSION['privateKey'];
+if(isset($_SESSION['publicPKey'])){
+    $publicKey = $_SESSION['publicPKey'];
+}
 
 $setActiveLink = 'class="active-link"';
-$unlockedPGP = '';
+
 require __DIR__ . "/connection.php";
 require __DIR__ . "/utilities.php";
 require __DIR__ . "/validate.php";
@@ -48,10 +51,9 @@ if ($userID == 1) { //superuser
 if($isERPAdmin == 'TRUE'){
     $canEditClients = $canEditSuppliers = 'TRUE';
 }
-$result = $conn->query("SELECT psw, lastPswChange, forcedPwdChange, publicPGPKey, birthday, displayBirthday FROM UserData WHERE id = $userID");
+$result = $conn->query("SELECT psw, lastPswChange, forcedPwdChange, birthday, displayBirthday FROM UserData WHERE id = $userID");
 if($result && ($userdata = $result->fetch_assoc())) {
     $userPasswordHash = $userdata['psw'];
-    $publicKey = $userdata['publicPGPKey'];
 } else {
     echo $conn->error;
 }
@@ -219,7 +221,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if(strcmp($password, $_POST['passwordConfirm']) == 0 && match_passwordpolicy($password, $output)){
             $userPasswordHash = password_hash($password, PASSWORD_BCRYPT);
             $private_encrypted = simple_encryption($privateKey, $password);
-            $conn->query("UPDATE UserData SET psw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP, privatePGPKey = '$private_encrypted', forcedPwdChange = 0 WHERE id = '$userID';");
+            $conn->query("UPDATE UserData SET psw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP, forcedPwdChange = 0 WHERE id = '$userID';");
+			$conn->query("UPDATE security_users SET privateKey = '$private_encrypted' WHERE outDated = 'FALSE' AND userID = $userID");
             if(!$conn->error){
                 $validation_output = showSuccess('Password successfully changed.', 1);
 				$userdata['forcedPwdChange'] = false;
@@ -752,7 +755,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             url: 'ajaxQuery/AJAX_postGetAlerts.php',
                             type: 'GET',
                             success: function (response) {
-                                if(response != "0"){                                    
+                                if(response != "0"){
                                     $(target).html(response)
                                     $(target).show()
                                 }else {
@@ -780,7 +783,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   <?php
                   $result = $conn->query("SELECT d.projectid FROM dynamicprojects d LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
                       LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
-                      WHERE d.isTemplate = 'FALSE' AND d.projectstatus = 'ACTIVE' AND (dynamicprojectsemployees.userid = $userID OR teamRelationshipData.userID = $userID)");
+                      WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") AND d.projectstatus = 'ACTIVE' AND (dynamicprojectsemployees.userid = $userID OR teamRelationshipData.userID = $userID)");
                       echo $conn->error;
                       if (($result && $result->num_rows > 0) || $userHasSurveys || $isDynamicProjectsAdmin || $canCreateTasks): ?>
                       <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><?php if($result->num_rows > 0) echo '<span class="badge pull-right">'.$result->num_rows.'</span>'; ?>

@@ -145,8 +145,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         VALUES ('$firstname', '$lastname', '$psw', '$gender', '$email', '$begin', '$recipients', 1);";
         if($conn->query($sql)){
           $curID = mysqli_insert_id($conn);
-          echo mysqli_error($conn);
           $conn->query("INSERT INTO archive_folders VALUES(0,$curID,'ROOT',-1)");
+		  echo mysqli_error($conn);
           //create interval
           $sql = "INSERT INTO $intervalTable (mon, tue, wed, thu, fri, sat, sun, userID, vacPerYear, overTimeLump, pauseAfterHours, hoursOfrest, startDate)
           VALUES ($mon, $tue, $wed, $thu, $fri, $sat, $sun, $curID, '$vacDaysPerYear', '$overTimeLump','$pauseAfter', '$hoursOfRest', '$begin');";
@@ -167,6 +167,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               $conn->query($sql);
             }
           }
+		  //add keys
+		  $keyPair = sodium_crypto_box_keypair();
+		  $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
+		  $user_public = sodium_crypto_box_publickey($keyPair);
+		  $encrypted = simple_encryption($private, $_POST['tester_pass']);
+		  $conn->query("INSERT INTO security_users(userID, publicKey, privateKey) VALUES($curID, '".base64_encode($user_public)."', '$encrypted')");
+
           if($conn->error){ echo $conn->error; } else {redirect('users');}
         }
       }

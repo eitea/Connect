@@ -2493,8 +2493,6 @@ if($row['version'] < 147){
     } else {
         echo '<br>Benutzer: Hauptmandant';
     }
-
-    $conn->query("ALTER TABLE dynamicprojectslogs ADD COLUMN id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY");
 }
 
 if($row['version'] < 148){
@@ -2610,11 +2608,8 @@ if($row['version'] < 151){
 
 if($row['version'] < 152){
 	$conn->query("ALTER TABLE security_projects DROP COLUMN privateKey");
-	//security_company -> build security_modules
-	//security_access -> build access to company
 
 	//same with User Access
-
 	$sql = "ALTER TABLE roles ADD canUseArchive ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL";
 	if (!$conn->query($sql)) {
 		echo $conn->error;
@@ -2622,20 +2617,17 @@ if($row['version'] < 152){
 		echo '<br>Archive User Module';
 	}
 
-}
-
-if($row['version'] < 153){
     $sql = "ALTER TABLE dsgvo_training_questions CHANGE `text` `text` MEDIUMTEXT";
     if (!$conn->query($sql)) {
         echo $conn->error;
     } else {
         echo '<br>Bigger Training Questions (16MiB)';
-    } 
+    }
 
     $result = $conn->query("SELECT id FROM dsgvo_vv_templates WHERE type = 'app'");
     $stmt = $conn->prepare("INSERT INTO dsgvo_vv_template_settings(templateID, opt_name, opt_descr) VALUES(?, ?, ?)");
     $stmt->bind_param("iss", $templateID, $opt, $descr);
-    
+
     if($result && ($row = $result->fetch_assoc())){
         $templateID = $row["id"];
 
@@ -2680,7 +2672,7 @@ if($row['version'] < 153){
     }
 
     // erp_settings in doUpdate.php:1060 is different than in setup_inc.php:807
-    // Values are taken from doUpdate.php:1085 
+    // Values are taken from doUpdate.php:1085
     //   clientNum, clientStep, supplierNum, supplierStep
     //   '1000'   , '1'       , '1000'     , '1'
     $conn->query("SELECT clientNum FROM erp_settings");
@@ -2713,9 +2705,41 @@ if($row['version'] < 153){
     }
 }
 
-// if($row['version'] < 153)
-// if($row['version'] < 154)
-// if($row['version'] < 155)
+if($row['version'] < 153){
+	$conn->query("ALTER TABLE dynamicprojectslogs ADD COLUMN id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY");
+
+	$conn->query("CREATE TABLE security_users(
+		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		userID INT(6) UNSIGNED,
+		publicKey VARCHAR(150) NOT NULL,
+		privateKey VARCHAR(150) NOT NULL,
+		recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+		FOREIGN KEY (userID) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+	)");
+	if($conn->error){
+        echo $conn->error;
+    } else {
+		$conn->query("INSERT INTO security_users (userID, publicKey, privateKey) SELECT id, publicPGPKey, privatePGPKey FROM UserData WHERE publicPGPKey IS NOT NULL"); echo $conn->error;
+		$conn->query("ALTER TABLE UserData DROP COLUMN publicPGPKey");echo $conn->error;
+		$conn->query("ALTER TABLE UserData DROP COLUMN privatePGPKey");echo $conn->error;
+        echo '<br>Security: Users';
+    }
+
+	$conn->query("INSERT INTO security_access(userID, module, optionalID, privateKey) SELECT userID, 'COMPANY', companyID, privateKey FROM security_company");
+	$conn->query("DELETE FROM security_company");
+	$conn->query("ALTER TABLE security_company ADD COLUMN publicKey VARCHAR(150) NOT NULL");
+	$conn->query("ALTER TABLE security_company ADD COLUMN symmetricKey VARCHAR(150) NOT NULL");
+	$conn->query("ALTER TABLE security_company DROP COLUMN privateKey");
+	$conn->query("ALTER TABLE security_company DROP FOREIGN KEY security_company_ibfk_1");
+	$conn->query("ALTER TABLE security_company DROP COLUMN userID");
+
+	$conn->query("ALTER TABLE companyData DROP COLUMN publicPGPKey");
+}
+// if($row['version'] < 154){}
+// if($row['version'] < 155){}
 
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';
