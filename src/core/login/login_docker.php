@@ -38,7 +38,7 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
                 $_SESSION['privateKey'] = $private;
             } else {
 				$key_row = $key_res->fetch_assoc();
-	            $_SESSION['privateKey'] = simple_decryption($key_row['privateKey'], $_POST['password']);
+	            $_SESSION['privateKey'] = simple_decryption($key_row['privateKey'], $_POST['tester_pass']);
             }
             //if core admin
             $result = $conn->query("SELECT userID FROM roles WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'");
