@@ -39,10 +39,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
     if (isset($_POST['addDocument']) && !empty($_POST['add_docName'])) {
-        $val = secure_data('DSGVO', test_input($_POST['add_docName']), 'encrypt', $userID, $privateKey);
+        $val = secure_data('DSGVO', test_input($_POST['add_docName']), 'encrypt', $userID, $privateKey, $err);
         $conn->query("INSERT INTO documents(name, txt, companyID, version) VALUES('$val', ' ', $cmpID, '1.0') ");
-        if ($conn->error) {
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
+        if ($err || $conn->error) {
+			showError($err . $conn->error);
         } else {
             redirect("edit?d=" . $conn->insert_id);
         }
@@ -256,7 +256,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
             echo "<tr $style>";
             echo '<td>' .mc_status('DSGVO'). secure_data('DSGVO', $row['name'], 'decrypt', $userID, $privateKey, $err) . '</td>';
-            //echo $err;
             echo '<td>' . $row['version'] . '</td>';
             echo '<td><form method="POST">';
             echo '<a href="edit?d=' . $row['id'] . '" title="Bearbeiten" class="btn btn-default"><i class="fa fa-pencil"></i></a> ';
@@ -268,6 +267,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			//5ae9c3361c57c
             $doc_selects .= '<option value="' . $row['id'] . '" >' . secure_data('DSGVO', $row['name'], 'decrypt')  .' - '. $row['version']. '</option>';
         }
+		showError($err);
         ?>
     </tbody>
 </table>
