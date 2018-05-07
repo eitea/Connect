@@ -10,7 +10,6 @@ if (isset($_GET["partner"], $_GET["subject"], $_GET["message"]) && !empty($_SESS
 
     require dirname(__DIR__) . "/connection.php";
 
-    // insert a new message into the database
     $sql = "INSERT INTO messages (userID, partnerID, subject, message, sent, seen) VALUES ($userID, $partner, '$subject', '$message', CURRENT_TIMESTAMP, 'FALSE')";
     $conn->query($sql);
 
@@ -25,6 +24,8 @@ if (isset($_GET["partner"], $_GET["subject"], $_GET["message"]) && !empty($_SESS
     $message = test_input($_GET["message"]);
 
     require dirname(__DIR__) . "/connection.php";
+
+    //TODO: encrypt message
 
     $conn->query("INSERT INTO taskmessages (userID, taskID, taskName, message) VALUES ($userID, '$taskID', '$taskName', '$message')");
     echo $conn->error;
