@@ -6,7 +6,7 @@ if (empty($_SESSION['userid'])) {
 $userID = $_SESSION['userid'];
 $timeToUTC = $_SESSION['timeToUTC'];
 $privateKey = $_SESSION['privateKey'];
-$publicKey = $_SESSION['publicPKey'];
+$publicKey = $_SESSION['publicKey'];
 
 $setActiveLink = 'class="active-link"';
 
@@ -784,7 +784,8 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                       WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") AND d.projectstatus = 'ACTIVE' AND (dynamicprojectsemployees.userid = $userID OR teamRelationshipData.userID = $userID)");
                       echo $conn->error;
                       if (($result && $result->num_rows > 0) || $userHasSurveys || $isDynamicProjectsAdmin || $canCreateTasks): ?>
-                      <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><?php if($result->num_rows > 0) echo '<span class="badge pull-right">'.$result->num_rows.'</span>'; ?>
+                      <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view">
+						  <?php if($result->num_rows > 0) echo '<span class="pull-right"><small>'.$result->num_rows.'</small></span>'; ?>
                           <i class="fa fa-tasks"></i><?php echo $lang['DYNAMIC_PROJECTS']; ?>
                       </a></li>
                   <?php endif; ?>
