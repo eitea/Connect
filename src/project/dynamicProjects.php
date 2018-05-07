@@ -481,7 +481,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             $x = $row['projectid'];
             $projectName = $row['projectname'];
 
-            $rowStyle = ($row['activity'] && $row['activity'] != 'VIEWED') ? 'style="color:#1689e7; font-weight:bold;"' : '';
+            $rowStyle = (isset($row['activity']) && $row['activity'] != 'VIEWED') ? 'style="color:#1689e7; font-weight:bold;"' : '';
             echo "<tr $rowStyle>";
             echo '<td>';
             // echo $row['activity'];
