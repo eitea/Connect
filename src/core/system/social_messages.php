@@ -75,8 +75,9 @@
                         <label><?php echo $lang['POST_TO']; ?> </label>
                         <select required class="js-example-basic-single" name="to_userid[]" multiple="multiple">
                             <?php //5abdd31716137
-                            foreach($available_users as $x){
-                            echo '<option value="'.$x.'">'.$userID_toName[$x].'</option>';
+                            foreach ($available_users as $x) {
+                                if($x == -1 || $x == $userID) continue;
+                                echo '<option value="' . $x . '">' . $userID_toName[$x] . '</option>';
                             }
                             ?>
                         </select><br>
