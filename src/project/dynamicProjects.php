@@ -481,7 +481,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             $x = $row['projectid'];
             $projectName = $row['projectname'];
 
-            $rowStyle = ($row['activity'] && $row['activity'] != 'VIEWED') ? 'style="color:#1689e7; font-weight:bold;"' : '';
+            $rowStyle = (isset($row['activity']) && $row['activity'] != 'VIEWED') ? 'style="color:#1689e7; font-weight:bold;"' : '';
             echo "<tr $rowStyle>";
             echo '<td>';
             // echo $row['activity'];
@@ -601,7 +601,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                     }
 
                     $.ajax({
-                        url: "ajaxQuery/AJAX_postGetMessage.php",
+                        url: "ajaxQuery/ajax_post_get_messages.php",
                         data: {
                             taskID: taskID,
                             limit: limit,
@@ -715,7 +715,6 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 <td style="color:white;"><span class="badge" style="background-color:<?=$priority_color[1]?>" title="<?=$lang['PRIORITY_TOSTRING'][1]?>">1</span></td>
                 <td>-</td>
                 <td>-</td>
-                <td><input type="checkbox" disabled /></td>
                 <td><a type="button" class="btn btn-default openSurvey"><i class="fa fa-question-circle"></i></a></td>
             </tr>
         <?php endif;
@@ -731,7 +730,6 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 <td style="color:white;"><span class="badge" style="background-color:<?=$priority_color[1]?>" title="<?=$lang['PRIORITY_TOSTRING'][1]?>">1</span></td>
                 <td>-</td>
                 <td>-</td>
-                <td><input type="checkbox" disabled /></td>
                 <td><a type="button" class="btn btn-default openDoneSurvey"><i class="fa fa-question-circle"></i></a></td>
             </tr>
         <?php endif; ?>

@@ -2738,9 +2738,33 @@ if($row['version'] < 153){
 
 	$conn->query("ALTER TABLE companyData DROP COLUMN publicPGPKey");
 }
-// if($row['version'] < 154){}
-// if($row['version'] < 155){}
 
+if($row['version'] < 154){
+    // this might exist already
+    $sql = "CREATE TABLE taskmessages(
+        userID INT(6) UNSIGNED,
+        taskID varchar(100),
+        taskName varchar(100),
+        message TEXT,
+        picture MEDIUMBLOB,
+        sent DATETIME DEFAULT CURRENT_TIMESTAMP
+    )";
+    $conn->query($sql);
+    if (!$conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Task Messages';
+    }
+    $conn->query("ALTER TABLE messages ADD COLUMN user_deleted ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+    echo $conn->error;
+    $conn->query("ALTER TABLE messages ADD COLUMN partner_deleted ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+    echo $conn->error;
+}
+
+if($row['version'] < 154){
+    $conn->query("ALTER TABLE socialprofile ADD COLUMN new_message_email ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+    echo $conn->error;
+}
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';
 $conn->query("UPDATE configurationData SET version=$VERSION_NUMBER");
