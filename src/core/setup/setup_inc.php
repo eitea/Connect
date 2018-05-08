@@ -830,6 +830,7 @@ function create_tables($conn) {
         isAvailable ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
         status varchar(150) DEFAULT '-',
         picture MEDIUMBLOB,
+        new_message_email ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         FOREIGN KEY (userID) REFERENCES UserData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -844,7 +845,7 @@ function create_tables($conn) {
         message TEXT,
         picture MEDIUMBLOB,
         sent DATETIME DEFAULT CURRENT_TIMESTAMP,
-        seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+        seen 
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);

@@ -2761,6 +2761,10 @@ if($row['version'] < 154){
     echo $conn->error;
 }
 
+if($row['version'] < 154){
+    $conn->query("ALTER TABLE socialprofile ADD COLUMN new_message_email ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+    echo $conn->error;
+}
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';
 $conn->query("UPDATE configurationData SET version=$VERSION_NUMBER");

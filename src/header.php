@@ -288,6 +288,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $sql = "UPDATE socialprofile SET isAvailable = 'FALSE' WHERE userID = '$userID'";
         }
         $conn->query($sql);
+        if (isset($_POST['social_newMessageEmail'])) {
+            $sql = "UPDATE socialprofile SET new_message_email = 'TRUE' WHERE userID = '$userID'";
+        } else {
+            $sql = "UPDATE socialprofile SET new_message_email = 'FALSE' WHERE userID = '$userID'";
+        }
+        $conn->query($sql);
     }
     //5ab7bd3310438
     if(!empty($_POST['social_birthday']) && test_Date($_POST['social_birthday'], 'Y-m-d')){
@@ -385,11 +391,12 @@ if ($_SESSION['color'] == 'light') {
             <div class="navbar-right" style="margin-right:10px;">
                 <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>
                 <?php
-                $result = $conn->query("SELECT status, isAvailable, picture FROM socialprofile WHERE userID = $userID"); echo $conn->error;
+                $result = $conn->query("SELECT status, isAvailable, picture, new_message_email FROM socialprofile WHERE userID = $userID"); echo $conn->error;
                 if($result){
                     $row = $result->fetch_assoc();
                     $social_status = $row["status"];
                     $social_isAvailable = $row["isAvailable"];
+                    $social_newMessageEmail = $row["new_message_email"];
                     $defaultGroupPicture = "images/group.png";
                     $defaultPicture = "images/defaultProfilePicture.png";
                     $profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($row['picture']) : $defaultPicture;
@@ -579,6 +586,16 @@ if ($_SESSION['color'] == 'light') {
                           <div class="col-md-4 checkbox">
                               <label><br>
                                   <input type="checkbox" name="social_isAvailable" <?php if($social_isAvailable == 'TRUE') {echo 'checked';} ?> ><?php echo $lang['SOCIAL_AVAILABLE']; ?>
+                              </label>
+                          </div>
+                      </div> 
+                      <div class="row">
+                        <div class="col-md-12">
+                            <label>Benachrichtigungen</label>
+                        </div>
+                        <div class="col-md-12 checkbox">
+                              <label><br>
+                                  <input type="checkbox" name="social_newMessageEmail" <?php if($social_newMessageEmail == 'TRUE') {echo 'checked';} ?> > Bei neuer Nachricht per E-Mail informieren
                               </label>
                           </div>
                       </div>
