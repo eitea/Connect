@@ -150,13 +150,14 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
                 //decrypt access
                 $nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
                 $cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
-				//echo base64_encode($privateKey) .' --keypairsize : '.strlen($privateKey.$public_module ).'<br>';
-				//echo base64_encode($public_module);
-                $private_module = sodium_crypto_box_open($cipher_private_module, $nonce, $privateKey.$public_module);
+				// echo base64_encode($privateKey) .' --private <br> keypairsize: '.strlen($privateKey.$public_module ).'<br> public--';
+				// echo base64_encode($public_module);
+				$private_module = sodium_crypto_box_open($cipher_private_module, $nonce, $privateKey.$public_module);
+				$nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
+				$cipher_symmetric = mb_substr($cipher_symmetric, 24, null, '8bit');
+				$symmetric = sodium_crypto_box_open($cipher_symmetric, $nonce, $private_module.$public_module);
+
                 //decrypt module
-                $nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
-                $cipher_symmetric = mb_substr($cipher_symmetric, 24, null, '8bit');
-                $symmetric = sodium_crypto_box_open($cipher_symmetric, $nonce, $private_module.$public_module);
                 if($symmetric){
                     if($mode == 'encrypt'){
                         return simple_encryption($message, $symmetric);
@@ -596,12 +597,12 @@ function convToUTF8($text) {
 function insert_access_user($projectID, $userID, $privateKey, $external = false){
 	global $conn;
 	if($external) {
-		$result = $conn->query("SELECT publicKey AS publicPGPKey FROM external_users WHERE id = $userID");
+		$result = $conn->query("SELECT publicKey FROM external_users WHERE id = $userID");
 	} else {
-		$result = $conn->query("SELECT publicPGPKey FROM UserData WHERE id = $userID");
+		$result = $conn->query("SELECT publicKey FROM security_users WHERE userID = $userID");
 	}
 	if($result && ($row = $result->fetch_assoc())){
-		$user_public = base64_decode($row['publicPGPKey']);
+		$user_public = base64_decode($row['publicKey']);
 		$nonce = random_bytes(24);
 		$private_encrypt = $nonce . sodium_crypto_box($privateKey, $nonce, $privateKey.$user_public);
 		if($external){

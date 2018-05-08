@@ -2740,6 +2740,7 @@ if($row['version'] < 153){
 }
 
 if($row['version'] < 154){
+    // this might exist already
     $sql = "CREATE TABLE taskmessages(
         userID INT(6) UNSIGNED,
         taskID varchar(100),

@@ -55,7 +55,7 @@ if(isset($_POST['savePAS']) && !empty($_POST['passwordCurrent']) && !empty($_POS
     if(strcmp($password, $_POST['passwordConfirm']) == 0 && match_passwordpolicy($password, $output)){
         $userPasswordHash = password_hash($password, PASSWORD_BCRYPT);
         $private_encrypted = simple_encryption($privateKey, $password);
-        $conn->query("UPDATE external_users SET login_pw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP, privatePGPKey = '$private_encrypted' WHERE id = '$userID';");
+        $conn->query("UPDATE external_users SET login_pw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP, privateKey = '$private_encrypted' WHERE id = '$userID';");
         if(!$conn->error){
             $validation_output  = '<div class="alert alert-success fade in"><a href="#" class="close" data-dismiss="alert" >&times;</a><strong>Success! </strong>Password successfully changed. </div>';
         } else {

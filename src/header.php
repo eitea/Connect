@@ -6,9 +6,8 @@ if (empty($_SESSION['userid'])) {
 $userID = $_SESSION['userid'];
 $timeToUTC = $_SESSION['timeToUTC'];
 $privateKey = $_SESSION['privateKey'];
-if(isset($_SESSION['publicPKey'])){
-    $publicKey = $_SESSION['publicPKey'];
-}
+if(isset($_SESSION['publicKey'])) 
+    $publicKey = $_SESSION['publicKey'];
 
 $setActiveLink = 'class="active-link"';
 
@@ -17,6 +16,11 @@ require __DIR__ . "/utilities.php";
 require __DIR__ . "/validate.php";
 require __DIR__ . "/language.php";
 
+if (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])){
+	ini_set('display_errors', 1);
+	ini_set('display_startup_errors', 1);
+	error_reporting(E_ALL);
+}
 $result = $conn->query("SELECT * FROM roles WHERE userID = $userID");
 if ($result && $result->num_rows > 0) {
     $row = $result->fetch_assoc();
@@ -787,7 +791,8 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                       WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") AND d.projectstatus = 'ACTIVE' AND (dynamicprojectsemployees.userid = $userID OR teamRelationshipData.userID = $userID)");
                       echo $conn->error;
                       if (($result && $result->num_rows > 0) || $userHasSurveys || $isDynamicProjectsAdmin || $canCreateTasks): ?>
-                      <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view"><?php if($result->num_rows > 0) echo '<span class="badge pull-right">'.$result->num_rows.'</span>'; ?>
+                      <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view">
+						  <?php if($result->num_rows > 0) echo '<span class="pull-right"><small>'.$result->num_rows.'</small></span>'; ?>
                           <i class="fa fa-tasks"></i><?php echo $lang['DYNAMIC_PROJECTS']; ?>
                       </a></li>
                   <?php endif; ?>
