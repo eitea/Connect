@@ -715,7 +715,6 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 <td style="color:white;"><span class="badge" style="background-color:<?=$priority_color[1]?>" title="<?=$lang['PRIORITY_TOSTRING'][1]?>">1</span></td>
                 <td>-</td>
                 <td>-</td>
-                <td><input type="checkbox" disabled /></td>
                 <td><a type="button" class="btn btn-default openSurvey"><i class="fa fa-question-circle"></i></a></td>
             </tr>
         <?php endif;
@@ -731,7 +730,6 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 <td style="color:white;"><span class="badge" style="background-color:<?=$priority_color[1]?>" title="<?=$lang['PRIORITY_TOSTRING'][1]?>">1</span></td>
                 <td>-</td>
                 <td>-</td>
-                <td><input type="checkbox" disabled /></td>
                 <td><a type="button" class="btn btn-default openDoneSurvey"><i class="fa fa-question-circle"></i></a></td>
             </tr>
         <?php endif; ?>
