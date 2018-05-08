@@ -255,54 +255,14 @@ if($projectRow['publicKey']){
 					<div class="col-xs-4 bold">Upload Datum</div>
 				</div>
 				<?php
-				$result = $conn->query("SELECT name FROM company_folders WHERE companyID = ".$projectRow['companyID']." AND name NOT IN
-				( SELECT name FROM project_archive WHERE projectID = $projectID AND parent_directory = 'ROOT') ");
+				$result = $conn->query("SELECT name FROM folder_default_sturctures WHERE category = 'COMPANY' AND categoryID = '".$projectRow['companyID']."' AND name NOT IN
+				( SELECT name FROM archive WHERE category = 'PROJECT' AND categoryID = '$projectID' AND parent_directory = 'ROOT') ");
 				echo $conn->error;
 				while($result && ($row = $result->fetch_assoc())){
-					$conn->query("INSERT INTO project_archive(projectID, name, parent_directory, type) VALUES($projectID, '".$row['name']."', 'ROOT', 'folder')"); echo $conn->error;
+					$conn->query("INSERT INTO archive(category, categoryID, name, parent_directory, type) VALUES('PROJECT', '$projectID', '".$row['name']."', 'ROOT', 'folder')"); echo $conn->error;
 				}
-				function drawFolder($parent_structure, $visibility = true){
-					global $conn;
-					global $projectID;
-					global $project_symmetric;
-					$html = '<div id="folder-'.$projectID.'-'.$parent_structure.'" >';
-					if(!$visibility) $html = substr_replace($html, 'style="display:none"', -1, 0);
 
-					if($parent_structure != 'ROOT') $html .= '<div class="row"><div class="col-xs-1"><i class="fa fa-arrow-left"></i></div>
-					<div class="col-xs-3"><button class="btn btn-link tree-node-back-'.$projectID.'" data-parent="'.$parent_structure.'">Zurück</button></div></div>';
-					$subfolder = '';
-					$result = $conn->query("SELECT id, name, uploadDate, type, uniqID FROM project_archive WHERE projectID = $projectID AND parent_directory = '$parent_structure' ORDER BY type <> 'folder', type ASC ");
-					echo $conn->error;
-					while($result && ($row = $result->fetch_assoc())){
-						$html .= '<div class="row">';
-						if($row['type'] == 'folder'){
-							$html .= '<div class="col-xs-1"><i class="fa fa-folder-open-o"></i></div>
-							<div class="col-xs-4"><a class="folder-structure-'.$projectID.'" data-child="'.$row['id'].'" data-parent="'.$parent_structure.'" >'
-							.$row['name'].'</a></div><div class="col-xs-4">'.$row['uploadDate'].'</div><div class="col-xs-3">';
-							$folder_res = $conn->query("SELECT id FROM project_archive WHERE projectID = $projectID AND parent_directory = '".$row['id']."' ");
-							if($folder_res->num_rows < 1){
-								$html .= '<form method="POST"><button type="submit" name="delete-folder" value="'.$row['id'].'" class="btn btn-default"><i class="fa fa-trash-o"></i></button>';
-							}
-							$html .= '</div>';
-							$subfolder .= drawFolder($row['id'], false);
-						} else {
-							$html .= '<div class="col-xs-1"><i class="fa fa-file-o"></i></div>
-							<div class="col-xs-4">'.$row['name'].'</div><div class="col-xs-4">'.$row['uploadDate'].'</div>
-							<div class="col-xs-3">
-							<form method="POST" style="display:inline"><button type="submit" class="btn btn-default" name="delete-file" value="'.$row['uniqID'].'">
-							<i class="fa fa-trash-o"></i></button></form>
-							<form method="POST" style="display:inline" action="detailDownload" target="_blank">
-							<input type="hidden" name="symmetricKey" value="'.base64_encode($project_symmetric).'" />
-							<button type="submit" class="btn btn-default" name="download-file" value="'.$row['uniqID'].'"><i class="fa fa-download"></i></button>
-							</form></div>';
-						}
-						$html .= '</div>';
-					}
-					$html .= '</div>';
-					$html .= $subfolder;
-					return $html;
-				}
-				echo drawFolder('ROOT');
+				echo drawFolder('ROOT', 'PROJECT', $projectID);
 				?>
 
 				<div id="modal-new-folder-<?php echo $projectID; ?>" class="modal fade">

@@ -87,14 +87,14 @@ if(!empty($_POST['delete-file'])){
 	$x = test_input($_POST['delete-file']);
 	try{
 		$s3->deleteObject(['Bucket' => $bucket, 'Key' => $x]);
-		$conn->query("DELETE FROM project_archive WHERE uniqID = '$x'");
+		$conn->query("DELETE FROM archive WHERE category='PROJECT' AND uniqID = '$x'");
 		if($conn->error){ showError($conn->error); } else { showSuccess($lang['OK_DELETE']); }
 	} catch(Exception $e){
 		echo $e->getMessage();
 	}
 } elseif(!empty($_POST['delete-folder'])){
 	$x = test_input($_POST['delete-folder']);
-	$conn->query("DELETE FROM project_archive WHERE id = '$x' AND type = 'folder'");
+	$conn->query("DELETE FROM archive WHERE id = '$x' AND type = 'folder'");
 	if($conn->error){ showError($conn->error); } else { showSuccess($lang['OK_DELETE']); }
 } elseif(!empty($_POST['saveThisProject'])){
 	$active_modal = $x = intval($_POST['saveThisProject']);
@@ -223,7 +223,7 @@ if(!empty($_POST['delete-file'])){
 				));
 
 				$filename = test_input($file_info['filename']);
-				$conn->query("INSERT INTO project_archive (projectID, name, parent_directory, type, uniqID) VALUES ($x, '$filename', '$parent', '$ext', '$hashkey')");
+				$conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uniqID) VALUES ('PROJECT', '$x', '$filename', '$parent', '$ext', '$hashkey')");
 				if($conn->error){ showError($conn->error); } else { showSuccess($lang['OK_UPLOAD']); }
 			} catch(Exception $e){
 				echo $e->getTraceAsString();
@@ -237,7 +237,7 @@ if(!empty($_POST['delete-file'])){
         $parent = test_input($_POST['add-new-folder']);
         if(!empty($_POST['new-folder-name'])){
             $name = test_input($_POST['new-folder-name']);
-            $conn->query("INSERT INTO project_archive(projectID, name, parent_directory, type) VALUES ($x, '$name', '$parent', 'folder')");
+            $conn->query("INSERT INTO archive(category, categoryID, name, parent_directory, type) VALUES ('PROJECT', '$x', '$name', '$parent', 'folder')");
             if($conn->error){
                 showError($conn->error);
             } else {
@@ -264,11 +264,14 @@ if($isProjectAdmin == 'TRUE'){
 	    include dirname(__DIR__) . "/misc/new_client_buttonless.php";
 	}
 	$result_outer = $conn->query("SELECT p.name, p.id, p.status, clientData.companyID, clientData.name AS clientName, companyData.name AS companyName
-        FROM projectData p INNER JOIN clientData ON clientData.id = p.clientID INNER JOIN companyData ON companyData.id = clientData.companyID WHERE 1 $query");
+        FROM projectData p INNER JOIN clientData ON clientData.id = p.clientID INNER JOIN companyData ON companyData.id = clientData.companyID
+		WHERE companyID IN (".implode(', ', $available_companies).")");
 } else {
-	$result_outer = $conn->query("SELECT p.name, p.id, p.status, companyData.name AS companyName, clientData.name AS clientName FROM $tableName t LEFT JOIN projectData p ON p.id = t.projectID
+	$result_outer = $conn->query("SELECT p.name, p.id, p.status, companyData.name AS companyName, clientData.name AS clientName
+		FROM $tableName t LEFT JOIN projectData p ON p.id = t.projectID
 		INNER JOIN clientData ON clientData.id = p.clientID INNER JOIN companyData ON companyData.id = clientData.companyID WHERE t.userID = $userID");
 }
+
 echo $conn->error
 ?>
 <div class="page-header h3"><?php echo $lang['PROJECTS']; ?>

@@ -110,6 +110,24 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             showError($lang['ERROR_INVALID_CHARACTER']);
         }
     }
+
+	if(!empty($_POST['add_folder_name'])){
+	    $val = test_input($_POST['add_folder_name']);
+	    $conn->query("INSERT INTO folder_default_sturctures(category, name, categoryID) VALUES ('DSGVO', '$val', '1')");
+	    if($conn->error){
+	      showError($conn->error);
+	    } else {
+	      showSuccess($lang['OK_ADD']);
+	    }
+	} elseif(!empty($_POST['folder_delete'])){
+	    $val = intval($_POST['folder_delete']);
+	    $conn->query("DELETE FROM folder_default_sturctures WHERE id = $val AND category = 'DSGVO'");
+	    if($conn->error){
+	        showError($conn->error);
+	    } else{
+	        showSuccess($lang['OK_DELETE']);
+	    }
+	}
 } //endif POST
 ?>
 <div class="page-header-fixed">
@@ -118,6 +136,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-app">+ neuer Vorgang</button>
             <button type="button" class="btn btn-default" data-toggle="modal" data-target="#list-templates"><?php echo $lang['MANAGE_TEMPLATES']; ?></button>
             <a href="data-matrix?n=<?php echo $cmpID; //5acb74765fddc ?>" class="btn btn-default" ><?php echo $lang['DATA_MATRIX'] ?></a>
+			<button type="button" class="btn btn-default" data-toggle="modal" data-target="#list-default-folders">Archivstruktur</button>
         </div>
     </h3></div>
 </div>
@@ -126,10 +145,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $result = $conn->query("SELECT dsgvo_vv.id FROM dsgvo_vv, dsgvo_vv_templates WHERE dsgvo_vv.name='Basis' AND templateID = dsgvo_vv_templates.id AND dsgvo_vv_templates.companyID = $cmpID");
     $row = $result->fetch_assoc();
     ?>
-    <div class="panel panel-default" style="margin:0 15px">
         <form method="POST">
             <div class="row">
-                <div class="col-sm-6"><a href="vDetail?v=<?php echo $row['id']; ?>&n=<?php echo $cmpID; ?>" class="btn btn-link"> Stammblatt </a></div>
+                <div class="panel panel-default col-sm-6"><a href="vDetail?v=<?php echo $row['id']; ?>&n=<?php echo $cmpID; ?>" class="btn btn-link"> Stammblatt </a></div>
                 <div class="col-sm-5">
                     <select name="change_basic_template" class="js-example-basic-single">
                         <?php
@@ -145,7 +163,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 </div>
             </div>
         </form>
-    </div>
     <br>
     <?php
     $template_select = '';
@@ -160,30 +177,24 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $name = $row['name'];
         ?>
         <div class="row">
-            <div class="col-md-11 col-md-offset-1">
-                <div class="panel panel-default">
-                    <div class="row">
-                        <form method="POST">
-                            <div class="col-sm-5">
-                                <a href="vDetail?v=<?php echo $id ?>&n=<?php echo $cmpID; ?>" class="btn btn-link"><?php echo $name; ?></a>
-                            </div>
-                            <div class="col-sm-5">
-                                <div class="input-group">
-                                    <select name="template_id" class="js-example-basic-single">
-                                        <?php echo str_replace('<option value="'.$row['templateID'].'"', '<option selected value="'.$row['templateID'].'"' , $template_select); ?>
-                                    </select>
-                                    <div class="input-group-btn">
-                                        <button type="submit" class="btn btn-default" name="change_template" value="<?php echo $id; ?>"><i class="fa fa-floppy-o"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-1">
-                                <button type="submit" class="btn btn-default" name="delete_app" value="<?php echo $id; ?>"><i class="fa fa-trash-o"></i></button>
-                            </div>
-                        </form>
+            <form method="POST">
+                <div class="panel panel-default col-sm-5 col-sm-offset-1">
+                    <a href="vDetail?v=<?php echo $id ?>&n=<?php echo $cmpID; ?>" class="btn btn-link"><?php echo $name; ?></a>
+                </div>
+                <div class="col-sm-5">
+                    <div class="input-group">
+                        <select name="template_id" class="js-example-basic-single">
+                            <?php echo str_replace('<option value="'.$row['templateID'].'"', '<option selected value="'.$row['templateID'].'"' , $template_select); ?>
+                        </select>
+                        <div class="input-group-btn">
+                            <button type="submit" class="btn btn-default" name="change_template" value="<?php echo $id; ?>"><i class="fa fa-floppy-o"></i></button>
+                        </div>
                     </div>
                 </div>
-            </div>
+                <div class="col-sm-1">
+                    <button type="submit" class="btn btn-default" name="delete_app" value="<?php echo $id; ?>"><i class="fa fa-trash-o"></i></button>
+                </div>
+            </form>
         </div>
     <?php endwhile; ?>
 </div>
@@ -216,7 +227,58 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     </div>
 </div>
 
-<div id="list-templates" class="modal fade">
+	<div id="list-default-folders" class="modal fade">
+		<div class="modal-dialog modal-content modal-md">
+			<form method="POST">
+				<div class="modal-header h4">Default Ordner
+					<div class="page-header-button-group">
+						<button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-folder" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
+					</div>
+				</div>
+				<div class="modal-body">
+					<table class="table table-hover">
+						<thead><tr>
+							<th>Name</th>
+							<th></th>
+						</tr></thead>
+						<tbody>
+							<?php
+							$result = $conn->query("SELECT id, name FROM folder_default_sturctures WHERE category = 'DSGVO' ");
+							while($result && ($row = $result->fetch_assoc())){
+								echo '<tr>';
+								echo '<td>'.$row['name'].'</td>';
+								echo '<td><form method="POST"><button type="submit" class="btn btn-default" name="folder_delete" value="'.$row['id'].'"><i class="fa fa-trash-o"></i></button></form></td>';
+								echo '</tr>';
+							}
+							?>
+						</tbody>
+					</table>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button type="submit" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<div id="add-folder" class="modal fade">
+		<div class="modal-dialog modal-content modal-sm">
+			<form method="POST">
+				<div class="modal-header h4">Neuer Ordner</div>
+				<div class="modal-body">
+					<label>Name</label>
+					<input type="text" name="add_folder_name" class="form-control" placeholder="Name..."/>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button type="submit" class="btn btn-warning"><?php echo $lang['ADD']; ?></button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<div id="list-templates" class="modal fade">
     <div class="modal-dialog modal-content modal-lg">
         <div class="modal-header h4">
             <?php echo $lang['PROCEDURE_DIRECTORY']; ?> - Templates
@@ -263,6 +325,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             </form>
 
             <?php echo $modals; ?>
+
             <div id="add-template" class="modal fade">
                 <div class="modal-dialog modal-content modal-sm">
                     <form method="POST">

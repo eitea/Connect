@@ -60,7 +60,7 @@ if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['a
                     $symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
                     $nonce = random_bytes(24);
                     $symmetric_encrypted = $nonce . sodium_crypto_box($symmetric, $nonce, $private.$public);
-                    $conn->query("INSERT INTO security_modules(module, publicPGPKey, symmetricKey) VALUES ('$module', '".base64_encode($public)."', '".base64_encode($symmetric_encrypted)."')");
+                    $conn->query("INSERT INTO security_modules(module, publicKey, symmetricKey) VALUES ('$module', '".base64_encode($public)."', '".base64_encode($symmetric_encrypted)."')");
                     if($conn->error){ $accept = false; $err .= $conn->error; }
 
                     $nonce = random_bytes(24);

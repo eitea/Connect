@@ -143,9 +143,9 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
 			//echo $row['privateKey'] .' --private access<br>';
             $cipher_private_module = base64_decode($row['privateKey']);
 			//echo ($cipher_private_module) .' --private key module<br>';
-            $result = $conn->query("SELECT publicPGPKey, symmetricKey FROM security_modules WHERE module = '$module' AND outDated = 'FALSE'");
+            $result = $conn->query("SELECT publicKey, symmetricKey FROM security_modules WHERE module = '$module' AND outDated = 'FALSE'");
             if($result && ( $row=$result->fetch_assoc() )){
-                $public_module = base64_decode($row['publicPGPKey']);
+                $public_module = base64_decode($row['publicKey']);
                 $cipher_symmetric = base64_decode($row['symmetricKey']);
                 //decrypt access
                 $nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
@@ -657,4 +657,44 @@ function showSuccess($message, $toString = false){
         return "<script>$(document).ready(function(){showSuccess('$message')})</script>";
     }
     echo "<script>$(document).ready(function(){showSuccess('$message')})</script>";
+}
+
+function drawFolder($parent_structure, $cat, $catID, $visibility = true){
+	global $conn;
+	$html = '<div id="folder-'.$catID.'-'.$parent_structure.'" >';
+	if(!$visibility) $html = substr_replace($html, 'style="display:none"', -1, 0);
+
+	if($parent_structure != 'ROOT') $html .= '<div class="row"><div class="col-xs-1"><i class="fa fa-arrow-left"></i></div>
+	<div class="col-xs-3"><button type="button" class="btn btn-link tree-node-back-'.$catID.'" data-parent="'.$parent_structure.'">Zurück</button></div></div>';
+	$subfolder = '';
+	$result = $conn->query("SELECT id, name, uploadDate, type, uniqID FROM archive WHERE category = '$cat' AND categoryID = '$catID' AND parent_directory = '$parent_structure' ORDER BY type <> 'folder', type ASC ");
+	echo $conn->error;
+	while($result && ($row = $result->fetch_assoc())){
+		$html .= '<div class="row">';
+		if($row['type'] == 'folder'){
+			$html .= '<div class="col-xs-1"><i class="fa fa-folder-open-o"></i></div>
+			<div class="col-xs-4"><a class="folder-structure-'.$catID.'" data-child="'.$row['id'].'" data-parent="'.$parent_structure.'" >'
+			.$row['name'].'</a></div><div class="col-xs-4">'.$row['uploadDate'].'</div><div class="col-xs-3">';
+			$folder_res = $conn->query("SELECT id FROM archive WHERE category = '$cat' AND categoryID = $catID AND parent_directory = '".$row['id']."' ");
+			if($folder_res->num_rows < 1){
+				$html .= '<form method="POST"><button type="submit" name="delete-folder" value="'.$row['id'].'" class="btn btn-default"><i class="fa fa-trash-o"></i></button>';
+			}
+			$html .= '</div>';
+			$subfolder .= drawFolder($row['id'], $cat, $catID, false);
+		} else {
+			$html .= '<div class="col-xs-1"><i class="fa fa-file-o"></i></div>
+			<div class="col-xs-4">'.$row['name'].'</div><div class="col-xs-4">'.$row['uploadDate'].'</div>
+			<div class="col-xs-3">
+			<form method="POST" style="display:inline"><button type="submit" class="btn btn-default" name="delete-file" value="'.$row['uniqID'].'">
+			<i class="fa fa-trash-o"></i></button></form>
+			<form method="POST" style="display:inline" action="../project/detailDownload" target="_blank">
+			<input type="hidden" name="keyReference" value="'.$cat.'_'.$catID.'" />
+			<button type="submit" class="btn btn-default" name="download-file" value="'.$row['uniqID'].'"><i class="fa fa-download"></i></button>
+			</form></div>';
+		}
+		$html .= '</div>';
+	}
+	$html .= '</div>';
+	$html .= $subfolder;
+	return $html;
 }

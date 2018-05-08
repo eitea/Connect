@@ -241,7 +241,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
 } elseif(!empty($_POST['add_folder_name'])){
     $val = test_input($_POST['add_folder_name']);
-    $conn->query("INSERT INTO company_folders(name, companyID) VALUES ('$val', $cmpID)");
+    $conn->query("INSERT INTO folder_default_sturctures(category, name, categoryID) VALUES ('COMPANY', '$val', '$cmpID')");
     if($conn->error){
       showError($conn->error);
     } else {
@@ -249,7 +249,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
 } elseif(!empty($_POST['folder_delete'])){
     $val = intval($_POST['folder_delete']);
-    $conn->query("DELETE FROM company_folders WHERE id = $val AND companyID = $cmpID");
+    $conn->query("DELETE FROM folder_default_sturctures WHERE id = $val AND category = 'COMPANY' AND categoryID = '$cmpID'");
     if($conn->error){
         showError($conn->error);
     } else{
@@ -1225,7 +1225,7 @@ $row = $result->fetch_assoc();
             </tr></thead>
             <tbody>
                 <?php
-                $result = $conn->query("SELECT id, name FROM company_folders WHERE companyID = $cmpID");
+                $result = $conn->query("SELECT id, name FROM folder_default_sturctures WHERE category 'COMPANY' AND categoryID = '$cmpID'");
                 while($result && ($row = $result->fetch_assoc())){
                     echo '<tr>';
                     echo '<td>'.$row['name'].'</td>';

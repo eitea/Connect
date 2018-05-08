@@ -2442,27 +2442,6 @@ if($row['version'] < 145){
     }
 }
 
-if($row['version'] < 146){
-    //text, file, s3File, s3Text, folder
-    $sql = "CREATE TABLE project_archive(
-        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        projectID INT(6) UNSIGNED,
-        name VARCHAR(120) NOT NULL,
-        parent_directory VARCHAR(120) NOT NULL DEFAULT 'ROOT',
-        type VARCHAR(10) NOT NULL,
-        uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (projectID) REFERENCES projectData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-    );";
-    if (!$conn->query($sql)) {
-        echo $conn->error;
-    } else {
-        echo '<br>Projekte: Archiv';
-    }
-}
-
-
 if($row['version'] < 147){
     //5ab7ae7596e5c
     $conn->query("ALTER TABLE roles ADD COLUMN canUseWorkflow ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL");
@@ -2564,7 +2543,6 @@ if($row['version'] < 150) {
         echo '<br>DSGVO Training: Question Version';
     }
 
-    $conn->query("ALTER TABLE project_archive ADD COLUMN uniqID VARCHAR(30) UNIQUE");
     //5ad4376e05226
     $conn->query("ALTER TABLE mailingOptions MODIFY COLUMN feedbackRecipient VARCHAR(50) DEFAULT 'connect@eitea.at'");
     $conn->query("UPDATE mailingOptions SET feedbackRecipient = 'connect@eitea.at'");
@@ -2738,7 +2716,48 @@ if($row['version'] < 153){
 
 	$conn->query("ALTER TABLE companyData DROP COLUMN publicPGPKey");
 }
-// if($row['version'] < 154){}
+
+if($row['version'] < 154){
+	$sql = "CREATE TABLE folder_default_sturctures(
+		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		category VARCHAR(20) NOT NULL,
+		categoryID VARCHAR(20) NOT NULL,
+		name VARCHAR(155) NOT NULL
+	)";
+	if(!$conn->query($sql)){
+		echo $conn->error;
+	} else {
+		echo '<br>Archive: Default folder structures';
+		$conn->query("INSERT INTO folder_default_sturctures(category, categoryID, name) SELECT 'COMPANY', companyID, name FROM company_folders");
+		if(!$conn->error) $conn->query("DROP TABLE company_folders");
+		echo $conn->error;
+	}
+
+	$conn->query("INSERT INTO folder_default_sturctures(category, categoryID, name) SELECT 'DSGVO', id, 'Dokumentation FROM companyData");
+
+	$sql = "CREATE TABLE archive(
+        id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		uniqID VARCHAR(30) UNIQUE,
+		category VARCHAR(20) NOT NULL,
+		categoryID VARCHAR(20) NOT NULL,
+        name VARCHAR(120) NOT NULL,
+        parent_directory VARCHAR(120) NOT NULL DEFAULT 'ROOT',
+        type VARCHAR(10) NOT NULL,
+        uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP
+    )";
+	if(!$conn->query($sql)){
+		echo $conn->error;
+	} else {
+		echo '<br>Archive: upload structure';
+		$conn->query("INSERT INTO archive(id, uniqID, category, categoryID, name, parent_directory, type, uploadDate)
+		SELECT id, uniqID, 'PROJECT', projectID, name, parent_directory, type, uploadDate FROM project_archive");
+		if(!$conn->error) $conn->query("DROP TABLE project_archive");
+		echo $conn->error;
+	}
+
+	$conn->query("ALTER TABLE security_modules CHANGE `publicPGPKey` `publicKey` VARCHAR(150) NOT NULL");
+}
+
 // if($row['version'] < 155){}
 
 // ------------------------------------------------------------------------------
