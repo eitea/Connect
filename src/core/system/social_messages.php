@@ -1,4 +1,14 @@
-<?php require dirname(dirname(__DIR__)) . '/header.php'; ?>
+<?php 
+require dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'header.php'; 
+/*
+
+Tables: 
++ messages: sent messages
++ taskmessages: sent messages for tasks
+
+ */
+?>
+
 
 <style>
 .subject {
@@ -39,15 +49,15 @@
             // messages [userID, partnerID, subject, message, picture, sent, seen]
             $stmt = $conn->prepare("INSERT INTO messages (userID, partnerID, subject, message, sent, seen) VALUES ($userID, ?, '$subject', '$message', CURRENT_TIMESTAMP, 'FALSE')");
             $stmt->bind_param('i', $to_userid);
-            foreach($_POST['to_userid'] AS $to_userid){ //5abdd31716137
+            foreach ($_POST['to_userid'] as $to_userid) { //5abdd31716137
                 $to_userid = intval($to_userid);
-                if($to_userid == $userID){
+                if ($to_userid == $userID) {
                     showError($lang['INVALID_USER']);
                 } else {
                     $stmt->execute();
                 }
             }
-            if(!$stmt->error){
+            if (!$stmt->error) {
                 showSuccess($lang['MESSAGE_SENT']);
             } else {
                 showError($stmt->error);
@@ -76,7 +86,7 @@
                         <select required class="js-example-basic-single" name="to_userid[]" multiple="multiple">
                             <?php //5abdd31716137
                             foreach ($available_users as $x) {
-                                if($x == -1 || $x == $userID) continue;
+                                if ($x == -1 || $x == $userID) continue;
                                 echo '<option value="' . $x . '">' . $userID_toName[$x] . '</option>';
                             }
                             ?>
@@ -126,31 +136,31 @@
         <!-- Subjects -->
         <div class="col-sm-6">
             <?php
-                $result = $conn->query("SELECT subject, userID, partnerID FROM messages WHERE $userID IN (partnerID, userID) GROUP BY subject, LEAST(userID, partnerID), GREATEST(userID, partnerID) ");
-                $i = 0;
-                while ($result && ($row = $result->fetch_assoc())) {
-                    $subject = $row['subject'];
-                    $sender = $row['userID'];
-                    $receiver = $row['partnerID'];
-                    $i++;
+            $result = $conn->query("SELECT subject, userID, partnerID FROM messages WHERE ((partnerID = $userID AND partner_deleted = 'FALSE') OR (userID = $userID AND user_deleted = 'FALSE')) GROUP BY subject, LEAST(userID, partnerID), GREATEST(userID, partnerID) ");
+            $i = 0;
+            while ($result && ($row = $result->fetch_assoc())) {
+                $subject = $row['subject'];
+                $sender = $row['userID'];
+                $receiver = $row['partnerID'];
+                $i++;
 
-                    if($userID == $receiver) {
-                        $help = $receiver;
-                        $receiver = $sender; //sending process must be reversed
-                        $sender = $help;    // 5ac62d49ea1c4
-                    }
+                if ($userID == $receiver) {
+                    $help = $receiver;
+                    $receiver = $sender; //sending process must be reversed
+                    $sender = $help;    // 5ac62d49ea1c4
+                }
 
                     // 5ac62d49ea1c4
-                    $sql = "SELECT firstname, lastname FROM UserData WHERE id = '{$receiver}' GROUP BY id";
-                    $name_result = $conn->query($sql);
-                    $name_row = $name_result->fetch_assoc();
-                    $firstname = $name_row['firstname'];
-                    $lastname = $name_row['lastname'];
+                $sql = "SELECT firstname, lastname FROM UserData WHERE id = '{$receiver}' GROUP BY id";
+                $name_result = $conn->query($sql);
+                $name_row = $name_result->fetch_assoc();
+                $firstname = $name_row['firstname'];
+                $lastname = $name_row['lastname'];
 
-                    if(!empty($firstname) && !empty($lastname)) 
-                        $name = $firstname . " " . $lastname;
-                    elseif ((empty($firstname) && !empty($lastname)) || (empty($firstname) && !empty($lastname)))   // the user has no firstname or no lastname (admin)
-                        $name = $firstname . " " . $lastname;
+                if (!empty($firstname) && !empty($lastname))
+                    $name = $firstname . " " . $lastname;
+                elseif ((empty($firstname) && !empty($lastname)) || (empty($firstname) && !empty($lastname)))   // the user has no firstname or no lastname (admin)
+                $name = $firstname . " " . $lastname;
 
                 ?>
                     <div style="padding: 5px;">
@@ -198,8 +208,9 @@
                     </script>
                 
                 <?php
-                }
-                echo $conn->error;
+
+            }
+            echo $conn->error;
             ?>
         </div>
 
@@ -315,14 +326,14 @@ function showChat(partner, subject, name) {
     var responseElement = document.getElementById("chatinput");
     responseElement.style.display = "block";
 }
-
+var lastGetMessagesResponse = "";
 function getMessages(partner, subject, target, scroll = false, limit = 50) {
     if(partner == -1 || subject.length == 0) {
         return;
     }
 
     $.ajax({
-        url: 'ajaxQuery/AJAX_postGetMessage.php',
+        url: 'ajaxQuery/ajax_post_get_messages.php',
         data: {
             partner: partner,
             subject: subject,
@@ -330,10 +341,11 @@ function getMessages(partner, subject, target, scroll = false, limit = 50) {
         },
         type: 'GET',
         success: function (response) {
+            if(response == lastGetMessagesResponse) return;
             $(target).html(response);
-
             //Scroll down
             if (scroll) $(target).scrollTop($(target)[0].scrollHeight)
+            lastGetMessagesResponse = response;
         },
         error: function (response) {
             $(target).html(response);
@@ -362,13 +374,14 @@ function sendMessage(partner, subject, message, target, limit = 50) {
 
 function deleteSubject(partner, subject) {
     $.ajax({
-        url: 'ajaxQuery/AJAX_postDeleteSubject.php',
+        url: 'ajaxQuery/ajax_post_delete_subject.php',
         data: {
             partner: partner,
             subject: subject,
         },
         type: 'GET',
         success: function (response) {
+            console.log(response);
             // reload without resending resent form
             window.location.href = window.location.pathname;
         },
@@ -381,7 +394,7 @@ function udpateBadge(target, menu, partner, subject) {
     }
 
     $.ajax({
-        url: 'ajaxQuery/AJAX_postGetAlerts.php',
+        url: 'ajaxQuery/ajax_post_get_alerts.php',
         type: 'GET',
         data:{
             partner: partner,

@@ -1749,8 +1749,10 @@ function create_tables($conn) {
         message TEXT,
         picture MEDIUMBLOB,
         sent DATETIME DEFAULT CURRENT_TIMESTAMP,
-        seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
-        )";
+        seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        user_deleted ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        partner_deleted ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+    )";
     if (!$conn->query($sql)) {
         echo $conn->error;
     }

@@ -2754,10 +2754,11 @@ if($row['version'] < 154){
     } else {
         echo '<br>Task Messages';
     }
+    $conn->query("ALTER TABLE messages ADD COLUMN user_deleted ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+    echo $conn->error;
+    $conn->query("ALTER TABLE messages ADD COLUMN partner_deleted ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+    echo $conn->error;
 }
-
-// if($row['version'] < 154){}
-// if($row['version'] < 155){}
 
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';

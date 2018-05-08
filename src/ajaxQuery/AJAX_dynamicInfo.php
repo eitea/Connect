@@ -327,7 +327,7 @@ if (sizeof($missingBookingsArray) == 0) {
                                 }
 
                                 $.ajax({
-                                    url: 'ajaxQuery/AJAX_postGetMessage.php',
+                                    url: 'ajaxQuery/ajax_post_get_messages.php',
                                     data: {
                                         taskID: taskID,
                                         taskName: taskName,

@@ -752,7 +752,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 
                     function udpateBadge(target) {
                         $.ajax({
-                            url: 'ajaxQuery/AJAX_postGetAlerts.php',
+                            url: 'ajaxQuery/ajax_post_get_alerts.php',
                             type: 'GET',
                             success: function (response) {
                                 if(response != "0"){
@@ -764,6 +764,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             },
                         });
                     }
+                    udpateBadge("#globalMessagingBadge"); // initial page render
                     </script>
                   </li>
 				  <?php
