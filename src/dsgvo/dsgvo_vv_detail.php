@@ -318,6 +318,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 
 			$key = 'GRET_TEXTAREA';
 	        $settings = getSettings($key);
+			//var_dump($settings);
 			if(isset($settings[$key])){
 				echo '<br><p class="text-center"><label for="#matrice-area">'.mc_status('DSGVO').'Notizen</label></p>';
 				if(isset($_POST[$key])){
@@ -331,7 +332,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 							insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$escaped_setting'");
 						}
 					} else {
-						$setID = $settings[$key]['setID'];
+						$setID = $settings[$key]['id'];
 						$stmt_insert_setting->execute();
 						$escaped_setting = test_input($setting);
 						insertVVLog("INSERT","Insert '$key' for Procedure Directory $vvID as '$escaped_setting'");

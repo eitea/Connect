@@ -12,7 +12,7 @@ $firstTimeWizard = false;
 $result = $conn->query("SELECT firstTimeWizard FROM configurationData WHERE firstTimeWizard = 'TRUE'");
 if ($result && $result->num_rows > 0) {
 	session_destroy();
-    redirect('../user/home');
+    redirect('../user/logout');
     $firstTimeWizard = true;  //safety check
 }
 
