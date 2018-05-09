@@ -34,14 +34,29 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       }
       $stmt->close();
     } else {
-      echo "<br>Error Opening csv File";
+      $accept .= "<br>Error Opening csv File. Kontoplan konnte nicht erstellt werden";
     }
     $accept .= $conn->error;
 
     $conn->query("UPDATE accounts SET manualBooking = 'TRUE' WHERE companyID = $ins_id AND (name = 'Bank' OR name = 'Kassa')");
     $accept .= $conn->error;
 
+	$keyPair = sodium_crypto_box_keypair();
+	$private = sodium_crypto_box_secretkey($keyPair);
+	$public = sodium_crypto_box_publickey($keyPair);
+	$symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
+	$nonce = random_bytes(24);
+	$symmetric_encrypted = $nonce . sodium_crypto_box($symmetric, $nonce, $private.$public);
+	$conn->query("INSERT INTO security_company (companyID, publicKey, symmetricKey) VALUES ($ins_id, '".base64_encode($public)."', '".base64_encode($symmetric_encrypted)."') ");
+	if($conn->error) $accept .= 'Error: Mandantschlüssel '.$conn->error;
+	$nonce = random_bytes(24);
+	$encrypted = $nonce . sodium_crypto_box($private, $nonce, $private.base64_decode($publicKey));
+	$conn->query("INSERT INTO security_access(userID, module, optionalID, privateKey) VALUES ($userID, 'COMPANY', $ins_id , '".base64_encode($encrypted)."')");
+	if($conn->error) $accept .= 'Error: Zugriff '.$conn->error;
+
+
     if($accept){ echo $accept; } else { redirect("company?cmp=$ins_id"); }
+
   } else {
     echo '<div class="alert alert-warning fade in">';
     echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
