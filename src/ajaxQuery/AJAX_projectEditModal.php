@@ -238,22 +238,6 @@ if($projectRow['publicKey']){
 			    <br><hr>
 			<?php endif; //$isProjectAdmin ?>
 			<?php if(!empty($s3)) : ?>
-				<h4>Dateifreigabe
-					<div class="page-header-button-group">
-						<div class="btn-group"><a class="btn btn-default dropdown-toggle" data-toggle="dropdown" title="Hochladen..."><i class="fa fa-upload"></i></a>
-							<ul class="dropdown-menu">
-								<li><a data-toggle="modal" data-target="#modal-new-folder-<?php echo $projectID; ?>">Neuer Ordner</a></li>
-								<li><a data-toggle="modal" data-target="#modal-new-file-<?php echo $projectID; ?>">File</a></li>
-								<!--li><a data-toggle="modal" data-target="#modal-new-text">Text</a></li-->
-							</ul>
-						</div>
-					</div>
-				</h4><br>
-				<div class="row">
-					<div class="col-xs-1 bold">Type</div>
-					<div class="col-xs-4 bold">Name</div>
-					<div class="col-xs-4 bold">Upload Datum</div>
-				</div>
 				<?php
 				$result = $conn->query("SELECT name FROM folder_default_sturctures WHERE category = 'COMPANY' AND categoryID = '".$projectRow['companyID']."' AND name NOT IN
 				( SELECT name FROM archive WHERE category = 'PROJECT' AND categoryID = '$projectID' AND parent_directory = 'ROOT') ");
@@ -262,44 +246,13 @@ if($projectRow['publicKey']){
 					$conn->query("INSERT INTO archive(category, categoryID, name, parent_directory, type) VALUES('PROJECT', '$projectID', '".$row['name']."', 'ROOT', 'folder')"); echo $conn->error;
 				}
 
-				echo drawFolder('ROOT', 'PROJECT', $projectID);
+				$upload_viewer = [
+				'accessKey' => '',
+				'category' => 'PROJECT',
+				'categoryID' => $projectID
+				];
+				include dirname(__DIR__).DIRECTORY_SEPARATOR.'misc'.DIRECTORY_SEPARATOR.'upload_viewer.php';
 				?>
-
-				<div id="modal-new-folder-<?php echo $projectID; ?>" class="modal fade">
-					<div class="modal-dialog modal-content modal-sm">
-						<form method="POST">
-							<input type="hidden" name="saveThisProject" value="<?php echo $projectID; ?>" />
-							<div class="modal-header h4">Neuer Ordner</div>
-							<div class="modal-body">
-								<label>Name</label>
-								<input type="text" name="new-folder-name" class="form-control" />
-							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-								<button type="submit" class="btn btn-warning modal-new-<?php echo $projectID; ?>" name="add-new-folder" value="ROOT"><?php echo $lang['ADD']; ?></button>
-							</div>
-						</form>
-					</div>
-				</div>
-				<div id="modal-new-file-<?php echo $projectID; ?>" class="modal fade">
-					<div class="modal-dialog modal-content modal-sm">
-						<form method="POST" enctype="multipart/form-data">
-							<input type="hidden" name="saveThisProject" value="<?php echo $projectID; ?>" />
-							<div class="modal-header h4">File Hochladen</div>
-							<div class="modal-body">
-								<label class="btn btn-default">
-									Datei Auswählen
-									<input type="file" name="new-file-upload"  accept="application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint, text/plain, application/pdf,.doc, .docx" style="display:none" >
-								</label>
-								<small>Max. 15MB<br>Text, PDF, .Zip und Office</small>
-							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-								<button type="submit" class="btn btn-warning modal-new-<?php echo $projectID; ?>" name="add-new-file" value="ROOT"><?php echo $lang['ADD']; ?></button>
-							</div>
-						</form>
-					</div>
-				</div>
 			<?php else: ?>
 				<h4>Dateifreigabe</h4>
 				<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>

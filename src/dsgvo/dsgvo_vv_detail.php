@@ -60,8 +60,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $stmt_insert_setting_client = $conn->prepare("INSERT INTO dsgvo_vv_settings(vv_id, setting_id, setting, category, clientID) VALUES($vvID, ?, ?, ?, ?)");
     $stmt_insert_setting_client->bind_param("issi", $setID, $setting_encrypt, $cat, $clientID);
 
-    $stmt_update_setting_matrix = $conn->prepare("UPDATE dsgvo_vv_settings SET setting = ? WHERE id = ?");
-    $stmt_update_setting_matrix->bind_param("si", $setting_encrypt, $valID);
     $stmt_insert_setting_matrix = $conn->prepare("INSERT INTO dsgvo_vv_settings(vv_id, matrix_setting_id, setting, category) VALUES($vvID, ?, ?, ?)");
     $stmt_insert_setting_matrix->bind_param("iss", $setID, $setting_encrypt, $cat);
 
@@ -136,7 +134,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 						'Body' => $file_encrypt
 					));
 
-					$filename = test_input($file_info['filename']);
+					$filename = test_input($file_info['filename'], 1);
 					$conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uniqID, uploadUser)
 					VALUES ('DSGVO', '$vvID', '$filename', '$parent', '$ext', '$hashkey', $userID)");
 					if($conn->error){ showError($conn->error); } else { showSuccess($lang['OK_UPLOAD']); }
@@ -155,7 +153,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $parent = test_input($_POST['add-new-folder']);
         if(!empty($_POST['new-folder-name'])){
             $name = test_input($_POST['new-folder-name']);
-            $conn->query("INSERT INTO archive(category, categoryID, name, parent_directory, type) VALUES ('DSGVO', '$vvID', '$name', '$parent', 'folder')");
+            $conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type) VALUES ('DSGVO', '$vvID', '$name', '$parent', 'folder')");
             if($conn->error){
                 showError($conn->error);
             } else {
@@ -267,7 +265,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                <div class="col-sm-6 bold">E-Mail</div><div class="col-sm-6 grey"><?php echo $row['mail']; ?><br></div>
 	            </div>
 	            <?php else: ?>
-	            <div class="panel-heading">Kurze Beschreibung der Applikation, bzw. den Zweck dieser Applikation <?php echo mc_status(); ?></div>
+	            <div class="panel-heading"><?php echo mc_status('DSGVO'); ?>Kurze Beschreibung der Applikation, bzw. den Zweck dieser Applikation</div>
 	            <div class="panel-body">
 	                <textarea name="DESCRIPTION" style='resize:none' class="form-control" rows="5"><?php echo $settings['DESCRIPTION']['setting']; ?></textarea>
 	            </div>
@@ -300,7 +298,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                }
 	            }
 	            echo '<div class="row">';
-	            echo '<div class="col-sm-6 bold">'.$val['descr'].' '.mc_status().'</div>';
+	            echo '<div class="col-sm-6 bold">'.mc_status('DSGVO').$val['descr'].'</div>';
 	            echo '<div class="col-sm-6 grey"><input type="text" class="form-control" maxlength="700" name="'.$key.'" value="'.$val['setting'].'"/></div>';
 	            echo '</div>';
 	        }
@@ -312,8 +310,31 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	    <div class="panel panel-default">
 	        <div class="panel-heading">Generelle organisatorische und technische Maßnahmen zum Schutz der personenbezogenen Daten</div>
 			<br>
-			<p class="text-center"><label for="#matrice-area">Notizen</label></p>
-			<textarea id="matrice-area"></textarea>
+			<p class="text-center"><label for="#matrice-area"><?php echo mc_status('DSGVO'); ?>Notizen</label></p>
+			<?php
+			$key = 'GRET_TEXTAREA';
+	        $settings = getSettings($key);
+			if(isset($_POST[$key])){
+				$settings[$key]['setting'] = $setting = strip_tags($_POST[$key]);
+				$setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
+				$valID = $settings[$key]['valID'];
+				if($valID){
+					$stmt_update_setting->execute();
+					if($stmt_update_setting->affected_rows > 0){
+						$escaped_setting = test_input($setting);
+						insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$escaped_setting'");
+					}
+				} else {
+					$setID = $val['id'];
+					$stmt_insert_setting->execute();
+					$escaped_setting = test_input($setting);
+					insertVVLog("INSERT","Insert '$key' for Procedure Directory $vvID as '$escaped_setting'");
+				}
+			}
+
+			echo '<textarea id="matrice-area" name="'.$key.'" >'.$settings[$key]['setting'].'</textarea>';
+			?>
+
 			<br>
 	        <div class="panel-body">
 	            <table class="table table-borderless">
@@ -362,7 +383,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 							echo '<div class="col-sm-4 text-center"><input type="radio" '.$checked.' name="'.$key.'" value="2" /> Nicht erfüllt</div>';
 							$checked = $radioValue == 3 ? 'checked' : '';
 							echo '<div class="col-sm-4 text-right"><input type="radio" '.$checked.' name="'.$key.'" value="3" /> N/A</div>';
-							echo '<div class="row"><textarea style="font-size:12px" rows="3" type="text" class="form-control" name="'.$textFieldKey.'"placeholder="Notizen...">'.$textFieldValue.'</textarea></div>';
+							echo '<div class="row"><textarea style="font-size:12px;resize:none" rows="3" type="text" class="form-control" name="'.$textFieldKey.'"placeholder="Notizen...">'.$textFieldValue.'</textarea></div>';
 							echo '</td>';
 	                        echo '</tr>';
 	                    }
@@ -434,62 +455,14 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	    echo '<div class="row"><div class="col-sm-6 bold">Wo befindet sich diese?</div><div class="col-sm-6"><input type="text" name="EXTRA_DOC" class="form-control" value="'.$settings['EXTRA_DOC']['setting'].'"></div></div>';
 	    echo '</div></div><br>';
 	}
+
+	$upload_viewer = [
+	'accessKey' => 'DSGVO',
+	'category' => 'DSGVO',
+	'categoryID' => $vvID
+	];
+	include dirname(__DIR__).DIRECTORY_SEPARATOR.'misc'.DIRECTORY_SEPARATOR.'upload_viewer.php';
 	?>
-
-	<div class="col-md-12">
-		<div class="panel panel-default">
-			<div class="panel-heading"><?php echo mc_status('DSGVO'); ?>Upload ins Archiv
-				<div class="page-header-button-group">
-					<div class="btn-group"><a class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" title="Hochladen..."><i class="fa fa-upload"></i></a>
-						<ul class="dropdown-menu">
-							<li><a data-toggle="modal" data-target="#modal-new-folder">Neuer Ordner</a></li>
-							<li><a data-toggle="modal" data-target="#modal-new-file">File</a></li>
-						</ul>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-xs-1 bold">Type</div>
-				<div class="col-xs-4 bold">Name</div>
-				<div class="col-xs-4 bold">Upload Datum</div>
-			</div>
-			<?php echo drawFolder('ROOT', 'DSGVO', $vvID); ?>
-		</div>
-	</div>
-
-	<div id="modal-new-folder" class="modal fade">
-		<div class="modal-dialog modal-content modal-sm">
-			<form method="POST">
-				<div class="modal-header h4">Neuer Ordner</div>
-				<div class="modal-body">
-					<label>Name</label>
-					<input type="text" name="new-folder-name" class="form-control" />
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-					<button type="submit" class="btn btn-warning modal-new" name="add-new-folder" value="ROOT"><?php echo $lang['ADD']; ?></button>
-				</div>
-			</form>
-		</div>
-	</div>
-	<div id="modal-new-file" class="modal fade">
-		<div class="modal-dialog modal-content modal-sm">
-			<form method="POST" enctype="multipart/form-data">
-				<div class="modal-header h4">File Hochladen</div>
-				<div class="modal-body">
-					<label class="btn btn-default">
-						Datei Auswählen
-						<input type="file" name="new-file-upload"  accept="application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint, text/plain, application/pdf,.doc, .docx" style="display:none" >
-					</label>
-					<small>Max. 15MB<br>Text, PDF, .Zip und Office</small>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-					<button type="submit" class="btn btn-warning modal-new" name="add-new-file" value="ROOT"><?php echo $lang['ADD']; ?></button>
-				</div>
-			</form>
-		</div>
-	</div>
 
 	<?php if($doc_type == 'APP'): ?>
 	<div class="col-md-12">
@@ -595,8 +568,8 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                                $catVal['setting'] = $setting = '1';
 	                                $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
 	                                if($valID){ //update to true if checked and exists
-	                                    $stmt_update_setting_matrix->execute();
-	                                    if($stmt_update_setting_matrix->affected_rows > 0){
+	                                    $stmt_update_setting->execute();
+	                                    if($stmt_update_setting->affected_rows > 0){
 	                                        $escaped_setting = test_input($setting);
 	                                        insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$escaped_setting'");
 	                                    }
@@ -610,8 +583,8 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                            } elseif($valID && $catVal['setting']) { //set to false only if not checked, exists and saved as true (anything else is false anyways)
 	                                $catVal['setting'] = $setting = '0';
 	                                $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
-	                                $stmt_update_setting_matrix->execute();
-	                                if($stmt_update_setting_matrix->affected_rows > 0){
+	                                $stmt_update_setting->execute();
+	                                if($stmt_update_setting->affected_rows > 0){
 	                                    $escaped_setting = test_input($setting);
 	                                    insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$escaped_setting'");
 	                                }
@@ -794,24 +767,6 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	        }, 1000);
 	    });
 	  }
-	});
-
-	var index = <?php echo $vvID; ?>;
-	var grandParent = ['ROOT'];
-	grandParent[index] = ['ROOT'];
-	$('.tree-node-back-'+index).click(function(){
-		var grandPa = grandParent[index].pop();
-		//alert(grandPa);
-		$('#folder-'+index+'-'+ $(this).data('parent')).hide();
-		$('#folder-'+index+'-'+ grandPa).fadeIn();
-		$('.modal-new').val(grandPa);
-	});
-	$('.folder-structure-'+index).click(function(event){
-		$('#folder-'+index+'-'+ $(this).data('parent')).hide();
-		$('#folder-'+index+'-'+ $(this).data('child')).fadeIn();
-		//alert('#folder-'+index+'-'+ $(this).data('child'));
-		grandParent[index].push($(this).data('parent'));
-		$('.modal-new').val($(this).data('child'));
 	});
 </script>
 <?php echo $last_encryption_error; ?>

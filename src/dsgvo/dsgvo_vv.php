@@ -67,7 +67,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     } elseif(!empty($_POST['duplicate_template']) && !empty($_POST['duplicate_template_name'])){
         $val = intval($_POST['duplicate_template']);
         $name = test_input($_POST['duplicate_template_name']);
-        $conn->query("INSERT INTO dsgvo_vv_templates (companyID, name, type) SELECT companyID, '$name', type FROM dsgvo_vv_templates WHERE id = $val");
+        $conn->query("INSERT INTO dsgvo_vv_templates (companyID, name, type) SELECT $cmpID, '$name', type FROM dsgvo_vv_templates WHERE id = $val");
         $templateID = $conn->insert_id;
         $conn->query("INSERT INTO dsgvo_vv_template_settings(templateID, opt_name, opt_descr, opt_status) SELECT $templateID, opt_name, opt_descr, opt_status FROM dsgvo_vv_template_settings WHERE templateID = $val");
         insertVVLog("CLONE","Clone template $val as '$name' with id '$templateID'");
@@ -171,7 +171,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $template_select .=' <option value="'.$select_row['id'].'">'.$select_row['name'].' - App</option>';
     }
 
-    $result = $conn->query("SELECT dsgvo_vv.id, dsgvo_vv.name, dsgvo_vv.templateID FROM dsgvo_vv, dsgvo_vv_templates WHERE dsgvo_vv_templates.type='app' AND templateID = dsgvo_vv_templates.id AND dsgvo_vv_templates.companyID = $cmpID ORDER BY dsgvo_vv.id");
+    $result = $conn->query("SELECT dsgvo_vv.id, dsgvo_vv.name, dsgvo_vv.templateID FROM dsgvo_vv, dsgvo_vv_templates
+		WHERE dsgvo_vv_templates.type='app' AND templateID = dsgvo_vv_templates.id AND dsgvo_vv_templates.companyID = $cmpID ORDER BY dsgvo_vv.id");
     while($row = $result->fetch_assoc()):
         $id = $row['id'];
         $name = $row['name'];

@@ -234,7 +234,7 @@ if(!empty($_POST['delete-file'])){
 					'Body' => $file_encrypt
 				));
 
-				$filename = test_input($file_info['filename']);
+				$filename = test_input($file_info['filename'], 1);
 				$conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uniqID, uploadUser)
 				VALUES ('PROJECT', '$x', '$filename', '$parent', '$ext', '$hashkey', $userID)");
 				if($conn->error){ showError($conn->error); } else { showSuccess($lang['OK_UPLOAD']); }
@@ -250,7 +250,7 @@ if(!empty($_POST['delete-file'])){
         $parent = test_input($_POST['add-new-folder']);
         if(!empty($_POST['new-folder-name'])){
             $name = test_input($_POST['new-folder-name']);
-            $conn->query("INSERT INTO archive(category, categoryID, name, parent_directory, type) VALUES ('PROJECT', '$x', '$name', '$parent', 'folder')");
+            $conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type) VALUES ('PROJECT', '$x', '$name', '$parent', 'folder')");
             if($conn->error){
                 showError($conn->error);
             } else {
@@ -389,7 +389,6 @@ echo $conn->error
 </form>
 
 <script>
-	var grandParent = [];
     var existingModals = new Array();
     function checkAppendModal(index){
         if(existingModals.indexOf(index) == -1){
@@ -407,21 +406,6 @@ echo $conn->error
                     if(index){
                         $('#editingModal-'+index).modal('show');
                     }
-					grandParent[index] = ['ROOT'];
-					$('.tree-node-back-'+index).click(function(){
-						var grandPa = grandParent[index].pop();
-						//alert(grandPa);
-						$('#folder-'+index+'-'+ $(this).data('parent')).hide();
-						$('#folder-'+index+'-'+ grandPa).fadeIn();
-						$('.modal-new-'+index).val(grandPa);
-					});
-					$('.folder-structure-'+index).click(function(event){
-						$('#folder-'+index+'-'+ $(this).data('parent')).hide();
-						$('#folder-'+index+'-'+ $(this).data('child')).fadeIn();
-						//alert('#folder-'+index+'-'+ $(this).data('child'));
-						grandParent[index].push($(this).data('parent'));
-						$('.modal-new-'+index).val($(this).data('child'));
-					});
                 }
             });
         } else {

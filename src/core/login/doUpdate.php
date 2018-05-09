@@ -2768,8 +2768,6 @@ if($row['version'] < 154){
     )";
     $conn->query($sql);
     if (!$conn->error) {
-        echo $conn->error;
-    } else {
         echo '<br>Task Messages';
     }
     $conn->query("ALTER TABLE messages ADD COLUMN user_deleted ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
@@ -2783,6 +2781,8 @@ if($row['version'] < 154){
 
 if($row['version'] < 155){
 	$conn->query("ALTER TABLE archive ADD COLUMN uploadUser INT(6)");
+
+	$conn->query("INSERT INTO dsgvo_vv_template_settings (templateID, opt_name, opt_descr) SELECT id, 'GEN_TEXTAREA', 'Notizen' FROM dsgvo_vv_templates WHERE type='base'");
 }
 
 // if($row['version'] < 156){}
