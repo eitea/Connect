@@ -11,6 +11,7 @@ require dirname(dirname(__DIR__)) . '/connection.php';
 $firstTimeWizard = false;
 $result = $conn->query("SELECT firstTimeWizard FROM configurationData WHERE firstTimeWizard = 'TRUE'");
 if ($result && $result->num_rows > 0) {
+	session_destroy();
     redirect('../user/home');
     $firstTimeWizard = true;  //safety check
 }
@@ -19,6 +20,7 @@ if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['a
     if(!empty($_POST['encryption_pass']) && !empty($_POST['encryption_pass_confirm']) && $_POST['encryption_pass'] == $_POST['encryption_pass_confirm']){
         $result = $conn->query("SELECT firstname, lastname, email FROM UserData WHERE id = $userID LIMIT 1");
         if($result && ($row = $result->fetch_assoc())){
+			$conn->query("UPDATE security_users SET outDated = 'TRUE'");
             $accept = true;
             $err = $content_personal = $content_company = '';
             //user PAIR
@@ -29,6 +31,7 @@ if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['a
             $content_personal = $private." \n".base64_encode($admin_public);
             $private_encrypt = simple_encryption($private, $_POST['encryption_pass']);
             $_SESSION['privateKey'] = $private;
+			$_SESSION['publicKey'] = base64_encode($admin_public);
             $conn->query("UPDATE UserData SET psw = '$hash' WHERE id = $userID");
 			$conn->query("INSERT INTO security_users (userID, publicKey, privateKey) VALUES ($userID, '".base64_encode($admin_public)."', '".$private_encrypt."')");
             if($conn->error) $accept = false;
