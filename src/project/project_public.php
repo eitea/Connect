@@ -234,7 +234,7 @@ if(!empty($_POST['delete-file'])){
 					'Body' => $file_encrypt
 				));
 
-				$filename = test_input($file_info['filename'], 1);
+				$filename = test_input($file_info['filename']);
 				$conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uniqID, uploadUser)
 				VALUES ('PROJECT', '$x', '$filename', '$parent', '$ext', '$hashkey', $userID)");
 				if($conn->error){ showError($conn->error); } else { showSuccess($lang['OK_UPLOAD']); }
@@ -250,7 +250,7 @@ if(!empty($_POST['delete-file'])){
         $parent = test_input($_POST['add-new-folder']);
         if(!empty($_POST['new-folder-name'])){
             $name = test_input($_POST['new-folder-name']);
-            $conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type) VALUES ('PROJECT', '$x', '$name', '$parent', 'folder')");
+            $conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uploadUser) VALUES ('PROJECT', '$x', '$name', '$parent', 'folder', $userID)");
             if($conn->error){
                 showError($conn->error);
             } else {

@@ -44,7 +44,7 @@ if($result && ($row = $result->fetch_assoc()) && $row['publicKey'] && $row['priv
 		echo $e;
 	}
 } else {
-	echo $conn->error." $sql - No Access";
+	echo $conn->error;
 }
 
 $result = $conn->query("SELECT endpoint, awskey, secret FROM archiveconfig WHERE isActive = 'TRUE' LIMIT 1");
@@ -67,7 +67,7 @@ if($result && ($row = $result->fetch_assoc())){
     }
 }
 
-$result = $conn->query("SELECT name, type FROM archive WHERE category='PROJECT' AND uniqID = '$fileKey' LIMIT 1");
+$result = $conn->query("SELECT name, type FROM archive WHERE category='$module' AND uniqID = '$fileKey' LIMIT 1");
 $row = $result->fetch_assoc();
 
 if(isset($object)){
@@ -80,6 +80,11 @@ if(isset($object)){
 		header( "Content-Type: {$object['ContentType']}" );
 		header( "Content-Disposition: attachment; filename=" . $row['name'] . "." . $row['type'] );
 	}
-    echo simple_decryption($object[ 'Body' ], $symmetricKey);
+
+	if(isset($symmetricKey)){
+		echo simple_decryption($object[ 'Body' ], $symmetricKey);
+	} else {
+		echo $object['Body'];
+	}
 }
 ?>

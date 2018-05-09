@@ -24,8 +24,15 @@ if(!function_exists('drawFolder')){
 			$html .= '<div class="row">';
 			if($row['type'] == 'folder'){
 				$html .= '<div class="col-xs-1"><i class="fa fa-folder-open-o"></i></div>
-						<div class="col-xs-3"><a class="folder-structure-'.$catID.'" data-child="'.$row['id'].'" data-parent="'.$parent_structure.'" >' .$row['name'].'</a></div>
-						<div class="col-xs-3">'.$row['uploadDate'].'</div><div class="col-xs-2"></div><div class="col-xs-3 text-right">';
+				<div class="col-xs-3"><a class="folder-structure-'.$catID.'" data-child="'.$row['id'].'" data-parent="'.$parent_structure.'" >' .$row['name'].'</a></div>
+				<div class="col-xs-3">'.$row['uploadDate'].'</div>';
+				$html .= '<div class="col-xs-2">';
+				if($row['uploadUser']){
+					$res_u = $conn->query("SELECT firstname, lastname FROM UserData WHERE id = ".$row['uploadUser']);
+					if($res_u && ($row_u = $res_u->fetch_assoc())) $html .= $row_u['firstname'].' '.$row_u['lastname'];
+				}
+				$html .= '</div>';
+				$html .='<div class="col-xs-3 text-right">';
 				$folder_res = $conn->query("SELECT id FROM archive WHERE category = '$cat' AND categoryID = $catID AND parent_directory = '".$row['id']."' ");
 				if($folder_res->num_rows < 1){
 					$html .= '<form method="POST"><button type="submit" name="delete-folder" value="'.$row['id'].'" class="btn btn-default"><i class="fa fa-trash-o"></i></button>';
@@ -33,7 +40,7 @@ if(!function_exists('drawFolder')){
 				$html .= '</div>';
 				$subfolder .= drawFolder($row['id'], false);
 			} else {
-				$html .= '<div class="col-xs-1"><i class="fa fa-file-o"></i></div><div class="col-xs-3">'.$row['name'].'</div><div class="col-xs-3">'.$row['uploadDate'].'</div>';
+				$html .= '<div class="col-xs-1"><i class="fa fa-file-o"></i></div><div class="col-xs-3">'.$row['name'].'.'.$row['type'].'</div><div class="col-xs-3">'.$row['uploadDate'].'</div>';
 				$html .= '<div class="col-xs-2">';
 				if($row['uploadUser']){
 					$res_u = $conn->query("SELECT firstname, lastname FROM UserData WHERE id = ".$row['uploadUser']);

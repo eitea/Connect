@@ -66,6 +66,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 	if(!empty($_POST['add-new-file']) && isset($_FILES['new-file-upload'])){
 		require dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.'aws'.DIRECTORY_SEPARATOR.'autoload.php';
 		$bucket = $identifier .'-uploads'; //no uppercase, no underscores, no ending dashes, no adjacent special chars
+
 		$result = $conn->query("SELECT endpoint, awskey, secret FROM archiveconfig WHERE isActive = 'TRUE' LIMIT 1");
 		if($result && ($row = $result->fetch_assoc())){
 			try{
@@ -134,7 +135,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 						'Body' => $file_encrypt
 					));
 
-					$filename = test_input($file_info['filename'], 1);
+					$filename = test_input($file_info['filename']);
 					$conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uniqID, uploadUser)
 					VALUES ('DSGVO', '$vvID', '$filename', '$parent', '$ext', '$hashkey', $userID)");
 					if($conn->error){ showError($conn->error); } else { showSuccess($lang['OK_UPLOAD']); }
@@ -153,7 +154,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $parent = test_input($_POST['add-new-folder']);
         if(!empty($_POST['new-folder-name'])){
             $name = test_input($_POST['new-folder-name']);
-            $conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type) VALUES ('DSGVO', '$vvID', '$name', '$parent', 'folder')");
+            $conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uploadUser) VALUES ('DSGVO', '$vvID', '$name', '$parent', 'folder', $userID)");
             if($conn->error){
                 showError($conn->error);
             } else {
