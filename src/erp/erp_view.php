@@ -124,9 +124,14 @@ $filtered_transitions = empty($filterings['procedures'][0]) ? $transitions : $fi
 $filterCompany_query = $filterings['company'] ?  'AND clientData.companyID = '.$filterings['company'] : "";
 $filterClient_query = $filterings['client'] ?  'AND clientData.id = '.$filterings['client'] : "";
 $filterStatus_query = ($filterings['procedures'][1] >= 0) ? 'AND status = '.$filterings['procedures'][1] : "";
-$result = $conn->query("SELECT proposals.*, companyID, clientData.name as clientName, companyData.name as companyName
-FROM proposals INNER JOIN clientData ON proposals.clientID = clientData.id INNER JOIN companyData ON clientData.companyID = companyData.id
-WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_query $filterClient_query $filterStatus_query  ORDER BY curDate DESC");
+
+//5af0481d917fe
+$result = $conn->query("SELECT id_number, p.id, p.clientID, p.status, p.curDate, companyID, processHistory.id AS historyID, clientData.name AS clientName, companyData.name AS companyName
+FROM processHistory INNER JOIN proposals p ON p.id = processHistory.processID
+INNER JOIN clientData ON p.clientID = clientData.id INNER JOIN companyData ON clientData.companyID = companyData.id
+WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_query $filterClient_query $filterStatus_query
+ORDER BY id_number");
+echo $conn->error;
 ?>
 
 <table class="table table-hover">
@@ -136,97 +141,84 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
     <th>ID</th>
     <th>Status</th>
     <?php if($showBalance == 'TRUE') echo '<th>Bilanz</th>'; ?>
+	<th>Vorgang</th>
+	<th>Datum</th>
     <th>Option</th>
   </thead>
   <tbody>
     <?php
-    $modals = '';
-      while($result && ($row = $result->fetch_assoc())){
-        echo '<tr style="background-color:#e4e4e4">';
-        if(count($available_companies) > 2){ echo '<td>'.$row['companyName'].'</td>'; }
-        echo '<td>'.$row['clientName'].'</td><td></td>';
-        echo '<td><form method="POST"><div class="dropdown"><a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'.$lang['OFFERSTATUS_TOSTRING'][$row['status']].'<i class="fa fa-caret-down"></i></a><ul class="dropdown-menu">';
-        echo '<li><button type="submit" name="save_wait" class="btn btn-link" value="'.$row['id'].'">'.$lang['OFFERSTATUS_TOSTRING'][0].'</button></li>';
-        echo '<li><button type="submit" name="save_complete" class="btn btn-link" value="'.$row['id'].'">'.$lang['OFFERSTATUS_TOSTRING'][1].'</button></li>';
-        echo '<li><button type="submit" name="save_cancel" class="btn btn-link" value="'.$row['id'].'">'.$lang['OFFERSTATUS_TOSTRING'][2].'</button></li>';
-        echo '</ul></div></form></td>';
-        if($showBalance == 'TRUE') echo '<td></td>';
-        echo '<td>'.substr(md5($row['id']),0,8).'</td>';
-        echo '</tr>';
+	//5af0481d917fe
+	$modals = '';
+	$stmt_balance = $conn->prepare("SELECT quantity, price, purchase, origin FROM products WHERE historyID = ? AND origin IS NOT NULL");
+	$stmt_balance->bind_param("i", $historyID);
+	while($result && ($row = $result->fetch_assoc())){
+		$historyID = $row['historyID'];
+		$current_transition = preg_replace('/\d/', '', $row['id_number']);
+		if(!in_array($current_transition, $filtered_transitions)) continue;
 
-        $filterings['procedures'][2];
-        $result_process = $conn->query("SELECT id, id_number FROM processHistory WHERE processID = ".$row['id']." ORDER BY id_number");
-        $product_placements = array_fill_keys($transitions, array());
-        while($row_history = $result_process->fetch_assoc()){
-          $i = $row_history['id'];
-          $current_transition = preg_replace('/\d/', '', $row_history['id_number']);
-          if(!in_array($current_transition, $filtered_transitions)) continue;
+		echo '<tr>';
+		if(count($available_companies) > 2){ echo '<td>'.$row['companyName'].'</td>'; }
+		echo '<td>'.$row['clientName'].'</td>';
+		echo '<td>'.$row['id_number'].'</td>';
+		echo '<td>'.$lang['OFFERSTATUS_TOSTRING'][$row['status']].'</td>';
+		if($showBalance == 'TRUE'){
+			$balance = 0;
+			$stmt_balance->execute();
+			$result_b = $stmt_balance->get_result();
+			while($rowB = $result_b->fetch_assoc()){
+				if(empty($product_placements[$current_transition][$rowB['origin']])) $product_placements[$current_transition][$rowB['origin']] = 0;
+				$product_placements[$current_transition][$rowB['origin']] += $rowB['quantity'];
+				$balance += $rowB['quantity'] * ($rowB['price'] - $rowB['purchase']);
+			}
+			$style = $balance > 0 ? "style='color:#6fcf2c;font-weight:bold;'" : "style='color:#facf1e;font-weight:bold;'";
+			echo "<td $style>".number_format($balance, 2, ',', '.').' EUR</td>';
+		}
 
-          $balance = 0;
-          $result_b = $conn->query("SELECT quantity, price, purchase, origin FROM products WHERE historyID = $i AND origin IS NOT NULL");
-          while($rowB = $result_b->fetch_assoc()){
-            if(empty($product_placements[$current_transition][$rowB['origin']])) $product_placements[$current_transition][$rowB['origin']] = 0;
-            $product_placements[$current_transition][$rowB['origin']] += $rowB['quantity'];
-            $balance += $rowB['quantity'] * ($rowB['price'] - $rowB['purchase']);
-          }
-          $transitable = false;
-          if($current_transition == 'ANG') {$transitable = true; $available_transitions = array('AUB', 'RE', 'STN');}
-          if($current_transition == 'AUB') {$transitable = true; $available_transitions = array('RE', 'LFS', 'STN');}
-          if($current_transition == 'RE') {$transitable = true; $available_transitions = array('LFS', 'GUT');}
+		$transitable = false;
+		if($current_transition == 'ANG') {$transitable = true; $available_transitions = array('AUB', 'RE', 'STN');}
+		if($current_transition == 'AUB') {$transitable = true; $available_transitions = array('RE', 'LFS', 'STN');}
+		if($current_transition == 'RE') {$transitable = true; $available_transitions = array('LFS', 'GUT');}
+		echo '<td>'.substr(md5($row['id']),0,8).'<i style="color:#'.substr(md5($row['id']),0,6).'" class="fa fa-circle"></i></td>';
+		echo '<td>'.date('d.m.Y', strtotime($row['curDate'])).'</td>';
+		echo '<td>';
+		echo "<a href='download?proc=$historyID' class='btn btn-default' target='_blank'><i class='fa fa-download'></i></a> ";
+		echo '<form method="POST" style="display:inline"><button type="submit" class="btn btn-default" name="copy_process" title="'.$lang['COPY'].'" value="'.$historyID.'"><i class="fa fa-files-o"></i></button></form> ';
+		echo '<a href="edit?val='.$historyID.'" title="'.$lang['EDIT'].'" class="btn btn-default"><i class="fa fa-pencil"></i></a> ';
 
-          echo "<tr>";
-          if(count($available_companies) > 2){ echo '<td></td>'; }
-          echo '<td style="color:white">'.substr(md5($row['id']),0,8).'</td>'; //semi-hide it for the datatables search
-          echo '<td>'.$row_history['id_number'].'</td>';
+		if($transitable){ //if open positions
+			if($current_transition != 'RE'){ echo '<button type="button" class="btn btn-default" title="'.$lang['DELETE'].'" data-toggle="modal" data-target=".confirm-delete-'.$historyID.'"><i class="fa fa-trash-o"></i></button> '; }
+			echo '<a  style="margin-left: 20px" data-target=".choose-transition-'.$historyID.'" data-toggle="modal" class="btn btn-warning" title="'.$lang['TRANSITION'].'"><i class="fa fa-arrow-right"></i></a>';
 
-          echo "<td></td>";
-
-          $style = $balance > 0 ? "style='color:#6fcf2c;font-weight:bold;'" : "style='color:#facf1e;font-weight:bold;'";
-          if($showBalance == 'TRUE') echo "<td $style>".number_format($balance, 2, ',', '.').' EUR</td>';
-          echo '<td>';
-          echo "<a href='download?proc=$i' class='btn btn-default' target='_blank'><i class='fa fa-download'></i></a> ";
-          echo '<form method="POST" style="display:inline"><button type="submit" class="btn btn-default" name="copy_process" title="'.$lang['COPY'].'" value="'.$i.'"><i class="fa fa-files-o"></i></button></form> ';
-          echo '<a href="edit?val='.$i.'" title="'.$lang['EDIT'].'" class="btn btn-default"><i class="fa fa-pencil"></i></a> ';
-
-          if($transitable){ //if open positions
-            if($current_transition != 'RE'){ echo '<button type="button" class="btn btn-default" title="'.$lang['DELETE'].'" data-toggle="modal" data-target=".confirm-delete-'.$i.'"><i class="fa fa-trash-o"></i></button> '; }
-            echo '<a  style="margin-left: 20px" data-target=".choose-transition-'.$i.'" data-toggle="modal" class="btn btn-warning" title="'.$lang['TRANSITION'].'"><i class="fa fa-arrow-right"></i></a>';
-
-            $modal_transits = '';
-            foreach($available_transitions as $t){
-              $modal_transits .= '<div class="row"><div class="col-xs-6"><label><input type="radio" name="copy_transition" value="'.$t.'" />'.getNextERP($t, $row['companyID']).'</label></div><div class="col-xs-6">'.$lang['PROPOSAL_TOSTRING'][$t].'</div></div>';
-            }
-            $modals .= '<form method="POST" action="edit?val='.$i.'">
-            <div class="modal fade choose-transition-'.$i.'">
-              <div class="modal-dialog modal-sm modal-content">
-                <div class="modal-header"><h3>'.$lang['TRANSITION'].'</h3></div>
-                <div class="modal-body"><div class="radio">'.$modal_transits.'</div></div>
-                <div class="modal-footer">
-                  <button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
-                  <button type="submit" class="btn btn-warning" name="translate">OK</button>
-                </div>
-              </div>
-            </div></form><form method="POST">
-            <div class="modal fade confirm-delete-'.$i.'">
-              <div class="modal-dialog modal-sm modal-content">
-                <div class="modal-header"><h4 class="modal-title">'.sprintf($lang['ASK_DELETE'], $row_history['id_number']).'</h4></div>
-                <div class="modal-body">#'.$lang['WARNING_DELETE_TRANSITION'].'</div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">'.$lang['CONFIRM_CANCEL'].'</button>
-                  <button type="submit" name="delete_proposal" class="btn btn-warning" value="'.$i.'">'.$lang['CONFIRM'].'</button>
-                </div>
-              </div>
-            </div>
-          </form>';
-          } //endif transitable
-
-          echo '</td>';
-          echo '</tr>';
-        } //endwhile each history
-        //TODO: i can only evaluate in here whether a transition still has open positions or not
-        //solve this either by a second iteration over questionable entries or... magic
-
-      } //endwhile each process
+			$modal_transits = '';
+			foreach($available_transitions as $t){
+				$modal_transits .= '<div class="row"><div class="col-xs-6"><label><input type="radio" name="copy_transition" value="'.$t.'" />'.getNextERP($t, $row['companyID']).'</label></div><div class="col-xs-6">'.$lang['PROPOSAL_TOSTRING'][$t].'</div></div>';
+			}
+			$modals .= '<form method="POST" action="edit?val='.$historyID.'">
+			<div class="modal fade choose-transition-'.$historyID.'">
+			<div class="modal-dialog modal-sm modal-content">
+			<div class="modal-header"><h3>'.$lang['TRANSITION'].'</h3></div>
+			<div class="modal-body"><div class="radio">'.$modal_transits.'</div></div>
+			<div class="modal-footer">
+			<button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
+			<button type="submit" class="btn btn-warning" name="translate">OK</button>
+			</div>
+			</div>
+			</div></form><form method="POST">
+			<div class="modal fade confirm-delete-'.$historyID.'">
+			<div class="modal-dialog modal-sm modal-content">
+			<div class="modal-header"><h4 class="modal-title">'.sprintf($lang['ASK_DELETE'], $row['id_number']).'</h4></div>
+			<div class="modal-body">#'.$lang['WARNING_DELETE_TRANSITION'].'</div>
+			<div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">'.$lang['CONFIRM_CANCEL'].'</button>
+			<button type="submit" name="delete_proposal" class="btn btn-warning" value="'.$historyID.'">'.$lang['CONFIRM'].'</button>
+			</div>
+			</div>
+			</div>
+			</form>';
+		} //endif transitable
+		echo '</td>';
+		echo '</tr>';
+	}
       echo $conn->error;
     ?>
 
@@ -253,7 +245,7 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
       </div>
       <div class="modal-footer">
         <button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
-        <button type="submit" class="btn btn-warning" name="add_new_process" value="<?php echo $i; ?>"><?php echo $lang['CONTINUE']; ?></button>
+        <button type="submit" class="btn btn-warning" name="add_new_process" value="<?php echo $historyID; ?>"><?php echo $lang['CONTINUE']; ?></button>
       </div>
     </div>
   </div>
@@ -263,7 +255,6 @@ WHERE companyID IN (".implode(', ', $available_companies).") $filterCompany_quer
 <script>
 $(document).ready(function(){
   $('.table').DataTable({
-    ordering: false,
     language: {
       <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
     },
