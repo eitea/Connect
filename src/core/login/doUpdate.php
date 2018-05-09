@@ -2777,12 +2777,12 @@ if($row['version'] < 154){
 
     $conn->query("ALTER TABLE socialprofile ADD COLUMN new_message_email ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
     echo $conn->error;
+
+	$conn->query("INSERT INTO dsgvo_vv_template_settings (templateID, opt_name, opt_descr) SELECT id, 'GEN_TEXTAREA', 'Notizen' FROM dsgvo_vv_templates WHERE type='base'");
 }
 
 if($row['version'] < 155){
 	$conn->query("ALTER TABLE archive ADD COLUMN uploadUser INT(6)");
-
-	$conn->query("INSERT INTO dsgvo_vv_template_settings (templateID, opt_name, opt_descr) SELECT id, 'GEN_TEXTAREA', 'Notizen' FROM dsgvo_vv_templates WHERE type='base'");
 }
 
 // if($row['version'] < 156){}

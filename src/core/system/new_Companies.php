@@ -88,7 +88,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 		$descr = '';
 		$opt = 'DESCRIPTION';
 		$stmt->execute();
-		$opt = 'GEN_TEXTAREA';
+		$opt = 'GRET_TEXTAREA';
 		$stmt->execute();
 		$descr = 'Leiter der Datenverarbeitung (IT Leitung)';
 		$opt = 'GEN_1';

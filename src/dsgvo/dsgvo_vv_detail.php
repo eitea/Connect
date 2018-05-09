@@ -309,30 +309,32 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	<div class="col-md-12">
 	    <div class="panel panel-default">
 	        <div class="panel-heading">Generelle organisatorische und technische Maßnahmen zum Schutz der personenbezogenen Daten</div>
-			<br>
-			<p class="text-center"><label for="#matrice-area"><?php echo mc_status('DSGVO'); ?>Notizen</label></p>
 			<?php
 			$key = 'GRET_TEXTAREA';
 	        $settings = getSettings($key);
-			if(isset($_POST[$key])){
-				$settings[$key]['setting'] = $setting = strip_tags($_POST[$key]);
-				$setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
-				$valID = $settings[$key]['valID'];
-				if($valID){
-					$stmt_update_setting->execute();
-					if($stmt_update_setting->affected_rows > 0){
+			if(isset($settings[$key])){
+				echo '<br><p class="text-center"><label for="#matrice-area">'.mc_status('DSGVO').'Notizen</label></p>';
+				if(isset($_POST[$key])){
+					$settings[$key]['setting'] = $setting = strip_tags($_POST[$key]);
+					$setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
+					$valID = $settings[$key]['valID'];
+					if($valID){
+						$stmt_update_setting->execute();
+						if($stmt_update_setting->affected_rows > 0){
+							$escaped_setting = test_input($setting);
+							insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$escaped_setting'");
+						}
+					} else {
+						$setID = $val['id'];
+						$stmt_insert_setting->execute();
 						$escaped_setting = test_input($setting);
-						insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$escaped_setting'");
+						insertVVLog("INSERT","Insert '$key' for Procedure Directory $vvID as '$escaped_setting'");
 					}
-				} else {
-					$setID = $val['id'];
-					$stmt_insert_setting->execute();
-					$escaped_setting = test_input($setting);
-					insertVVLog("INSERT","Insert '$key' for Procedure Directory $vvID as '$escaped_setting'");
 				}
+
+				echo '<textarea id="matrice-area" name="'.$key.'" >'.$settings[$key]['setting'].'</textarea>';
 			}
 
-			echo '<textarea id="matrice-area" name="'.$key.'" >'.$settings[$key]['setting'].'</textarea>';
 			?>
 
 			<br>
