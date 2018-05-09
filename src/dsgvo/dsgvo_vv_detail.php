@@ -311,6 +311,11 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	    <div class="panel panel-default">
 	        <div class="panel-heading">Generelle organisatorische und technische Maßnahmen zum Schutz der personenbezogenen Daten</div>
 			<?php
+			// $stmt_update_setting = $conn->prepare("UPDATE dsgvo_vv_settings SET setting = ? WHERE id = ?");
+		    // $stmt_update_setting->bind_param("si", $setting_encrypt, $valID);
+		    // $stmt_insert_setting = $conn->prepare("INSERT INTO dsgvo_vv_settings(vv_id, setting_id, setting, category) VALUES($vvID, ?, ?, ?)");
+		    // $stmt_insert_setting->bind_param("iss", $setID, $setting_encrypt, $cat);
+
 			$key = 'GRET_TEXTAREA';
 	        $settings = getSettings($key);
 			if(isset($settings[$key])){
@@ -326,7 +331,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 							insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$escaped_setting'");
 						}
 					} else {
-						$setID = $val['id'];
+						$setID = $settings[$key]['setID'];
 						$stmt_insert_setting->execute();
 						$escaped_setting = test_input($setting);
 						insertVVLog("INSERT","Insert '$key' for Procedure Directory $vvID as '$escaped_setting'");
