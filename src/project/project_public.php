@@ -9,6 +9,18 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
 }
 
 if($isProjectAdmin == 'TRUE' && $_SERVER['REQUEST_METHOD'] == 'POST'){
+	if(!empty($_POST['deleteProject'])){
+		$val = intval($_POST['deleteProject']);
+		$conn->query("DELETE FROM folder_default_sturctures WHERE category = 'PROJECT' AND categoryID = '$val'");
+		$conn->query("DELETE FROM archive WHERE category = 'PROJECT' AND categoryID = '$val'");
+		$conn->query("UPDATE security_access SET outdated = 'TRUE' WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$val'"); //never delete a key.
+		$conn->query("DELETE FROM projectData WHERE id = $val;");
+		if($conn->error){
+			showError($conn->error);
+		} else {
+			showSuccess($lang['OK_DELETE']);
+		}
+	}
 	if(isset($_POST['add']) && !empty($_POST['name']) && !empty($_POST['filterClient'])){
 	    $client_id = $filterings['client'] = intval($_POST['filterClient']);
 	    $name = test_input($_POST['name']);
@@ -284,7 +296,7 @@ echo $conn->error
 	</div>
 </div>
 
-<form id="mainForm" method="POST">
+<form method="POST">
     <table class="table table-hover">
         <thead>
             <th><?php echo $lang['COMPANY']; ?></th>
@@ -302,7 +314,8 @@ echo $conn->error
 				 echo '<td>'. $row['clientName'] .'</td>';
 				 echo '<td>'.$productive.'</td>';
 				 echo '<td>'. $row['name'] .'</td>';
-				 echo '<td><button type="button" class="btn btn-default" name="editModal" value="'.$row['id'].'" ><i class="fa fa-pencil"></i></button></td>';
+				 echo '<td><button type="button" class="btn btn-default" name="editModal" value="'.$row['id'].'" ><i class="fa fa-pencil"></i></button>
+				 <button type="submit" class="btn btn-default" name="deleteProject" value="'.$row['id'].'" ><i class="fa fa-trash-o"></i></button></td>';
 				 echo '</tr>';
 			 }
 			?>
@@ -431,6 +444,10 @@ echo $conn->error
             <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
         }
     });
+
+	$("button[name='deleteProject']").click(function() {
+	    return confirm("Are you sure you want to delete this item?");
+	});
 
 	<?php
 	if(isset($active_modal)){

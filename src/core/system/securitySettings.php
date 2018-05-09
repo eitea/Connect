@@ -130,6 +130,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $public = sodium_crypto_box_publickey($keyPair);
                 $key_downloads[] = base64_encode($private)." \n".base64_encode($public);
 				$symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
+				$nonce = random_bytes(24);
 				$symmetric_encrypted = $nonce . sodium_crypto_box($symmetric, $nonce, $private.$public);
                 $conn->query("INSERT INTO security_company (companyID, publicKey, symmetricKey) VALUES (".$row['id'].", '".base64_encode($public)."', '".base64_encode($symmetric_encrypted)."') ");
                 $nonce = random_bytes(24);
