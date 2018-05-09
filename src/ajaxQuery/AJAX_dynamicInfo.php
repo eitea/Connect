@@ -240,8 +240,9 @@ if (sizeof($missingBookingsArray) == 0) {
                     <div id="chatinput<?php echo $x; ?>" style="padding-top: 5px;">
                         <form name="chatInputForm<?php echo $x; ?>" autocomplete="off">
                             <div class="input-group">
-                                <textarea id="message<?php echo $x; ?>" wrap="hard" placeholder="Type a message" class="form-control" style="height: 3.6vh; max-height: 11vh; resize: none; "></textarea>
-                                <span class="input-group-btn"><button id="sendButton<?php echo $x; ?>" class="btn btn-default" type="submit" style="height: 3.6vh"><?php echo $lang['SEND'] ?></button></span>
+                                <!-- TODO: set resize to none and create a js listerner to auto resize the textarea -->
+                                <textarea id="message<?php echo $x; ?>" wrap="hard" placeholder="Type a message" class="form-control" style="max-height: 11vh; resize: vertical;"></textarea>
+                                <span id="sendButton<?php echo $x; ?>" class="input-group-addon btn btn-default" type="submit"><?php echo $lang['SEND'] ?></span>
                             </div>
                         </form>
 
@@ -261,11 +262,6 @@ if (sizeof($missingBookingsArray) == 0) {
                             $("#projectMessagesTab<?php echo $x; ?>").on('hide.bs.tab', function (e) {
                                 clearInterval(intervalID<?php echo $x; ?>);
                             });
-
-                            // auto resize
-                            $('#message<?php echo $x; ?>, #sendButton<?php echo $x; ?>').on('change keyup keydown paste cut click', function (event) {
-                                $("#message<?php echo $x; ?>").height(0).height(this.scrollHeight/1.4);
-                            }).find('textarea').change();
                                         
                             // send on enter
                             var shiftPressed<?php echo "$x" ?> = false;
@@ -331,7 +327,7 @@ if (sizeof($missingBookingsArray) == 0) {
                                 }
 
                                 $.ajax({
-                                    url: 'ajaxQuery/AJAX_postGetMessage.php',
+                                    url: 'ajaxQuery/ajax_post_get_messages.php',
                                     data: {
                                         taskID: taskID,
                                         taskName: taskName,

@@ -1,0 +1,17 @@
+<?php 
+session_start();
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "connection.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "utilities.php";
+
+$userID = $_SESSION["userid"] ?? -1;
+
+if (isset($_REQUEST["partner"], $_REQUEST["subject"]) && !empty($_SESSION["userid"])) {
+    $partner = intval($_REQUEST["partner"]);
+    $subject = test_input($_REQUEST["subject"]);
+    echo $conn->query("SELECT * FROM messages WHERE seen = 'FALSE' AND partnerID = $userID AND userID = $partner AND subject = '$subject' AND partner_deleted = 'FALSE'")->num_rows;
+} elseif (!empty($_SESSION["userid"])) {
+    $sql = "SELECT * FROM messages WHERE seen = 'FALSE' AND partnerID = $userID AND partner_deleted = 'FALSE'";
+    echo $conn->query($sql)->num_rows;
+} else {
+    echo "0";
+}

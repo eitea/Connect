@@ -201,6 +201,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
 } //end POST
 
+if(isset($_SESSION["LAST_ERRORS"])){
+  foreach ($_SESSION["LAST_ERRORS"] as $err) {
+    echo $err;
+  }
+  $_SESSION["LAST_ERRORS"] = array();
+}
 $selection_main_company = '';
 $result = $conn->query("SELECT id, name FROM companyData");
 while($row = $result->fetch_assoc()){

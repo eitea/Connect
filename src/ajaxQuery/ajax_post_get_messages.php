@@ -13,9 +13,7 @@ if (isset($_GET["partner"], $_GET["subject"]) && !empty($_SESSION["userid"])) {
     // message has been seen
     $conn->query("UPDATE messages SET seen = 'TRUE' WHERE ( userID = $partner AND partnerID = $userID ) AND subject = '$subject'");
 
-    // its needed to select the usernames for 
-
-    // get the name of the partner
+    // its needed to select the usernames for - get the name of the partner
     $sql = "SELECT firstname, lastname FROM UserData WHERE id = '{$partner}' GROUP BY id";
     $result = $conn->query($sql);
     $row = $result->fetch_assoc();
@@ -30,13 +28,16 @@ if (isset($_GET["partner"], $_GET["subject"]) && !empty($_SESSION["userid"])) {
     $lastname = $row['lastname'];
 
     // get the messages
-    $sql = "SELECT * FROM (SELECT * FROM messages WHERE (( userID = $userID AND partnerID = $partner ) OR ( userID = $partner AND partnerID = $userID )) AND subject = '$subject' ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC";
+    $sql = "SELECT * FROM (
+                SELECT * FROM messages WHERE (( userID = $userID AND partnerID = $partner AND user_deleted = 'FALSE' ) OR ( userID = $partner AND partnerID = $userID AND partner_deleted = 'FALSE' )) AND subject = '$subject' ORDER BY sent DESC LIMIT $limit
+            ) AS temptable ORDER BY sent ASC";
     $result = $conn->query($sql);
-} elseif(isset($_GET["taskID"]) && !empty($_SESSION["userid"])) {
+    echo $conn->error;
+} elseif (isset($_GET["taskID"]) && !empty($_SESSION["userid"])) {
     $taskView = true;
     $taskID = intval($_GET["taskID"]);
 
-    if(isset($_GET["taskName"])){
+    if (isset($_GET["taskName"])) {
         $taskName = test_input($_GET["taskName"]);
         $result = $conn->query("SELECT * FROM (SELECT * FROM taskmessages INNER JOIN UserData ON UserData.id = taskmessages.userID WHERE ( taskID = $taskID and taskName = '$taskName' ) ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC");
     } else {
@@ -53,17 +54,17 @@ if (!$result || $result->num_rows == 0) {
     // process the result
     while ($row = $result->fetch_assoc()) {
         $message = $row["message"];
-        
-        if($taskView) { // firstname and lastname not available in normal query
+
+        if ($taskView) { // firstname and lastname not available in normal query
             $firstname = $row["firstname"];
             $lastname = $row["lastname"];
         }
 
-        $pull = $row["userID"] == $userID ? "pull-right":"pull-left";       // left or right side?
+        $pull = $row["userID"] == $userID ? "pull-right" : "pull-left";       // left or right side?
         $color = $row["userID"] == $userID ? "#c7f4a4" : "#whitesmoke";     //dcf8c6
 
         // seen is only available in normal sql query
-        if(!$taskView) $seen = $row["seen"] == 'TRUE' ? "fa-eye":"fa-eye-slash";
+        if (!$taskView) $seen = $row["seen"] == 'TRUE' ? "fa-eye" : "fa-eye-slash";
 
         $showseen = ($row["userID"] == $userID);
         $alignment = ($row["userID"] != $userID) ? 'left: 0px;' : 'right: 0;';   // alignment of the username+date: partner(s) = left, current user = right
@@ -73,14 +74,28 @@ if (!$result || $result->num_rows == 0) {
         $messageDate = date('G:i', strtotime($row["sent"]));
 
         //5ac62d49ea1c4
-        if(!empty($firstname) || !empty($lastname)) 
+        if (!empty($firstname) || !empty($lastname))
             $name = $firstname . " " . $lastname;
         
         //partner only available when not using taskView, bc in taskView its handled with a join
-        if((!empty($partner_firstname) || !empty($partner_lastname)) && !$taskView) 
+        if ((!empty($partner_firstname) || !empty($partner_lastname)) && !$taskView)
             $partner_name = $partner_firstname . " " . $partner_lastname;
         
-        if($lastdate != $date):
+
+        //TODO: decrypt message
+
+        // Testing: 
+        // RX1gCMdnGcM5+2CMSEnoRx4XzxwqidP7/rwO3XwcsGQ=
+        //showError("Private key: " . $privateKey);
+
+        //  jgoLsRNAdiUC3oReQUnZBnxLm7Z26h99Q7GC
+        //showError("Encrypted string: " . simple_encryption("Testmessage", $privateKey));
+
+        // Decrypt: 
+        //showError("Decrypted string: " . simple_decryption("jgoLsRNAdiUC3oReQUnZBnxLm7Z26h99Q7GC", $privateKey));
+
+
+        if ($lastdate != $date) :
         ?>
         
             <div class="row">
@@ -94,13 +109,13 @@ if (!$result || $result->num_rows == 0) {
             <div class="row">
                 <div class="col-xs-12">
                     <div class="well <?php echo $pull; ?>" style="position:relative; background-color: <?php echo $color ?>;">
-                        <?php if($taskView): ?>
+                        <?php if ($taskView) : ?>
                             <span class="label label-default" style="display:block; top:-17px; <?php echo $alignment ?> position:absolute; background-color: white; color: black;"><?php echo $name . " - " . $messageDate; ?></span>
-                        <?php else: ?>
-                            <?php if($showseen): ?>
+                        <?php else : ?>
+                            <?php if ($showseen) : ?>
                                 <span class="label label-default" style="display:block; top:-17px; right:0px; position:absolute; background-color: white; color: black;"><?php echo $name . " - " . $messageDate; ?></span>
                                 <i class="fa <?php echo $seen; ?>" style="display:block; top:0px; right:-3px; position:absolute; color:#9d9d9d;"></i>
-                            <?php elseif(!$showseen): ?>
+                            <?php elseif (!$showseen) : ?>
                                 <span class="label label-default" style="display:block; top:-17px; left:0px; position:absolute; background-color: white; color: black;"><?php echo $partner_name . " - " . $messageDate; ?></span>
                             <?php endif; ?>
                         <?php endif ?>
@@ -108,11 +123,11 @@ if (!$result || $result->num_rows == 0) {
                         <div style='word-break: normal; word-wrap: normal;'>
                             <?php 
                                 // handle line breaks
-                                $parts = explode("\n", $message);
+                            $parts = explode("\n", $message);
 
-                                foreach  ($parts as $part){
-                                    echo $part . "<br>"; 
-                                }
+                            foreach ($parts as $part) {
+                                echo $part . "<br>";
+                            }
                             ?>
                         </div>
                     </div>
@@ -120,10 +135,12 @@ if (!$result || $result->num_rows == 0) {
             </div>
 
         <?php
+
     }
 }
 
-function test_input($data){
+function test_input($data)
+{
     require dirname(__DIR__) . "/connection.php";
     $data = $conn->escape_string($data);
     $data = trim($data);
