@@ -223,7 +223,8 @@ if(!empty($_POST['delete-file'])){
 				));
 
 				$filename = test_input($file_info['filename']);
-				$conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uniqID) VALUES ('PROJECT', '$x', '$filename', '$parent', '$ext', '$hashkey')");
+				$conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uniqID, uploadUser)
+				VALUES ('PROJECT', '$x', '$filename', '$parent', '$ext', '$hashkey', $userID)");
 				if($conn->error){ showError($conn->error); } else { showSuccess($lang['OK_UPLOAD']); }
 			} catch(Exception $e){
 				echo $e->getTraceAsString();

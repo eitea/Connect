@@ -2780,6 +2780,17 @@ if($row['version'] < 154){
     $conn->query("ALTER TABLE socialprofile ADD COLUMN new_message_email ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
     echo $conn->error;
 }
+
+if($row['version'] < 155){
+	$conn->query("ALTER TABLE archive ADD COLUMN uploadUser INT(6)");
+}
+
+// if($row['version'] < 156){}
+// if($row['version'] < 157){}
+// if($row['version'] < 158){}
+// if($row['version'] < 159){}
+// if($row['version'] < 160){}
+// if($row['version'] < 161){}
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';
 $conn->query("UPDATE configurationData SET version=$VERSION_NUMBER");

@@ -137,7 +137,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 					));
 
 					$filename = test_input($file_info['filename']);
-					$conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uniqID) VALUES ('DSGVO', '$vvID', '$filename', '$parent', '$ext', '$hashkey')");
+					$conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uniqID, uploadUser)
+					VALUES ('DSGVO', '$vvID', '$filename', '$parent', '$ext', '$hashkey', $userID)");
 					if($conn->error){ showError($conn->error); } else { showSuccess($lang['OK_UPLOAD']); }
 				} catch(Exception $e){
 					echo $e->getTraceAsString();

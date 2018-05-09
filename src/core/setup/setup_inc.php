@@ -845,7 +845,7 @@ function create_tables($conn) {
         message TEXT,
         picture MEDIUMBLOB,
         sent DATETIME DEFAULT CURRENT_TIMESTAMP,
-        seen 
+        seen
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -1792,6 +1792,21 @@ function create_tables($conn) {
 		categoryID VARCHAR(20) NOT NULL,
 		name VARCHAR(155) NOT NULL
 	)";
+	if(!$conn->query($sql)){
+		echo $conn->error;
+	}
+
+	$sql = "CREATE TABLE archive(
+        id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		uniqID VARCHAR(30) UNIQUE,
+		category VARCHAR(20) NOT NULL,
+		categoryID VARCHAR(20) NOT NULL,
+        name VARCHAR(120) NOT NULL,
+        parent_directory VARCHAR(120) NOT NULL DEFAULT 'ROOT',
+        type VARCHAR(10) NOT NULL,
+        uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+		uploadUser INT(6)
+    )";
 	if(!$conn->query($sql)){
 		echo $conn->error;
 	}

@@ -181,13 +181,13 @@ echo $conn->error;
 		echo '<td>'.substr(md5($row['id']),0,8).'<i style="color:#'.substr(md5($row['id']),0,6).'" class="fa fa-circle"></i></td>';
 		echo '<td>'.date('d.m.Y', strtotime($row['curDate'])).'</td>';
 		echo '<td>';
-		echo "<a href='download?proc=$historyID' class='btn btn-default' target='_blank'><i class='fa fa-download'></i></a> ";
-		echo '<form method="POST" style="display:inline"><button type="submit" class="btn btn-default" name="copy_process" title="'.$lang['COPY'].'" value="'.$historyID.'"><i class="fa fa-files-o"></i></button></form> ';
-		echo '<a href="edit?val='.$historyID.'" title="'.$lang['EDIT'].'" class="btn btn-default"><i class="fa fa-pencil"></i></a> ';
+		echo "<a href='download?proc=$historyID' class='btn btn-default btn-sm' target='_blank'><i class='fa fa-download'></i></a> ";
+		echo '<form method="POST" style="display:inline"><button type="submit" class="btn btn-default btn-sm" name="copy_process" title="'.$lang['COPY'].'" value="'.$historyID.'"><i class="fa fa-files-o"></i></button></form> ';
+		echo '<a href="edit?val='.$historyID.'" title="'.$lang['EDIT'].'" class="btn btn-default btn-sm"><i class="fa fa-pencil"></i></a> ';
 
 		if($transitable){ //if open positions
-			if($current_transition != 'RE'){ echo '<button type="button" class="btn btn-default" title="'.$lang['DELETE'].'" data-toggle="modal" data-target=".confirm-delete-'.$historyID.'"><i class="fa fa-trash-o"></i></button> '; }
-			echo '<a  style="margin-left: 20px" data-target=".choose-transition-'.$historyID.'" data-toggle="modal" class="btn btn-warning" title="'.$lang['TRANSITION'].'"><i class="fa fa-arrow-right"></i></a>';
+			if($current_transition != 'RE'){ echo '<button type="button" class="btn btn-default btn-sm" title="'.$lang['DELETE'].'" data-toggle="modal" data-target=".confirm-delete-'.$historyID.'"><i class="fa fa-trash-o"></i></button> '; }
+			echo '<a  style="margin-left: 20px" data-target=".choose-transition-'.$historyID.'" data-toggle="modal" class="btn btn-warning btn-sm" title="'.$lang['TRANSITION'].'"><i class="fa fa-arrow-right"></i></a>';
 
 			$modal_transits = '';
 			foreach($available_transitions as $t){
