@@ -203,7 +203,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <div id="add-app" class="modal fade">
     <div class="modal-dialog modal-content modal-sm">
         <form method="POST">
-            <div class="modal-header h4">Application Hinzufügen</div>
+            <div class="modal-header h4">Vorgang Hinzufügen</div>
             <div class="modal-body">
                 <div class="row">
                     <label>Name</label>

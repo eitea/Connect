@@ -214,13 +214,12 @@ function getSettings($like, $mults = false, $from_matrix = false){
     return $settings;
 }
 ?>
-
-<form method="POST">
-	<div class="page-header-fixed">
-		<div class="page-header"><h3><?php echo $vv_row['name'].' '.$lang['PROCEDURE_DIRECTORY']; ?>
-			<div class="page-header-button-group"><button type="submit" class="btn btn-default blinking"><i class="fa fa-floppy-o"></i></button></div></h3></div>
-		</div>
-	</div>
+<div class="page-header-fixed">
+	<div class="page-header"><h3><?php echo $vv_row['name'].' '.$lang['PROCEDURE_DIRECTORY']; ?>
+		<div class="page-header-button-group"><button type="submit" form="vv-mainForm" class="btn btn-default blinking"><i class="fa fa-floppy-o"></i></button></div>
+	</h3></div>
+</div>
+<form id="vv-mainForm" method="POST">
 	<div class="page-content-fixed-100">
 	<?php
 	$settings = getSettings('DESCRIPTION');
@@ -266,7 +265,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                <div class="col-sm-6 bold">E-Mail</div><div class="col-sm-6 grey"><?php echo $row['mail']; ?><br></div>
 	            </div>
 	            <?php else: ?>
-	            <div class="panel-heading"><?php echo mc_status('DSGVO'); ?>Kurze Beschreibung der Applikation, bzw. den Zweck dieser Applikation</div>
+	            <div class="panel-heading"><?php echo mc_status('DSGVO'); ?>Kurze Beschreibung des Vorgangs, bzw. den Zweck dieses Vorgangs</div>
 	            <div class="panel-body">
 	                <textarea name="DESCRIPTION" style='resize:none' class="form-control" rows="5"><?php echo $settings['DESCRIPTION']['setting']; ?></textarea>
 	            </div>
@@ -507,7 +506,8 @@ function getSettings($like, $mults = false, $from_matrix = false){
 
 	                    $str_heads .= '<th data-toggle="tooltip" data-container="body" data-placement="left" title="'.$tooltip.$client.'"><div class="btn-group">
 						<button style="white-space: normal;" type="button" class="btn btn-link" data-toggle="dropdown">'.$val['setting'][0].'</button> <ul class="dropdown-menu">
-						<li><button type="button" class="btn btn-link" data-toggle="modal" data-target="#edit-cate" data-valID="'.$val['valID'][0].'">Bearbeiten</button></li>
+						<li><button type="button" class="btn btn-link" data-toggle="modal" data-target="#add-cate"
+						data-valid="'.$val['valID'][0].'" data-setting="'.$val['setting'][0].'" data-client="'.$val['client'][0].'" data-cat="'.$val['category'][0].'">Bearbeiten</button></li>
 						<li><button type="submit" class="btn btn-link" name="delete_cat" value="'.$val['valID'][0].'">Löschen</button></li>
 						</ul></div></th>';
 	                } else {
@@ -517,8 +517,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                }
 	            }
 	            // no other sane choice for the backend to be but here
-	            if($space && isset($_POST['add_category']) && !empty($_POST['add_category_name'])){
-	                $setID = $space;
+	            if(isset($_POST['add_category']) && !empty($_POST['add_category_name'])){
 	                $setting = test_input($_POST['add_category_name']);
 	                $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
 	                $cat = test_input($_POST['add_category_mittlung']);
@@ -528,27 +527,31 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                }else{
 	                    $stmt = $stmt_insert_setting;
 	                }
-	                $stmt->execute();
-	                $escaped_setting = test_input($setting);
-	                insertVVLog("INSERT","Add new category '$escaped_setting' for Procedure Directory $vvID");
-	                if($stmt->error){
-	                    showError($stmt->error);
-	                } else {
-	                    $client = "";
-	                    if($clientID){
-	                        $result = $conn->query("SELECT name FROM $clientTable WHERE id = $clientID");
-	                        if($result && $result->num_rows !== 0){
-	                            $client = ' (an '.$result->fetch_assoc()["name"].') ';
-	                        }
-	                        showError($conn->error);
-	                    }
-	                    $heading[$space_key] = array('id' => $stmt->insert_id, 'category' => array());
-	                    $str_heads .= '<th data-toggle="tooltip" data-container="body" data-placement="left" title="'.$lang['DSGVO_CATEGORY_TOSTRING'][$cat].$client.'">
-						<div class="btn-group"><button type="button" class="btn btn-link" data-toggle="dropdown">'.$setting.'</button>
-	                    <ul class="dropdown-menu"><li><button type="submit" class="btn btn-link" name="delete_cat" value="'.$stmt->insert_id.'">Löschen</button></li></ul></div></th>';
-	                }
-	            } elseif(!$space){
-	                showWarning("Kein Platz mehr");
+					if(!empty($_POST['add_category'])){
+						$valID = test_input($_POST['add_category']);
+						if($clientID){
+							$conn->query("UPDATE dsgvo_vv_settings SET setting = '$setting_encrypt', category = '$cat', clientID = $clientID WHERE id = $valID ");
+						} else {
+							$conn->query("UPDATE dsgvo_vv_settings SET setting = '$setting_encrypt', category = '$cat' WHERE id = $valID ");
+						}
+						if($conn->error){
+		                    showError($conn->error);
+		                } else {
+							redirect('');
+						}
+					} elseif($space) {
+						$setID = $space;
+						$stmt->execute();
+		                $escaped_setting = test_input($setting);
+		                insertVVLog("INSERT","Add new category '$escaped_setting' for Procedure Directory $vvID");
+						if($stmt->error){
+		                    showError($stmt->error);
+		                } else {
+							redirect('');
+						}
+					} else {
+						showWarning("Kein Platz mehr");
+					}
 	            }
 	            ?>
 
@@ -658,25 +661,13 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	    </div>
 	</div>
 
-	<div id="edit-cate" class="modal fade">
-		<div class="modal-dialog modal-content modal-md">
-			<div class="modal-header h4"></div>
-			<div class="modal-body">
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-				<button type="submit" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
-			</div>
-		</div>
-	</div>
-
 	<div id="add-cate" class="modal fade">
 	  <div class="modal-dialog modal-content modal-md">
 		<div class="modal-header h4">Neue Kategorie Option</div>
 		<div class="modal-body">
 	        <div class="row">
 	            <div class="col-sm-12">
-	                <label for="add_category_name">Name</label>
+	                <label>Name</label>
 	                <input type="text" name="add_category_name" class="form-control" maxlength="60" />
 	            </div>
 	        </div>
@@ -692,7 +683,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                    <label><input type="radio" name="add_category_mittlung" value="heading2" /><?php echo $lang['DSGVO_CATEGORY_TOSTRING']['heading2']; ?></label>
 	                </div>
 					<div class="radio">
-	                    <label><input type="radio" name="add_category_mittlung" value="heading4" /><?php echo $Lang['DSGVO_CATEGORY_TOSTRING']['heading4']; ?></label>
+	                    <label><input type="radio" name="add_category_mittlung" value="heading4" /><?php echo $lang['DSGVO_CATEGORY_TOSTRING']['heading4']; ?></label>
 	                </div>
 	            </div>
 	        </div>
@@ -730,6 +721,15 @@ function getSettings($like, $mults = false, $from_matrix = false){
 </form>
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 <script>
+	$('#add-cate').on('show.bs.modal', function (event) {
+	  var button = $(event.relatedTarget);
+	  //data-valid="'.$val['valID'][0].'" data-setting="'.$val['setting'][0].'" data-client="'.$val['client'][0].'" data-cat="'.$val['category'][0].'"
+	  $(this).find('button[name="add_category"]').val(button.data('valid'));
+	  $(this).find('input[name="add_category_name"]').val(button.data('setting'));
+	  $(this).find('input:radio[name="add_category_mittlung"][value="'+button.data('cat')+'"]').click();
+	  $(this).find('[name="add_category_client"]').val(button.data('client')).trigger('change');
+	});
+
     $('[data-toggle="tooltip"]').tooltip();
 
     function toggleCustomerChooser(visible){
