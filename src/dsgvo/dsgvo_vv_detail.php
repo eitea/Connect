@@ -42,7 +42,7 @@ function insertVVLog($short,$long){
     global $privateKey;
     global $last_encryption_error;
     $stmt_insert_vv_log_short_description = secure_data('DSGVO', $short, 'encrypt', $userID, $privateKey);
-    $stmt_insert_vv_log_long_description = secure_data('DSGVO', $long, 'encrypt', $userID, $privateKey, $encryptionError);
+    $stmt_insert_vv_log_long_description = secure_data('DSGVO', $userID.' '.$long, 'encrypt', $userID, $privateKey, $encryptionError);
     $stmt_insert_vv_log_scope = secure_data('DSGVO', "VV", 'encrypt', $userID, $privateKey, $encryptionError);
     if($encryptionError){
         $last_encryption_error = showError($encryptionError, true); // only show last error because consecutive errors are usually the same

@@ -1037,7 +1037,7 @@ function appendModal(index){
 			setTimeout(function(){
 				$("#editingModal-").modal("show");
 				tinyMCE.activeEditor.setContent('<?php echo $_POST['description']; ?>');
-				$("#editingModal-").find('input[name="owner"]').val(<?php echo $_POST['owner']; ?>);
+				//$("#editingModal-").find('input[name="owner"]').val(<?php echo $_POST['owner']; ?>);
 			}, 1500);
 			<?php endif; ?>
 		}

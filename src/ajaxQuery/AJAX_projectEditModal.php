@@ -42,7 +42,7 @@ if($projectRow['publicKey']){
         }
     } else {
 		if($conn->error){
-			echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.__LINE__.'</div>';
+			echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Access Err: '.$conn->error.__LINE__.'</div>';
 		} else {
 			$result = $conn->query("SELECT privateKey FROM security_access WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$projectID'");
 			if($result->num_rows > 0){

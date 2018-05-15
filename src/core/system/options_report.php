@@ -56,7 +56,9 @@ $checked = $visibility = '';
 if($row['isDefault'] ){
 	$checked = 'checked';
 	$visibility = 'style=display:none';
+	$temp = $row['feedbackRecipient'];
 	$row = array_fill_keys(array_keys($row), '');
+	$row['feedbackRecipient'] = $temp;
 }
 ?>
 
