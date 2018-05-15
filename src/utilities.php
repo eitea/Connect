@@ -628,7 +628,7 @@ function util_strip_prefix($subject, $prefix) {
 use PHPMailer\PHPMailer\PHPMailer;
 function send_standard_email($recipient, $content){
   require dirname(__DIR__).'/plugins/phpMailer/autoload.php';
-  require __DIR__.'/connect.php';
+  global $conn;
 
   //send mail
   $mail = new PHPMailer();
@@ -636,7 +636,7 @@ function send_standard_email($recipient, $content){
   $mail->Encoding = "base64";
   $mail->IsSMTP();
 
-  $result = $conn->query("SELECT host, username, password, port, smtpSecure, sender, senderName FROM mailingOptions");
+  $result = $conn->query("SELECT host, username, password, port, smtpSecure, sender, senderName FROM mailingOptions LIMIT 1");
   $row = $result->fetch_assoc();
 
   if(!empty($row['username']) && !empty($row['password'])){

@@ -2733,7 +2733,7 @@ if($row['version'] < 154){
 		echo $conn->error;
 	}
 
-	$conn->query("INSERT INTO folder_default_sturctures(category, categoryID, name) SELECT 'DSGVO', id, 'Dokumentation FROM companyData");
+	$conn->query("INSERT INTO folder_default_sturctures(category, categoryID, name) SELECT 'DSGVO', id, 'Dokumentation' FROM companyData");
 
 	$sql = "CREATE TABLE archive(
         id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,

@@ -113,7 +113,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 	if(!empty($_POST['add_folder_name'])){
 	    $val = test_input($_POST['add_folder_name']);
-	    $conn->query("INSERT INTO folder_default_sturctures(category, name, categoryID) VALUES ('DSGVO', '$val', '1')");
+	    $conn->query("INSERT INTO folder_default_sturctures(category, name, categoryID) VALUES ('DSGVO', '$val', '$cmpID')");
 	    if($conn->error){
 	      showError($conn->error);
 	    } else {
@@ -124,7 +124,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 	    $conn->query("DELETE FROM folder_default_sturctures WHERE id = $val AND category = 'DSGVO'");
 	    if($conn->error){
 	        showError($conn->error);
-	    } else{
+	    } else {
 	        showSuccess($lang['OK_DELETE']);
 	    }
 	}
@@ -244,7 +244,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 						</tr></thead>
 						<tbody>
 							<?php
-							$result = $conn->query("SELECT id, name FROM folder_default_sturctures WHERE category = 'DSGVO' ");
+							$result = $conn->query("SELECT id, name FROM folder_default_sturctures WHERE category = 'DSGVO' AND categoryID = '$cmpID'");
 							while($result && ($row = $result->fetch_assoc())){
 								echo '<tr>';
 								echo '<td>'.$row['name'].'</td>';

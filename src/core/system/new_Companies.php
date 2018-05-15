@@ -19,7 +19,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 		$accept .= $conn->error;
 		$conn->query("INSERT INTO erp_settings (companyID, clientNum, clientStep, supplierNum, supplierStep) VALUES($ins_id, '1000',1,'1000',1)");
 		$accept .= $conn->error;
-
+		$conn->query("INSERT INTO folder_default_sturctures(category, name, categoryID) VALUES ('DSGVO', 'Dokumente', '$ins_id'), ('COMPANY', 'Uploads', '$ins_id')");
+		$accept .= $conn->error;
 		$file = fopen((dirname(__DIR__)).'/setup/Kontoplan.csv', 'r');
 		if($file){
 			$stmt = $conn->prepare("INSERT INTO accounts (companyID, num, name, type) VALUES($ins_id, ?, ?, ?)");
