@@ -637,6 +637,7 @@ function send_standard_email($recipient, $content){
   $mail->IsSMTP();
 
   $result = $conn->query("SELECT host, username, password, port, smtpSecure, sender, senderName FROM mailingOptions LIMIT 1");
+  if(!$result || $result->num_rows < 1) return 'Keine E-Mail Einstellungen hinterlegt'; //5ac712bc31939
   $row = $result->fetch_assoc();
 
   if(!empty($row['username']) && !empty($row['password'])){
