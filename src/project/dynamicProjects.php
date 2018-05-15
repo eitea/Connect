@@ -207,7 +207,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 if(!empty($_POST['completeWithoutBooking'])){
                     $conn->query("DELETE FROM projectBookingData WHERE id = $bookingID");
                 } else {
-                    $description = $dynamicID.' - '.test_input($_POST['description']); //5ac9e5167c616
+                    $description = 'TASK: '. $dynamicID.' - '.test_input($_POST['description']); //5ac9e5167c616, 5aeb2a8256b5f
                     $conn->query("UPDATE projectBookingData SET end = UTC_TIMESTAMP, infoText = '$description', projectID = '$projectID', internInfo = '$percentage% von $dynamicID Abgeschlossen' WHERE id = $bookingID");
                 }
                 if($conn->error){
