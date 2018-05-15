@@ -243,6 +243,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $isDSGVOAdmin = 'FALSE';
         $isCoreAdmin = isset($_POST['isCoreAdmin']) ? 'TRUE' : 'FALSE';
         $isDynamicProjectsAdmin = isset($_POST['isDynamicProjectsAdmin']) ? 'TRUE' : 'FALSE';
+		$isTimeAdmin = isset($_POST['isTimeAdmin']) ? 'TRUE' : 'FALSE';
         $isProjectAdmin = isset($_POST['isProjectAdmin']) ? 'TRUE' : 'FALSE';
         $isReportAdmin = isset($_POST['isReportAdmin']) ? 'TRUE' : 'FALSE';
         $isERPAdmin = 'FALSE';
