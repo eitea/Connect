@@ -172,7 +172,7 @@ if($projectRow['publicKey']){
 			            <div class="col-sm-6">
 			                <h5>Intern</h5>
 			                <?php
-							$access_select = '<option value="WRITE">Vollzugriff</option><option value="READ">Halbzugriff</option>';
+							$access_select = '<option value="WRITE">Vollzugriff</option><option value="READ">Lesezugriff</option>'; //5af14c95ef1f0
 			                $result = $conn->query("SELECT userID, firstname, lastname, access FROM relationship_project_user INNER JOIN UserData e ON userID = e.id WHERE projectID = $projectID"); echo $conn->error;
 			                while($result && ($row = $result->fetch_assoc())){
 			                    echo '<div class="col-sm-6"><button type="submit" name="removeUser" value="'.$row['userID'].'" class="btn btn-empty" title="Entfernen"><i class="fa fa-times" style="color:red"></i></button>';
