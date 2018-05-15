@@ -66,7 +66,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 	if(!empty($_POST['add-new-file']) && isset($_FILES['new-file-upload'])){
 		require dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.'aws'.DIRECTORY_SEPARATOR.'autoload.php';
 		$bucket = $identifier .'-uploads'; //no uppercase, no underscores, no ending dashes, no adjacent special chars
-
 		$result = $conn->query("SELECT endpoint, awskey, secret FROM archiveconfig WHERE isActive = 'TRUE' LIMIT 1");
 		if($result && ($row = $result->fetch_assoc())){
 			try{
@@ -135,7 +134,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 						'Body' => $file_encrypt
 					));
 
-					$filename = test_input($file_info['filename']);
+					$filename = test_input($file_info['filename'], 1);
 					$conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uniqID, uploadUser)
 					VALUES ('DSGVO', '$vvID', '$filename', '$parent', '$ext', '$hashkey', $userID)");
 					if($conn->error){ showError($conn->error); } else { showSuccess($lang['OK_UPLOAD']); }
@@ -154,7 +153,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $parent = test_input($_POST['add-new-folder']);
         if(!empty($_POST['new-folder-name'])){
             $name = test_input($_POST['new-folder-name']);
-            $conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uploadUser) VALUES ('DSGVO', '$vvID', '$name', '$parent', 'folder', $userID)");
+            $conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type) VALUES ('DSGVO', '$vvID', '$name', '$parent', 'folder')");
             if($conn->error){
                 showError($conn->error);
             } else {
@@ -214,12 +213,13 @@ function getSettings($like, $mults = false, $from_matrix = false){
     return $settings;
 }
 ?>
-<div class="page-header-fixed">
-	<div class="page-header"><h3><?php echo $vv_row['name'].' '.$lang['PROCEDURE_DIRECTORY']; ?>
-		<div class="page-header-button-group"><button type="submit" form="vv-mainForm" class="btn btn-default blinking"><i class="fa fa-floppy-o"></i></button></div>
-	</h3></div>
-</div>
-<form id="vv-mainForm" method="POST">
+
+<form method="POST">
+	<div class="page-header-fixed">
+		<div class="page-header"><h3><?php echo $vv_row['name'].' '.$lang['PROCEDURE_DIRECTORY']; ?>
+			<div class="page-header-button-group"><button type="submit" class="btn btn-default blinking"><i class="fa fa-floppy-o"></i></button></div></h3></div>
+		</div>
+	</div>
 	<div class="page-content-fixed-100">
 	<?php
 	$settings = getSettings('DESCRIPTION');
@@ -265,7 +265,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                <div class="col-sm-6 bold">E-Mail</div><div class="col-sm-6 grey"><?php echo $row['mail']; ?><br></div>
 	            </div>
 	            <?php else: ?>
-	            <div class="panel-heading"><?php echo mc_status('DSGVO'); ?>Kurze Beschreibung des Vorgangs, bzw. den Zweck dieses Vorgangs</div>
+	            <div class="panel-heading"><?php echo mc_status('DSGVO'); ?>Kurze Beschreibung der Applikation, bzw. den Zweck dieser Applikation</div>
 	            <div class="panel-body">
 	                <textarea name="DESCRIPTION" style='resize:none' class="form-control" rows="5"><?php echo $settings['DESCRIPTION']['setting']; ?></textarea>
 	            </div>
@@ -297,9 +297,9 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                    insertVVLog("INSERT","Insert '$key' for Procedure Directory $vvID as '$escaped_setting'");
 	                }
 	            }
-	            echo '<div class="row">';
-	            echo '<div class="col-sm-6 bold">'.mc_status('DSGVO').$val['descr'].'</div>';
-	            echo '<div class="col-sm-6 grey"><input type="text" class="form-control" maxlength="700" name="'.$key.'" value="'.$val['setting'].'"/></div>';
+	            echo '<div class="col-sm-12">';
+	            echo '<label>'.mc_status('DSGVO').$val['descr'].'</label>';
+	            echo '<textarea style="resize:none" rows="2" class="form-control" maxlength="700" name="'.$key.'">'.$val['setting'].'</textarea><br>';
 	            echo '</div>';
 	        }
 	        ?>
@@ -309,38 +309,29 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	<div class="col-md-12">
 	    <div class="panel panel-default">
 	        <div class="panel-heading">Generelle organisatorische und technische Maßnahmen zum Schutz der personenbezogenen Daten</div>
+			<br>
+			<p class="text-center"><label for="#matrice-area"><?php echo mc_status('DSGVO'); ?>Notizen</label></p>
 			<?php
-			// $stmt_update_setting = $conn->prepare("UPDATE dsgvo_vv_settings SET setting = ? WHERE id = ?");
-		    // $stmt_update_setting->bind_param("si", $setting_encrypt, $valID);
-		    // $stmt_insert_setting = $conn->prepare("INSERT INTO dsgvo_vv_settings(vv_id, setting_id, setting, category) VALUES($vvID, ?, ?, ?)");
-		    // $stmt_insert_setting->bind_param("iss", $setID, $setting_encrypt, $cat);
-
 			$key = 'GRET_TEXTAREA';
 	        $settings = getSettings($key);
-			//var_dump($settings);
-			if(isset($settings[$key])){
-				echo '<br><p class="text-center"><label for="#matrice-area">'.mc_status('DSGVO').'Notizen</label></p>';
-				if(isset($_POST[$key])){
-					$settings[$key]['setting'] = $setting = strip_tags($_POST[$key]);
-					$setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
-					$valID = $settings[$key]['valID'];
-					if($valID){
-						$stmt_update_setting->execute();
-						if($stmt_update_setting->affected_rows > 0){
-							$escaped_setting = test_input($setting);
-							insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$escaped_setting'");
-						}
-					} else {
-						$setID = $settings[$key]['id'];
-						$stmt_insert_setting->execute();
+			if(isset($_POST[$key])){
+				$settings[$key]['setting'] = $setting = strip_tags($_POST[$key]);
+				$setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
+				$valID = $settings[$key]['valID'];
+				if($valID){
+					$stmt_update_setting->execute();
+					if($stmt_update_setting->affected_rows > 0){
 						$escaped_setting = test_input($setting);
-						insertVVLog("INSERT","Insert '$key' for Procedure Directory $vvID as '$escaped_setting'");
+						insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$escaped_setting'");
 					}
+				} else {
+					$setID = $val['id'];
+					$stmt_insert_setting->execute();
+					$escaped_setting = test_input($setting);
+					insertVVLog("INSERT","Insert '$key' for Procedure Directory $vvID as '$escaped_setting'");
 				}
-
-				echo '<textarea id="matrice-area" name="'.$key.'" >'.$settings[$key]['setting'].'</textarea>';
 			}
-
+			echo '<textarea id="matrice-area" name="'.$key.'" >'.$settings[$key]['setting'].'</textarea>';
 			?>
 
 			<br>
@@ -506,8 +497,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 
 	                    $str_heads .= '<th data-toggle="tooltip" data-container="body" data-placement="left" title="'.$tooltip.$client.'"><div class="btn-group">
 						<button style="white-space: normal;" type="button" class="btn btn-link" data-toggle="dropdown">'.$val['setting'][0].'</button> <ul class="dropdown-menu">
-						<li><button type="button" class="btn btn-link" data-toggle="modal" data-target="#add-cate"
-						data-valid="'.$val['valID'][0].'" data-setting="'.$val['setting'][0].'" data-client="'.$val['client'][0].'" data-cat="'.$val['category'][0].'">Bearbeiten</button></li>
+						<li><button type="button" class="btn btn-link" data-toggle="modal" data-target="#edit-cate" data-valID="'.$val['valID'][0].'">Bearbeiten</button></li>
 						<li><button type="submit" class="btn btn-link" name="delete_cat" value="'.$val['valID'][0].'">Löschen</button></li>
 						</ul></div></th>';
 	                } else {
@@ -517,7 +507,8 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                }
 	            }
 	            // no other sane choice for the backend to be but here
-	            if(isset($_POST['add_category']) && !empty($_POST['add_category_name'])){
+	            if($space && isset($_POST['add_category']) && !empty($_POST['add_category_name'])){
+	                $setID = $space;
 	                $setting = test_input($_POST['add_category_name']);
 	                $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
 	                $cat = test_input($_POST['add_category_mittlung']);
@@ -527,31 +518,27 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                }else{
 	                    $stmt = $stmt_insert_setting;
 	                }
-					if(!empty($_POST['add_category'])){
-						$valID = test_input($_POST['add_category']);
-						if($clientID){
-							$conn->query("UPDATE dsgvo_vv_settings SET setting = '$setting_encrypt', category = '$cat', clientID = $clientID WHERE id = $valID ");
-						} else {
-							$conn->query("UPDATE dsgvo_vv_settings SET setting = '$setting_encrypt', category = '$cat' WHERE id = $valID ");
-						}
-						if($conn->error){
-		                    showError($conn->error);
-		                } else {
-							redirect('');
-						}
-					} elseif($space) {
-						$setID = $space;
-						$stmt->execute();
-		                $escaped_setting = test_input($setting);
-		                insertVVLog("INSERT","Add new category '$escaped_setting' for Procedure Directory $vvID");
-						if($stmt->error){
-		                    showError($stmt->error);
-		                } else {
-							redirect('');
-						}
-					} else {
-						showWarning("Kein Platz mehr");
-					}
+	                $stmt->execute();
+	                $escaped_setting = test_input($setting);
+	                insertVVLog("INSERT","Add new category '$escaped_setting' for Procedure Directory $vvID");
+	                if($stmt->error){
+	                    showError($stmt->error);
+	                } else {
+	                    $client = "";
+	                    if($clientID){
+	                        $result = $conn->query("SELECT name FROM $clientTable WHERE id = $clientID");
+	                        if($result && $result->num_rows !== 0){
+	                            $client = ' (an '.$result->fetch_assoc()["name"].') ';
+	                        }
+	                        showError($conn->error);
+	                    }
+	                    $heading[$space_key] = array('id' => $stmt->insert_id, 'category' => array());
+	                    $str_heads .= '<th data-toggle="tooltip" data-container="body" data-placement="left" title="'.$lang['DSGVO_CATEGORY_TOSTRING'][$cat].$client.'">
+						<div class="btn-group"><button type="button" class="btn btn-link" data-toggle="dropdown">'.$setting.'</button>
+	                    <ul class="dropdown-menu"><li><button type="submit" class="btn btn-link" name="delete_cat" value="'.$stmt->insert_id.'">Löschen</button></li></ul></div></th>';
+	                }
+	            } elseif(!$space){
+	                showWarning("Kein Platz mehr");
 	            }
 	            ?>
 
@@ -661,13 +648,25 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	    </div>
 	</div>
 
+	<div id="edit-cate" class="modal fade">
+		<div class="modal-dialog modal-content modal-md">
+			<div class="modal-header h4"></div>
+			<div class="modal-body">
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button type="submit" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
+			</div>
+		</div>
+	</div>
+
 	<div id="add-cate" class="modal fade">
 	  <div class="modal-dialog modal-content modal-md">
 		<div class="modal-header h4">Neue Kategorie Option</div>
 		<div class="modal-body">
 	        <div class="row">
 	            <div class="col-sm-12">
-	                <label>Name</label>
+	                <label for="add_category_name">Name</label>
 	                <input type="text" name="add_category_name" class="form-control" maxlength="60" />
 	            </div>
 	        </div>
@@ -683,7 +682,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                    <label><input type="radio" name="add_category_mittlung" value="heading2" /><?php echo $lang['DSGVO_CATEGORY_TOSTRING']['heading2']; ?></label>
 	                </div>
 					<div class="radio">
-	                    <label><input type="radio" name="add_category_mittlung" value="heading4" /><?php echo $lang['DSGVO_CATEGORY_TOSTRING']['heading4']; ?></label>
+	                    <label><input type="radio" name="add_category_mittlung" value="heading4" /><?php echo $Lang['DSGVO_CATEGORY_TOSTRING']['heading4']; ?></label>
 	                </div>
 	            </div>
 	        </div>
@@ -721,15 +720,6 @@ function getSettings($like, $mults = false, $from_matrix = false){
 </form>
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 <script>
-	$('#add-cate').on('show.bs.modal', function (event) {
-	  var button = $(event.relatedTarget);
-	  //data-valid="'.$val['valID'][0].'" data-setting="'.$val['setting'][0].'" data-client="'.$val['client'][0].'" data-cat="'.$val['category'][0].'"
-	  $(this).find('button[name="add_category"]').val(button.data('valid'));
-	  $(this).find('input[name="add_category_name"]').val(button.data('setting'));
-	  $(this).find('input:radio[name="add_category_mittlung"][value="'+button.data('cat')+'"]').click();
-	  $(this).find('[name="add_category_client"]').val(button.data('client')).trigger('change');
-	});
-
     $('[data-toggle="tooltip"]').tooltip();
 
     function toggleCustomerChooser(visible){
