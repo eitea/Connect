@@ -507,7 +507,7 @@ function create_tables($conn) {
         password VARCHAR(50),
         port VARCHAR(50),
         smtpSecure ENUM('', 'tls', 'ssl') DEFAULT 'tls',
-        sender VARCHAR(50) DEFAULT 'noreplay@mail.com',
+        sender VARCHAR(50) DEFAULT 'noreply@mail.com',
         enableEmailLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         senderName VARCHAR(50) DEFAULT NULL,
         feedbackRecipient VARCHAR(50) DEFAULT 'connect@eitea.at',

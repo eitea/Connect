@@ -17,6 +17,10 @@ if ($result && $result->num_rows > 0) {
 }
 
 if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['accept_licence'])){
+	if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
+		$conn->query("UPDATE mailingOptions SET host = 'adminmail', port = 25, username = 'admin', password = 'admin', smtpSecure = 'SSL',
+		sender = 'noreply@eitea.at', sendername = 'Connect im Auftrag von ', isDefault = 1");
+	}
     if(!empty($_POST['encryption_pass']) && !empty($_POST['encryption_pass_confirm']) && $_POST['encryption_pass'] == $_POST['encryption_pass_confirm']){
         $result = $conn->query("SELECT firstname, lastname, email FROM UserData WHERE id = $userID LIMIT 1");
         if($result && ($row = $result->fetch_assoc())){
