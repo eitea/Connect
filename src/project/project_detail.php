@@ -10,12 +10,12 @@ function insert_access_user($userID, $privateKey, $external = false){
     global $conn;
     global $projectID;
     if($external) {
-        $result = $conn->query("SELECT publicKey AS publicPGPKey FROM external_users WHERE id = $userID");
+        $result = $conn->query("SELECT publicKey FROM external_users WHERE id = $userID");
     } else {
-        $result = $conn->query("SELECT publicPGPKey FROM UserData WHERE id = $userID");
+        $result = $conn->query("SELECT publicKey FROM security_users WHERE id = $userID AND outDated = 'FALSE'");
     }
     if($result && ($row = $result->fetch_assoc())){
-        $user_public = base64_decode($row['publicPGPKey']);
+        $user_public = base64_decode($row['publicKey']);
         $nonce = random_bytes(24);
         $private_encrypt = $nonce . sodium_crypto_box($privateKey, $nonce, $privateKey.$user_public);
         if($external){
@@ -53,9 +53,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $new_public = sodium_crypto_box_publickey($keyPair);
         //outdate and insert
         $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$projectID'"); echo $conn->error;
-        $result = $conn->query("SELECT userID, publicPGPKey FROM relationship_project_user r LEFT JOIN UserData ON r.userID = UserData.id WHERE projectID = $projectID");
+        $result = $conn->query("SELECT userID, publicKey FROM relationship_project_user r LEFT JOIN security_users su ON r.userID = su.id AND su.outDated = 'FALSE' WHERE projectID = $projectID");
         while($result && ($row = $result->fetch_assoc())){
-            $user_public = base64_decode($row['publicPGPKey']);
+            $user_public = base64_decode($row['publicKey']);
             $nonce = random_bytes(24);
             $private_encrypt = $nonce . sodium_crypto_box($new_private, $nonce, $new_private.$new_public);
             $conn->query("INSERT INTO security_access(userID, module, privateKey, optionalID) VALUES ($userID, 'PRIVATE_PROJECT', '".base64_encode($private_encrypt)."', '$projectID')");

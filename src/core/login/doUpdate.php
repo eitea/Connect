@@ -2109,7 +2109,7 @@ if($row['version'] < 139){
         module VARCHAR(50) NOT NULL,
         recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         symmetricKey VARCHAR(150) NOT NULL,
-        publicPGPKey VARCHAR(150) NOT NULL,
+        publicKey VARCHAR(150) NOT NULL,
         outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
     )";
     if(!$conn->query($sql)){
@@ -2134,8 +2134,6 @@ if($row['version'] < 139){
     } else {
         echo '<br>Security Update: User Keys';
     }
-
-    $conn->query("ALTER TABLE companyData ADD COLUMN publicPGPKey VARCHAR(150)");
 
     $sql = "CREATE TABLE security_company(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -2249,8 +2247,6 @@ if($row['version'] < 142){
         echo '<br>Team Update: Messages';
     }
 
-    $conn->query("ALTER TABLE UserData ADD COLUMN publicPGPKey TEXT DEFAULT NULL");
-    $conn->query("ALTER TABLE UserData ADD COLUMN privatePGPKey TEXT DEFAULT NULL");
     if(!$conn->error){
         echo '<br>PGP: keypairs';
     }
@@ -2701,8 +2697,8 @@ if($row['version'] < 153){
         echo $conn->error;
     } else {
 		$conn->query("INSERT INTO security_users (userID, publicKey, privateKey) SELECT id, publicPGPKey, privatePGPKey FROM UserData WHERE publicPGPKey IS NOT NULL"); echo $conn->error;
-		$conn->query("ALTER TABLE UserData DROP COLUMN publicPGPKey");echo $conn->error;
-		$conn->query("ALTER TABLE UserData DROP COLUMN privatePGPKey");echo $conn->error;
+		$conn->query("ALTER TABLE UserData DROP COLUMN publicPGPKey");
+		$conn->query("ALTER TABLE UserData DROP COLUMN privatePGPKey");
         echo '<br>Security: Users';
     }
 
