@@ -634,7 +634,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                     }
 
                     $.ajax({
-                        url: "ajaxQuery/AJAX_postSendMessage.php",
+                        url: "ajaxQuery/ajax_post_send_message.php",
                         data: {
                             taskID: taskID,
                             taskName: taskName,

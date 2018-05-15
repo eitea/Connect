@@ -163,7 +163,7 @@ Tables:
                 $name = $firstname . " " . $lastname;
 
                 ?>
-                    <div style="padding: 5px;">
+                    <div style="padding: 5px; cursor: pointer;">
                         <div class="subject<?php echo $i; ?> input-group" style="word-break: normal; word-wrap: normal; background-color: white; border: 1px solid gainsboro;">
                             <p style="padding: 10px;" onclick="showChat(<?php echo $receiver; ?>, '<?php echo $subject; ?>', '<?php echo $name; ?>')">
                                 <?php echo $subject; ?>
@@ -217,7 +217,7 @@ Tables:
         <!-- Messages -->
         <div class="col-sm-6">
             <!-- 5ac62d49ea1c4 -->
-            <div id="user_bar" style="display: none; background-color: whitesmoke; border: 1px gainsboro solid; border-bottom: none; max-height: 10vh; padding: 10px;"></div>
+            <div id="user_bar" style="display: none; background-color: whitesmoke; border: 1px gainsboro solid; border-bottom: none; padding: 10px; user-select: none;"></div>
             
             <div class="pre-scrollable" id="messages" style="display: none; background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh; padding-top: 5px"></div>
 
@@ -291,12 +291,49 @@ Tables:
         </div>
     </div>
 </div>
+<div id="current_open_modal"></div>
 
 <script>
 var selectedPartner = -1;
 var selectedSubject = "";
 var intervalID = -1;
 var messageLimit = 10;
+
+function setCurrentModal(data, type, url){
+    $.ajax({
+        url: url,
+        data: data,
+        type: type,
+        success : function(resp){
+            $("#current_open_modal").html(resp);
+        },
+        error : function(resp){console.error(resp)},
+        complete: function(resp){
+            onModalLoad();
+            $("#current_open_modal .modal").modal('show');
+        }
+   });
+}
+
+function showUserProfile(partner){
+    setCurrentModal({partner:partner},'get', 'ajaxQuery/ajax_post_get_user_profile.php')
+}
+
+function fetchUserBar(partner,targetSelector){
+    $.ajax({
+        url: 'ajaxQuery/ajax_post_get_user_bar.php',
+        data: {
+            partner: partner
+        },
+        type: 'GET',
+        success: function (response) {
+            $(targetSelector).html(response);
+        },
+        error: function (response) {
+            $(targetSelector).html(response);
+        },
+    });
+}
 
 //Make the div visible, when someone clicks the button
 function showChat(partner, subject, name) {
@@ -319,6 +356,7 @@ function showChat(partner, subject, name) {
     var user_bar = document.getElementById("user_bar");     //5ac62d49ea1c4
     user_bar.style.display = "block";
     user_bar.innerHTML = name;
+    fetchUserBar(partner,"#user_bar");
 
     var messagesElement = document.getElementById("messages");
     messagesElement.style.display = "block";
@@ -359,7 +397,7 @@ function sendMessage(partner, subject, message, target, limit = 50) {
     }
 
     $.ajax({
-        url: 'ajaxQuery/AJAX_postSendMessage.php',
+        url: 'ajaxQuery/ajax_post_send_message.php',
         data: {
             partner: partner,
             subject: subject,
@@ -414,6 +452,10 @@ function udpateBadge(target, menu, partner, subject) {
             }
         },
     })
+}
+
+function onModalLoad(){
+
 }
 
 </script>
