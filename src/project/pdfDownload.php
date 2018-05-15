@@ -11,6 +11,7 @@ $templateID = $_POST['templateID'];
 
 if($templateID == -1) include __DIR__ . "/download_overview.php";
 if($templateID == -2) include __DIR__ . "/download_overview_invoice.php";
+if($templateID == -3){ $roundUp = true; include __DIR__ . "/download_overview_invoice.php"; } //5afa777be1d4e
 
 $html = '<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><link href="plugins/homeMenu/template.css" rel="stylesheet" /></head>';
 $html .= getFilledOutTemplate($templateID, $filterQuery); //query must contain WHERE clause

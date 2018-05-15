@@ -14,11 +14,11 @@ $activeTab = 'home';
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(!empty($_POST['setActiveTab'])){$activeTab = $_POST['setActiveTab']; }
 
-    if (isset($_POST['ts_remove'])){
+    if (!empty($_POST['ts_remove'])){
         $x = intval($_POST['ts_remove']);
         $conn->query("DELETE FROM logs WHERE indexIM=$x;");
         if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
-    } elseif(isset($_POST['bk_remove'])){
+    } elseif(!empty($_POST['bk_remove'])){
         $x = intval($_POST['bk_remove']);
         $conn->query("DELETE FROM projectBookingData WHERE id=$x;");
         if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
@@ -331,8 +331,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <div class="dropdown">
         <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" title="PDF Download"><i class="fa fa-download"></i> PDF</button>
         <ul class="dropdown-menu">
-            <li><button type="submit" name="templateID" value="-1" class="btn btn-empty">Detallierte <?php echo $lang['OVERVIEW']; ////5ac72a2d8a093 ?></button></li>
-            <li><button type="submit" name="templateID" value="-2" class="btn btn-empty"><?php echo $lang['OVERVIEW']; ////5ac72a2d8a093 ?></button></li>
+            <li><button type="submit" name="templateID" value="-1" class="btn btn-empty">Detallierte <?php echo $lang['OVERVIEW']; //5ac72a2d8a093 ?></button></li>
+            <li><button type="submit" name="templateID" value="-2" class="btn btn-empty"><?php echo $lang['OVERVIEW']; //5ac72a2d8a093 ?></button></li>
+			<li><button type="submit" name="templateID" value="-3" class="btn btn-empty">Aufgerundete <?php echo $lang['OVERVIEW']; //5afa777be1d4e ?></button></li>
         </ul>
       </div>
     </form>

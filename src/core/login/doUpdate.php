@@ -2783,6 +2783,11 @@ if($row['version'] < 154){
 
 if($row['version'] < 155){
 	$conn->query("ALTER TABLE archive ADD COLUMN uploadUser INT(6)");
+
+	if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
+		$conn->query("UPDATE mailingOptions SET host = 'adminmail', port = 25, username = '', password = '', smtpSecure = '',
+		sender = 'noreply@eitea.at', sendername = 'Connect', isDefault = 1");
+	}
 }
 
 // if($row['version'] < 156){}

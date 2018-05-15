@@ -120,6 +120,10 @@ while($result && ($row = $result->fetch_assoc())){
         $projectText .= "\n###\n". $row['infoText'];
         $projectTime += (strtotime($row['end']) - strtotime($row['start'])) / 60;
     }
+	if(isset($roundUp)){ //5afa777be1d4e
+		$decimal = ceil(($projectTime / 60) * 4) / 4;
+		$projectTime = $decimal * 60;
+	}
     //restore consumed row for next iteration
     if($row){$result->data_seek($row_count);}
 
@@ -129,7 +133,7 @@ while($result && ($row = $result->fetch_assoc())){
     $pdf->Cell($w[2],$h, sprintf('%.2f', $projectTime), 0, '', 'R');
 
     $sum += $projectTime; //5aeaefea49a8c
-    $y[] = $pdf->MultiColCell($w[3],$h,iconv('UTF-8', 'windows-1252', $projectText));
+    $y[] = $pdf->MultiColCell($w[3],$h,iconv('UTF-8', 'windows-1252', $projectText .$decimal));
 
     $pdf->Ln();
     $pdf->SetY(max($y));

@@ -3,8 +3,8 @@
 <?php
 if(isset($_POST['saveButton'])){
 	if(isset($_POST['defaultOptions'])){
-		$conn->query("UPDATE mailingOptions SET host = 'adminmail', port = 25, username = 'admin', password = 'admin', smtpSecure = 'SSL',
-		sender = 'noreply@eitea.at', sendername = 'Connect im Auftrag von ', isDefault = 1");
+		$conn->query("UPDATE mailingOptions SET host = 'adminmail', port = 25, username = '', password = '', smtpSecure = '',
+			 sender = 'noreply@eitea.at', sendername = 'Connect', isDefault = 1");
 	} else {
 		$conn->query("UPDATE mailingOptions SET isDefault = 0");
 		if(!empty($_POST['smtp_host'])){
