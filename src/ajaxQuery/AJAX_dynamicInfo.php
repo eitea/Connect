@@ -147,7 +147,7 @@ if (sizeof($missingBookingsArray) == 0) {
                 <li class="active"><a data-toggle="tab" href="#projectDescription<?php echo $x; ?>">Beschreibung</a></li>
                 <li><a data-toggle="tab" href="#projectInfoBookings<?php echo $x; ?>">Buchungen</a></li>
                 <li><a data-toggle="tab" href="#projectInfoLogs<?php echo $x; ?>">Logs</a></li>
-                <li><a data-toggle="tab" href="#projectMessages<?php echo $x; ?>" id="projectMessagesTab<?php echo $x; ?>">Messages</a></li>
+                <?php if(false): ?><li><a data-toggle="tab" href="#projectMessages<?php echo $x; ?>" id="projectMessagesTab<?php echo $x; ?>">Messages</a></li><?php endif; ?>
                 <?php if($showMissingBookings): ?><li><a data-toggle="tab" href="#projectForgottenBooking<?php echo $x; ?>">Zeit nachbuchen</a></li><?php endif; ?>
             </ul>
             <div class="tab-content">
@@ -227,7 +227,7 @@ if (sizeof($missingBookingsArray) == 0) {
                         </tbody>
                     </table>
                 </div>
-
+                <?php if(false): ?>
                 <!-- Project Messages -->
                 <div id="projectMessages<?php echo $x; ?>" class="tab-pane fade"><br>
                     <!-- Subject bar -->
@@ -356,7 +356,7 @@ if (sizeof($missingBookingsArray) == 0) {
                                 }
 
                                 $.ajax({
-                                    url: 'ajaxQuery/AJAX_postSendMessage.php',
+                                    url: 'ajaxQuery/ajax_post_send_message.php',
                                     data: {
                                         taskID: taskID,
                                         taskName: taskName,
@@ -371,6 +371,7 @@ if (sizeof($missingBookingsArray) == 0) {
                         </script>
                     </div>
                 </div>
+                <?php endif; ?>
 
                 <?php if($showMissingBookings): ?>
                 <div id="projectForgottenBooking<?php echo $x; ?>" class="tab-pane fade"><br>

@@ -18,7 +18,7 @@ if (isset($_GET["partner"], $_GET["message"]) && !empty($_SESSION["userid"])) {
     require_once __DIR__ . "/../utilities.php";
     $partner = intval($_REQUEST["partner"]);
     $userID = $_SESSION["userid"];
-    $picture = uploadFile("picture", 1, 0, 1);
+    $picture = uploadImage("picture", 1, 0);
     require dirname(__DIR__) . "/connection.php";
     $stmt = $conn->prepare("INSERT INTO socialmessages (userID, partner, picture) VALUES ($userID, $partner, ?)");
     echo $conn->error;
@@ -31,7 +31,7 @@ if (isset($_GET["partner"], $_GET["message"]) && !empty($_SESSION["userid"])) {
     require_once __DIR__ . "/../utilities.php";
     $group = intval($_REQUEST["group"]);
     $userID = $_SESSION["userid"];
-    $picture = uploadFile("picture", 1, 0, 1);
+    $picture = uploadImage("picture", 1, 0);
     require dirname(__DIR__) . "/connection.php";
     $stmt = $conn->prepare("INSERT INTO socialgroupmessages (userID, groupID, picture, seen) VALUES ($userID, $group, ?, '$userID')");
     echo $conn->error;
