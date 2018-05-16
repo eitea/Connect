@@ -26,7 +26,7 @@ function clearPGP(){
     document.getElementsByName('privatePGP')[0].value = '';
 }
 
-function showError(message){
+function showError(message, hideDelay = 30000){
     if(!message || message.length == 0) return;
     $.notify({
         icon: 'fa fa-exclamation-triangle',
@@ -34,7 +34,7 @@ function showError(message){
         message: message
     },{
         type: 'danger',
-        delay: 30000,
+        delay: hideDelay,
         mouse_over: "pause",
         animate: {
             enter: 'animated bounceInRight',
@@ -42,7 +42,7 @@ function showError(message){
         },
     });
 }
-function showWarning(message){
+function showWarning(message, hideDelay = 30000){
     if(!message || message.length == 0) return;
     $.notify({
         icon: 'fa fa-warning',
@@ -50,7 +50,7 @@ function showWarning(message){
         message: message
     },{
         type: 'warning',
-        delay: 30000,
+        delay: hideDelay,
         mouse_over: "pause",
         animate: {
             enter: 'animated bounceInRight',
@@ -58,7 +58,7 @@ function showWarning(message){
         },
     });
 }
-function showInfo(message){
+function showInfo(message, hideDelay = 30000){
     if(!message || message.length == 0) return;
     $.notify({
         icon: 'fa fa-info',
@@ -66,7 +66,7 @@ function showInfo(message){
         message: message
     },{
         type: 'info',
-        delay: 30000,
+        delay: hideDelay,
         mouse_over: "pause",
         animate: {
             enter: 'animated bounceInRight',
@@ -74,7 +74,7 @@ function showInfo(message){
         },
     });
 }
-function showSuccess(message){
+function showSuccess(message, hideDelay = 30000){
     if(!message || message.length == 0) return;
     $.notify({
         icon: 'fa fa-check',
@@ -82,7 +82,7 @@ function showSuccess(message){
         message: message
     },{
         type: 'success',
-        delay: 30000,
+        delay: hideDelay,
         mouse_over: "pause",
         animate: {
             enter: 'animated bounceInRight',

@@ -226,7 +226,13 @@ Tables:
                     <div class="input-group">
                         <!-- TODO: set resize to none and create a js listerner to auto resize the textarea -->
                         <textarea id="message" wrap="hard" placeholder="Type a message" class="form-control" style="max-height: 11vh; resize: vertical;"></textarea>
-                        <span id="sendButton" class="input-group-addon btn btn-default" type="submit"><?php echo $lang['SEND'] ?></span>
+                        <span class="input-group-btn">
+                            <span id="sendButton" class="btn btn-default" type="submit" style="height: 100%;"><?php echo $lang['SEND'] ?></span>
+                            <label class="btn btn-default" title="Bild senden">
+                                <i class="fa fa-upload" aria-hidden="true"></i>
+                                    <input type="file" id="messagePictureUpload" name="picture" style="display:none">
+                            </label>
+                        </span>
                     </div>
                 </form>
 
@@ -240,7 +246,7 @@ Tables:
                             $("#message").append("<br>");
                         } else {
                             // update shiftPressed when not pressed shift+enter
-                            if(event.which == 16) shiftPressed = true; else shiftPressed = false;
+                            shiftPressed = (event.which == 16)
                         }
                         
                         if(event.which == 13 && !shiftPressed){
@@ -307,7 +313,7 @@ function setCurrentModal(data, type, url){
         success : function(resp){
             $("#current_open_modal").html(resp);
         },
-        error : function(resp){console.error(resp)},
+        error : function(resp){showError(resp)},
         complete: function(resp){
             onModalLoad();
             $("#current_open_modal .modal").modal('show');
@@ -405,10 +411,48 @@ function sendMessage(partner, subject, message, target, limit = 50) {
         },
         type: 'GET',
         success: function (response) {
+            showInfo(response, 1000);
             getMessages(partner, subject, target, true, limit)
         },
     })
 }
+
+$("#messagePictureUpload").change(function(e){
+    e.stopPropagation()
+    e.preventDefault()
+    file = e.target.files[0]
+    var data = new FormData()
+    if(!file.type.match('image.*')){
+        alert("Not an image")
+    }else if (file.size > 1048576){
+        alert("File too large")
+    }else{
+        var partner = selectedPartner;
+        var subject = selectedSubject;
+        var limit = messageLimit;
+        var target = "#messages";
+        if(partner == -1 || subject.length == 0) return
+        data.append('picture', file)
+        data.append('partner', partner)
+        data.append('subject', subject)
+        const finishedFunction = function (response){
+            console.log(response);
+            showInfo(response.responseText || response.statusText || response, 1000);
+            getMessages(partner, subject, target, true, limit)
+        }
+        $.ajax({
+            url: 'ajaxQuery/ajax_post_send_message.php',
+            dataType: 'json',
+            data: data,
+            cache: false,
+            type: 'POST',
+            processData: false,
+            contentType: false,
+            success: finishedFunction,
+            error: finishedFunction
+        })
+    }
+})
 
 function deleteSubject(partner, subject) {
     $.ajax({
@@ -419,7 +463,7 @@ function deleteSubject(partner, subject) {
         },
         type: 'GET',
         success: function (response) {
-            console.log(response);
+            showInfo(response);
             // reload without resending resent form
             window.location.href = window.location.pathname;
         },

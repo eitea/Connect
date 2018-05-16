@@ -694,10 +694,50 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                     sendMessage("'.$x.'", "'.$projectName.'", $("#message-'.$x.'").val(), "#messages-div-'.$x.'", messageLimit'.$x.');
                     $("#message-'.$x.'").val("");
                   });
+                
+                 $(document).ready(function(){ $("#messagePictureUpload-'.$x.'").change(function(e){
+                    e.stopPropagation()
+                    e.preventDefault()
+                    file = e.target.files[0]
+                    var data = new FormData()
+                    if(!file.type.match("image.*")){
+                        alert("Not an image")
+                    }else if (file.size > 1048576){
+                        alert("File too large")
+                    }else{
+                        var limit = messageLimit'.$x.';
+                        var target = "#messages-div-'.$x.'";
+                        var taskID = "'.$x.'";
+                        var taskName = "'.$projectName.'";
+                        data.append("picture", file)
+                        data.append("taskID", taskID)
+                        data.append("taskName", taskName)
+                        const finishedFunction = function (response){
+                            console.log(response);
+                            showInfo(response.responseText || response.statusText || response, 1000);
+                            getMessages(taskID, target, true, limit)
+                        }
+                        $.ajax({
+                            url: "ajaxQuery/ajax_post_send_message.php",
+                            dataType: "json",
+                            data: data,
+                            cache: false,
+                            type: "POST",
+                            processData: false,
+                            contentType: false,
+                            success: finishedFunction,
+                            error: finishedFunction
+                        })
+                    }
+                }) })
                 </script>';
             //footer
             $modals .= '</div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                 <button class="btn btn-warning" type="submit" title="'.$lang["SEND"].'" name="task-plan" value="'.$x.'">'.$lang["SEND"].'</button>
+                <label class="btn btn-default" title="Bild senden">
+                    <i class="fa fa-upload" aria-hidden="true"></i>
+                        <input type="file" id="messagePictureUpload-'.$x.'" name="picture" style="display:none">
+                </label>
                 </div></form></div></div>';
 
         }
