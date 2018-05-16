@@ -207,7 +207,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 if(!empty($_POST['completeWithoutBooking'])){
                     $conn->query("DELETE FROM projectBookingData WHERE id = $bookingID");
                 } else {
-                    $description = $dynamicID.' - '.test_input($_POST['description']); //5ac9e5167c616
+                    $description = 'TASK: '. $dynamicID.' - '.test_input($_POST['description']); //5ac9e5167c616, 5aeb2a8256b5f
                     $conn->query("UPDATE projectBookingData SET end = UTC_TIMESTAMP, infoText = '$description', projectID = '$projectID', internInfo = '$percentage% von $dynamicID Abgeschlossen' WHERE id = $bookingID");
                 }
                 if($conn->error){
@@ -235,6 +235,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
         }
         if(isset($_POST['editDynamicProject'])){ //new projects
+			$setEdit = false;
             if(isset($available_companies[1]) && !empty($_POST['name']) && !empty($_POST['description']) && !empty($_POST['owner']) && test_Date($_POST['start'], 'Y-m-d') && !empty($_POST['employees'])){
                 $id = uniqid();
                 if(!empty($_POST['editDynamicProject'])){ //existing
@@ -319,6 +320,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $stmt->execute();
                 if(!$stmt->error){
                     $stmt->close();
+					$setEdit = true;
                     //EMPLOYEES
                     $stmt = $conn->prepare("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES ('$id', ?, ?)"); echo $conn->error;
                     $stmt->bind_param("is", $employee, $position);
@@ -1070,13 +1072,21 @@ function appendModal(index){
     complete: function(resp){
         if(index){
             $('#editingModal-'+index).modal('show');
-        }
-        $("#projectForm"+index).rememberState();
+        } else {
+			<?php if(isset($setEdit) && !$setEdit): //5ae9e4ee9e35f ?>
+			setTimeout(function(){
+				$("#editingModal-").modal("show");
+				tinyMCE.activeEditor.setContent('<?php echo $_POST['description']; ?>');
+				//$("#editingModal-").find('input[name="owner"]').val(<?php echo $_POST['owner']; ?>);
+			}, 1500);
+			<?php endif; ?>
+		}
     }
    });
 }
 var existingModals = new Array();
 appendModal('');
+
 var existingModals_info = new Array();
 $('.view-modal-open').click(function(){
     var index = $(this).val();

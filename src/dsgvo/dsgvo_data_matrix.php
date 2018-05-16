@@ -17,10 +17,6 @@ if (isset($_POST['company_id'])) {
 	}
 }
 
-function isNumberOrUnit($var){
-	return !((strpos($var, '_NUMBER') === false) && (strpos($var, '_UNIT') === false));
-}
-
 $stmt_insert_vv_log = $conn->prepare("INSERT INTO dsgvo_vv_logs (user_id,short_description,long_description,scope) VALUES ($userID,?,?,?)");
 showError($conn->error);
 $stmt_insert_vv_log->bind_param("sss", $stmt_insert_vv_log_short_description, $stmt_insert_vv_log_long_description, $stmt_insert_vv_log_scope);
@@ -123,14 +119,14 @@ if (isset($_POST['delete_setting']) && isset($matrixID)) {
 }
 
 if (isset($_POST['save_all']) && isset($matrixID)) {
-	$stmt = $conn->prepare("UPDATE dsgvo_vv_data_matrix_settings SET opt_descr = ?, opt_duration = ?, opt_unit = ? WHERE matrixID = $matrixID AND opt_name = ?");
-	showError($conn->error);
-	$stmt->bind_param("siis", $descr, $duration, $unit, $setting);
+	$stmt = $conn->prepare("UPDATE dsgvo_vv_data_matrix_settings SET opt_descr = ?, opt_duration = ?, opt_unit = ?, opt_status = ? WHERE matrixID = $matrixID AND opt_name = ?"); echo $conn->error;
+	$stmt->bind_param("siiss", $descr, $duration, $unit, $status, $setting);
 	$affected_rows = 0;
 	foreach ($_POST as $name => $value) {
-		if(isNumberOrUnit($name)) continue;
+		if(strpos($name, '_NUMBER') || strpos($name, '_UNIT') || strpos($name, '_SETTING')) continue;
 		$setting = test_input($name);
 		$descr = test_input($value);
+		$status = empty($_POST[$name.'_SETTING']) ? '' : 'ART9'; //heavy misuse of unused column, but you really dont want to meddle with dsgvo_vv_settings in here
 		$duration = $unit = 0;
 		if(isset($_POST["${name}_NUMBER"],$_POST["${name}_UNIT"])){
 			$duration = intval($_POST["${name}_NUMBER"]);
@@ -144,6 +140,7 @@ if (isset($_POST['save_all']) && isset($matrixID)) {
 					insertVVLog("UPDATE","Update a field (name: $setting, description: $descr) in matrix $matrixID");
 				}
 				showError($stmt->error);
+
 			}
 		}
 	}
@@ -223,7 +220,7 @@ $("#company_chooser").change(function () {
 							<div class="col-sm-offset-1">
 								<?php
 								$j = 1;
-								$cat_result = $conn->query("SELECT opt_name, opt_descr, opt_unit, opt_duration FROM dsgvo_vv_data_matrix_settings WHERE matrixID = $matrixID AND opt_name LIKE 'APP_CAT_$num%'");
+								$cat_result = $conn->query("SELECT opt_name, opt_descr, opt_unit, opt_duration, opt_status FROM dsgvo_vv_data_matrix_settings WHERE matrixID = $matrixID AND opt_name LIKE 'APP_CAT_$num%'");
 								$jnum = 1;
 								while ($cat_row = $cat_result->fetch_assoc()):
 									$jnum = util_strip_prefix($cat_row['opt_name'], 'APP_CAT_' . $num . '_');
@@ -236,13 +233,17 @@ $("#company_chooser").change(function () {
 									}
 									$fieldID++;
 									?>
-									<div class="col-xs-12 ">
-										<div class="input-group">
-											<span class="input-group-addon">
-												<?php echo $fieldID; ?>
-											</span>
-											<input style="width: 33.333%;" type="text" class="form-control" maxlength="350" name="<?php echo $cat_row['opt_name']; ?>" value="<?php echo $cat_row['opt_descr']; ?>" />
-											<select style="width: 33.333%;" class="form-control duration-number-select" name="<?php echo $cat_row['opt_name']; ?>_NUMBER" >
+									<div class="row form-group">
+										<div class="col-md-3">
+											<div class="input-group">
+												<span class="input-group-addon">
+													<?php echo $fieldID; ?>
+												</span>
+												<input type="text" class="form-control" maxlength="350" name="<?php echo $cat_row['opt_name']; ?>" value="<?php echo $cat_row['opt_descr']; ?>" />
+											</div>
+										</div>
+										<div class="col-md-3">
+											<select class="form-control duration-number-select" name="<?php echo $cat_row['opt_name']; ?>_NUMBER" >
 												<option value="default">Löschfrist - im Vorgang beschrieben</option>
 												<?php
 												for ($i = 1;$i<=30;++$i) {
@@ -251,18 +252,23 @@ $("#company_chooser").change(function () {
 												}
 												?>
 											</select>
-											<select style="width: 33.333%;" class="form-control duration-unit-select" name="<?php echo $cat_row['opt_name']; ?>_UNIT" >
+										</div>
+										<div class="col-md-3">
+											<select class="form-control duration-unit-select" name="<?php echo $cat_row['opt_name']; ?>_UNIT" >
 												<option value="default">Löschfrist - im Vorgang beschrieben</option>
 												<option value="1" <?php echo (intval($cat_row['opt_unit']) === 1)?"selected":""; echo '>'; echo $lang['TIME_UNIT_TOSTRING'][1]; ?></option>
 												<option value="2" <?php echo (intval($cat_row['opt_unit']) === 2)?"selected":""; echo '>'; echo $lang['TIME_UNIT_TOSTRING'][2]; ?></option>
 												<option value="3" <?php echo (intval($cat_row['opt_unit']) === 3)?"selected":""; echo '>'; echo $lang['TIME_UNIT_TOSTRING'][3]; ?></option>
 												<option value="4" <?php echo (intval($cat_row['opt_unit']) === 4)?"selected":""; echo '>'; echo $lang['TIME_UNIT_TOSTRING'][4]; ?></option>
 											</select>
-											<span class="input-group-btn">
-												<button type="button" onclick="delete_setting('<?php echo $cat_row['opt_name']; ?>')" class="btn btn-danger">
-													<i class="fa fa-trash-o"></i>
-												</button>
-											</span>
+										</div>
+										<div class="col-sm-2">
+											<label title="Besondere Datenkategorie iSd Art 9 DSGVO">
+												<input type="checkbox" <?php if($cat_row['opt_status'] == 'ART9') echo 'checked'; ?>  name="<?php echo $cat_row['opt_name']; ?>_SETTING" value="1" /> Art9
+											</label>
+										</div>
+										<div class="col-sm-1">
+											<button type="button" onclick="delete_setting('<?php echo $cat_row['opt_name']; ?>')" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
 										</div>
 										<br>
 									</div>

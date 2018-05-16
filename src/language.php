@@ -626,6 +626,9 @@ $lang_ger['GAPS_FOUND_PLEASE_CORRECT'] = 'Bitte die fehlenden Einträge nachtrag
 $lang_eng['GENDER'] = 'Gender';
 $lang_ger['GENDER'] = 'Gender';
 
+$lang_eng['GERMAN'] = 'German';
+$lang_ger['GERMAN'] = 'Deutsch';
+
 $lang_eng['GREETING_MORNING'] = 'Good Morning';
 $lang_ger['GREETING_MORNING'] = 'Guten Morgen';
 
@@ -1472,6 +1475,10 @@ $lang_ger['YES_I_WILL'] = 'Ja, ich will.';
 $lang_eng['YOUR_ARCHIVE'] = 'Your Archive';
 $lang_ger['YOUR_ARCHIVE'] = 'Ihr Archiv';
 
+
+
+
+
 $lang_eng['ACCOUNT_TOSTRING'] = array('', 'Asset Account', 'Liability Account', 'Expense Account', 'Revenue Account');
 $lang_ger['ACCOUNT_TOSTRING'] = array('', 'Aktivkonto', 'Passivkonto', 'Aufwandskonto', 'Ertragskonto');
 
@@ -1479,6 +1486,9 @@ $lang_eng['ACTIVITY_TOSTRING'] = array("-1" => "Absent","0" => "Work","1" => "Va
   "3" => "Sick","4" => "Education", "5" => "Mixed", "6" => "Compensatory Time");
 $lang_ger['ACTIVITY_TOSTRING'] = array("-1" => "Abwesend","0" => "Dienst","1" => "Urlaub","2" => "Sonderurlaub",
   "3" => "Krankenstand","4" => "Weiterbildung", "5" => "Gemischt", "6" => "Zeitausgleich");
+
+$lang_eng['DSGVO_CATEGORY_TOSTRING'] = array('heading1' => 'Transmission', 'heading2' => 'Processing', 'heading3' => 'Transmission non-EU country', 'heading4' => 'Processing Application');
+$lang_ger['DSGVO_CATEGORY_TOSTRING'] = array('heading1' => 'Übermittlung', 'heading2' => 'Verarbeitung', 'heading3' => 'Übermittlung in nicht-EU Ausland', 'heading4' => 'Verarbeitung Applikation');
 
 $lang_eng['EMOJI_TOSTRING'] = array("-", "Terrible", "Disappointing", "Neutral", "Good", "Excellent");
 $lang_ger['EMOJI_TOSTRING'] = array("-", "Schrecklich", "Enttäuschend", "Neutral", "Gut", "Ausgezeichnet");
@@ -1491,9 +1501,6 @@ $lang_ger['COMPLEXITY_TOSTRING'] = array("SIMPLE" => 'Einfach', "MEDIUM" => 'Mit
 
 $lang_eng['GENDER_TOSTRING'] = array('male' => 'Mr.', 'female' => 'Mrs.', '' => '');
 $lang_ger['GENDER_TOSTRING'] = array('male' => 'Herr','female' => 'Frau', '' => '');
-
-$lang_eng['GERMAN'] = 'German';
-$lang_ger['GERMAN'] = 'Deutsch';
 
 $lang_eng['OFFERSTATUS_TOSTRING'] = array('Waiting', 'Completed', 'Canceled');
 $lang_ger['OFFERSTATUS_TOSTRING'] = array('Wartend', 'Abgeschlossen', 'Abgebrochen');

@@ -8,13 +8,19 @@ $cmpID = intval($_GET['cmp']);
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
   if(isset($_POST['deleteCompany'])){
-    if($cmpID == 1){
-      echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert">&times;</a>'.$lang['ERROR_DELETE_COMPANY'].'</div>';
-    } else {
-      $sql = "DELETE FROM companyData WHERE id = $cmpID;";
-      $conn->query($sql);
-      echo mysqli_error($conn);
-    }
+	  if($cmpID == 1){
+		  echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert">&times;</a>'.$lang['ERROR_DELETE_COMPANY'].'</div>';
+	  } else {
+		  $conn->query("DELETE FROM folder_default_sturctures WHERE category = 'COMPANY' AND categoryID = '$cmpID'");
+		  $conn->query("DELETE FROM archive WHERE category = 'COMPANY' AND categoryID = '$cmpID'");
+		  $conn->query("UPDATE security_access SET outdated = 'TRUE' WHERE module = 'COMPANY' AND optionalID = '$cmpID'"); //never delete a key.
+		  $conn->query("DELETE FROM companyData WHERE id = $cmpID;");
+		  if($conn->error){
+ 			 showError($conn->error);
+ 		 } else {
+ 			 showSuccess($lang['OK_DELETE']);
+ 		 }
+	  }
   } elseif(isset($_POST['delete_logo'])){
     if(!mysqli_error($conn)){
       $conn->query("UPDATE companyData SET logo = '' WHERE id = $cmpID");
@@ -241,7 +247,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
 } elseif(!empty($_POST['add_folder_name'])){
     $val = test_input($_POST['add_folder_name']);
-    $conn->query("INSERT INTO company_folders(name, companyID) VALUES ('$val', $cmpID)");
+    $conn->query("INSERT INTO folder_default_sturctures(category, name, categoryID) VALUES ('COMPANY', '$val', '$cmpID')");
     if($conn->error){
       showError($conn->error);
     } else {
@@ -249,7 +255,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
 } elseif(!empty($_POST['folder_delete'])){
     $val = intval($_POST['folder_delete']);
-    $conn->query("DELETE FROM company_folders WHERE id = $val AND companyID = $cmpID");
+    $conn->query("DELETE FROM folder_default_sturctures WHERE id = $val AND category = 'COMPANY' AND categoryID = '$cmpID'");
     if($conn->error){
         showError($conn->error);
     } else{
@@ -1225,7 +1231,7 @@ $row = $result->fetch_assoc();
             </tr></thead>
             <tbody>
                 <?php
-                $result = $conn->query("SELECT id, name FROM company_folders WHERE companyID = $cmpID");
+                $result = $conn->query("SELECT id, name FROM folder_default_sturctures WHERE category 'COMPANY' AND categoryID = '$cmpID'");
                 while($result && ($row = $result->fetch_assoc())){
                     echo '<tr>';
                     echo '<td>'.$row['name'].'</td>';
@@ -1256,6 +1262,10 @@ $row = $result->fetch_assoc();
 
 <br><br>
 <script>
+$("button[name='deleteCompany']").click(function() {
+    return confirm("Are you sure you want to delete this item?");
+});
+
 $('#account2').mask("0000");
 function startBlinker(){
   var blink = $('#blinker');

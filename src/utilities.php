@@ -143,9 +143,9 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
 			//echo $row['privateKey'] .' --private access<br>';
             $cipher_private_module = base64_decode($row['privateKey']);
 			//echo ($cipher_private_module) .' --private key module<br>';
-            $result = $conn->query("SELECT publicPGPKey, symmetricKey FROM security_modules WHERE module = '$module' AND outDated = 'FALSE'");
+            $result = $conn->query("SELECT publicKey, symmetricKey FROM security_modules WHERE module = '$module' AND outDated = 'FALSE'");
             if($result && ( $row=$result->fetch_assoc() )){
-                $public_module = base64_decode($row['publicPGPKey']);
+                $public_module = base64_decode($row['publicKey']);
                 $cipher_symmetric = base64_decode($row['symmetricKey']);
                 //decrypt access
                 $nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
@@ -625,7 +625,49 @@ function util_strip_prefix($subject, $prefix) {
     return $subject;
 }
 
-//TODO: very bad design, redo
+use PHPMailer\PHPMailer\PHPMailer;
+function send_standard_email($recipient, $content){
+  require dirname(__DIR__).'/plugins/phpMailer/autoload.php';
+  global $conn;
+
+  //send mail
+  $mail = new PHPMailer();
+  $mail->CharSet = 'UTF-8';
+  $mail->Encoding = "base64";
+  $mail->IsSMTP();
+
+  $result = $conn->query("SELECT host, username, password, port, smtpSecure, sender, senderName FROM mailingOptions LIMIT 1");
+  if(!$result || $result->num_rows < 1) return 'Keine E-Mail Einstellungen hinterlegt'; //5ac712bc31939
+  $row = $result->fetch_assoc();
+
+  if(!empty($row['username']) && !empty($row['password'])){
+      $mail->SMTPAuth   = true;
+      $mail->Username   = $row['username'];
+      $mail->Password   = $row['password'];
+  } else {
+      $mail->SMTPAuth   = false;
+  }
+
+  if(empty($row['smptSecure'])){
+      $mail->SMTPSecure = $row['smtpSecure'];
+  }
+
+  $mail->Host       = $row['host'];
+  $mail->Port       = $row['port'];
+  $mail->setFrom($row['sender'], $row['senderName']);
+  //$mail->addReplyTo($row['replyEmail']);
+
+  $mail->addAddress($recipient);
+  $mail->isHTML(true);
+
+  $mail->Subject = 'Connect';
+  $mail->Body    =  $content;
+  $mail->AltBody = 'Your e-mail provider does not support HTML. Use an Html Viewer to format this email. '. $content;
+
+  if(!$mail->send()) return $mail->ErrorInfo;
+}
+
+//TODO: bad design, redo
 function showError($message, $toString = false){
     if(!$message || strlen($message) == 0) return;
     $message = str_replace("'", "\\'", $message);

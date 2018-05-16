@@ -42,7 +42,7 @@ if($projectRow['publicKey']){
         }
     } else {
 		if($conn->error){
-			echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.__LINE__.'</div>';
+			echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Access Err: '.$conn->error.__LINE__.'</div>';
 		} else {
 			$result = $conn->query("SELECT privateKey FROM security_access WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$projectID'");
 			if($result->num_rows > 0){
@@ -172,7 +172,7 @@ if($projectRow['publicKey']){
 			            <div class="col-sm-6">
 			                <h5>Intern</h5>
 			                <?php
-							$access_select = '<option value="WRITE">Vollzugriff</option><option value="READ">Halbzugriff</option>';
+							$access_select = '<option value="WRITE">Vollzugriff</option><option value="READ">Lesezugriff</option>'; //5af14c95ef1f0
 			                $result = $conn->query("SELECT userID, firstname, lastname, access FROM relationship_project_user INNER JOIN UserData e ON userID = e.id WHERE projectID = $projectID"); echo $conn->error;
 			                while($result && ($row = $result->fetch_assoc())){
 			                    echo '<div class="col-sm-6"><button type="submit" name="removeUser" value="'.$row['userID'].'" class="btn btn-empty" title="Entfernen"><i class="fa fa-times" style="color:red"></i></button>';
@@ -238,108 +238,21 @@ if($projectRow['publicKey']){
 			    <br><hr>
 			<?php endif; //$isProjectAdmin ?>
 			<?php if(!empty($s3)) : ?>
-				<h4>Dateifreigabe
-					<div class="page-header-button-group">
-						<div class="btn-group"><a class="btn btn-default dropdown-toggle" data-toggle="dropdown" title="Hochladen..."><i class="fa fa-upload"></i></a>
-							<ul class="dropdown-menu">
-								<li><a data-toggle="modal" data-target="#modal-new-folder-<?php echo $projectID; ?>">Neuer Ordner</a></li>
-								<li><a data-toggle="modal" data-target="#modal-new-file-<?php echo $projectID; ?>">File</a></li>
-								<!--li><a data-toggle="modal" data-target="#modal-new-text">Text</a></li-->
-							</ul>
-						</div>
-					</div>
-				</h4><br>
-				<div class="row">
-					<div class="col-xs-1 bold">Type</div>
-					<div class="col-xs-4 bold">Name</div>
-					<div class="col-xs-4 bold">Upload Datum</div>
-				</div>
 				<?php
-				$result = $conn->query("SELECT name FROM company_folders WHERE companyID = ".$projectRow['companyID']." AND name NOT IN
-				( SELECT name FROM project_archive WHERE projectID = $projectID AND parent_directory = 'ROOT') ");
+				$result = $conn->query("SELECT name FROM folder_default_sturctures WHERE category = 'COMPANY' AND categoryID = '".$projectRow['companyID']."' AND name NOT IN
+				( SELECT name FROM archive WHERE category = 'PROJECT' AND categoryID = '$projectID' AND parent_directory = 'ROOT') ");
 				echo $conn->error;
 				while($result && ($row = $result->fetch_assoc())){
-					$conn->query("INSERT INTO project_archive(projectID, name, parent_directory, type) VALUES($projectID, '".$row['name']."', 'ROOT', 'folder')"); echo $conn->error;
+					$conn->query("INSERT INTO archive(category, categoryID, name, parent_directory, type) VALUES('PROJECT', '$projectID', '".$row['name']."', 'ROOT', 'folder')"); echo $conn->error;
 				}
-				function drawFolder($parent_structure, $visibility = true){
-					global $conn;
-					global $projectID;
-					global $project_symmetric;
-					$html = '<div id="folder-'.$projectID.'-'.$parent_structure.'" >';
-					if(!$visibility) $html = substr_replace($html, 'style="display:none"', -1, 0);
 
-					if($parent_structure != 'ROOT') $html .= '<div class="row"><div class="col-xs-1"><i class="fa fa-arrow-left"></i></div>
-					<div class="col-xs-3"><button class="btn btn-link tree-node-back-'.$projectID.'" data-parent="'.$parent_structure.'">Zurück</button></div></div>';
-					$subfolder = '';
-					$result = $conn->query("SELECT id, name, uploadDate, type, uniqID FROM project_archive WHERE projectID = $projectID AND parent_directory = '$parent_structure' ORDER BY type <> 'folder', type ASC ");
-					echo $conn->error;
-					while($result && ($row = $result->fetch_assoc())){
-						$html .= '<div class="row">';
-						if($row['type'] == 'folder'){
-							$html .= '<div class="col-xs-1"><i class="fa fa-folder-open-o"></i></div>
-							<div class="col-xs-4"><a class="folder-structure-'.$projectID.'" data-child="'.$row['id'].'" data-parent="'.$parent_structure.'" >'
-							.$row['name'].'</a></div><div class="col-xs-4">'.$row['uploadDate'].'</div><div class="col-xs-3">';
-							$folder_res = $conn->query("SELECT id FROM project_archive WHERE projectID = $projectID AND parent_directory = '".$row['id']."' ");
-							if($folder_res->num_rows < 1){
-								$html .= '<form method="POST"><button type="submit" name="delete-folder" value="'.$row['id'].'" class="btn btn-default"><i class="fa fa-trash-o"></i></button>';
-							}
-							$html .= '</div>';
-							$subfolder .= drawFolder($row['id'], false);
-						} else {
-							$html .= '<div class="col-xs-1"><i class="fa fa-file-o"></i></div>
-							<div class="col-xs-4">'.$row['name'].'</div><div class="col-xs-4">'.$row['uploadDate'].'</div>
-							<div class="col-xs-3">
-							<form method="POST" style="display:inline"><button type="submit" class="btn btn-default" name="delete-file" value="'.$row['uniqID'].'">
-							<i class="fa fa-trash-o"></i></button></form>
-							<form method="POST" style="display:inline" action="detailDownload" target="_blank">
-							<input type="hidden" name="symmetricKey" value="'.base64_encode($project_symmetric).'" />
-							<button type="submit" class="btn btn-default" name="download-file" value="'.$row['uniqID'].'"><i class="fa fa-download"></i></button>
-							</form></div>';
-						}
-						$html .= '</div>';
-					}
-					$html .= '</div>';
-					$html .= $subfolder;
-					return $html;
-				}
-				echo drawFolder('ROOT');
+				$upload_viewer = [
+				'accessKey' => '',
+				'category' => 'PROJECT',
+				'categoryID' => $projectID
+				];
+				include dirname(__DIR__).DIRECTORY_SEPARATOR.'misc'.DIRECTORY_SEPARATOR.'upload_viewer.php';
 				?>
-
-				<div id="modal-new-folder-<?php echo $projectID; ?>" class="modal fade">
-					<div class="modal-dialog modal-content modal-sm">
-						<form method="POST">
-							<input type="hidden" name="saveThisProject" value="<?php echo $projectID; ?>" />
-							<div class="modal-header h4">Neuer Ordner</div>
-							<div class="modal-body">
-								<label>Name</label>
-								<input type="text" name="new-folder-name" class="form-control" />
-							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-								<button type="submit" class="btn btn-warning modal-new-<?php echo $projectID; ?>" name="add-new-folder" value="ROOT"><?php echo $lang['ADD']; ?></button>
-							</div>
-						</form>
-					</div>
-				</div>
-				<div id="modal-new-file-<?php echo $projectID; ?>" class="modal fade">
-					<div class="modal-dialog modal-content modal-sm">
-						<form method="POST" enctype="multipart/form-data">
-							<input type="hidden" name="saveThisProject" value="<?php echo $projectID; ?>" />
-							<div class="modal-header h4">File Hochladen</div>
-							<div class="modal-body">
-								<label class="btn btn-default">
-									Datei Auswählen
-									<input type="file" name="new-file-upload"  accept="application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint, text/plain, application/pdf,.doc, .docx" style="display:none" >
-								</label>
-								<small>Max. 15MB<br>Text, PDF, .Zip und Office</small>
-							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-								<button type="submit" class="btn btn-warning modal-new-<?php echo $projectID; ?>" name="add-new-file" value="ROOT"><?php echo $lang['ADD']; ?></button>
-							</div>
-						</form>
-					</div>
-				</div>
 			<?php else: ?>
 				<h4>Dateifreigabe</h4>
 				<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>

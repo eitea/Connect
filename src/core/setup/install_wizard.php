@@ -11,14 +11,20 @@ require dirname(dirname(__DIR__)) . '/connection.php';
 $firstTimeWizard = false;
 $result = $conn->query("SELECT firstTimeWizard FROM configurationData WHERE firstTimeWizard = 'TRUE'");
 if ($result && $result->num_rows > 0) {
-    redirect('../user/home');
+	session_destroy();
+    redirect('../user/logout');
     $firstTimeWizard = true;  //safety check
 }
 
 if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['accept_licence'])){
+	if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
+		$conn->query("UPDATE mailingOptions SET host = 'adminmail', port = 25, username = '', password = '', smtpSecure = '',
+		sender = 'noreply@eitea.at', sendername = 'Connect', isDefault = 1");
+	}
     if(!empty($_POST['encryption_pass']) && !empty($_POST['encryption_pass_confirm']) && $_POST['encryption_pass'] == $_POST['encryption_pass_confirm']){
         $result = $conn->query("SELECT firstname, lastname, email FROM UserData WHERE id = $userID LIMIT 1");
         if($result && ($row = $result->fetch_assoc())){
+			$conn->query("UPDATE security_users SET outDated = 'TRUE'");
             $accept = true;
             $err = $content_personal = $content_company = '';
             //user PAIR
@@ -29,6 +35,7 @@ if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['a
             $content_personal = $private." \n".base64_encode($admin_public);
             $private_encrypt = simple_encryption($private, $_POST['encryption_pass']);
             $_SESSION['privateKey'] = $private;
+			$_SESSION['publicKey'] = base64_encode($admin_public);
             $conn->query("UPDATE UserData SET psw = '$hash' WHERE id = $userID");
 			$conn->query("INSERT INTO security_users (userID, publicKey, privateKey) VALUES ($userID, '".base64_encode($admin_public)."', '".$private_encrypt."')");
             if($conn->error) $accept = false;
@@ -41,6 +48,7 @@ if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['a
                 $public = sodium_crypto_box_publickey($keyPair);
                 $content_company = base64_encode($private)." \n".base64_encode($public);
 				$symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
+				$nonce = random_bytes(24);
 				$symmetric_encrypted = $nonce . sodium_crypto_box($symmetric, $nonce, $private.$public);
                 $conn->query("INSERT INTO security_company (companyID, publicKey, symmetricKey) VALUES (".$row['id'].", '".base64_encode($public)."', '".base64_encode($symmetric_encrypted)."') ");
                 $nonce = random_bytes(24);
@@ -60,7 +68,7 @@ if(!$firstTimeWizard && $_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['a
                     $symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
                     $nonce = random_bytes(24);
                     $symmetric_encrypted = $nonce . sodium_crypto_box($symmetric, $nonce, $private.$public);
-                    $conn->query("INSERT INTO security_modules(module, publicPGPKey, symmetricKey) VALUES ('$module', '".base64_encode($public)."', '".base64_encode($symmetric_encrypted)."')");
+                    $conn->query("INSERT INTO security_modules(module, publicKey, symmetricKey) VALUES ('$module', '".base64_encode($public)."', '".base64_encode($symmetric_encrypted)."')");
                     if($conn->error){ $accept = false; $err .= $conn->error; }
 
                     $nonce = random_bytes(24);

@@ -130,6 +130,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $public = sodium_crypto_box_publickey($keyPair);
                 $key_downloads[] = base64_encode($private)." \n".base64_encode($public);
 				$symmetric = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
+				$nonce = random_bytes(24);
 				$symmetric_encrypted = $nonce . sodium_crypto_box($symmetric, $nonce, $private.$public);
                 $conn->query("INSERT INTO security_company (companyID, publicKey, symmetricKey) VALUES (".$row['id'].", '".base64_encode($public)."', '".base64_encode($symmetric_encrypted)."') ");
                 $nonce = random_bytes(24);
@@ -140,7 +141,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
         if(isset($_POST['activate_encryption']) && !empty($_POST['module_encrypt'])){
             //see if modules were added and encrypt those
-            $stmt = $conn->prepare("INSERT INTO security_modules(module, publicPGPKey, symmetricKey) VALUES (?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO security_modules(module, publicKey, symmetricKey) VALUES (?, ?, ?)");
             $stmt->bind_param("sss", $module, $public, $encrypted);
             $stmt_access = $conn->prepare("INSERT INTO security_access(userID, module, privateKey) VALUES(?, ?, ?)");
             $stmt_access->bind_param("iss", $access_user, $module, $access_private_encrypted);
@@ -202,9 +203,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $result = $conn->query("SELECT module, privateKey FROM security_access WHERE userID = $userID AND outDated = 'FALSE' AND module = '$module' ORDER BY recentDate LIMIT 1");
                 if($result && ($row = $result->fetch_assoc()) && array_key_exists($module, $encrypted_modules)){
                     $cipher_private_module = base64_decode($row['privateKey']);
-                    $result = $conn->query("SELECT publicPGPKey, symmetricKey FROM security_modules WHERE module = '$module' AND outDated = 'FALSE'");
+                    $result = $conn->query("SELECT publicKey, symmetricKey FROM security_modules WHERE module = '$module' AND outDated = 'FALSE'");
                     if($result && ($row = $result->fetch_assoc())){
-                        $public_module = base64_decode($row['publicPGPKey']);
+                        $public_module = base64_decode($row['publicKey']);
                         $cipher_symmetric = base64_decode($row['symmetricKey']);
                         //access
                         $nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
@@ -242,6 +243,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $isDSGVOAdmin = 'FALSE';
         $isCoreAdmin = isset($_POST['isCoreAdmin']) ? 'TRUE' : 'FALSE';
         $isDynamicProjectsAdmin = isset($_POST['isDynamicProjectsAdmin']) ? 'TRUE' : 'FALSE';
+		$isTimeAdmin = isset($_POST['isTimeAdmin']) ? 'TRUE' : 'FALSE';
         $isProjectAdmin = isset($_POST['isProjectAdmin']) ? 'TRUE' : 'FALSE';
         $isReportAdmin = isset($_POST['isReportAdmin']) ? 'TRUE' : 'FALSE';
         $isERPAdmin = 'FALSE';
@@ -275,14 +277,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 			if($result && ($row = $result->fetch_assoc()) && !$row['module']){
 				$user_public = base64_decode($row['publicKey']);
 				//grant which can be granted
-				$result = $conn->query("SELECT s.privateKey, m.publicPGPKey FROM security_access s, security_modules m WHERE m.outDated = 'FALSE' AND m.module = 'DSGVO'
+				$result = $conn->query("SELECT s.privateKey, m.publicKey FROM security_access s, security_modules m WHERE m.outDated = 'FALSE' AND m.module = 'DSGVO'
 					AND s.userID = $userID AND s.outDated = 'FALSE' AND s.module = 'DSGVO' LIMIT 1");
 				if($result && ($row = $result->fetch_assoc()) && array_key_exists('DSGVO', $encrypted_modules)){
 
 					$cipher_private_module = base64_decode($row['privateKey']);
 					$nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
         			$cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
-					$private = sodium_crypto_box_open($cipher_private_module, $nonce, base64_decode($privateKey).base64_decode($row['publicPGPKey']));
+					$private = sodium_crypto_box_open($cipher_private_module, $nonce, base64_decode($privateKey).base64_decode($row['publicKey']));
 
 		            $nonce = random_bytes(24);
 		            $access_private_encrypted = base64_encode($nonce . sodium_crypto_box($private, $nonce, $private.$user_public));
@@ -310,7 +312,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 			if($result && ($row = $result->fetch_assoc()) && !$row['module']){
 				$user_public = base64_decode($row['publicKey']);
 				//grant which can be granted
-				$result = $conn->query("SELECT s.privateKey, m.publicPGPKey FROM security_access s, security_modules m
+				$result = $conn->query("SELECT s.privateKey, m.publicKey FROM security_access s, security_modules m
 					WHERE m.outDated = 'FALSE' AND m.module = 'ERP'
 					AND s.userID = $userID AND s.outDated = 'FALSE' AND s.module = 'ERP' LIMIT 1");
 				if($result && ($row = $result->fetch_assoc()) && array_key_exists('ERP', $encrypted_modules)){
@@ -318,7 +320,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 					$cipher_private_module = base64_decode($row['privateKey']);
 					$nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
         			$cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
-					$private = sodium_crypto_box_open($cipher_private_module, $nonce, base64_decode($privateKey).base64_decode($row['publicPGPKey']));
+					$private = sodium_crypto_box_open($cipher_private_module, $nonce, base64_decode($privateKey).base64_decode($row['publicKey']));
 
 		            $nonce = random_bytes(24);
 		            $access_private_encrypted = base64_encode($nonce . sodium_crypto_box($private, $nonce, $private.$user_public));

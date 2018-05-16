@@ -211,7 +211,8 @@ ini_set('max_execution_time',999);
             //insert restic backup configuration
             $conn->query("INSERT INTO resticconfiguration () VALUES ()");
 			//insert default folders
-			$conn->query("INSERT INTO company_folders(companyID, name) SELECT id, 'Uploads' FROM companyData");
+			$conn->query("INSERT INTO folder_default_sturctures(category, categoryID, name) SELECT 'COMPANY', id, 'Uploads' FROM companyData");
+			$conn->query("INSERT INTO folder_default_sturctures(category, categoryID, name) VALUES('ARCHIVE', '1', 'Dokumente')");
 
             //insert holidays
             $icsFile = file_get_contents(__DIR__ .'/Feiertage.txt');
@@ -372,6 +373,8 @@ ini_set('max_execution_time',999);
               //BASE
               $descr = '';
               $opt = 'DESCRIPTION';
+              $stmt->execute();
+			  $opt = 'GRET_TEXTAREA';
               $stmt->execute();
               $descr = 'Leiter der Datenverarbeitung (IT Leitung)';
               $opt = 'GEN_1';

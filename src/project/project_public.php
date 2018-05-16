@@ -9,6 +9,18 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
 }
 
 if($isProjectAdmin == 'TRUE' && $_SERVER['REQUEST_METHOD'] == 'POST'){
+	if(!empty($_POST['deleteProject'])){
+		$val = intval($_POST['deleteProject']);
+		$conn->query("DELETE FROM folder_default_sturctures WHERE category = 'PROJECT' AND categoryID = '$val'");
+		$conn->query("DELETE FROM archive WHERE category = 'PROJECT' AND categoryID = '$val'");
+		$conn->query("UPDATE security_access SET outdated = 'TRUE' WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$val'"); //never delete a key.
+		$conn->query("DELETE FROM projectData WHERE id = $val;");
+		if($conn->error){
+			showError($conn->error);
+		} else {
+			showSuccess($lang['OK_DELETE']);
+		}
+	}
 	if(isset($_POST['add']) && !empty($_POST['name']) && !empty($_POST['filterClient'])){
 	    $client_id = $filterings['client'] = intval($_POST['filterClient']);
 	    $name = test_input($_POST['name']);
@@ -87,14 +99,14 @@ if(!empty($_POST['delete-file'])){
 	$x = test_input($_POST['delete-file']);
 	try{
 		$s3->deleteObject(['Bucket' => $bucket, 'Key' => $x]);
-		$conn->query("DELETE FROM project_archive WHERE uniqID = '$x'");
+		$conn->query("DELETE FROM archive WHERE category='PROJECT' AND uniqID = '$x'");
 		if($conn->error){ showError($conn->error); } else { showSuccess($lang['OK_DELETE']); }
 	} catch(Exception $e){
 		echo $e->getMessage();
 	}
 } elseif(!empty($_POST['delete-folder'])){
 	$x = test_input($_POST['delete-folder']);
-	$conn->query("DELETE FROM project_archive WHERE id = '$x' AND type = 'folder'");
+	$conn->query("DELETE FROM archive WHERE id = '$x' AND type = 'folder'");
 	if($conn->error){ showError($conn->error); } else { showSuccess($lang['OK_DELETE']); }
 } elseif(!empty($_POST['saveThisProject'])){
 	$active_modal = $x = intval($_POST['saveThisProject']);
@@ -223,7 +235,8 @@ if(!empty($_POST['delete-file'])){
 				));
 
 				$filename = test_input($file_info['filename']);
-				$conn->query("INSERT INTO project_archive (projectID, name, parent_directory, type, uniqID) VALUES ($x, '$filename', '$parent', '$ext', '$hashkey')");
+				$conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uniqID, uploadUser)
+				VALUES ('PROJECT', '$x', '$filename', '$parent', '$ext', '$hashkey', $userID)");
 				if($conn->error){ showError($conn->error); } else { showSuccess($lang['OK_UPLOAD']); }
 			} catch(Exception $e){
 				echo $e->getTraceAsString();
@@ -237,7 +250,7 @@ if(!empty($_POST['delete-file'])){
         $parent = test_input($_POST['add-new-folder']);
         if(!empty($_POST['new-folder-name'])){
             $name = test_input($_POST['new-folder-name']);
-            $conn->query("INSERT INTO project_archive(projectID, name, parent_directory, type) VALUES ($x, '$name', '$parent', 'folder')");
+            $conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uploadUser) VALUES ('PROJECT', '$x', '$name', '$parent', 'folder', $userID)");
             if($conn->error){
                 showError($conn->error);
             } else {
@@ -264,11 +277,14 @@ if($isProjectAdmin == 'TRUE'){
 	    include dirname(__DIR__) . "/misc/new_client_buttonless.php";
 	}
 	$result_outer = $conn->query("SELECT p.name, p.id, p.status, clientData.companyID, clientData.name AS clientName, companyData.name AS companyName
-        FROM projectData p INNER JOIN clientData ON clientData.id = p.clientID INNER JOIN companyData ON companyData.id = clientData.companyID WHERE 1 $query");
+        FROM projectData p INNER JOIN clientData ON clientData.id = p.clientID INNER JOIN companyData ON companyData.id = clientData.companyID
+		WHERE companyID IN (".implode(', ', $available_companies).")");
 } else {
-	$result_outer = $conn->query("SELECT p.name, p.id, p.status, companyData.name AS companyName, clientData.name AS clientName FROM $tableName t LEFT JOIN projectData p ON p.id = t.projectID
+	$result_outer = $conn->query("SELECT p.name, p.id, p.status, companyData.name AS companyName, clientData.name AS clientName
+		FROM $tableName t LEFT JOIN projectData p ON p.id = t.projectID
 		INNER JOIN clientData ON clientData.id = p.clientID INNER JOIN companyData ON companyData.id = clientData.companyID WHERE t.userID = $userID");
 }
+
 echo $conn->error
 ?>
 <div class="page-header h3"><?php echo $lang['PROJECTS']; ?>
@@ -280,7 +296,7 @@ echo $conn->error
 	</div>
 </div>
 
-<form id="mainForm" method="POST">
+<form method="POST">
     <table class="table table-hover">
         <thead>
             <th><?php echo $lang['COMPANY']; ?></th>
@@ -298,7 +314,8 @@ echo $conn->error
 				 echo '<td>'. $row['clientName'] .'</td>';
 				 echo '<td>'.$productive.'</td>';
 				 echo '<td>'. $row['name'] .'</td>';
-				 echo '<td><button type="button" class="btn btn-default" name="editModal" value="'.$row['id'].'" ><i class="fa fa-pencil"></i></button></td>';
+				 echo '<td><button type="button" class="btn btn-default" name="editModal" value="'.$row['id'].'" ><i class="fa fa-pencil"></i></button>
+				 <button type="submit" class="btn btn-default" name="deleteProject" value="'.$row['id'].'" ><i class="fa fa-trash-o"></i></button></td>';
 				 echo '</tr>';
 			 }
 			?>
@@ -372,7 +389,6 @@ echo $conn->error
 </form>
 
 <script>
-	var grandParent = [];
     var existingModals = new Array();
     function checkAppendModal(index){
         if(existingModals.indexOf(index) == -1){
@@ -390,21 +406,6 @@ echo $conn->error
                     if(index){
                         $('#editingModal-'+index).modal('show');
                     }
-					grandParent[index] = ['ROOT'];
-					$('.tree-node-back-'+index).click(function(){
-						var grandPa = grandParent[index].pop();
-						//alert(grandPa);
-						$('#folder-'+index+'-'+ $(this).data('parent')).hide();
-						$('#folder-'+index+'-'+ grandPa).fadeIn();
-						$('.modal-new-'+index).val(grandPa);
-					});
-					$('.folder-structure-'+index).click(function(event){
-						$('#folder-'+index+'-'+ $(this).data('parent')).hide();
-						$('#folder-'+index+'-'+ $(this).data('child')).fadeIn();
-						//alert('#folder-'+index+'-'+ $(this).data('child'));
-						grandParent[index].push($(this).data('parent'));
-						$('.modal-new-'+index).val($(this).data('child'));
-					});
                 }
             });
         } else {
@@ -427,6 +428,10 @@ echo $conn->error
             <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
         }
     });
+
+	$("button[name='deleteProject']").click(function() {
+	    return confirm("Are you sure you want to delete this item?");
+	});
 
 	<?php
 	if(isset($active_modal)){

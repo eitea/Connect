@@ -507,7 +507,7 @@ function create_tables($conn) {
         password VARCHAR(50),
         port VARCHAR(50),
         smtpSecure ENUM('', 'tls', 'ssl') DEFAULT 'tls',
-        sender VARCHAR(50) DEFAULT 'noreplay@mail.com',
+        sender VARCHAR(50) DEFAULT 'noreply@mail.com',
         enableEmailLog ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         senderName VARCHAR(50) DEFAULT NULL,
         feedbackRecipient VARCHAR(50) DEFAULT 'connect@eitea.at',
@@ -845,7 +845,7 @@ function create_tables($conn) {
         message TEXT,
         picture MEDIUMBLOB,
         sent DATETIME DEFAULT CURRENT_TIMESTAMP,
-        seen 
+        seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -1609,7 +1609,7 @@ function create_tables($conn) {
         module VARCHAR(50) NOT NULL,
         recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         symmetricKey VARCHAR(150) NOT NULL,
-        publicPGPKey VARCHAR(150) NOT NULL,
+        publicKey VARCHAR(150) NOT NULL,
         outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
     )";
     if(!$conn->query($sql)){
@@ -1758,34 +1758,7 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
-    $sql = "CREATE TABLE project_archive(
-        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-		uniqID VARCHAR(30) UNIQUE,
-        projectID INT(6) UNSIGNED,
-        name VARCHAR(120) NOT NULL,
-        parent_directory VARCHAR(120) NOT NULL DEFAULT 'ROOT',
-        type VARCHAR(10) NOT NULL,
-        uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (projectID) REFERENCES projectData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-    );";
-    if (!$conn->query($sql)) {
-        echo $conn->error;
-    }
-
-	$sql = "CREATE TABLE company_folders(
-		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-		companyID INT(6) UNSIGNED,
-		name VARCHAR(155) NOT NULL,
-		FOREIGN KEY (companyID) REFERENCES companyData(id)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
-	)";
-	if (!$conn->query($sql)) {
-		echo $conn->error;
-	}
-    // 5ac63505c0ecd
+	    // 5ac63505c0ecd
     $sql = "CREATE TABLE taskmessages(
         userID INT(6) UNSIGNED,
         taskID varchar(100),
@@ -1812,4 +1785,29 @@ function create_tables($conn) {
 	if (!$conn->query($sql)) {
         echo $conn->error;
     }
+
+	$sql = "CREATE TABLE folder_default_sturctures(
+		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		category VARCHAR(20) NOT NULL,
+		categoryID VARCHAR(20) NOT NULL,
+		name VARCHAR(155) NOT NULL
+	)";
+	if(!$conn->query($sql)){
+		echo $conn->error;
+	}
+
+	$sql = "CREATE TABLE archive(
+        id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		uniqID VARCHAR(30) UNIQUE,
+		category VARCHAR(20) NOT NULL,
+		categoryID VARCHAR(20) NOT NULL,
+        name VARCHAR(120) NOT NULL,
+        parent_directory VARCHAR(120) NOT NULL DEFAULT 'ROOT',
+        type VARCHAR(10) NOT NULL,
+        uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+		uploadUser INT(6)
+    )";
+	if(!$conn->query($sql)){
+		echo $conn->error;
+	}
 }

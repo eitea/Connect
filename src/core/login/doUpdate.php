@@ -2109,7 +2109,7 @@ if($row['version'] < 139){
         module VARCHAR(50) NOT NULL,
         recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         symmetricKey VARCHAR(150) NOT NULL,
-        publicPGPKey VARCHAR(150) NOT NULL,
+        publicKey VARCHAR(150) NOT NULL,
         outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
     )";
     if(!$conn->query($sql)){
@@ -2134,8 +2134,6 @@ if($row['version'] < 139){
     } else {
         echo '<br>Security Update: User Keys';
     }
-
-    $conn->query("ALTER TABLE companyData ADD COLUMN publicPGPKey VARCHAR(150)");
 
     $sql = "CREATE TABLE security_company(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -2249,8 +2247,6 @@ if($row['version'] < 142){
         echo '<br>Team Update: Messages';
     }
 
-    $conn->query("ALTER TABLE UserData ADD COLUMN publicPGPKey TEXT DEFAULT NULL");
-    $conn->query("ALTER TABLE UserData ADD COLUMN privatePGPKey TEXT DEFAULT NULL");
     if(!$conn->error){
         echo '<br>PGP: keypairs';
     }
@@ -2442,27 +2438,6 @@ if($row['version'] < 145){
     }
 }
 
-if($row['version'] < 146){
-    //text, file, s3File, s3Text, folder
-    $sql = "CREATE TABLE project_archive(
-        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        projectID INT(6) UNSIGNED,
-        name VARCHAR(120) NOT NULL,
-        parent_directory VARCHAR(120) NOT NULL DEFAULT 'ROOT',
-        type VARCHAR(10) NOT NULL,
-        uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (projectID) REFERENCES projectData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-    );";
-    if (!$conn->query($sql)) {
-        echo $conn->error;
-    } else {
-        echo '<br>Projekte: Archiv';
-    }
-}
-
-
 if($row['version'] < 147){
     //5ab7ae7596e5c
     $conn->query("ALTER TABLE roles ADD COLUMN canUseWorkflow ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL");
@@ -2564,7 +2539,6 @@ if($row['version'] < 150) {
         echo '<br>DSGVO Training: Question Version';
     }
 
-    $conn->query("ALTER TABLE project_archive ADD COLUMN uniqID VARCHAR(30) UNIQUE");
     //5ad4376e05226
     $conn->query("ALTER TABLE mailingOptions MODIFY COLUMN feedbackRecipient VARCHAR(50) DEFAULT 'connect@eitea.at'");
     $conn->query("UPDATE mailingOptions SET feedbackRecipient = 'connect@eitea.at'");
@@ -2723,8 +2697,8 @@ if($row['version'] < 153){
         echo $conn->error;
     } else {
 		$conn->query("INSERT INTO security_users (userID, publicKey, privateKey) SELECT id, publicPGPKey, privatePGPKey FROM UserData WHERE publicPGPKey IS NOT NULL"); echo $conn->error;
-		$conn->query("ALTER TABLE UserData DROP COLUMN publicPGPKey");echo $conn->error;
-		$conn->query("ALTER TABLE UserData DROP COLUMN privatePGPKey");echo $conn->error;
+		$conn->query("ALTER TABLE UserData DROP COLUMN publicPGPKey");
+		$conn->query("ALTER TABLE UserData DROP COLUMN privatePGPKey");
         echo '<br>Security: Users';
     }
 
@@ -2740,6 +2714,45 @@ if($row['version'] < 153){
 }
 
 if($row['version'] < 154){
+	$sql = "CREATE TABLE folder_default_sturctures(
+		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		category VARCHAR(20) NOT NULL,
+		categoryID VARCHAR(20) NOT NULL,
+		name VARCHAR(155) NOT NULL
+	)";
+	if(!$conn->query($sql)){
+		echo $conn->error;
+	} else {
+		echo '<br>Archive: Default folder structures';
+		$conn->query("INSERT INTO folder_default_sturctures(category, categoryID, name) SELECT 'COMPANY', companyID, name FROM company_folders");
+		if(!$conn->error) $conn->query("DROP TABLE company_folders");
+		echo $conn->error;
+	}
+
+	$conn->query("INSERT INTO folder_default_sturctures(category, categoryID, name) SELECT 'DSGVO', id, 'Dokumentation' FROM companyData");
+
+	$sql = "CREATE TABLE archive(
+        id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		uniqID VARCHAR(30) UNIQUE,
+		category VARCHAR(20) NOT NULL,
+		categoryID VARCHAR(20) NOT NULL,
+        name VARCHAR(120) NOT NULL,
+        parent_directory VARCHAR(120) NOT NULL DEFAULT 'ROOT',
+        type VARCHAR(10) NOT NULL,
+        uploadDate DATETIME DEFAULT CURRENT_TIMESTAMP
+    )";
+	if(!$conn->query($sql)){
+		echo $conn->error;
+	} else {
+		echo '<br>Archive: upload structure';
+		$conn->query("INSERT INTO archive(id, uniqID, category, categoryID, name, parent_directory, type, uploadDate)
+		SELECT id, uniqID, 'PROJECT', projectID, name, parent_directory, type, uploadDate FROM project_archive");
+		if(!$conn->error) $conn->query("DROP TABLE project_archive");
+		echo $conn->error;
+	}
+
+	$conn->query("ALTER TABLE security_modules CHANGE `publicPGPKey` `publicKey` VARCHAR(150) NOT NULL");
+
     // this might exist already
     $sql = "CREATE TABLE taskmessages(
         userID INT(6) UNSIGNED,
@@ -2751,20 +2764,34 @@ if($row['version'] < 154){
     )";
     $conn->query($sql);
     if (!$conn->error) {
-        echo $conn->error;
-    } else {
         echo '<br>Task Messages';
     }
     $conn->query("ALTER TABLE messages ADD COLUMN user_deleted ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
     echo $conn->error;
     $conn->query("ALTER TABLE messages ADD COLUMN partner_deleted ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
     echo $conn->error;
-}
 
-if($row['version'] < 154){
     $conn->query("ALTER TABLE socialprofile ADD COLUMN new_message_email ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
     echo $conn->error;
+
+	$conn->query("INSERT INTO dsgvo_vv_template_settings (templateID, opt_name, opt_descr) SELECT id, 'GEN_TEXTAREA', 'Notizen' FROM dsgvo_vv_templates WHERE type='base'");
 }
+
+if($row['version'] < 155){
+	$conn->query("ALTER TABLE archive ADD COLUMN uploadUser INT(6)");
+
+	if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])){
+		$conn->query("UPDATE mailingOptions SET host = 'adminmail', port = 25, username = '', password = '', smtpSecure = '',
+		sender = 'noreply@eitea.at', sendername = 'Connect', isDefault = 1");
+	}
+}
+
+// if($row['version'] < 156){}
+// if($row['version'] < 157){}
+// if($row['version'] < 158){}
+// if($row['version'] < 159){}
+// if($row['version'] < 160){}
+// if($row['version'] < 161){}
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';
 $conn->query("UPDATE configurationData SET version=$VERSION_NUMBER");
