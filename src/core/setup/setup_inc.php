@@ -1810,4 +1810,28 @@ function create_tables($conn) {
 	if(!$conn->query($sql)){
 		echo $conn->error;
 	}
+
+	$sql = "CREATE TABLE archive_meta(
+		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		archiveID INT(10) UNSIGNED,
+		parentID INT(10),
+		name VARCHAR(400) NOT NULL,
+		description MEDIUMTEXT NOT NULL DEFAULT '',
+		category VARCHAR(120),
+		status VARCHAR(100) NOT NULL DEFAULT 'PENDING',
+		fromDate DATE NOT NULL DEFAULT '0000-00-00',
+		toDate DATE NOT NULL DEFAULT '0000-00-00',
+		validDate DATE NOT NULL DEFAULT '0000-00-00',
+		version INT(4) NOT NULL DEFAULT 1,
+		versionDescr VARCHAR(250),
+		cPartner VARCHAR(50),
+		cPartnerID INT(6),
+		note VARCHAR(500) NOT NULL DEFAULT '',
+		FOREIGN KEY (archiveID) REFERENCES archive(id)
+		ON UPDATE CASCADE ON DELETE CASCADE
+	)";
+	if(!$conn->query($sql)){
+		echo $conn->error;
+	}
+
 }

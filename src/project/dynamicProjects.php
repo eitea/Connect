@@ -496,7 +496,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             echo '<td><button type="button" class="btn btn-default view-modal-open" value="'.$x.'" >View</button></td>';
             echo '<td>'.$row['companyName'].'<br>'.$row['clientName'].'<br>'.$row['projectDataName'].'</td>';
             $A = substr(carryOverAdder_Hours($row['projectstart'], $timeToUTC),0,10);
-            $B = $row['projectend'] == '0000-00-00 00:00:00' ? '' : substr($row['projectend'],0,10);
+            $B = $row['projectend'] == '0000-00-00' ? '' : substr($row['projectend'],0,10);
             echo '<td>'.$A.'</td>';
             echo '<td>'.$B.'</td>';
             if($row['projectseries']){
