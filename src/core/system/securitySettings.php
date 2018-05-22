@@ -249,6 +249,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $isERPAdmin = 'FALSE';
         $isFinanceAdmin = isset($_POST['isFinanceAdmin']) ? 'TRUE' : 'FALSE';
         $canStamp = isset($_POST['canStamp']) ? 'TRUE' : 'FALSE';
+		$canBook = isset($_POST['canBook']) ? 'TRUE' : 'FALSE';
         $canEditTemplates = isset($_POST['canEditTemplates']) ? 'TRUE' : 'FALSE';
         $canUseSocialMedia = isset($_POST['canUseSocialMedia']) ? 'TRUE' : 'FALSE';
         $canCreateTasks = isset($_POST['canCreateTasks']) ? 'TRUE' : 'FALSE';
@@ -342,7 +343,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 		}
 
         $conn->query("UPDATE roles SET isDSGVOAdmin = '$isDSGVOAdmin', isCoreAdmin = '$isCoreAdmin', isDynamicProjectsAdmin = '$isDynamicProjectsAdmin', isTimeAdmin = '$isTimeAdmin',
-        isProjectAdmin = '$isProjectAdmin', isReportAdmin = '$isReportAdmin', isERPAdmin = '$isERPAdmin', isFinanceAdmin = '$isFinanceAdmin', canStamp = '$canStamp',
+        isProjectAdmin = '$isProjectAdmin', isReportAdmin = '$isReportAdmin', isERPAdmin = '$isERPAdmin', isFinanceAdmin = '$isFinanceAdmin', canStamp = '$canStamp', canBook = '$canBook',
         canEditTemplates = '$canEditTemplates', canUseSocialMedia = '$canUseSocialMedia', canCreateTasks = '$canCreateTasks', canUseArchive = '$canUseArchive', canUseClients = '$canUseClients',
         canUseSuppliers = '$canUseSuppliers', canEditClients = '$canEditClients', canEditSuppliers = '$canEditSuppliers', canUseWorkflow = '$canUseWorkflow' WHERE userID = '$x'");
 
