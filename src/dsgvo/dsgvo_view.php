@@ -58,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		} else {
 			showSuccess($lang['OK_SAVE']);
 		}
-
 	} else if(!empty($_POST['edit-meta'])){
 		$openUpload = intval($_POST['edit-meta']);
 	}
@@ -329,7 +328,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $row['version'] .= ' <small>(Basis)</small>';
             }
             echo "<tr $style>";
-            echo '<td>' .mc_status('DSGVO'). secure_data('DSGVO', $row['name'], 'decrypt', $userID, $privateKey, $err) . '</td>';
+            echo '<td>' .mc_status('DSGVO'). secure_data('DSGVO', $row['name'], 'decrypt', $userID, $privateKey) . '</td>';
             echo '<td>' . $row['version'] . '</td>';
             echo '<td><form method="POST">';
             echo '<a href="edit?d=' . $row['id'] . '" title="Bearbeiten" class="btn btn-default"><i class="fa fa-pencil"></i></a> ';
@@ -341,7 +340,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			//5ae9c3361c57c
             $doc_selects .= '<option value="' . $row['id'] . '" >' . secure_data('DSGVO', $row['name'], 'decrypt')  .' - '. $row['version']. '</option>';
         }
-		showError($err);
         ?>
     </tbody>
 </table>

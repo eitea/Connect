@@ -8,7 +8,7 @@ if($result){
     while($row = $result->fetch_assoc()){
         $security = empty($row['security']) ? '' : '/'.$row['security'];
         $mailbox = '{'.$row['server'] .':'. $row['port']. '/'.$row['service'] . $security.'/novalidate-cert}';
-        //$conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'$mailbox')");
+
         $imap = new PhpImap\Mailbox($mailbox, $row['username'], $row['password'], __DIR__ ); //modified so nothing will be saved to disk
         if(!$imap->getMailboxes($trash)) $imap->createMailbox($trash);
         $imap->switchMailbox($mailbox.'INBOX');
@@ -106,7 +106,5 @@ if($result){
             } //end foreach mail
         }
     }
-} else {
-    $conn->query("INSERT INTO emailprojectlogs VALUES(null,CURRENT_TIMESTAMP,'ERROR')");
 }
 ?>

@@ -2811,12 +2811,40 @@ if($row['version'] < 155){
 	}
 }
 
-// if($row['version'] < 156){}
+if($row['version'] < 156){
+	if(empty($identifier) || preg_match('/[^0-9]/', $identifier)){
+		$identifier = uniqid('');
+		echo '<br> New Identification';
+	}
+	$conn->query("UPDATE identification SET id = '$identifier'");
+
+	$myfile = fopen(dirname(dirname(__DIR__)) .'/connection_config.php', 'w');
+	$txt = '<?php
+	$servername = "'.$servername.'";
+	$username = "'.$username.'";
+	$password = "'.$password.'";
+	$dbName = "'.$dbName.'";';
+	fwrite($myfile, $txt);
+	fclose($myfile);
+
+	//5af32c18c9ab7
+	$conn->query("DELETE FROM emailprojectlogs WHERE id NOT IN (SELECT id FROM emailprojectslogs ORDER BY id DESC LIMIT 200)");
+	$result = $conn->query("SELECT id FROM emailprojectlogs");
+	$i = 1;
+	while($row = $result->fetch_assoc()){
+		$conn->query("UPDATE emailprojectlogs SET id = $i WHERE id = ".$row['id']);
+		$i++;
+	}
+}
+
 // if($row['version'] < 157){}
 // if($row['version'] < 158){}
 // if($row['version'] < 159){}
 // if($row['version'] < 160){}
 // if($row['version'] < 161){}
+// if($row['version'] < 162){}
+// if($row['version'] < 163){}
+// if($row['version'] < 164){}
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';
 $conn->query("UPDATE configurationData SET version=$VERSION_NUMBER");

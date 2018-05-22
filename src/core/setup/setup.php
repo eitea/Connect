@@ -139,25 +139,16 @@ ini_set('max_execution_time',999);
             $conn->query("SET NAMES 'utf8';");
             $conn->query("SET CHARACTER SET 'utf8';");
 
-            set_time_limit(0); //setup takes longer with a laptop in energy saving mode
+            set_time_limit(300); //setup takes longer with a laptop in energy saving mode
             //create all tables
             require "setup_inc.php";
             create_tables($conn);
 
             require_once dirname(dirname(__DIR__)) . "/version_number.php";
-            //add lines to connection file
-            $identifier = uniqid('', true);
-            $myfile = fopen(dirname(dirname(__DIR__)) .'/connection_config.php', 'a');
-            $txt = '$identifier = \''.$identifier.'\';
-            $s3SharedFiles=$identifier.\'_sharedFiles\';
-            $s3uploadedFiles=$identifier.\'_uploadedFiles\';
-            $s3privateFiles=$identifier.\'_privateFiles\';';
-            fwrite($myfile, $txt);
-            fclose($myfile);
-
 
             //------------------------------ INSERTS ---------------------------------------
             //insert identification
+			$identifier = uniqid('', true);
             $conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
             //insert main company
             $stmt = $conn->prepare("INSERT INTO companyData (name, companyType, cmpDescription, companyPostal, companyCity, uid, address, phone, mail, homepage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
