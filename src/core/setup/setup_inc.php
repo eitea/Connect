@@ -40,6 +40,7 @@ function create_tables($conn) {
         birthday DATE,
         displayBirthday ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
         companyID INT(6) UNSIGNED,
+		supervisor INT(6) DEFAULT NULL,
         lastLogin DATETIME DEFAULT NULL
     )";
     if (!$conn->query($sql)) {

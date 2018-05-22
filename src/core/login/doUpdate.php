@@ -1088,13 +1088,6 @@ if ($row['version'] < 119) {
     $conn->query("DROP TABLE erpNumbers");
     echo $conn->error;
 
-    $conn->query("ALTER TABLE UserData ADD COLUMN supervisor INT(6) DEFAULT NULL ");
-    if ($conn->error) {
-        echo $conn->error;
-    } else {
-        echo '<br>Benutzer: Vorgesetzter';
-    }
-
     $conn->query("ALTER TABLE clientInfoData ADD COLUMN homepage VARCHAR(100)");
     if ($conn->error) {
         echo $conn->error;
@@ -2836,6 +2829,9 @@ if($row['version'] < 156){
 		$i++;
 	}
 }
+
+$conn->query("ALTER TABLE UserData ADD COLUMN supervisor INT(6) DEFAULT NULL ");
+
 
 // if($row['version'] < 157){}
 // if($row['version'] < 158){}
