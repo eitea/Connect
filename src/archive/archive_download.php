@@ -1,17 +1,15 @@
 <?php
 
-require dirname(__DIR__) . "/misc/useS3Config.php";
+require dirname(__DIR__) . "/utilities.php";
 require dirname(__DIR__)."/connection.php";
-  $s3 = new Aws\S3\S3Client(getS3Config());
-    if(empty($_GET['n'])){
-      echo "Invalid Access.";
-      die();
-  }
-  function clean($string) {
-      return preg_replace('/[^A-Za-z0-9\-]/', '', $string);
-  }
-  
-  $hashkey = clean($_GET['n']);
+
+  $s3 = getS3Object();
+
+  $result = $conn->query("SELECT id FROM identification LIMIT 1");
+  $row = $result->fetch_assoc();
+  $bucket = $row['id'].'_sharedFiles';
+
+  $hashkey = test_input($_GET['n'],1);
   $proc_agent = $_SERVER['HTTP_USER_AGENT'];
   $access = true;
 
@@ -19,7 +17,7 @@ require dirname(__DIR__)."/connection.php";
   if($result){
       $row = $result->fetch_assoc();
       $object= $s3->getObject(array(
-          'Bucket' => $s3SharedFiles,
+          'Bucket' => $bucket,
           'Key' => $hashkey,
       ));
   }

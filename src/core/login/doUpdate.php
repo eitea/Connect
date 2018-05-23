@@ -1429,17 +1429,6 @@ if ($row['version'] < 124) {
     } else {
         echo '<br>Module: Auflösen';
     }
-    $id = $conn->query("SELECT * FROM identification");
-    $identifier = $id->fetch_assoc()['id'];
-    $myfile = fopen(dirname(dirname(__DIR__)) .'/connection_config.php', 'a');
-    $txt = '$identifier = \''.hash('sha1',$identifier).'\';
-    $s3SharedFiles=$identifier.\'_sharedFiles\';
-    $s3uploadedFiles=$identifier.\'_uploadedFiles\';
-    $s3privateFiles=$identifier.\'_privateFiles\';';
-    fwrite($myfile, $txt);
-    fclose($myfile);
-
-    echo '<br>S3 Configuration';
 
     $sql = "ALTER TABLE userRequestsData MODIFY COLUMN requestType VARCHAR(3) DEFAULT 'vac' NOT NULL;";
     if ($conn->query($sql)) {

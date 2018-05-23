@@ -63,26 +63,25 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $stmt_insert_setting_matrix = $conn->prepare("INSERT INTO dsgvo_vv_settings(vv_id, matrix_setting_id, setting, category) VALUES($vvID, ?, ?, ?)");
     $stmt_insert_setting_matrix->bind_param("iss", $setID, $setting_encrypt, $cat);
 
-	if(!empty($_POST['add-new-file']) && isset($_FILES['new-file-upload'])){
-		require dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.'aws'.DIRECTORY_SEPARATOR.'autoload.php';
-		$bucket = $identifier .'-uploads'; //no uppercase, no underscores, no ending dashes, no adjacent special chars
-		$result = $conn->query("SELECT endpoint, awskey, secret FROM archiveconfig WHERE isActive = 'TRUE' LIMIT 1");
-		if($result && ($row = $result->fetch_assoc())){
-			try{
-				$s3 = new Aws\S3\S3Client(array(
-					'version' => 'latest',
-					'region' => '',
-					'endpoint' => $row['endpoint'],
-					'use_path_style_endpoint' => true,
-					'credentials' => array('key' => $row['awskey'], 'secret' => $row['secret'])
-				));
-			} catch(Exception $e){
-				echo $e->getMessage();
-			}
-		} else {
-			showError("Keine S3 Schnittstelle gefunden ".$conn->error);
+	$bucket = $identifier .'-uploads'; //no uppercase, no underscores, no ending dashes, no adjacent special chars
+	require dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.'aws'.DIRECTORY_SEPARATOR.'autoload.php';
+	$result = $conn->query("SELECT endpoint, awskey, secret FROM archiveconfig WHERE isActive = 'TRUE' LIMIT 1");
+	if($result && ($row = $result->fetch_assoc())){
+		try{
+			$s3 = new Aws\S3\S3Client(array(
+				'version' => 'latest',
+				'region' => '',
+				'endpoint' => $row['endpoint'],
+				'use_path_style_endpoint' => true,
+				'credentials' => array('key' => $row['awskey'], 'secret' => $row['secret'])
+			));
+		} catch(Exception $e){
+			echo $e->getMessage();
 		}
-
+	} else {
+		showError("Keine S3 Schnittstelle gefunden ".$conn->error);
+	}
+	if(!empty($_POST['add-new-file']) && isset($_FILES['new-file-upload'])){
 		//decrypt the symmetric key
 		$result = $conn->query("SELECT privateKey, s.publicKey AS publicKey, s.symmetricKey FROM security_access a
 			LEFT JOIN security_modules s ON (s.module = a.module AND s.outDated = 'FALSE') WHERE a.module = 'DSGVO' AND a.userID = $userID AND a.outDated = 'FALSE' LIMIT 1");
@@ -165,6 +164,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }elseif(!empty($_POST['delete-folder'])){
 		$x = test_input($_POST['delete-folder']);
 		$conn->query("DELETE FROM archive WHERE id = '$x' AND type = 'folder'");
+		if($conn->error){ showError($conn->error); } else { showSuccess($lang['OK_DELETE']); }
+	} elseif(!empty($_POST['delete-file'])){
+		$x = test_input($_POST['delete-file']);
+		$s3->deleteObject(['Bucket' => $bucket, 'Key' => $x]);
+		$conn->query("DELETE FROM archive WHERE uniqID = '$x'");
 		if($conn->error){ showError($conn->error); } else { showSuccess($lang['OK_DELETE']); }
 	}
 }

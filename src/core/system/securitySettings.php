@@ -249,7 +249,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $isERPAdmin = 'FALSE';
         $isFinanceAdmin = isset($_POST['isFinanceAdmin']) ? 'TRUE' : 'FALSE';
         $canStamp = isset($_POST['canStamp']) ? 'TRUE' : 'FALSE';
-		$canBook = isset($_POST['canBook']) ? 'TRUE' : 'FALSE';
+		$canBook = isset($_POST['canBook']) ? 'TRUE' : 'FALSE'; //5afc1e6e44373
         $canEditTemplates = isset($_POST['canEditTemplates']) ? 'TRUE' : 'FALSE';
         $canUseSocialMedia = isset($_POST['canUseSocialMedia']) ? 'TRUE' : 'FALSE';
         $canCreateTasks = isset($_POST['canCreateTasks']) ? 'TRUE' : 'FALSE';

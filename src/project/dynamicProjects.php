@@ -48,7 +48,6 @@ function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$refe
     .'<div data-toggle="tooltip" title="'.round($timeLeft,2).' Stunden" class="progress-bar progress-bar-success" style="height:10px;width:'.$greenBar.'%"></div>'
     .'<div data-toggle="tooltip" title="'.round($timeOver,2).' Stunden" class="progress-bar progress-bar-danger" style="height:10px;width:'.$redBar.'%"></div></div>';
 }
-
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', "priority" => 0, 'employees' => ["user;".$userID]); //set_filter requirement
 $result = $conn->query("SELECT teamID FROM teamRelationshipData WHERE userID = $userID");
 while($result && ( $row = $result->fetch_assoc())){
@@ -451,7 +450,6 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 			   $query_filter ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
 	   }
 
-
         // if($isDynamicProjectsAdmin == 'FALSE'){
 		// 	$nonAdminQuery = "LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid AND dynamicprojectsemployees.userid = $userID
 		// 	LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid
@@ -583,6 +581,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 $modals .= '</div></form></div></div>';
             }
 
+			//TODO: remove this...
             //########################################
             //      messages modal (5ac63505c0ecd)
             //########################################
@@ -696,7 +695,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                     sendMessage("'.$x.'", "'.$projectName.'", $("#message-'.$x.'").val(), "#messages-div-'.$x.'", messageLimit'.$x.');
                     $("#message-'.$x.'").val("");
                   });
-                
+
                  $(document).ready(function(){ $("#messagePictureUpload-'.$x.'").change(function(e){
                     e.stopPropagation()
                     e.preventDefault()
@@ -1077,7 +1076,7 @@ function appendModal(index){
 			setTimeout(function(){
 				$("#editingModal-").modal("show");
 				tinyMCE.activeEditor.setContent('<?php echo $_POST['description']; ?>');
-				//$("#editingModal-").find('input[name="owner"]').val(<?php echo $_POST['owner']; ?>);
+				$("#editingModal-").find('input[name="name"]').val(<?php echo $_POST['name']; ?>);
 			}, 1500);
 			<?php endif; ?>
 		}

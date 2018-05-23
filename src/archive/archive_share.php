@@ -11,11 +11,9 @@ if($result){
           echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['UNDEFINED_S3'].'</div>';
       }
     include dirname(__DIR__) . '/footer.php';
-    return;
+    die();
   }
 }
-require dirname(dirname(__DIR__))."/plugins/aws/autoload.php";
-require dirname(__DIR__) . "/connection.php";
 use PHPMailer\PHPMailer\PHPMailer;
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0); //set_filter requirement
 
@@ -24,6 +22,29 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
 }
 if(isset($_POST['filterClient'])){
   $filterings['client'] = intval($_POST['filterClient']);
+}
+
+if(!empty($_POST['delete_archive'])){
+	$s3 = getS3Object();
+
+	$result = $conn->query("SELECT id FROM identification LIMIT 1");
+	$row = $result->fetch_assoc();
+	$bucket = $row['id'].'_sharedFiles';
+
+	$groupID = intval($_POST['delete_archive']);
+	try {
+		$result = $conn->query("SELECT * FROM sharedfiles WHERE sharegroup=".$groupID."");
+		while($row = $result->fetch_assoc()){
+			$s3->deleteObject(array(
+				'Bucket' => $bucket,
+				'Key' => $row['hashkey']
+			));
+			$conn->query("DELETE FROM sharedfiles WHERE id=".$row['id']);
+		}
+		$conn->query("DELETE FROM sharedgroups WHERE id=".$groupID);
+	} catch(Exception $e) {
+		echo $e;
+	}
 }
 ?>
 <link href="plugins/homeMenu/fileUpload.css" rel="stylesheet" />
@@ -244,15 +265,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         if($daysLeft>1) $days = $days . "e";
         echo '<td>'.$daysLeft. $days .' </td>';
       }
-      
+
       echo '<td>';
-      echo '<button type="button" data-toggle="modal" data-target="#edit-group" class="btn btn-default" title="Bearbeiten" onclick="getGroup(this,'. $row['id'] .')"><i class="fa fa-pencil"></i></a>';
+      echo '<button type="button" data-toggle="modal" data-target="#edit-group" class="btn btn-default" title="Bearbeiten" onclick="getGroup(this,'. $row['id'] .')"><i class="fa fa-pencil"></i></button>';
       if($expired){
         echo '<button type="button" name="setSelect" onclick="document.getElementById(\'refreshTtl\').onclick=function(){refreshLink('.$row['id'].')}" data-toggle="modal" data-target="#refresh-ttl" class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';
       }else{
         echo '<button type="button" name="setSelect" onclick="showClients('. $row['companyID'] .',\''. $row['uri'] .'\')" data-target="#send-as-mail" data-toggle="modal"  class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';
       }
-      echo '<button onclick="deleteGroup('.$row['id'].')" type="button" class="btn btn-default"  title="Löschen"><i class="fa fa-trash-o"></i></a>';
+      echo '<form method="POST"><button value="'.$row['id'].'" type="submit" class="btn btn-default" title="Löschen" name="delete_archive"><i class="fa fa-trash-o"></i></button></form>';
       echo '</td>';
       echo '</tr>';
     }
@@ -412,17 +433,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
 
 <script>
-  function deleteGroup(groupID){
-    $.ajax({
-      type: "POST",
-      url: "../archive/delete",
-      data: { groupID: groupID}
-    }).done(function(e){
-      if(e!='') alert(e);
-      location.href='../archive/share';
-    });
-  }
-  
   function finishEditGroup(evt){
     editGroup(evt,document.getElementById('groupID').value);
   }
@@ -565,7 +575,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     formData.append('ttl',document.querySelector('input[name = "ttl"]:checked').value);
     formData.append('add_groupName',document.getElementById('add_groupName').value);
     formData.append('filterCompany',document.getElementsByName('filterCompany')[0].value);
-    
+
     $.ajax({
       url: 'ajaxQuery/AJAX_getSharedFiles.php',
       type: 'POST',
