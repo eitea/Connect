@@ -273,9 +273,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <table class="table">
 	<thead>
 		<tr>
+			<th><?php echo $lang['CATEGORY']; //5b055b4696156 ?></th>
 			<th>Name</th>
 			<th>Gültigkeitsdatum</th>
-			<th><?php echo $lang['CATEGORY']; ?></th>
 			<th>Status</th>
 			<th></th>
 		</tr>
@@ -286,9 +286,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		echo $conn->error;
 		while($result && ($row = $result->fetch_assoc())){
 			echo '<tr>';
+			echo '<td>'.$lang['CATEGORY_TOSTRING'][$row['category']].'</td>';
 			echo '<td>'.mc_status('DSGVO').secure_data('DSGVO',$row['name'], 'decrypt', $userID, $privateKey).' - '.secure_data('DSGVO', $row['versionDescr'], 'decrypt').'</td>';
 			echo '<td>'.$row['validDate'].'</td>';
-			echo '<td>'.$lang['CATEGORY_TOSTRING'][$row['category']].'</td>';
 			echo '<td>'.$row['status'].'</td>';
 			echo '<td><form method="POST" style="display:inline"><button type="submit" name="edit-meta" value="'.$row['id'].'" class="btn btn-default"><i class="fa fa-pencil"></i></button></form>
 			<form method="POST" style="display:inline" action="../project/detailDownload" target="_blank"><input type="hidden" name="keyReference" value="DSGVO" />
@@ -520,6 +520,7 @@ if($result && ($row = $result->fetch_assoc())):
 					<div class="col-md-8">
 						<label for="meta-parent"><?php echo mc_status('DSGVO'); ?>Ersetzt alten Vertrag</label>
 						<select id="meta-parent" class="js-example-basic-single" name="meta-parent">
+							<option value=""> ... </option> <!--5b055b09c88df -->
 							<?php
 							$result = $conn->query("SELECT am.id, am.name, versionDescr FROM archive INNER JOIN archive_meta am ON archive.id = am.archiveID AND am.status != 'PENDING'
 								WHERE archive.category = 'AGREEMENT' AND archive.categoryID = '$cmpID' ");

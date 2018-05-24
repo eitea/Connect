@@ -217,13 +217,13 @@ function getSettings($like, $mults = false, $from_matrix = false){
     return $settings;
 }
 ?>
+<div class="page-header-fixed">
+	<div class="page-header"><h3><?php echo $vv_row['name'].' '.$lang['PROCEDURE_DIRECTORY']; ?>
+		<div class="page-header-button-group"><button type="submit" class="btn btn-default blinking" form="mainForm"><i class="fa fa-floppy-o"></i></button></div>
+	</h3></div>
+</div>
 
-<form method="POST">
-	<div class="page-header-fixed">
-		<div class="page-header"><h3><?php echo $vv_row['name'].' '.$lang['PROCEDURE_DIRECTORY']; ?>
-			<div class="page-header-button-group"><button type="submit" class="btn btn-default blinking"><i class="fa fa-floppy-o"></i></button></div></h3></div>
-		</div>
-	</div>
+<form id="mainForm" method="POST">
 	<div class="page-content-fixed-100">
 	<?php
 	$settings = getSettings('DESCRIPTION');
@@ -329,11 +329,15 @@ function getSettings($like, $mults = false, $from_matrix = false){
 						insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$escaped_setting'");
 					}
 				} else {
-					$setID = $val['id'];
+					$setID = $settings[$key]['id'];
 					$stmt_insert_setting->execute();
 					$escaped_setting = test_input($setting);
 					insertVVLog("INSERT","Insert '$key' for Procedure Directory $vvID as '$escaped_setting'");
 				}
+			}
+			if(!isset($settings[$key])){ //TODO: remove during August18.
+				$conn->query("INSERT INTO dsgvo_vv_template_settings(templateID, opt_name, opt_descr) VALUES($templateID, '$key', '')");
+				$settings[$key]['setting'] = '';
 			}
 			echo '<textarea id="matrice-area" name="'.$key.'" >'.$settings[$key]['setting'].'</textarea>';
 			?>
@@ -489,7 +493,6 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                }
 	                if($val['setting'][0]){
 						$tooltip = isset($lang['DSGVO_CATEGORY_TOSTRING'][$val['category'][0]]) ? $lang['DSGVO_CATEGORY_TOSTRING'][$val['category'][0]] : '';
-
 	                    $client = "";
 	                    if($val['client'] && $val['client'][0]){
 	                        $clientID = $val['client'][0];

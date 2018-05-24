@@ -2819,10 +2819,26 @@ if($row['version'] < 156){
 	}
 }
 
-$conn->query("ALTER TABLE UserData ADD COLUMN supervisor INT(6) DEFAULT NULL ");
 
 
-// if($row['version'] < 157){}
+//$conn->query("DELETE FROM UserData WHERE id = 1");
+//$conn->query("UPDATE UserData SET id = 1 WHERE id = 2");
+//update: social tables, archive tables, messages,  leaders/ responisbles/ supervisors
+
+if($row['version'] < 157){
+	$conn->query("ALTER TABLE UserData ADD COLUMN supervisor INT(6) DEFAULT NULL ");
+	$conn->query("CREATE TABLE dsgvo_categories(
+		id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		name VARCHAR(250) NOT NULL
+	)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>DSGVO: Subkategorien';
+	}
+
+	$conn->query("INSERT INTO dsgvo_categories (name) VALUES ('Geheimhaltungsvereinbarung'),('Auftragsverarbeitung Art. 28'),('IT-Richtlinien'),('Allgemeine-Richtlinien'),('Datenschutzerklärung'),('Vereinbarung nach Art. 26')");
+}
 // if($row['version'] < 158){}
 // if($row['version'] < 159){}
 // if($row['version'] < 160){}
