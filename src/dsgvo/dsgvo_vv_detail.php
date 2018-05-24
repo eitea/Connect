@@ -381,7 +381,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                        $number = sprintf("A%03d",intval(util_strip_prefix($key,"MULT_OPT_")));
 	                        echo '<tr>';
 	                        echo '<td class="text-muted">'.$number.'</td>';
-	                        echo '<td class="bold">'.$val['descr'].'</td>';
+	                        echo '<td class="bold">'.mc_status('DSGVO').$val['descr'].'</td>';
 							echo '<td>';
 							echo '';
 							$checked = $radioValue == 1 ? 'checked' : '';
