@@ -16,6 +16,15 @@ $result = $conn->query("SELECT DISTINCT module, outDated FROM security_modules W
 while($row = $result->fetch_assoc()){
     $encrypted_modules[$row['module']] = $row['outDated']; //save module as keys so array_key_exists() or isset() can be used (performance)
 }
+
+$grantable_modules = array();
+$result = $conn->query("SELECT a.module, a.privateKey, m.publicKey FROM security_access a
+	LEFT JOIN security_modules m ON m.module = a.module AND m.outDated = 'FALSE' WHERE a.outDated = 'FALSE' AND a.userID = $userID");
+while($row = $result->fetch_assoc()){
+    $grantable_modules[$row['module']]['private'] = $row['privateKey'];
+	$grantable_modules[$row['module']]['public'] = $row['publicKey'];
+}
+
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     function secure_module($module, $symmetric, $decrypt = false){
         global $conn;
@@ -278,14 +287,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 			if($result && ($row = $result->fetch_assoc()) && !$row['module']){
 				$user_public = base64_decode($row['publicKey']);
 				//grant which can be granted
-				$result = $conn->query("SELECT s.privateKey, m.publicKey FROM security_access s, security_modules m WHERE m.outDated = 'FALSE' AND m.module = 'DSGVO'
-					AND s.userID = $userID AND s.outDated = 'FALSE' AND s.module = 'DSGVO' LIMIT 1");
-				if($result && ($row = $result->fetch_assoc()) && array_key_exists('DSGVO', $encrypted_modules)){
-
-					$cipher_private_module = base64_decode($row['privateKey']);
+				if(array_key_exists('DSGVO', $grantable_modules) && array_key_exists('DSGVO', $encrypted_modules)){
+					$cipher_private_module = base64_decode($grantable_modules['DSGVO']['private']);
 					$nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
         			$cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
-					$private = sodium_crypto_box_open($cipher_private_module, $nonce, base64_decode($privateKey).base64_decode($row['publicKey']));
+					$private = sodium_crypto_box_open($cipher_private_module, $nonce, base64_decode($privateKey).base64_decode($grantable_modules['DSGVO']['public']));
 
 		            $nonce = random_bytes(24);
 		            $access_private_encrypted = base64_encode($nonce . sodium_crypto_box($private, $nonce, $private.$user_public));
@@ -297,10 +303,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 						showSuccess("DSGVO Schlüssel wurde hinzugefügt");
 					}
 				} else {
-					showError($conn->error);
+					if($conn->error){
+						showError($conn->error);
+					} else {
+						showInfo("Fehlende DSGVO Verschlüsselung: Sie können keinen Modulzugriff gewähren, zudem Sie selbst keinen Zugriff besitzen.");
+					}
 				}
 			} else {
-				showError($conn->error);
+				if($conn->error){
+					showError($conn->error);
+				}
 			}
 		} else {
 			$conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'DSGVO' AND userID = $x");
@@ -455,7 +467,7 @@ if(!empty($key_downloads)){
                             </div>
                             <div class="col-md-3">
                                 <label>
-                                    <input type="checkbox" name="isERPAdmin" <?php if($row['isERPAdmin'] == 'TRUE'){echo 'checked';} ?> />ERP
+                                    <input type="checkbox" name="isERPAdmin" <?php if(!array_key_exists('ERP', $grantable_modules) && $row['isERPAdmin'] == 'FALSE'){ echo 'disabled';} elseif($row['isERPAdmin'] == 'TRUE'){echo 'checked';} ?> />ERP
                                 </label><br>
                             </div>
                             <div class="col-md-3">
@@ -470,7 +482,7 @@ if(!empty($key_downloads)){
                             </div>
                             <div class="col-md-3">
                                 <label>
-                                    <input type="checkbox" name="isDSGVOAdmin" <?php if($row['isDSGVOAdmin'] == 'TRUE'){echo 'checked';} ?> />DSGVO
+                                    <input type="checkbox" name="isDSGVOAdmin" <?php if(!array_key_exists('DSGVO', $grantable_modules) && $row['isDSGVOAdmin'] == 'FALSE'){ echo 'disabled';} elseif($row['isDSGVOAdmin'] == 'TRUE'){echo 'checked';} ?> />DSGVO
                                 </label><br>
                             </div>
                             <div class="col-md-3">
