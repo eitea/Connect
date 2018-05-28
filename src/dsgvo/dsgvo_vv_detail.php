@@ -463,6 +463,15 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	    echo '</div></div><br>';
 	}
 
+
+	//5b06e9fddddb8
+	$result = $conn->query("SELECT name FROM folder_default_sturctures WHERE category = 'DSGVO' AND categoryID = '".$company."' AND name NOT IN
+	( SELECT name FROM archive WHERE category = 'DSGVO' AND categoryID = '$vvID' AND parent_directory = 'ROOT') ");
+	echo $conn->error;
+	while($result && ($row = $result->fetch_assoc())){
+		$conn->query("INSERT INTO archive(category, categoryID, name, parent_directory, type) VALUES('DSGVO', '$vvID', '".$row['name']."', 'ROOT', 'folder')"); echo $conn->error;
+	}
+
 	$upload_viewer = [
 	'accessKey' => 'DSGVO',
 	'category' => 'DSGVO',

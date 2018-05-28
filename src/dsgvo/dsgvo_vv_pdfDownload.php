@@ -1,6 +1,7 @@
 <?php
 require dirname(__DIR__).DIRECTORY_SEPARATOR.'connection.php';
 require dirname(__DIR__).DIRECTORY_SEPARATOR.'utilities.php';
+require dirname(__DIR__).DIRECTORY_SEPARATOR.'language.php';
 require dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.'fpdf'.DIRECTORY_SEPARATOR.'fpdf.php';
 
 $companyID = intval($_POST['downloadVVs']) or die();
@@ -162,19 +163,31 @@ while($result && ($vv_row = $result->fetch_assoc())){
 		$headings = getSettings($vv_row['id'], $vv_row['templateID'], 'APP_HEAD_%', true);
 
 		$settings = getSettings($vv_row['id'], $vv_row['templateID'], 'APP_GROUP_%', false, $matrixID);
-		foreach($settings as $val){
+		$i = 1;
+		foreach($settings as $key => $val){
 			$pdf->SetFont('Helvetica','B', 10);
 			$pdf->Cell(0, 5, iconv('UTF-8', 'windows-1252', $val['descr']), 0, 1);
-
 			$pdf->SetFont('Helvetica','',8);
 			$cats = getSettings($vv_row['id'], $vv_row['templateID'], 'APP_CAT_'.util_strip_prefix($key, 'APP_GROUP_').'_%', false, $matrixID);
 			foreach($cats as $catKey => $catVal){
-				$pdf->Cell(0, 5, iconv('UTF-8', 'windows-1252', $val['descr']), 0, 1);
-			}
-			foreach($headings as $val){
-				if($val['setting'][0]){
+				$pdf->Cell(0, 5, iconv('UTF-8', 'windows-1252', $i++ .'. '. $catVal['descr']),0 , 1);
+				$dur = $catVal['duration'] ? $catVal['duration'] : 'D';
+				$pdf->Cell(10, 5);
+				$pdf->Cell(20, 5, iconv('UTF-8', 'windows-1252', 'Löschfrist: '.$dur.' '.$lang['TIME_UNIT_TOSTRING'][$catVal['duration_unit']]));
+				$pdf->Cell(10, 5);
+				$description_line = '';
+				foreach($headings as $headVal){
+					if($headVal['setting'][0]){
+						$j = array_search($catKey, $headVal['category']); //$j = numeric index
+						if($j && $headVal['setting'][$j]){
+							$description_line .= $headVal['setting'][0].'; ';
+						}
+					}
 				}
+				$pdf->MultiCell(0, 5, iconv('UTF-8', 'windows-1252', $description_line));
+				//$pdf->Ln();
 			}
+			$pdf->Ln();
 		}
 
 	}
