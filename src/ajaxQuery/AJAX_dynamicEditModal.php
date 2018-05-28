@@ -22,7 +22,7 @@ while ($result && ($row = $result->fetch_assoc())) {
 }
 
 if($x){
-    $result = $conn->query("SELECT * from dynamicprojects WHERE projectid = '$x'"); echo $conn->error;
+    $result = $conn->query("SELECT * FROM dynamicprojects WHERE projectid = '$x'"); echo $conn->error;
     $dynrow = $result->fetch_assoc();
 
     $result = $conn->query("SELECT teamid FROM dynamicprojectsteams WHERE projectid = '$x'"); echo $conn->error;
@@ -206,7 +206,7 @@ if($x){
                             </div>
                             <div class="col-md-12">
                                 <label><?php echo $lang["DESCRIPTION"]; ?>* <small>(Max. 15MB)</small></label>
-                                <textarea class="form-control projectDescriptionEditor tinymce-remember" name="description"  ><?php echo $dynrow['projectdescription']; ?></textarea>
+                                <textarea class="form-control projectDescriptionEditor tinymce-remember" name="description"><?php echo $dynrow['projectdescription']; ?></textarea>
                                 <br>
                             </div>
                         </div>

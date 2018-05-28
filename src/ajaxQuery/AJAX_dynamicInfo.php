@@ -28,13 +28,11 @@ $projectleader = $row['projectleader'];
 
 // 5ac63505c0ecd
 $projectname = $row['projectname'];
-
 $stmt_booking = $conn->prepare("SELECT userID, p.id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = ?");
 $stmt_booking->bind_param('s', $x);
 $stmt_booking->execute();
 $isInUse = $stmt_booking->get_result(); //max 1 row
 $useRow = $isInUse->fetch_assoc();
-
 if($useRow){
     $showMissingBookings = false;
 }
@@ -147,6 +145,7 @@ if (sizeof($missingBookingsArray) == 0) {
                 <li class="active"><a data-toggle="tab" href="#projectDescription<?php echo $x; ?>">Beschreibung</a></li>
                 <li><a data-toggle="tab" href="#projectInfoBookings<?php echo $x; ?>">Buchungen</a></li>
                 <li><a data-toggle="tab" href="#projectInfoLogs<?php echo $x; ?>">Logs</a></li>
+				<li><a data-toggle="tab" href="#projectInfoData<?php echo $x; ?>">Dateien</a></li>
                 <?php if(false): ?><li><a data-toggle="tab" href="#projectMessages<?php echo $x; ?>" id="projectMessagesTab<?php echo $x; ?>">Messages</a></li><?php endif; ?>
                 <?php if($showMissingBookings): ?><li><a data-toggle="tab" href="#projectForgottenBooking<?php echo $x; ?>">Zeit nachbuchen</a></li><?php endif; ?>
             </ul>
@@ -227,12 +226,38 @@ if (sizeof($missingBookingsArray) == 0) {
                         </tbody>
                     </table>
                 </div>
+				<div id="projectInfoData<?php echo $x; ?>" class="tab-pane fade"><br>
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Upload Datum</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php
+							$result = $conn->query("SELECT uniqID, name, uploadDate FROM archive WHERE category = 'TASK' AND categoryID = '$x'");
+							while($result && ($row = $result->fetch_assoc())){
+								echo '<tr>';
+								echo '<td>'.$row['name'].'</td>';
+								echo '<td>'.$row['uploadDate'].'</td>';
+								echo '<td><form method="POST" style="display:inline">
+								<button type="submit" class="btn btn-default" name="delete-file" value="'.$row['uniqID'].'"><i class="fa fa-trash-o"></i></button></form>
+								<form method="POST" style="display:inline" action="../project/detailDownload" target="_blank"><input type="hidden" name="keyReference" value="TASK_'.$x.'" />
+								<button type="submit" class="btn btn-default" name="download-file" value="'.$row['uniqID'].'"><i class="fa fa-download"></i></form></td>';
+								echo '</tr>';
+							}
+							?>
+						</tbody>
+					</table>
+				</div>
                 <?php if(false): ?>
                 <!-- Project Messages -->
                 <div id="projectMessages<?php echo $x; ?>" class="tab-pane fade"><br>
                     <!-- Subject bar -->
                     <div id="subject_bar<?php echo $x; ?>" style="background-color: whitesmoke; border: 1px gainsboro solid; border-bottom: none; max-height: 10vh; padding: 10px;"><?php echo $projectname; ?></div>
-                    
+
                     <!-- Messages -->
                     <div class="pre-scrollable" id="messages<?php echo $x; ?>" style="background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh; padding-top: 5px"></div>
 
@@ -262,7 +287,7 @@ if (sizeof($missingBookingsArray) == 0) {
                             $("#projectMessagesTab<?php echo $x; ?>").on('hide.bs.tab', function (e) {
                                 clearInterval(intervalID<?php echo $x; ?>);
                             });
-                                        
+
                             // send on enter
                             var shiftPressed<?php echo "$x" ?> = false;
                             $("#message<?php echo $x; ?>").keydown(function(event) {
@@ -273,7 +298,7 @@ if (sizeof($missingBookingsArray) == 0) {
                                     // update shiftPressed when not pressed shift+enter
                                     if(event.which == 16) shiftPressed<?php echo $x ?> = true; else shiftPressed<?php echo $x ?> = false;
                                 }
-                                
+
                                 if(event.which == 13 && !shiftPressed<?php echo $x ?>){
                                     event.preventDefault();
 
@@ -284,7 +309,7 @@ if (sizeof($missingBookingsArray) == 0) {
                                     }
                                 }
                             });
-                                
+
                             //submit
                             $("#chatinput<?php echo $x; ?>").submit(function (e) {
                                 //prevent enter
