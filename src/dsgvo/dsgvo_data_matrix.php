@@ -1,6 +1,6 @@
 <?php
 include dirname(__DIR__) . '/header.php';
-enableToCore($userID);
+enableToDSGVO($userID);
 require dirname(__DIR__) . "/misc/helpcenter.php";
 
 if (isset($_GET['n'])) {

@@ -19,7 +19,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $lastname = test_input($_POST['lastname']);
     $step = 2;
   }
-
   $t = strtotime(carryOverAdder_Hours(getCurrentTimestamp(), 24));
   $begin = date('Y-m-d', strtotime('last Monday', $t)). ' 01:00:00';
   if(substr($begin, 5, 2) != substr(getCurrentTimestamp(), 5, 2)){ //different month
@@ -27,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
   $pass = randomPassword();
 
-  $result = $conn->query("SELECT email FROM $userTable");
+  $result = $conn->query("SELECT email FROM UserData LIMIT 1");
   $row = $result->fetch_assoc();
   $emailpostfix = strrchr($row['email'], "@");
 
