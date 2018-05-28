@@ -65,7 +65,8 @@ function test_input($data, $strong = false) {
 
 function test_Date($date, $format = "Y-m-d H:i:s") {
     $dt = DateTime::createFromFormat($format, $date);
-    return $dt && $dt->format($format) === $date;
+	if($dt && $dt->format($format) === $date) return $date;
+    return false;
 }
 
 function test_Time($time) {
@@ -625,6 +626,28 @@ function util_strip_prefix($subject, $prefix) {
     return $subject;
 }
 
+function getS3Object(){
+	global $conn;
+	require dirname(__DIR__) . DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.'aws'.DIRECTORY_SEPARATOR.'autoload.php';
+	$result = $conn->query("SELECT endpoint, awskey, secret FROM archiveconfig WHERE isActive = 'TRUE' LIMIT 1");
+	if($result && ($row = $result->fetch_assoc())){
+		try{
+			$s3 = new Aws\S3\S3Client(array(
+				'version' => 'latest',
+				'region' => '',
+				'endpoint' => $row['endpoint'],
+				'use_path_style_endpoint' => true,
+				'credentials' => array('key' => $row['awskey'], 'secret' => $row['secret'])
+			));
+		} catch(Exception $e){
+			echo $e->getMessage();
+			return false;
+		}
+	}
+	return $s3;
+}
+
+
 use PHPMailer\PHPMailer\PHPMailer;
 function send_standard_email($recipient, $content){
   require dirname(__DIR__).'/plugins/phpMailer/autoload.php';
@@ -637,6 +660,7 @@ function send_standard_email($recipient, $content){
   $mail->IsSMTP();
 
   $result = $conn->query("SELECT host, username, password, port, smtpSecure, sender, senderName FROM mailingOptions LIMIT 1");
+  if(!$result || $result->num_rows < 1) return 'Keine E-Mail Einstellungen hinterlegt'; //5ac712bc31939
   $row = $result->fetch_assoc();
 
   if(!empty($row['username']) && !empty($row['password'])){

@@ -19,7 +19,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $lastname = test_input($_POST['lastname']);
     $step = 2;
   }
-
   $t = strtotime(carryOverAdder_Hours(getCurrentTimestamp(), 24));
   $begin = date('Y-m-d', strtotime('last Monday', $t)). ' 01:00:00';
   if(substr($begin, 5, 2) != substr(getCurrentTimestamp(), 5, 2)){ //different month
@@ -27,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
   $pass = randomPassword();
 
-  $result = $conn->query("SELECT email FROM $userTable");
+  $result = $conn->query("SELECT email FROM UserData LIMIT 1");
   $row = $result->fetch_assoc();
   $emailpostfix = strrchr($row['email'], "@");
 
@@ -89,60 +88,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if(isset($_POST['create'])){
       if($accept){
+		  $recipient = '';
         //send accessdata if user gets created
-        if(!empty($_POST['real_email']) && filter_var($_POST['real_email'], FILTER_VALIDATE_EMAIL)){
-          require dirname(dirname(dirname(__DIR__))).'/plugins/phpMailer/autoload.php';
-          $recipients = $_POST['real_email'];
-          $mail = new PHPMailer();
-          $mail->CharSet = 'UTF-8';
-          $mail->Encoding = "base64";
-          $mail->IsSMTP();
-          //get mail server options
-          $result = $conn->query("SELECT * FROM $mailOptionsTable");
-          $row = $result->fetch_assoc();
-          if(!empty($row['username']) && !empty($row['password'])){
-            $mail->SMTPAuth   = true;
-            $mail->Username   = $row['username'];
-            $mail->Password   = $row['password'];
-          } else {
-            $mail->SMTPAuth   = false;
-          }
-          if(empty($row['smptSecure'])){
-            $mail->SMTPSecure = $row['smtpSecure'];
-          }
-          $content = "You have been registered to Connect. <br> Your login information: <br><br> Login e-mail: $email <br> Password: $pass";
-          if(empty($row['host']) || empty($row['port'])){
-            showError("No host or port configured in settings");
-            if(isset($_SESSION["LAST_ERRORS"])){
-              array_push($_SESSION["LAST_ERRORS"],showError("No host or port configured in settings",true));
-            }else{
-              $_SESSION["LAST_ERRORS"] = array();
-              array_push($_SESSION["LAST_ERRORS"],showError("No host or port configured in settings",true));
-            }
-          }else{
-            $mail->Host       = $row['host'];
-            $mail->Port       = $row['port'];
-  
-            $mail->setFrom($row['sender']);
-            $mail->Timeout = 60;
-  
-            $mail->addAddress($recipients);
-            $mail->isHTML(true);                       // Set email format to HTML
-            $mail->Subject = "Your access to Connect";
-            $mail->Body    = $content;
-            $mail->AltBody = "If you can read this, your E-Mail provider does not support HTML." . $content;
-            $errorInfo = "";
-            if(!$mail->send()){
-              $errorInfo = $mail->ErrorInfo;
-            }
-            $conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('$recipients', '$errorInfo')");
-          }
-        } else { $recipients = ""; }
-
+		if(!empty($_POST['real_email']) && filter_var($_POST['real_email'], FILTER_VALIDATE_EMAIL)){
+			$recipient = $_POST['real_email'];
+			$content = "You have been registered to Connect. <br> Your login information: <br><br> Login e-mail: $email <br> Password: $pass";
+			send_standard_email($recipient, $content);
+		}
         //create user
         $psw = password_hash($pass, PASSWORD_BCRYPT);
         $sql = "INSERT INTO $userTable (firstname, lastname, psw, gender, email, beginningDate, real_email, forcedPwdChange)
-        VALUES ('$firstname', '$lastname', '$psw', '$gender', '$email', '$begin', '$recipients', 1);";
+        VALUES ('$firstname', '$lastname', '$psw', '$gender', '$email', '$begin', '$recipient', 1);";
         if($conn->query($sql)){
           $curID = mysqli_insert_id($conn);
           $conn->query("INSERT INTO archive_folders VALUES(0,$curID,'ROOT',-1)");
@@ -171,7 +127,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		  $keyPair = sodium_crypto_box_keypair();
 		  $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
 		  $user_public = sodium_crypto_box_publickey($keyPair);
-		  $encrypted = simple_encryption($private, $_POST['tester_pass']);
+		  $encrypted = simple_encryption($private, $pass);
 		  $conn->query("INSERT INTO security_users(userID, publicKey, privateKey) VALUES($curID, '".base64_encode($user_public)."', '$encrypted')");
 
           if($conn->error){ echo $conn->error; } else {redirect('users');}
@@ -247,33 +203,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </div>
     </div>
     <br><br>
-    <div class=container-fluid>
-      <div class="col-md-3">
-        <?php echo $lang['GENDER']; ?>: <br>
-        <div class="radio">
-          <label>
-            <input type="radio" name="gender" value="female" checked>Female <br>
-          </label>
-        </div>
-        <div class="radio">
-          <label>
-            <input type="radio" name="gender" value="male" >Male <br>
-          </label>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <?php echo $lang['COMPANIES']; ?>: <br>
-        <div class="checkbox">
-          <?php
-          $sql = "SELECT * FROM $companyTable";
-          $companyResult = $conn->query($sql);
-          while($companyRow = $companyResult->fetch_assoc()){
-            echo "<label><input type='checkbox' name='company[]' value=" .$companyRow['id']. "> " . $companyRow['name'] ."</label><br>";
-          }
-          ?>
-        </div>
-      </div>
-    </div>
+	<div class=container-fluid>
+		<div class="col-md-2">
+			<?php echo $lang['GENDER']; ?>:
+		</div>
+		<div class="col-md-2">
+			<label> <input type="radio" name="gender" value="female" checked>Female</label><br>
+		</div>
+		<div class="col-md-2">
+			<label> <input type="radio" name="gender" value="male" >Male</label><br>
+		</div>
+	</div>
     <br><br>
     <div class="container-fluid">
       <div class="col-md-3">

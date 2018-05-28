@@ -1,5 +1,7 @@
 <?php
 /* DOES NOT INCLUDE BACKEND
+can be included multiple times
+
 $upload_viewer = [
 'accessKey' => 'mc_status'
 'category' => ''

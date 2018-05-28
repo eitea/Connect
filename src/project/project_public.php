@@ -75,24 +75,7 @@ if($isProjectAdmin == 'TRUE' && $_SERVER['REQUEST_METHOD'] == 'POST'){
 	}
 }
 
-require dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.'aws'.DIRECTORY_SEPARATOR.'autoload.php';
-
-
-
-$result = $conn->query("SELECT endpoint, awskey, secret FROM archiveconfig WHERE isActive = 'TRUE' LIMIT 1");
-if($result && ($row = $result->fetch_assoc())){
-	try{
-		$s3 = new Aws\S3\S3Client(array(
-			'version' => 'latest',
-			'region' => '',
-			'endpoint' => $row['endpoint'],
-			'use_path_style_endpoint' => true,
-			'credentials' => array('key' => $row['awskey'], 'secret' => $row['secret'])
-		));
-	} catch(Exception $e){
-		echo $e->getMessage();
-	}
-}
+$s3 = getS3Object();
 
 //doesnt need a projectID, since we are unique anyways
 if(!empty($_POST['delete-file'])){

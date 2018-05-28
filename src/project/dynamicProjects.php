@@ -48,7 +48,6 @@ function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$refe
     .'<div data-toggle="tooltip" title="'.round($timeLeft,2).' Stunden" class="progress-bar progress-bar-success" style="height:10px;width:'.$greenBar.'%"></div>'
     .'<div data-toggle="tooltip" title="'.round($timeOver,2).' Stunden" class="progress-bar progress-bar-danger" style="height:10px;width:'.$redBar.'%"></div></div>';
 }
-
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', "priority" => 0, 'employees' => ["user;".$userID]); //set_filter requirement
 $result = $conn->query("SELECT teamID FROM teamRelationshipData WHERE userID = $userID");
 while($result && ( $row = $result->fetch_assoc())){
@@ -207,7 +206,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 if(!empty($_POST['completeWithoutBooking'])){
                     $conn->query("DELETE FROM projectBookingData WHERE id = $bookingID");
                 } else {
-                    $description = $dynamicID.' - '.test_input($_POST['description']); //5ac9e5167c616
+                    $description = 'TASK: '. $dynamicID.' - '.test_input($_POST['description']); //5ac9e5167c616, 5aeb2a8256b5f
                     $conn->query("UPDATE projectBookingData SET end = UTC_TIMESTAMP, infoText = '$description', projectID = '$projectID', internInfo = '$percentage% von $dynamicID Abgeschlossen' WHERE id = $bookingID");
                 }
                 if($conn->error){
@@ -235,6 +234,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
         }
         if(isset($_POST['editDynamicProject'])){ //new projects
+			$setEdit = false;
             if(isset($available_companies[1]) && !empty($_POST['name']) && !empty($_POST['description']) && !empty($_POST['owner']) && test_Date($_POST['start'], 'Y-m-d') && !empty($_POST['employees'])){
                 $id = uniqid();
                 if(!empty($_POST['editDynamicProject'])){ //existing
@@ -319,6 +319,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $stmt->execute();
                 if(!$stmt->error){
                     $stmt->close();
+					$setEdit = true;
                     //EMPLOYEES
                     $stmt = $conn->prepare("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES ('$id', ?, ?)"); echo $conn->error;
                     $stmt->bind_param("is", $employee, $position);
@@ -440,6 +441,31 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 				AND id IN ( SELECT MAX(id) FROM dynamicprojectslogs GROUP BY projectid)) tbl4 ON tbl4.projectid = d.projectid
 			WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter
 			ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
+        // if($isDynamicProjectsAdmin == 'FALSE'){
+		// 	$nonAdminQuery = "LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid AND dynamicprojectsemployees.userid = $userID
+		// 	LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid
+		// 	LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid AND teamRelationshipData.userID = $userID";
+        // }
+		//
+		// $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,
+		// 	projectpriority, projectowner, projectleader, projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
+		// 	clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours,
+		// 	tbl4.activity, tbl5.userID AS workingUser, tbl5.start AS workStart, tbl5.id AS workingID
+		// 	FROM dynamicprojects d
+		// 	LEFT JOIN ( SELECT projectid, GROUP_CONCAT(userid SEPARATOR ' ') AS conemployees FROM dynamicprojectsemployees GROUP BY projectid ) tbl ON tbl.projectid = d.projectid
+		// 	LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
+		// 	LEFT JOIN ( SELECT t.projectid, GROUP_CONCAT(teamData.name SEPARATOR ',<br>') AS conteams, GROUP_CONCAT(teamData.id SEPARATOR ' ') AS conteamsids FROM dynamicprojectsteams t
+		// 		LEFT JOIN teamData ON teamData.id = t.teamid GROUP BY t.projectid ) tbl2 ON tbl2.projectid = d.projectid
+		// 	LEFT JOIN ( SELECT p.dynamicID, SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) AS currentHours
+		// 		FROM projectBookingData p GROUP BY dynamicID) tbl3 ON tbl3.dynamicID = d.projectid
+		// 	LEFT JOIN ( SELECT userID, dynamicID, p.id, p.start FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00') tbl5
+		// 		ON tbl5.dynamicID = d.projectid
+		// 	$nonAdminQuery
+		// 	LEFT JOIN ( SELECT activity, projectid FROM dynamicprojectslogs
+		// 		WHERE ((activity = 'VIEWED' AND userID = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID))
+		// 		AND id IN ( SELECT MAX(id) FROM dynamicprojectslogs GROUP BY projectid)) tbl4 ON tbl4.projectid = d.projectid
+		// 	WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter
+		// 	ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
 
         echo $conn->error;
         while($result && ($row = $result->fetch_assoc())){
@@ -546,6 +572,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 $modals .= '</div></form></div></div>';
             }
 
+			//TODO: remove this...
             //########################################
             //      messages modal (5ac63505c0ecd)
             //########################################
@@ -599,7 +626,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                     }
 
                     $.ajax({
-                        url: "ajaxQuery/AJAX_postSendMessage.php",
+                        url: "ajaxQuery/ajax_post_send_message.php",
                         data: {
                             taskID: taskID,
                             taskName: taskName,
@@ -659,10 +686,50 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                     sendMessage("'.$x.'", "'.$projectName.'", $("#message-'.$x.'").val(), "#messages-div-'.$x.'", messageLimit'.$x.');
                     $("#message-'.$x.'").val("");
                   });
+
+                 $(document).ready(function(){ $("#messagePictureUpload-'.$x.'").change(function(e){
+                    e.stopPropagation()
+                    e.preventDefault()
+                    file = e.target.files[0]
+                    var data = new FormData()
+                    if(!file.type.match("image.*")){
+                        alert("Not an image")
+                    }else if (file.size > 1048576){
+                        alert("File too large")
+                    }else{
+                        var limit = messageLimit'.$x.';
+                        var target = "#messages-div-'.$x.'";
+                        var taskID = "'.$x.'";
+                        var taskName = "'.$projectName.'";
+                        data.append("picture", file)
+                        data.append("taskID", taskID)
+                        data.append("taskName", taskName)
+                        const finishedFunction = function (response){
+                            console.log(response);
+                            showInfo(response.responseText || response.statusText || response, 1000);
+                            getMessages(taskID, target, true, limit)
+                        }
+                        $.ajax({
+                            url: "ajaxQuery/ajax_post_send_message.php",
+                            dataType: "json",
+                            data: data,
+                            cache: false,
+                            type: "POST",
+                            processData: false,
+                            contentType: false,
+                            success: finishedFunction,
+                            error: finishedFunction
+                        })
+                    }
+                }) })
                 </script>';
             //footer
             $modals .= '</div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                 <button class="btn btn-warning" type="submit" title="'.$lang["SEND"].'" name="task-plan" value="'.$x.'">'.$lang["SEND"].'</button>
+                <label class="btn btn-default" title="Bild senden">
+                    <i class="fa fa-upload" aria-hidden="true"></i>
+                        <input type="file" id="messagePictureUpload-'.$x.'" name="picture" style="display:none">
+                </label>
                 </div></form></div></div>';
 
         }
@@ -995,13 +1062,21 @@ function appendModal(index){
     complete: function(resp){
         if(index){
             $('#editingModal-'+index).modal('show');
-        }
-        $("#projectForm"+index).rememberState();
+        } else {
+			<?php if(isset($setEdit) && !$setEdit): //5ae9e4ee9e35f ?>
+			setTimeout(function(){
+				$("#editingModal-").modal("show");
+				tinyMCE.activeEditor.setContent('<?php echo $_POST['description']; ?>');
+				$("#editingModal-").find('input[name="name"]').val(<?php echo $_POST['name']; ?>);
+			}, 1500);
+			<?php endif; ?>
+		}
     }
    });
 }
 var existingModals = new Array();
 appendModal('');
+
 var existingModals_info = new Array();
 $('.view-modal-open').click(function(){
     var index = $(this).val();

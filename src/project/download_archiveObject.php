@@ -16,6 +16,13 @@ $userID = $_SESSION['userid'];
 $privateKey = $_SESSION['privateKey'];
 $publicKey = $_SESSION['publicKey'];
 
+$result = $conn->query("SELECT id FROM identification LIMIT 1");
+if($row = $result->fetch_assoc()){
+	$identifier = $row['id'];
+} else {
+	die('No identifier found '.$conn->error);
+}
+
 $module = $arr[0];
 if($module == 'PROJECT'){
 	$module = 'PRIVATE_PROJECT';
@@ -67,7 +74,7 @@ if($result && ($row = $result->fetch_assoc())){
     }
 }
 
-$result = $conn->query("SELECT name, type FROM archive WHERE category='$module' AND uniqID = '$fileKey' LIMIT 1");
+$result = $conn->query("SELECT name, type FROM archive WHERE uniqID = '$fileKey' LIMIT 1");
 $row = $result->fetch_assoc();
 
 if(isset($object)){

@@ -42,7 +42,7 @@ if($projectRow['publicKey']){
         }
     } else {
 		if($conn->error){
-			echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.__LINE__.'</div>';
+			echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Access Err: '.$conn->error.__LINE__.'</div>';
 		} else {
 			$result = $conn->query("SELECT privateKey FROM security_access WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$projectID'");
 			if($result->num_rows > 0){
@@ -172,7 +172,7 @@ if($projectRow['publicKey']){
 			            <div class="col-sm-6">
 			                <h5>Intern</h5>
 			                <?php
-							$access_select = '<option value="WRITE">Vollzugriff</option><option value="READ">Halbzugriff</option>';
+							$access_select = '<option value="WRITE">Vollzugriff</option><option value="READ">Lesezugriff</option>'; //5af14c95ef1f0
 			                $result = $conn->query("SELECT userID, firstname, lastname, access FROM relationship_project_user INNER JOIN UserData e ON userID = e.id WHERE projectID = $projectID"); echo $conn->error;
 			                while($result && ($row = $result->fetch_assoc())){
 			                    echo '<div class="col-sm-6"><button type="submit" name="removeUser" value="'.$row['userID'].'" class="btn btn-empty" title="Entfernen"><i class="fa fa-times" style="color:red"></i></button>';

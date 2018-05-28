@@ -6,8 +6,7 @@ if (empty($_SESSION['userid'])) {
 $userID = $_SESSION['userid'];
 $timeToUTC = $_SESSION['timeToUTC'];
 $privateKey = $_SESSION['privateKey'];
-if(isset($_SESSION['publicKey'])) 
-    $publicKey = $_SESSION['publicKey'];
+$publicKey = $_SESSION['publicKey'];
 
 $setActiveLink = 'class="active-link"';
 
@@ -20,6 +19,14 @@ if (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])){
 	ini_set('display_errors', 1);
 	ini_set('display_startup_errors', 1);
 	error_reporting(E_ALL);
+}
+
+$result = $conn->query("SELECT id FROM identification LIMIT 1");
+if($row = $result->fetch_assoc()){
+	$identifier = $row['id'];
+} else {
+	$identifier = uniqid('');
+	$conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
 }
 $result = $conn->query("SELECT * FROM roles WHERE userID = $userID");
 if ($result && $result->num_rows > 0) {
@@ -61,13 +68,11 @@ if($result && ($userdata = $result->fetch_assoc())) {
 } else {
     echo $conn->error;
 }
-$result = $conn->query("SELECT enableReadyCheck, firstTimeWizard FROM configurationData");
-if ($result) {
-    $row = $result->fetch_assoc();
-    if($row['firstTimeWizard'] == 'FALSE'){ redirect('../setup/wizard'); }
-    $showReadyPlan = $row['enableReadyCheck'];
+$result = $conn->query("SELECT firstTimeWizard FROM configurationData");
+if ($result && ($row = $result->fetch_assoc()) && $row['firstTimeWizard'] == 'FALSE') {
+    redirect('../setup/wizard');
 }
-$result = $conn->query("SELECT id, CONCAT(firstname,' ', lastname) as name FROM UserData")->fetch_all(MYSQLI_ASSOC);
+$result = $conn->query("SELECT id, CONCAT(firstname,' ', lastname) AS name FROM UserData")->fetch_all(MYSQLI_ASSOC);
 $userID_toName = array_combine( array_column($result, 'id'), array_column($result, 'name'));
 
 $numberOfSocialAlerts = 0;
@@ -262,19 +267,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $pp = uploadImage("profilePictureUpload", 1, 1);
             if (!is_array($pp)) {
                 $stmt = $conn->prepare("UPDATE socialprofile SET picture = ? WHERE userID = $userID");
-                echo $conn->error;
+                $validation_output = $conn->error;
                 $null = NULL;
                 $stmt->bind_param("b", $null);
                 $stmt->send_long_data(0, $pp);
                 $stmt->execute();
                 if ($stmt->errno) {
-                    echo $stmt->error; //displayError($stmt->error);
+                    $validation_output =  $stmt->error; //displayError($stmt->error);
                 } else {
                     //displaySuccess($lang['SOCIAL_SUCCESS_IMAGE_UPLOAD']);
                 }
                 $stmt->close();
             } else {
-                echo print_r($filename);
+                $validation_output = print_r($filename, 1);
             }
         }
         // other settings
@@ -588,7 +593,7 @@ if ($_SESSION['color'] == 'light') {
                                   <input type="checkbox" name="social_isAvailable" <?php if($social_isAvailable == 'TRUE') {echo 'checked';} ?> ><?php echo $lang['SOCIAL_AVAILABLE']; ?>
                               </label>
                           </div>
-                      </div> 
+                      </div>
                       <div class="row">
                         <div class="col-md-12">
                             <label>Benachrichtigungen</label>

@@ -139,6 +139,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       } else {
           echo '<div class="alert alert-danger fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$lang['ERROR_EMAIL'].'</div>';
       }
+	  if (!empty($_POST['real_email']) && filter_var(test_input($_POST['real_email']), FILTER_VALIDATE_EMAIL)){
+          $val = test_input($_POST['real_email']);
+          $conn->query("UPDATE UserData SET real_email = '$val' WHERE id = '$x';");
+      } elseif(!empty($_POST['real_email'])) {
+          echo '<div class="alert alert-danger fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$lang['ERROR_EMAIL'].__LINE__.'</div>';
+      }
       if (!empty($_POST['gender'])) {
           $val = test_input($_POST['gender']);
           $conn->query("UPDATE UserData SET gender= '$val' WHERE id = '$x';");
@@ -160,7 +166,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                   $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
                   $user_public = sodium_crypto_box_publickey($keyPair);
 
-                  $private_encrypt = simple_encryption($private, $_POST['encryption_pass']);
+                  $private_encrypt = simple_encryption($private, $_POST['password']);
                   $conn->query("UPDATE UserData SET psw = '$psw', lastPswChange = UTC_TIMESTAMP, forcePwdChange = 1 WHERE id = '$x';");
 				  $conn->query("UPDATE security_users SET outDated = 'TRUE' WHERE userID = $x");
 				  $conn->query("INSERT INTO security_users (userID, publicKey, privateKey) VALUES ( $x, '".base64_encode($user_public)."', '$private_encrypt' )");
@@ -265,24 +271,32 @@ $stmt_company_relationship->bind_param('i', $x);
             </form>
 
             <form method="POST">
-				<div class="container-fluid">
-					<div class="form-group">
+				<div class="row form-group">
+					<div class="col-md-6">
 						<div class="input-group">
 							<span class="input-group-addon" style="min-width:150px"><?php echo $lang['FIRSTNAME'] ?></span>
 							<input type="text" class="form-control" name="firstname" value="<?php echo $row['firstname']; ?>">
 						</div>
 					</div>
-					<div class="form-group">
+					<div class="col-md-6">
 						<div class="input-group">
 							<span class="input-group-addon" style="min-width:150px"><?php echo $lang['LASTNAME'] ?></span>
 							<input type="text" class="form-control" name="lastname" value="<?php echo $row['lastname']; ?>">
 						</div>
 					</div>
+				</div>
+				<div class="container-fluid">
 					<div class="form-group">
 						<div class="input-group">
-							<span class="input-group-addon" style="min-width:150px">Login E-Mail</span>
+							<span class="input-group-addon" style="min-width:150px">Login Adresse</span>
 							<input type="text" class="form-control" name="email" value="<?php echo explode('@', $row['email'])[0]; ?>"/>
 							<span class="input-group-addon" style="min-width:150px">@<?php echo explode('@', $row['email'])[1]; ?></span>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="input-group">
+							<span class="input-group-addon" style="min-width:150px">E-Mail Adresse</span>
+							<input type="email" class="form-control" name="real_email" value="<?php echo $row['real_email']; ?>"/>
 						</div>
 					</div>
 				</div>
@@ -292,14 +306,13 @@ $stmt_company_relationship->bind_param('i', $x);
 							<span class="input-group-addon" style="min-width:150px"><?php echo $lang['NEW_PASSWORD']; ?></span>
 							<input type="password" class="form-control" name="password" placeholder="* * * *">
 						</div>
-						<small>Achtung: Benutzer verliert dadurch jeden seiner Zugriffe.</small>
+						<small>Achtung: Benutzer verliert dadurch jeden seiner Zugriffe. Erzwingt eine Passwortänderung.</small>
 					</div>
 					<div class="col-md-6">
 						<div class="input-group">
 							<span class="input-group-addon" style="min-width:150px"><?php echo $lang['NEW_PASSWORD_CONFIRM']; ?></span>
 							<input type="password" class="form-control" name="passwordConfirm" placeholder="* * * *">
 						</div>
-						<small>Zwingt den Benutzer beim 1. Login sein Passwort ändern zu müssen.</small>
 					</div>
 				</div>
               <div class="row">
@@ -348,7 +361,7 @@ $stmt_company_relationship->bind_param('i', $x);
                   </div>
                   <div class="col-md-3">
                       <select name="main_company" class="js-example-basic-single"> <option value=""> .... </option>
-                          <?php echo str_replace('<option value="'.$row['companyID'].'" ', '<option selected value="'.$row['companyID'].'" ', $selection_main_company); ?>
+                          <?php echo str_replace('<option value="'.$row['companyID'].'">', '<option selected value="'.$row['companyID'].'">', $selection_main_company); ?>
                       </select>
                   </div>
                   <div class="col-md-2">

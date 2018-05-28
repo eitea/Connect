@@ -139,25 +139,16 @@ ini_set('max_execution_time',999);
             $conn->query("SET NAMES 'utf8';");
             $conn->query("SET CHARACTER SET 'utf8';");
 
-            set_time_limit(0); //setup takes longer with a laptop in energy saving mode
+            set_time_limit(300); //setup takes longer with a laptop in energy saving mode
             //create all tables
             require "setup_inc.php";
             create_tables($conn);
 
             require_once dirname(dirname(__DIR__)) . "/version_number.php";
-            //add lines to connection file
-            $identifier = uniqid('', true);
-            $myfile = fopen(dirname(dirname(__DIR__)) .'/connection_config.php', 'a');
-            $txt = '$identifier = \''.$identifier.'\';
-            $s3SharedFiles=$identifier.\'_sharedFiles\';
-            $s3uploadedFiles=$identifier.\'_uploadedFiles\';
-            $s3privateFiles=$identifier.\'_privateFiles\';';
-            fwrite($myfile, $txt);
-            fclose($myfile);
-
 
             //------------------------------ INSERTS ---------------------------------------
             //insert identification
+			$identifier = uniqid('', true);
             $conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
             //insert main company
             $stmt = $conn->prepare("INSERT INTO companyData (name, companyType, cmpDescription, companyPostal, companyCity, uid, address, phone, mail, homepage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -167,8 +158,8 @@ ini_set('max_execution_time',999);
             $stmt->close();
             //insert password policy
             $conn->query("INSERT INTO policyData (passwordLength) VALUES (6)");
-            //insert ADMIN bogus
-            $sql = "INSERT INTO UserData (firstname, lastname, email, psw) VALUES ('', 'Admin', 'Admin@$domainname', '$2y$10$98/h.UxzMiwux5OSlprx0.Cp/2/83nGi905JoK/0ud1VUWisgUIzK');";
+			//insert core user
+            $sql = "INSERT INTO UserData (firstname, lastname, email, psw) VALUES ('$firstname', '$lastname', '$loginname', '$psw');";
             $conn->query($sql);
             //interval
             $sql = "INSERT INTO intervalData (userID) VALUES (1);";
@@ -181,23 +172,6 @@ ini_set('max_execution_time',999);
             $conn->query($sql);
             //socialprofile
             $sql = "INSERT INTO socialprofile (userID, isAvailable, status) VALUES(1, 'TRUE', '-');";
-            $conn->query($sql);
-
-            //insert core user
-            $sql = "INSERT INTO UserData (firstname, lastname, email, psw) VALUES ('$firstname', '$lastname', '$loginname', '$psw');";
-            $conn->query($sql);
-            //insert intervaltable
-            $sql = "INSERT INTO intervalData (userID) VALUES (2);";
-            $conn->query($sql);
-            //insert roletable
-            $sql = "INSERT INTO roles (userID, isCoreAdmin, isTimeAdmin, isProjectAdmin, isReportAdmin, isERPAdmin, isFinanceAdmin, isDSGVOAdmin, isDynamicProjectsAdmin, canStamp, canBook, canUseSocialMedia)
-              VALUES(2, 'TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE','TRUE', 'TRUE', 'TRUE', 'TRUE', 'TRUE');";
-            $conn->query($sql);
-            //insert company-client relationship
-            $sql = "INSERT INTO relationship_company_client(companyID, userID) VALUES(1,2)";
-            $conn->query($sql);
-            //socialprofile
-            $sql = "INSERT INTO socialprofile (userID, isAvailable, status) VALUES(2, 'TRUE', '-');";
             $conn->query($sql);
 
             //insert configs

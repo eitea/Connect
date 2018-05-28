@@ -117,7 +117,7 @@ if($x){
                             $modal_options = '';
                             if($isDynamicProjectsAdmin == 'TRUE'){
                                 $result = $conn->query("SELECT id, firstname, lastname FROM UserData WHERE id IN (".implode(', ', $available_users).")");
-                            }else{
+                            } else {
                                 $result = $conn->query("SELECT id, firstname, lastname FROM UserData WHERE id = $userID");
                             }
                             while ($row = $result->fetch_assoc()){ $modal_options .= '<option value="'.$row['id'].'" data-icon="user">'.$row['firstname'] .' '. $row['lastname'].'</option>'; }

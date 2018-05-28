@@ -118,7 +118,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
      }
    }
    if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>'; }
- } elseif(isset($_POST['save_erp_numbers'])){
+} elseif(isset($_POST['save_erp_numbers'])){
    $erp_ang = abs(intval($_POST['erp_ang']));
    $erp_aub = abs(intval($_POST['erp_aub']));
    $erp_re = abs(intval($_POST['erp_re']));
@@ -132,8 +132,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
    $conn->query("UPDATE erp_settings SET erp_ang = $erp_ang, erp_aub = $erp_aub, erp_re = $erp_re, erp_lfs = $erp_lfs, erp_gut = $erp_gut, erp_stn = $erp_stn,
     clientNum = '$clientNum', clientStep = $clientStep, supplierNum = '$supplierNum', supplierStep = $supplierStep WHERE companyID = $cmpID");
-   if($conn->error){ echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>'; } else {
-     echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+   if($conn->error){
+	 echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+   } else {
+     echo '<div class="alert alert-success alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>ERP: '.$lang['OK_SAVE'].'</div>';
    }
  } elseif(isset($_POST['save_erp_reference_numrow'])){
     $ourSign = test_input($_POST['erp_ourSign']);
@@ -877,7 +879,10 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
 
 <!-- ERP NUMBERS -->
 <?php
-$result = $conn->query("SELECT * FROM erp_settings WHERE companyID = $cmpID");
+$result = $conn->query("SELECT * FROM erp_settings WHERE companyID = $cmpID LIMIT 1");
+if($result->num_rows < 1){
+	$conn->query("INSERT INTO erp_settings (companyID, clientNum, clientStep, supplierNum, supplierStep) VALUES ($cmpID, '1000', 1, '1000', 1)");
+}
 $row = $result->fetch_assoc();
 ?>
 <form method="POST" class="page-seperated-section">

@@ -29,7 +29,20 @@ if (isset($_GET["partner"], $_GET["subject"]) && !empty($_SESSION["userid"])) {
 
     // get the messages
     $sql = "SELECT * FROM (
-                SELECT * FROM messages WHERE (( userID = $userID AND partnerID = $partner AND user_deleted = 'FALSE' ) OR ( userID = $partner AND partnerID = $userID AND partner_deleted = 'FALSE' )) AND subject = '$subject' ORDER BY sent DESC LIMIT $limit
+                SELECT * FROM messages 
+                WHERE 
+                (
+                    ( 
+                        userID = $userID 
+                        AND partnerID = $partner 
+                        AND user_deleted = 'FALSE' 
+                    ) 
+                    OR 
+                    ( 
+                        userID = $partner AND partnerID = $userID AND partner_deleted = 'FALSE' 
+                    )
+                ) 
+                AND subject = '$subject' ORDER BY sent DESC LIMIT $limit
             ) AS temptable ORDER BY sent ASC";
     $result = $conn->query($sql);
     echo $conn->error;
@@ -54,6 +67,7 @@ if (!$result || $result->num_rows == 0) {
     // process the result
     while ($row = $result->fetch_assoc()) {
         $message = $row["message"];
+        $picture = $row["picture"];
 
         if ($taskView) { // firstname and lastname not available in normal query
             $firstname = $row["firstname"];
@@ -122,6 +136,9 @@ if (!$result || $result->num_rows == 0) {
 
                         <div style='word-break: normal; word-wrap: normal;'>
                             <?php 
+                            if($picture){
+                                echo "<img src='data:image/jpeg;base64,".base64_encode($row["picture"])."' alt='Picture type not supported' style='max-width:100%;' >";
+                            }
                                 // handle line breaks
                             $parts = explode("\n", $message);
 

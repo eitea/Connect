@@ -21,7 +21,7 @@ function insertVVLog($short,$long){
     global $userID;
     global $privateKey;
     $stmt_insert_vv_log_short_description = secure_data('DSGVO', $short, 'encrypt', $userID, $privateKey, $encryptionError);
-    $stmt_insert_vv_log_long_description = secure_data('DSGVO', $long, 'encrypt', $userID, $privateKey, $encryptionError);
+    $stmt_insert_vv_log_long_description = secure_data('DSGVO',  $userID.' '.$long, 'encrypt', $userID, $privateKey, $encryptionError);
     $stmt_insert_vv_log_scope = secure_data('DSGVO', "VV", 'encrypt', $userID, $privateKey, $encryptionError);
     if($encryptionError){
         showError($encryptionError);
@@ -137,6 +137,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <button type="button" class="btn btn-default" data-toggle="modal" data-target="#list-templates"><?php echo $lang['MANAGE_TEMPLATES']; ?></button>
             <a href="data-matrix?n=<?php echo $cmpID; //5acb74765fddc ?>" class="btn btn-default" ><?php echo $lang['DATA_MATRIX'] ?></a>
 			<button type="button" class="btn btn-default" data-toggle="modal" data-target="#list-default-folders">Archivstruktur</button>
+			<form method="POST" target="_blank" action="pdfDownload" style="display: inline;">
+				<button type="submit" name="downloadVVs" value="<?php echo $cmpID; ?>" class="btn btn-default" title="Startet Download"><i class="fa fa-download"></i> PDF Download</button>
+			</form>
         </div>
     </h3></div>
 </div>

@@ -3,13 +3,13 @@ $routes = array(
 	'login/auth' => 'core/login/login.php',                           'login/register' => 'core/login/selfregistration.php',       'login/update' => 'core/login/doUpdate.php',
 	'login/access' => 'core/login/login_docker.php',
 
-	'php/info' => 'core/dev/phpinfo.php',                             'php/ext' => 'core/dev/phpext.php',							'php/debug' => 'core/dev/crypt.php',
+	'php/info' => 'core/dev/phpinfo.php',                             'php/debug' => 'core/dev/crypt.php',
 
 	'user/home' => 'core/user/home.php',                              'user/time' => 'core/user/timeCalcTable.php',                'user/book' => 'core/user/userProjecting.php',
 	'user/logout' => 'core/user/logout.php',                          'user/request' => 'core/user/makeRequest.php',               'user/ready' => 'core/user/readyPlan.php',
 
 	'social/post' => 'core/system/social_messages.php',               'social/home' => 'core/system/socialMedia.php',
-	'setup/run' => 'core/setup/setup.php',                            'setup/wizard' => 'core/setup/install_wizard.php',          'setup/keys' => 'core/setup/download_keys.php',
+	'setup/run' => 'core/setup/setup.php',                            'setup/wizard' => 'core/setup/install_wizard.php',           'setup/keys' => 'core/setup/download_keys.php',
 
 	'system/users' => 'core/system/editUsers.php',                    'system/saldo' => 'core/system/admin_saldoview.php',         'system/register' => 'core/system/register.php',
 	'system/deactivated' => 'core/system/deactivatedUsers.php',       'system/company' => 'core/system/editCompanies.php',         'system/new' => 'core/system/new_Companies.php',
@@ -44,11 +44,11 @@ $routes = array(
 	'dsgvo/documents' => 'dsgvo/dsgvo_view.php',                      'dsgvo/access' => 'dsgvo/dsgvo_access.php',                  'dsgvo/templates' => 'dsgvo/dsgvo_mail.php',
 	'dsgvo/edit' => 'dsgvo/dsgvo_edit.php',                           'dsgvo/vv' => 'dsgvo/dsgvo_vv.php',                          'dsgvo/log' => 'dsgvo/dsgvo_log.php',
 	'dsgvo/vDetail' => 'dsgvo/dsgvo_vv_detail.php',                   'dsgvo/editTemplate' => 'dsgvo/dsgvo_vv_template_edit.php',  'dsgvo/training' => 'dsgvo/dsgvo_training.php',
-	'dsgvo/data-matrix' => 'dsgvo/dsgvo_data_matrix.php',
+	'dsgvo/data-matrix' => 'dsgvo/dsgvo_data_matrix.php',             'dsgvo/pdfDownload' => 'dsgvo/dsgvo_vv_pdfDownload.php',
 
 	'archive/share' => 'archive/archive_share.php',                   'archive/files' => 'archive/archive_files.php',              'archive/download' => 'archive/archive_download.php',
-	'archive/delete' => 'archive/archive_delete.php',                 'archive/upload' => 'archive/archive_upload.php',            'archive/private'  => 'archive/private_view.php',
-	'upload/file' => 'archive/uploadToS3.php',                        'archive/getFolderContent' => 'archive/getFolderContent.php','private/files'   => 'archive/private_files.php',
+	'archive/upload' => 'archive/archive_upload.php',            	  'private/files'   => 'archive/private_files.php', 		   'archive/private'  => 'archive/private_view.php',
+	'upload/file' => 'archive/uploadToS3.php',                        'archive/getFolderContent' => 'archive/getFolderContent.php',
 
 	'extern/login' => 'external/login.php',                           'extern/home' => 'external/home.php'
 );
