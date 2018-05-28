@@ -166,7 +166,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                   $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
                   $user_public = sodium_crypto_box_publickey($keyPair);
 
-                  $private_encrypt = simple_encryption($private, $_POST['encryption_pass']);
+                  $private_encrypt = simple_encryption($private, $_POST['password']);
                   $conn->query("UPDATE UserData SET psw = '$psw', lastPswChange = UTC_TIMESTAMP, forcePwdChange = 1 WHERE id = '$x';");
 				  $conn->query("UPDATE security_users SET outDated = 'TRUE' WHERE userID = $x");
 				  $conn->query("INSERT INTO security_users (userID, publicKey, privateKey) VALUES ( $x, '".base64_encode($user_public)."', '$private_encrypt' )");

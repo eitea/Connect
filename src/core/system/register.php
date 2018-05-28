@@ -128,7 +128,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		  $keyPair = sodium_crypto_box_keypair();
 		  $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
 		  $user_public = sodium_crypto_box_publickey($keyPair);
-		  $encrypted = simple_encryption($private, $_POST['tester_pass']);
+		  $encrypted = simple_encryption($private, $pass);
 		  $conn->query("INSERT INTO security_users(userID, publicKey, privateKey) VALUES($curID, '".base64_encode($user_public)."', '$encrypted')");
 
           if($conn->error){ echo $conn->error; } else {redirect('users');}
