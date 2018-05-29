@@ -449,7 +449,6 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 			   WHERE d.isTemplate = 'FALSE' AND (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (teamRelationshipData.userID = $userID AND teamRelationshipData.skill >= d.level))
 			   $query_filter ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
 	   }
-
         // if($isDynamicProjectsAdmin == 'FALSE'){
 		// 	$nonAdminQuery = "LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid AND dynamicprojectsemployees.userid = $userID
 		// 	LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid
@@ -475,6 +474,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 		// 		AND id IN ( SELECT MAX(id) FROM dynamicprojectslogs GROUP BY projectid)) tbl4 ON tbl4.projectid = d.projectid
 		// 	WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter
 		// 	ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
+
 
         echo $conn->error;
         while($result && ($row = $result->fetch_assoc())){

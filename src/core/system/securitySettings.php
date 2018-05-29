@@ -302,16 +302,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 					} else {
 						showSuccess("DSGVO Schlüssel wurde hinzugefügt");
 					}
-				} else {
-					if($conn->error){
-						showError($conn->error);
-					} else {
-						showInfo("Fehlende DSGVO Verschlüsselung: Sie können keinen Modulzugriff gewähren, zudem Sie selbst keinen Zugriff besitzen.");
-					}
+				} elseif(!array_key_exists('DSGVO', $grantable_modules)) {
+					$isDSGVOAdmin = 'FALSE';
+					showInfo("Fehlende DSGVO Verschlüsselung: Sie können keinen Modulzugriff gewähren, zudem Sie selbst keinen Zugriff besitzen.");
 				}
 			} else {
 				if($conn->error){
 					showError($conn->error);
+				} elseif($result->num_rows < 1) {
+					$isDSGVOAdmin = 'FALSE';
+					showError("Nicht registrierter Benutzer: Dieser Benutzer muss sich zuerst einloggen");
 				}
 			}
 		} else {

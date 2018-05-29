@@ -2823,7 +2823,7 @@ if($row['version'] < 156){
 
 //$conn->query("DELETE FROM UserData WHERE id = 1");
 //$conn->query("UPDATE UserData SET id = 1 WHERE id = 2");
-//update: social tables, archive tables, messages,  leaders/ responisbles/ supervisors
+//update: social tables, archive tables, messages,  leaders/ responisbles/ supervisors, uploadUser
 
 if($row['version'] < 157){
 	$conn->query("ALTER TABLE UserData ADD COLUMN supervisor INT(6) DEFAULT NULL ");
