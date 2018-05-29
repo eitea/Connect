@@ -187,7 +187,8 @@ ini_set('max_execution_time',999);
 			//insert default folders
 			$conn->query("INSERT INTO folder_default_sturctures(category, categoryID, name) SELECT 'COMPANY', id, 'Uploads' FROM companyData");
 			$conn->query("INSERT INTO folder_default_sturctures(category, categoryID, name) VALUES('ARCHIVE', '1', 'Dokumente')");
-
+			//insert sub categories
+			$conn->query("INSERT INTO dsgvo_categories (name) VALUES ('Geheimhaltungsvereinbarung'),('Auftragsverarbeitung Art. 28'),('IT-Richtlinien'),('Allgemeine-Richtlinien'),('Datenschutzerklärung'),('Vereinbarung nach Art. 26')");
             //insert holidays
             $icsFile = file_get_contents(__DIR__ .'/Feiertage.txt');
             foreach (explode("BEGIN:", $icsFile) as $key => $value) {

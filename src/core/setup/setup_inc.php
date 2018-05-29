@@ -1835,4 +1835,12 @@ function create_tables($conn) {
 		echo $conn->error;
 	}
 
+	$conn->query("CREATE TABLE dsgvo_categories(
+		id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		name VARCHAR(250) NOT NULL
+	)");
+	if($conn->error){
+		echo $conn->error;
+	}
+
 }

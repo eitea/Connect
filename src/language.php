@@ -1499,9 +1499,6 @@ $lang_eng['ACTIVITY_TOSTRING'] = array("-1" => "Absent","0" => "Work","1" => "Va
 $lang_ger['ACTIVITY_TOSTRING'] = array("-1" => "Abwesend","0" => "Dienst","1" => "Urlaub","2" => "Sonderurlaub",
   "3" => "Krankenstand","4" => "Weiterbildung", "5" => "Gemischt", "6" => "Zeitausgleich");
 
-$lang_eng['CATEGORY_TOSTRING'] = array('', 'Confidentiality Agreement');
-$lang_ger['CATEGORY_TOSTRING'] = array('', 'Geheimhaltungsvereinbarung');
-
 $lang_eng['DSGVO_CATEGORY_TOSTRING'] = array('heading1' => 'Transmission', 'heading2' => 'Processing', 'heading3' => 'Transmission non-EU country', 'heading4' => 'Processing Application');
 $lang_ger['DSGVO_CATEGORY_TOSTRING'] = array('heading1' => 'Übermittlung', 'heading2' => 'Verarbeitung', 'heading3' => 'Übermittlung in nicht-EU Ausland', 'heading4' => 'Verarbeitung Applikation');
 

@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$filename = secure_data('DSGVO', test_input($_POST['meta-name']), 'encrypt', $userID, $privateKey);
 		$versionDescr = secure_data('DSGVO', test_input($_POST['meta-versionDescr']));
 		$descr = secure_data('DSGVO', test_input($_POST['meta-description']));
-		$cat = test_input($_POST['meta-subcat'], 1);
+		$cat = intval($_POST['meta-subcat']);
 		$status = test_input($_POST['meta-status'], 1);
 		$fromDate = test_Date($_POST['meta-fromDate'], 'Y-m-d') ? $_POST['meta-fromDate'] : '0000-00-00';
 		$toDate = test_Date($_POST['meta-toDate'], 'Y-m-d') ? $_POST['meta-toDate'] : '0000-00-00';
@@ -58,8 +58,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		} else {
 			showSuccess($lang['OK_SAVE']);
 		}
-	} else if(!empty($_POST['edit-meta'])){
+	} elseif(!empty($_POST['edit-meta'])){
 		$openUpload = intval($_POST['edit-meta']);
+	} elseif(isset($_POST['editcat_save']) && !empty($_POST['editcat_name'])){
+		$val = test_input($_POST['editcat_name']);
+		if(!empty($_POST['editcat_save'])){
+			$id = intval($_POST['editcat_save']);
+			$conn->query("UPDATE dsgvo_categories SET name = '$val' WHERE id = $id");
+		} else {
+			$conn->query("INSERT INTO dsgvo_categories(name) VALUES('$val')");
+		}
+		if($conn->error){
+			showError($conn->error);
+		} else {
+			showSuccess($lang['OK_SAVE']);
+		}
+	} elseif(isset($_POST['editcat_save'])){
+		showError($lang['ERROR_MISSING_FIELDS']);
 	}
 
 	if (isset($_FILES['uploadPDF']) && !empty($_FILES['uploadPDF']['name'])) {
@@ -210,9 +225,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
             }
         }
-
+		//create process and history
         if($accept){
-            //create process and history
             $stmt = $conn->prepare("INSERT INTO documentProcess(id, docID, personID, password, document_text, document_headline, document_version) VALUES(?, ?, ?, ?, ?, ?, ?)");
             $stmt->bind_param('siissss', $processID, $docID, $contactID, $pass, $doc_cont, $doc_head, $doc_ver);
             $stmt->execute();
@@ -267,8 +281,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <div class="page-header"><h3><?php echo $lang['DOCUMENTS']; ?>
     <div class="page-header-button-group">
         <button type="button" data-toggle="modal" data-target="#pdf-upload" class="btn btn-default" title="Upload PDF File"><i class="fa fa-upload"></i> PDF Upload</button>
+		<a data-toggle="collapse" href="#show-categories" class="btn btn-default" title="Subkategorien Bearbeiten">Kategorien</a>
     </div>
 </h3></div>
+
+<div class="collapse" id="show-categories">
+	<h4>Subkategorien Verwalten
+		<div class="page-header-button-group">
+	        <button type="button" data-toggle="modal" data-target="#edit-categories" class="btn btn-default" title="Neue Subkategorie Hinzufügen"><i class="fa fa-plus"></i></button>
+	    </div>
+	</h4>
+	<table class="table datatable">
+		<thead>
+			<tr>
+				<th>Kategorie</th>
+				<th>Name</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php
+			$catresult = $conn->query("SELECT id, name FROM dsgvo_categories");
+			while($cats = $catresult->fetch_assoc()){
+				echo '<tr>';
+				echo '<td>Vertrag</td>';
+				echo '<td>'.$cats['name'].'</td>';
+				echo '<td><a data-toggle="modal" href="#edit-categories" data-name="'.$cats['name'].'" data-catid="'.$cats['id'].'" data- class="btn btn-default"><i class="fa fa-pencil"></i></a></td>';
+				echo '</tr>';
+			}
+			?>
+		</tbody>
+	</table><br><br>
+</div>
 
 <table class="table">
 	<thead>
@@ -282,11 +326,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	</thead>
 	<tbody>
 		<?php
-		$result = $conn->query("SELECT am.*, uniqID FROM archive INNER JOIN archive_meta am ON archive.id = am.archiveID WHERE archive.category = 'AGREEMENT' AND archive.categoryID = '$cmpID' ");
+		$result = $conn->query("SELECT am.*, uniqID, c.name AS catName FROM archive INNER JOIN archive_meta am ON archive.id = am.archiveID
+			LEFT JOIN dsgvo_categories c ON c.id = am.category WHERE archive.category = 'AGREEMENT' AND archive.categoryID = '$cmpID' ");
 		echo $conn->error;
 		while($result && ($row = $result->fetch_assoc())){
 			echo '<tr>';
-			echo '<td>'.$lang['CATEGORY_TOSTRING'][$row['category']].'</td>';
+			echo '<td>'.$row['catName'].'</td>';
 			echo '<td>'.mc_status('DSGVO').secure_data('DSGVO',$row['name'], 'decrypt', $userID, $privateKey).' - '.secure_data('DSGVO', $row['versionDescr'], 'decrypt').'</td>';
 			echo '<td>'.$row['validDate'].'</td>';
 			echo '<td>'.$row['status'].'</td>';
@@ -457,8 +502,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
 </form>
 
+<form method="POST" enctype="multipart/form-data">
+    <div class="modal fade" id="edit-categories">
+        <div class="modal-dialog modal-content modal-sm">
+            <div class="modal-header h4">Subkategorie</div>
+            <div class="modal-body">
+				<label>Kategorie</label>
+				<select class="form-control">
+					<option>Vertrag</option>
+				</select>
+				<br>
+                <label for="editcat_name">Name</label>
+				<input type="text" class="form-control" name="editcat_name" id="editcat_name" value="">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-warning" name="editcat_save" id="editcat_save"><?php echo $lang['SAVE']; ?></button>
+            </div>
+        </div>
+    </div>
+</form>
+
 <?php
-//NOTE: we should always do it like this.
 $result = false;
 if(!empty($openUpload) && is_numeric($openUpload)){
 	$result = $conn->query("SELECT * FROM archive_meta WHERE id = $openUpload LIMIT 1");
@@ -498,7 +563,13 @@ if($result && ($row = $result->fetch_assoc())):
 					<div class="col-md-6">
 						<label>Subkategorie</label>
 						<select class="js-example-basic-single" name="meta-subcat">
-							<option value='1'>Geheimhaltungsvereinbarung</option>
+							<?php
+							$catresult = $conn->query("SELECT id, name FROM dsgvo_categories");
+							while($cats = $catresult->fetch_assoc()){
+								$checked = $cats['id'] == $row['category'] ? 'checked' : '';
+								echo '<option '.$checked.' vlaue="'.$cats['id'].'">'.$cats['name'].'</option>';
+							}
+							?>
 						</select>
 					</div>
 				</div>
@@ -611,7 +682,21 @@ function showContacts(client){
     error : function(resp){}
   });
 }
-
+$(document).ready(function(){
+	$('.datatable').DataTable({
+		language: {
+			<?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
+		},
+		autoWidth: false,
+		dom: 'ftp',
+		pageLength: 3
+	});
+	$('#edit-categories').on('show.bs.modal', function (event) {
+		var button = $(event.relatedTarget);
+		$('#editcat_name').val(button.data('name'));
+		$('#editcat_save').val(button.data('catid'));
+	});
+});
 <?php if(!empty($openUpload)){ echo "setTimeout(function(){ $('#edit-meta-modal').modal('show'); }, 500)"; } ?>
 </script>
 
