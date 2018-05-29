@@ -211,7 +211,7 @@ $result = $conn->query("SELECT *, $projectTable.name AS projectName, $projectBoo
     <h3><?php echo $lang['BOOK_PROJECTS'] .'<small> &nbsp ' . $date .'</small>'; ?></h3>
 </div>
 
-<form method="POST" id="bookingForm">
+<form method="POST">
     <?php if(!$request_addendum): ?>
         <div style='text-align:right;'>
             <?php if($showUndoButton): ?>

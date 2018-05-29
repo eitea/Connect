@@ -75,6 +75,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		}
 	} elseif(isset($_POST['editcat_save'])){
 		showError($lang['ERROR_MISSING_FIELDS']);
+	} elseif(!empty($_POST['deletecat'])){
+		$id = intval($_POST['deletecat']);
+		$conn->query("DELETE FROM dsgvo_categories WHERE id = $id");
+		//TODO: add a foreign key dependency
+		$conn->query("UPDATE archive_meta SET category = NULL WHERE category = $id");
+		if($conn->error){
+			showError($conn->error);
+		} else {
+			showSuccess($lang['OK_DELETE']);
+		}
 	}
 
 	if (isset($_FILES['uploadPDF']) && !empty($_FILES['uploadPDF']['name'])) {
@@ -286,6 +296,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </h3></div>
 
 <div class="collapse" id="show-categories">
+	<form method="POST">
 	<h4>Subkategorien Verwalten
 		<div class="page-header-button-group">
 	        <button type="button" data-toggle="modal" data-target="#edit-categories" class="btn btn-default" title="Neue Subkategorie Hinzufügen"><i class="fa fa-plus"></i></button>
@@ -306,15 +317,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				echo '<tr>';
 				echo '<td>Vertrag</td>';
 				echo '<td>'.$cats['name'].'</td>';
-				echo '<td><a data-toggle="modal" href="#edit-categories" data-name="'.$cats['name'].'" data-catid="'.$cats['id'].'" data- class="btn btn-default"><i class="fa fa-pencil"></i></a></td>';
+				echo '<td>';
+				if($conn->query("SELECT id FROM archive_meta WHERE category = ".$cats['id'])->num_rows < 1){
+					echo '<button type="submit" name="deletecat" value="'.$cats['id'].'" class="btn btn-default" title="Löschen"><i class="fa fa-trash-o"></i></button> ';
+				}
+				echo '<a data-toggle="modal" href="#edit-categories" data-name="'.$cats['name'].'" data-catid="'.$cats['id'].'" data- class="btn btn-default"><i class="fa fa-pencil"></i></a></td>';
 				echo '</tr>';
 			}
 			?>
 		</tbody>
 	</table><br><br>
+	</form>
 </div>
 
-<table class="table">
+<table class="table datatable">
 	<thead>
 		<tr>
 			<th><?php echo $lang['CATEGORY']; //5b055b4696156 ?></th>
@@ -356,7 +372,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
     <span style="float:right" ><a href="https://consulio.at/dokumente" class="btn btn-sm btn-warning" target="_blank"><?php echo $lang['NEWEST_AGREEMENTS_FROM_CONSULIO']; ?></a></span>
 </h3></div>
-<table class="table">
+<table class="table datatable">
     <thead><tr>
         <th>Name</th>
         <th>Version</th>
@@ -688,8 +704,8 @@ $(document).ready(function(){
 			<?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
 		},
 		autoWidth: false,
-		dom: 'ftp',
-		pageLength: 3
+		pageLength: 5,
+		dom: 'ftp'
 	});
 	$('#edit-categories').on('show.bs.modal', function (event) {
 		var button = $(event.relatedTarget);
