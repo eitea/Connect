@@ -1,20 +1,32 @@
 <?php
 session_start();
-require dirname(__DIR__) . "/connection.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "connection.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "utilities.php";
 
 
 isset($_SESSION["userid"]) or die("Not logged in");
 isset($_REQUEST["partner"]) or die("No Partner specified");
+isset($_REQUEST["mode"]) or die("No mode specified");
 $userID = $_SESSION["userid"];
 $partner = intval($_REQUEST["partner"]);
+$mode = test_input($_REQUEST["mode"]);
 
-$result = $conn->query("SELECT socialprofile.status, socialprofile.picture, socialprofile.isAvailable, UserData.firstname, UserData.lastname FROM socialprofile INNER JOIN UserData ON UserData.id = socialprofile.userID WHERE UserData.id = $partner");
-echo $conn->error;
-($result && $result->num_rows != 0) or die("Partner not found");
-$row = $result->fetch_assoc();
-$name = $row["firstname"] . " " . $row["lastname"];
 $defaultPicture = "images/defaultProfilePicture.png";
-$profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($row['picture']) : $defaultPicture;
+
+if ($mode != "group") {
+    $result = $conn->query("SELECT socialprofile.status, socialprofile.picture, socialprofile.isAvailable, UserData.firstname, UserData.lastname FROM socialprofile INNER JOIN UserData ON UserData.id = socialprofile.userID WHERE UserData.id = $partner");
+    ($result && $result->num_rows != 0) or die("Partner not found");
+    $row = $result->fetch_assoc();
+    $name = $row["firstname"] . " " . $row["lastname"];
+    $profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($row['picture']) : $defaultPicture;
+} else {
+    $result = $conn->query("SELECT subject FROM messagegroups WHERE id = $partner");
+    ($result && $result->num_rows != 0) or die("Group not found");
+    $row = $result->fetch_assoc();
+    $name = $row["subject"];
+    $profilePicture = $defaultPicture;
+}
+echo $conn->error;
 ?>
 
 
@@ -26,11 +38,19 @@ $profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($r
             <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
         </button>
         <ul class="dropdown-menu dropdown-menu-right clearfix" role="menu" aria-labelledby="menu">
-            <li>
-                <a role="menuitem" href="#" onclick="showUserProfile(<?= $partner ?>)">
-                    <i class="fa fa-user" aria-hidden="true"></i> User Info
-                </a>
-            </li>
+            <?php if ($mode != "group") : ?>
+                <li>
+                    <a role="menuitem" href="#" onclick="showUserProfile(<?= $partner ?>)">
+                        <i class="fa fa-user" aria-hidden="true"></i> User Info
+                    </a>
+                </li>
+            <?php else : ?>
+                <li>
+                    <a role="menuitem" href="#" onclick="showGroupInformation(<?= $partner ?>)">
+                        <i class="fa fa-users" aria-hidden="true"></i> Gruppe bearbeiten
+                    </a>
+                </li>
+            <?php endif; ?>
         </ul>
     </div>
 </div>

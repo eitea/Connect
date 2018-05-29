@@ -51,6 +51,21 @@ if (isset($_GET["partner"], $_GET["subject"], $_GET["message"])) {
     $stmt->send_long_data(0, $picture);
     $stmt->execute();
     echo $stmt->error;
+} elseif (isset($_REQUEST["group"], $_REQUEST["message"])) {
+    $groupID = intval($_REQUEST["group"]);
+    $message = test_input($_REQUEST["message"]);
+    $conn->query("INSERT INTO groupmessages (sender, message, groupID) VALUES ($userID, '$message', $groupID)");
+    echo $conn->error;
+} elseif (isset($_REQUEST["group"], $_FILES["picture"])) {
+    $groupID = intval($_REQUEST["group"]);
+    $picture = uploadImage("picture", 0, 1);
+    $stmt = $conn->prepare("INSERT INTO groupmessages (sender, groupID, picture) VALUES ($userID, $groupID, ?)");
+    echo $conn->error;
+    $null = null;
+    $stmt->bind_param("b", $null);
+    $stmt->send_long_data(0, $picture);
+    $stmt->execute();
+    echo $stmt->error;
 } else {
     die('Invalid Request');
 }
