@@ -214,14 +214,14 @@ if(isset($_POST['request_submit'])){
                   <th></th>
                   <th><?php echo $lang['CLIENT']; ?></th>
                   <th><?php echo $lang['PROJECT']; ?></th>
-                  <th width="15%">Datum</th>
-                  <th>Start</th>
-                  <th><?php echo $lang['END']; ?></th>
+                  <th width="100px">Datum</th>
+                  <th width="80px">Start</th>
+                  <th width="80px"><?php echo $lang['END']; ?></th>
                   <th>Info</th>
                   <th></th>
                 </thead>
                 <tbody>
-                  <?php
+                  <?php 
                   while($row = $bookingResult->fetch_assoc()) {
                     $A = substr(carryOverAdder_Hours($row['start'], $row['timeToUTC']), 11, 5);
                     $B = substr(carryOverAdder_Hours($row['end'], $row['timeToUTC']), 11, 5);

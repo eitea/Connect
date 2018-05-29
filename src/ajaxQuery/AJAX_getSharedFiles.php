@@ -5,6 +5,9 @@ require dirname(__DIR__)."/connection.php";
 
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         $s3 = new Aws\S3\S3Client(getS3Config());
+		$result = $conn->query("SELECT id FROM identification LIMIT 1");
+		$row = $result->fetch_assoc();
+		$bucket = $row['id'].'_sharedFiles';
            //var_dump($_POST);
            //var_dump($_FILES);
            //echo "\n";
@@ -24,10 +27,10 @@ require dirname(__DIR__)."/connection.php";
             $buckets = $s3->listBuckets();
             $thereisabucket = false;
             foreach($buckets['Buckets'] as $bucket){
-              if($bucket['Name']===$s3SharedFiles) $thereisabucket=true;
+              if($bucket['Name']===$bucket) $thereisabucket=true;
             }
             if(!$thereisabucket){
-                $s3->createBucket( array('Bucket' => $s3SharedFiles ) ); 
+                $s3->createBucket( array('Bucket' => $bucket ) );
             }
             for($i = 0;$i<$amount;$i++){
               $filename = pathinfo($_FILES['file'.$i]['name'], PATHINFO_FILENAME);
@@ -36,12 +39,12 @@ require dirname(__DIR__)."/connection.php";
               $hashkey = hash('md5',random_bytes(100));
               $conn->query("INSERT INTO sharedfiles VALUES (null,'$filename', '$filetype', ".$_POST['userid'].", $groupID, '$hashkey', $filesize, null)");
               $s3->putObject(array(
-                  'Bucket' => $s3SharedFiles,
+                  'Bucket' => $bucket,
                   'Key' => $hashkey,
                   'SourceFile' => $_FILES['file'.$i]['tmp_name']
               ));
           }
-      
+
           }catch(Exception $e){
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
           }
@@ -83,7 +86,7 @@ require dirname(__DIR__)."/connection.php";
                 $info[0] = array('name' => 'FEHLER2');
                 echo json_encode($info);
             }
-            
+
         }elseif($_POST['function']==='deleteFile'){
             $s3 = new Aws\S3\S3Client(getS3Config());
             try{
@@ -105,7 +108,7 @@ require dirname(__DIR__)."/connection.php";
             }
             $groupID = $groupID->fetch_assoc()['groupID'];
             $s3->deleteObject(array(
-                'Bucket' => $s3SharedFiles,
+                'Bucket' => $bucket,
                 'Key' => $hash
             ));
             $conn->query("DELETE FROM sharedfiles WHERE id = $fileID");
@@ -125,7 +128,7 @@ require dirname(__DIR__)."/connection.php";
                 $hashkey = hash('md5',random_bytes(10));
                 $conn->query("INSERT INTO sharedfiles VALUES (null,'$filename', '$filetype', ".$_POST['userID'].", $groupID, '$hashkey', $filesize, null)");
                 $s3->putObject(array(
-                    'Bucket' => $s3SharedFiles,
+                    'Bucket' => $bucket,
                     'Key' => $hashkey,
                     'SourceFile' => $_FILES['file'.$i]['tmp_name']
                 ));
@@ -146,7 +149,7 @@ require dirname(__DIR__)."/connection.php";
         }else{
             return;
         }
-        
+
     }
 
   ?>

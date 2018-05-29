@@ -200,6 +200,9 @@ $lang_ger['CAN_EDIT_SUPPLIERS'] = 'Kann Lieferanten bearbeiten';
 $lang_eng['CASH_EXPENSE'] = 'Cash Expense';
 $lang_ger['CASH_EXPENSE'] = 'Barauslage';
 
+$lang_eng['CATEGORY'] = 'Category';
+$lang_ger['CATEGORY'] = 'Kategorie';
+
 $lang_eng['CHARGED'] = 'Charged';
 $lang_ger['CHARGED'] = 'Verrechnet';
 
@@ -244,6 +247,9 @@ $lang_ger['CONTACT_PERSON'] = 'Ansprechpartner';
 
 $lang_eng['CONTINUE'] = 'Continue';
 $lang_ger['CONTINUE'] = 'Weiter';
+
+$lang_eng['CONTRACT'] = 'Contract';
+$lang_ger['CONTRACT'] = 'Vertrag';
 
 $lang_eng['COMPANIES'] = 'Companies';
 $lang_ger['COMPANIES'] = 'Mandanten';
@@ -562,6 +568,9 @@ $lang_ger['FEEDBACK_FEATURES'] = 'Ich will ein neues Feature vorschlagen';
 
 $lang_eng['FEEDBACK_POSITIVE'] = 'Expiration Date';
 $lang_ger['FEEDBACK_POSITIVE'] = 'Ich habe etwas positives zu berichten';
+
+$lang_eng['FOR'] = 'for';
+$lang_ger['FOR'] = 'für';
 
 $lang_eng['FORGOTTEN_LUNCHBREAK'] = 'Forgotten Lunchbreak';
 $lang_ger['FORGOTTEN_LUNCHBREAK'] = 'Vergessene Mittagspause';
@@ -926,6 +935,9 @@ $lang_ger['NEW_RECEIPT'] = 'Neue Rechnung';
 
 $lang_eng['NEW_TEMPLATE'] = 'New Template';
 $lang_ger['NEW_TEMPLATE'] = 'Neue Vorlage';
+
+$lang_eng['NEWEST_AGREEMENTS_FROM_CONSULIO'] = 'Get the latest documents from consulio';
+$lang_ger['NEWEST_AGREEMENTS_FROM_CONSULIO'] = 'Neueste Dokumente von Consulio laden';
 
 $lang_eng['NO'] = 'No';
 $lang_ger['NO'] = 'Nein';
@@ -1486,6 +1498,9 @@ $lang_eng['ACTIVITY_TOSTRING'] = array("-1" => "Absent","0" => "Work","1" => "Va
   "3" => "Sick","4" => "Education", "5" => "Mixed", "6" => "Compensatory Time");
 $lang_ger['ACTIVITY_TOSTRING'] = array("-1" => "Abwesend","0" => "Dienst","1" => "Urlaub","2" => "Sonderurlaub",
   "3" => "Krankenstand","4" => "Weiterbildung", "5" => "Gemischt", "6" => "Zeitausgleich");
+
+$lang_eng['CATEGORY_TOSTRING'] = array('', 'Confidentiality Agreement');
+$lang_ger['CATEGORY_TOSTRING'] = array('', 'Geheimhaltungsvereinbarung');
 
 $lang_eng['DSGVO_CATEGORY_TOSTRING'] = array('heading1' => 'Transmission', 'heading2' => 'Processing', 'heading3' => 'Transmission non-EU country', 'heading4' => 'Processing Application');
 $lang_ger['DSGVO_CATEGORY_TOSTRING'] = array('heading1' => 'Übermittlung', 'heading2' => 'Verarbeitung', 'heading3' => 'Übermittlung in nicht-EU Ausland', 'heading4' => 'Verarbeitung Applikation');

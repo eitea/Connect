@@ -1088,13 +1088,6 @@ if ($row['version'] < 119) {
     $conn->query("DROP TABLE erpNumbers");
     echo $conn->error;
 
-    $conn->query("ALTER TABLE UserData ADD COLUMN supervisor INT(6) DEFAULT NULL ");
-    if ($conn->error) {
-        echo $conn->error;
-    } else {
-        echo '<br>Benutzer: Vorgesetzter';
-    }
-
     $conn->query("ALTER TABLE clientInfoData ADD COLUMN homepage VARCHAR(100)");
     if ($conn->error) {
         echo $conn->error;
@@ -1436,17 +1429,6 @@ if ($row['version'] < 124) {
     } else {
         echo '<br>Module: Auflösen';
     }
-    $id = $conn->query("SELECT * FROM identification");
-    $identifier = $id->fetch_assoc()['id'];
-    $myfile = fopen(dirname(dirname(__DIR__)) .'/connection_config.php', 'a');
-    $txt = '$identifier = \''.hash('sha1',$identifier).'\';
-    $s3SharedFiles=$identifier.\'_sharedFiles\';
-    $s3uploadedFiles=$identifier.\'_uploadedFiles\';
-    $s3privateFiles=$identifier.\'_privateFiles\';';
-    fwrite($myfile, $txt);
-    fclose($myfile);
-
-    echo '<br>S3 Configuration';
 
     $sql = "ALTER TABLE userRequestsData MODIFY COLUMN requestType VARCHAR(3) DEFAULT 'vac' NOT NULL;";
     if ($conn->query($sql)) {
@@ -2784,9 +2766,81 @@ if($row['version'] < 155){
 		$conn->query("UPDATE mailingOptions SET host = 'adminmail', port = 25, username = '', password = '', smtpSecure = '',
 		sender = 'noreply@eitea.at', sendername = 'Connect', isDefault = 1");
 	}
+
+	$sql = "CREATE TABLE archive_meta(
+		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		archiveID INT(10) UNSIGNED,
+		parentID INT(10),
+		name VARCHAR(400) NOT NULL,
+		description MEDIUMTEXT NOT NULL DEFAULT '',
+		category VARCHAR(120),
+		status VARCHAR(100) NOT NULL DEFAULT 'PENDING',
+		fromDate DATE NOT NULL DEFAULT '0000-00-00',
+		toDate DATE NOT NULL DEFAULT '0000-00-00',
+		validDate DATE NOT NULL DEFAULT '0000-00-00',
+		version INT(4) NOT NULL DEFAULT 1,
+		versionDescr VARCHAR(250),
+		cPartner VARCHAR(50),
+		cPartnerID INT(6),
+		note VARCHAR(500) NOT NULL DEFAULT '',
+		FOREIGN KEY (archiveID) REFERENCES archive(id)
+		ON UPDATE CASCADE ON DELETE CASCADE
+	)";
+	if(!$conn->query($sql)){
+		echo $conn->error;
+	} else {
+		echo '<br>Archiv: Metadaten';
+	}
 }
 
 if($row['version'] < 156){
+	if(empty($identifier) || preg_match('/[^0-9]/', $identifier)){
+		$identifier = uniqid('');
+		echo '<br> New Identification';
+	}
+	$conn->query("UPDATE identification SET id = '$identifier'");
+
+	$myfile = fopen(dirname(dirname(__DIR__)) .'/connection_config.php', 'w');
+	$txt = '<?php
+	$servername = "'.$servername.'";
+	$username = "'.$username.'";
+	$password = "'.$password.'";
+	$dbName = "'.$dbName.'";';
+	fwrite($myfile, $txt);
+	fclose($myfile);
+
+	//5af32c18c9ab7
+	$conn->query("DELETE FROM emailprojectlogs WHERE id NOT IN (SELECT id FROM emailprojectslogs ORDER BY id DESC LIMIT 200)");
+	$result = $conn->query("SELECT id FROM emailprojectlogs");
+	$i = 1;
+	while($row = $result->fetch_assoc()){
+		$conn->query("UPDATE emailprojectlogs SET id = $i WHERE id = ".$row['id']);
+		$i++;
+	}
+}
+
+
+
+//$conn->query("DELETE FROM UserData WHERE id = 1");
+//$conn->query("UPDATE UserData SET id = 1 WHERE id = 2");
+//update: social tables, archive tables, messages,  leaders/ responisbles/ supervisors
+
+if($row['version'] < 157){
+	$conn->query("ALTER TABLE UserData ADD COLUMN supervisor INT(6) DEFAULT NULL ");
+	$conn->query("CREATE TABLE dsgvo_categories(
+		id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		name VARCHAR(250) NOT NULL
+	)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>DSGVO: Subkategorien';
+	}
+
+	$conn->query("INSERT INTO dsgvo_categories (name) VALUES ('Geheimhaltungsvereinbarung'),('Auftragsverarbeitung Art. 28'),('IT-Richtlinien'),('Allgemeine-Richtlinien'),('Datenschutzerklärung'),('Vereinbarung nach Art. 26')");
+}
+
+if($row['version'] < 158){
     $sql = "CREATE TABLE messagegroups (
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         subject VARCHAR(60)
@@ -2835,11 +2889,14 @@ if($row['version'] < 156){
     }
 }
 
-// if($row['version'] < 157){}
+
 // if($row['version'] < 158){}
 // if($row['version'] < 159){}
 // if($row['version'] < 160){}
 // if($row['version'] < 161){}
+// if($row['version'] < 162){}
+// if($row['version'] < 163){}
+// if($row['version'] < 164){}
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';
 $conn->query("UPDATE configurationData SET version=$VERSION_NUMBER");

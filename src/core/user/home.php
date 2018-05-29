@@ -117,7 +117,11 @@ if($result_Sum && $result_Sum->num_rows > 0){
       </div>
     </div> <!-- End tab content -->
 
-    <?php if($showReadyPlan == 'TRUE' || $isCoreAdmin == 'TRUE'): ?>
+
+    <?php
+	$result = $conn->query("SELECT enableReadyCheck FROM configurationData");
+	$row = $result->fetch_assoc();
+	if($row['enableReadyCheck'] == 'TRUE' || $isCoreAdmin == 'TRUE'): ?>
       <br><h4><?php echo $lang['READY_STATUS'];?></h4>
       <table class="table table-striped">
         <thead>
@@ -126,14 +130,11 @@ if($result_Sum && $result_Sum->num_rows > 0){
         </thead>
         <tbody>
           <?php
-          $result = $conn->query("SELECT enableReadyCheck FROM $configTable");
-          $row = $result->fetch_assoc();
           $today = substr(getCurrentTimestamp(),0,10);
-          $sql = "SELECT * FROM $logTable INNER JOIN $userTable ON $userTable.id = $logTable.userID WHERE time LIKE '$today %' AND timeEnd = '0000-00-00 00:00:00' ORDER BY lastname ASC";
-          $result = $conn->query($sql);
+          $result = $conn->query("SELECT * FROM logs WHERE time LIKE '$today %' AND timeEnd = '0000-00-00 00:00:00'");
           if($result && $result->num_rows > 0){
             while($row = $result->fetch_assoc()){
-              echo '<tr><td>' . $row['firstname'] .' '. $row['lastname'] .'</td>';
+              echo '<tr><td>' . $userID_toName[$row['userID']] .'</td>';
               echo '<td>'. substr(carryOverAdder_Hours($row['time'], $row['timeToUTC']), 11, 5) . '</td></tr>';
             }
           } else {

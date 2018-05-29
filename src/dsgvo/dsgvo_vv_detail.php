@@ -63,26 +63,25 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $stmt_insert_setting_matrix = $conn->prepare("INSERT INTO dsgvo_vv_settings(vv_id, matrix_setting_id, setting, category) VALUES($vvID, ?, ?, ?)");
     $stmt_insert_setting_matrix->bind_param("iss", $setID, $setting_encrypt, $cat);
 
-	if(!empty($_POST['add-new-file']) && isset($_FILES['new-file-upload'])){
-		require dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.'aws'.DIRECTORY_SEPARATOR.'autoload.php';
-		$bucket = $identifier .'-uploads'; //no uppercase, no underscores, no ending dashes, no adjacent special chars
-		$result = $conn->query("SELECT endpoint, awskey, secret FROM archiveconfig WHERE isActive = 'TRUE' LIMIT 1");
-		if($result && ($row = $result->fetch_assoc())){
-			try{
-				$s3 = new Aws\S3\S3Client(array(
-					'version' => 'latest',
-					'region' => '',
-					'endpoint' => $row['endpoint'],
-					'use_path_style_endpoint' => true,
-					'credentials' => array('key' => $row['awskey'], 'secret' => $row['secret'])
-				));
-			} catch(Exception $e){
-				echo $e->getMessage();
-			}
-		} else {
-			showError("Keine S3 Schnittstelle gefunden ".$conn->error);
+	$bucket = $identifier .'-uploads'; //no uppercase, no underscores, no ending dashes, no adjacent special chars
+	require dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.'aws'.DIRECTORY_SEPARATOR.'autoload.php';
+	$result = $conn->query("SELECT endpoint, awskey, secret FROM archiveconfig WHERE isActive = 'TRUE' LIMIT 1");
+	if($result && ($row = $result->fetch_assoc())){
+		try{
+			$s3 = new Aws\S3\S3Client(array(
+				'version' => 'latest',
+				'region' => '',
+				'endpoint' => $row['endpoint'],
+				'use_path_style_endpoint' => true,
+				'credentials' => array('key' => $row['awskey'], 'secret' => $row['secret'])
+			));
+		} catch(Exception $e){
+			echo $e->getMessage();
 		}
-
+	} else {
+		showError("Keine S3 Schnittstelle gefunden ".$conn->error);
+	}
+	if(!empty($_POST['add-new-file']) && isset($_FILES['new-file-upload'])){
 		//decrypt the symmetric key
 		$result = $conn->query("SELECT privateKey, s.publicKey AS publicKey, s.symmetricKey FROM security_access a
 			LEFT JOIN security_modules s ON (s.module = a.module AND s.outDated = 'FALSE') WHERE a.module = 'DSGVO' AND a.userID = $userID AND a.outDated = 'FALSE' LIMIT 1");
@@ -166,6 +165,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 		$x = test_input($_POST['delete-folder']);
 		$conn->query("DELETE FROM archive WHERE id = '$x' AND type = 'folder'");
 		if($conn->error){ showError($conn->error); } else { showSuccess($lang['OK_DELETE']); }
+	} elseif(!empty($_POST['delete-file'])){
+		$x = test_input($_POST['delete-file']);
+		$s3->deleteObject(['Bucket' => $bucket, 'Key' => $x]);
+		$conn->query("DELETE FROM archive WHERE uniqID = '$x'");
+		if($conn->error){ showError($conn->error); } else { showSuccess($lang['OK_DELETE']); }
 	}
 }
 function getSettings($like, $mults = false, $from_matrix = false){
@@ -213,13 +217,13 @@ function getSettings($like, $mults = false, $from_matrix = false){
     return $settings;
 }
 ?>
+<div class="page-header-fixed">
+	<div class="page-header"><h3><?php echo $vv_row['name'].' '.$lang['PROCEDURE_DIRECTORY']; ?>
+		<div class="page-header-button-group"><button type="submit" class="btn btn-default blinking" form="mainForm"><i class="fa fa-floppy-o"></i></button></div>
+	</h3></div>
+</div>
 
-<form method="POST">
-	<div class="page-header-fixed">
-		<div class="page-header"><h3><?php echo $vv_row['name'].' '.$lang['PROCEDURE_DIRECTORY']; ?>
-			<div class="page-header-button-group"><button type="submit" class="btn btn-default blinking"><i class="fa fa-floppy-o"></i></button></div></h3></div>
-		</div>
-	</div>
+<form id="mainForm" method="POST">
 	<div class="page-content-fixed-100">
 	<?php
 	$settings = getSettings('DESCRIPTION');
@@ -325,11 +329,15 @@ function getSettings($like, $mults = false, $from_matrix = false){
 						insertVVLog("UPDATE","Update '$key' for Procedure Directory $vvID to '$escaped_setting'");
 					}
 				} else {
-					$setID = $val['id'];
+					$setID = $settings[$key]['id'];
 					$stmt_insert_setting->execute();
 					$escaped_setting = test_input($setting);
 					insertVVLog("INSERT","Insert '$key' for Procedure Directory $vvID as '$escaped_setting'");
 				}
+			}
+			if(!isset($settings[$key])){ //TODO: remove during August18.
+				$conn->query("INSERT INTO dsgvo_vv_template_settings(templateID, opt_name, opt_descr) VALUES($templateID, '$key', '')");
+				$settings[$key]['setting'] = '';
 			}
 			echo '<textarea id="matrice-area" name="'.$key.'" >'.$settings[$key]['setting'].'</textarea>';
 			?>
@@ -373,7 +381,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                        $number = sprintf("A%03d",intval(util_strip_prefix($key,"MULT_OPT_")));
 	                        echo '<tr>';
 	                        echo '<td class="text-muted">'.$number.'</td>';
-	                        echo '<td class="bold">'.$val['descr'].'</td>';
+	                        echo '<td class="bold">'.mc_status('DSGVO').$val['descr'].'</td>';
 							echo '<td>';
 							echo '';
 							$checked = $radioValue == 1 ? 'checked' : '';
@@ -455,6 +463,15 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	    echo '</div></div><br>';
 	}
 
+
+	//5b06e9fddddb8
+	$result = $conn->query("SELECT name FROM folder_default_sturctures WHERE category = 'DSGVO' AND categoryID = '".$company."' AND name NOT IN
+	( SELECT name FROM archive WHERE category = 'DSGVO' AND categoryID = '$vvID' AND parent_directory = 'ROOT') ");
+	echo $conn->error;
+	while($result && ($row = $result->fetch_assoc())){
+		$conn->query("INSERT INTO archive(category, categoryID, name, parent_directory, type) VALUES('DSGVO', '$vvID', '".$row['name']."', 'ROOT', 'folder')"); echo $conn->error;
+	}
+
 	$upload_viewer = [
 	'accessKey' => 'DSGVO',
 	'category' => 'DSGVO',
@@ -485,7 +502,6 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                }
 	                if($val['setting'][0]){
 						$tooltip = isset($lang['DSGVO_CATEGORY_TOSTRING'][$val['category'][0]]) ? $lang['DSGVO_CATEGORY_TOSTRING'][$val['category'][0]] : '';
-
 	                    $client = "";
 	                    if($val['client'] && $val['client'][0]){
 	                        $clientID = $val['client'][0];

@@ -1,6 +1,6 @@
 <?php
 include dirname(__DIR__) . '/header.php';
-enableToCore($userID);
+enableToDSGVO($userID);
 require dirname(__DIR__) . "/misc/helpcenter.php";
 
 if (isset($_GET['n'])) {
@@ -17,22 +17,19 @@ if (isset($_POST['company_id'])) {
 	}
 }
 
-$stmt_insert_vv_log = $conn->prepare("INSERT INTO dsgvo_vv_logs (user_id,short_description,long_description,scope) VALUES ($userID,?,?,?)");
-showError($conn->error);
-$stmt_insert_vv_log->bind_param("sss", $stmt_insert_vv_log_short_description, $stmt_insert_vv_log_long_description, $stmt_insert_vv_log_scope);
 function insertVVLog($short,$long){
-	global $stmt_insert_vv_log;
-	global $stmt_insert_vv_log_short_description;
-	global $stmt_insert_vv_log_long_description;
-	global $stmt_insert_vv_log_scope;
+	global $conn;
 	global $userID;
 	global $privateKey;
-	$stmt_insert_vv_log_short_description = secure_data('DSGVO', $short, 'encrypt', $userID, $privateKey, $encryptionError);
-	$stmt_insert_vv_log_long_description = secure_data('DSGVO', $long, 'encrypt', $userID, $privateKey, $encryptionError);
-	$stmt_insert_vv_log_scope = secure_data('DSGVO', "VV", 'encrypt', $userID, $privateKey, $encryptionError);
-	if($encryptionError){
-		showError($encryptionError);
+	static $stmt_insert_vv_log = null;
+	if($stmt_insert_vv_log == null){
+		$stmt_insert_vv_log = $conn->prepare("INSERT INTO dsgvo_vv_logs (user_id,short_description,long_description,scope) VALUES ($userID,?,?,?)");
+		showError($conn->error);
+		$stmt_insert_vv_log->bind_param("sss", $stmt_insert_vv_log_short_description, $stmt_insert_vv_log_long_description, $stmt_insert_vv_log_scope);
 	}
+	$stmt_insert_vv_log_short_description = secure_data('DSGVO', $short, 'encrypt', $userID, $privateKey);
+	$stmt_insert_vv_log_long_description = secure_data('DSGVO', $long);
+	$stmt_insert_vv_log_scope = secure_data('DSGVO', 'VV'); //usefulness: 0
 	$stmt_insert_vv_log->execute();
 	showError($stmt_insert_vv_log->error);
 }
@@ -83,7 +80,6 @@ if (isset($cmpID)) {
 				$i++;
 			}
 			$stmt->close();
-			// /new matrix
 		}
 	} else {
 		$matrixID = $result->fetch_assoc()["id"];
@@ -98,7 +94,7 @@ if (isset($_POST['add_setting']) && isset($matrixID)) {
 		insertVVLog("INSERT","Add a new field (name: $setting, description: $descr) to matrix $matrixID");
 		$conn->query("INSERT INTO dsgvo_vv_data_matrix_settings (matrixID, opt_name, opt_descr) VALUES ($matrixID, '$setting', '$descr')");
 		if ($conn->error) {
-			showError($conn->error);
+			showError($conn->error . __LINE__);
 		} else {
 			showSuccess($lang['OK_ADD']);
 		}

@@ -19,7 +19,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $lastname = test_input($_POST['lastname']);
     $step = 2;
   }
-
   $t = strtotime(carryOverAdder_Hours(getCurrentTimestamp(), 24));
   $begin = date('Y-m-d', strtotime('last Monday', $t)). ' 01:00:00';
   if(substr($begin, 5, 2) != substr(getCurrentTimestamp(), 5, 2)){ //different month
@@ -27,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
   $pass = randomPassword();
 
-  $result = $conn->query("SELECT email FROM $userTable");
+  $result = $conn->query("SELECT email FROM UserData LIMIT 1");
   $row = $result->fetch_assoc();
   $emailpostfix = strrchr($row['email'], "@");
 
@@ -128,7 +127,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		  $keyPair = sodium_crypto_box_keypair();
 		  $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
 		  $user_public = sodium_crypto_box_publickey($keyPair);
-		  $encrypted = simple_encryption($private, $_POST['tester_pass']);
+		  $encrypted = simple_encryption($private, $pass);
 		  $conn->query("INSERT INTO security_users(userID, publicKey, privateKey) VALUES($curID, '".base64_encode($user_public)."', '$encrypted')");
 
           if($conn->error){ echo $conn->error; } else {redirect('users');}
