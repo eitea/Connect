@@ -398,7 +398,7 @@ $result = $conn->query("SELECT *, $projectTable.name AS projectName, $projectBoo
     <div class="row">
         <div class="col-md-6">
             <div class="input-group">
-                <input type="time" class="form-control dont-remember" readonly onkeypress="return event.keyCode != 13;" name="start" value="<?php echo substr($start,0,5); ?>" >
+                <input type="time" class="form-control" readonly onkeypress="return event.keyCode != 13;" name="start" value="<?php echo substr($start,0,5); ?>" >
                 <span class="input-group-addon"> - </span>
                 <input type="time" class="form-control timepicker" onkeypress="return event.keyCode != 13;"  name="end" value="<?php echo $end; ?>" />
                 <div class="input-group-btn">
@@ -471,10 +471,6 @@ function showMyDiv(o, toShow){
         document.getElementById(toShow).style.display='none';
     }
 }
-
-$("#bookingForm").rememberState({
-    ignore: ['confirm_addendum', 'hidden']
-});
 
 function fill_keepFields(){};
 </script>
