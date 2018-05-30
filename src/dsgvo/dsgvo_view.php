@@ -43,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$filename = secure_data('DSGVO', test_input($_POST['meta-name']), 'encrypt', $userID, $privateKey);
 		$versionDescr = secure_data('DSGVO', test_input($_POST['meta-versionDescr']));
 		$descr = secure_data('DSGVO', test_input($_POST['meta-description']));
+		$note = secure_data('DSGVO', test_input($_POST['meta-note']));
 		$cat = intval($_POST['meta-subcat']);
 		$status = test_input($_POST['meta-status'], 1);
 		$fromDate = test_Date($_POST['meta-fromDate'], 'Y-m-d') ? $_POST['meta-fromDate'] : '0000-00-00';
@@ -52,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		if($cPartner == 'employee') $cPartnerID = intval($_POST['meta-cPartner-employee']);
 		if($cPartner == 'contact') $cPartnerID = intval($_POST['meta-cPartner-contact']);
 		$conn->query("UPDATE archive_meta SET parentID = $parentID, name = '$filename', description = '$descr', versionDescr = '$versionDescr', category = '$cat', status = '$status',
-			fromDate = '$fromDate', toDate = '$toDate', validDate = '$validDate', cPartner = '$cPartner', cPartnerID = '$cPartnerID' WHERE id = $metaID");
+			fromDate = '$fromDate', toDate = '$toDate', validDate = '$validDate', cPartner = '$cPartner', cPartnerID = '$cPartnerID', note = '$note' WHERE id = $metaID");
 		if($conn->error){
 			echo $conn->error;
 		} else {
@@ -582,8 +583,8 @@ if($result && ($row = $result->fetch_assoc())):
 							<?php
 							$catresult = $conn->query("SELECT id, name FROM dsgvo_categories");
 							while($cats = $catresult->fetch_assoc()){
-								$checked = $cats['id'] == $row['category'] ? 'checked' : '';
-								echo '<option '.$checked.' vlaue="'.$cats['id'].'">'.$cats['name'].'</option>';
+								$checked = $cats['id'] == $row['category'] ? 'selected' : '';
+								echo '<option '.$checked.' value="'.$cats['id'].'">'.$cats['name'].'</option>';
 							}
 							?>
 						</select>
@@ -630,7 +631,7 @@ if($result && ($row = $result->fetch_assoc())):
 					<div class="col-md-9">
 						<div id="meta-cPartner-employee" <?php if($row['cPartner'] != 'employee') echo 'style="display:none"'; ?> >
 							<label><?php echo $lang['EMPLOYEE']; ?></label>
-							<select class="js-example-basic-single" name="meta-cPartnerID-employee">
+							<select class="js-example-basic-single" name="meta-cPartner-employee">
 								<?php
 								foreach($userID_toName as $key => $val){
 									if(in_array($key, $available_users)){
@@ -663,8 +664,8 @@ if($result && ($row = $result->fetch_assoc())):
 						<textarea id="meta-description" name="meta-description" rows="3" class="form-control"><?php echo secure_data('DSGVO', $row['description'], 'decrypt'); ?></textarea>
 					</div>
 					<div class="col-md-4">
-						<label for="meta-note"><?php echo mc_status('DSGVO').' '.$lang['NOTES']; ?></label>
-						<textarea id="meta-note" maxlength="250" name="meta-note" rows="3" class="form-control"><?php echo secure_data('DSGVO', $row['note'], 'decrypt'); ?></textarea>
+						<label><?php echo mc_status('DSGVO').' '.$lang['NOTES']; ?></label>
+						<textarea maxlength="250" name="meta-note" rows="3" class="form-control"><?php echo secure_data('DSGVO', $row['note'], 'decrypt'); ?></textarea>
 					</div>
 				</div>
 			</div>
