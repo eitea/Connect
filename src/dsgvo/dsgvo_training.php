@@ -423,7 +423,7 @@ showError($conn->error);
     </div>
     <!-- question add modal -->
         <div class="modal fade" id="addQuestionModal_<?php echo $trainingID; ?>">
-        <div class="modal-dialog modal-content modal-md">
+        <div class="modal-dialog modal-content modal-lg">
         <div class="modal-header">Neue Frage</div>
         <div class="modal-body">
             <input type="text" name="title" class="form-control" placeholder="Title"></input><br/>
@@ -564,9 +564,9 @@ function formatState (state) {
 function onModalLoad(){
     tinymce.init({
         selector: '.tinymce',
-        plugins: "image autolink emoticons",
+        plugins: "image autolink emoticons lists advlist textcolor charmap colorpicker visualblocks",
         file_picker_types: 'image',
-        toolbar: 'undo redo | cut copy paste | styleselect | link image emoticons | insertquestion insertquestion2',
+            toolbar: 'undo redo | cut copy paste | styleselect numlist bullist forecolor backcolor | link image emoticons charmap | visualblocks | insertquestion insertquestion2',
         setup: function(editor){
             function insertQuestion(){
                 var html = "<p>{ </p><p>[?] Welche dieser Antworten ist richtig? </p><p>[-] Eine falsche Antwort </p><p>[+] Eine richtige Antwort </p><p> }</p>";

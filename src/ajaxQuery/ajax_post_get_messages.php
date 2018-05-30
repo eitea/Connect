@@ -1,9 +1,21 @@
 <?php
 session_start();
-require dirname(__DIR__) . "/connection.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "connection.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "utilities.php";
 
 $userID = $_SESSION["userid"] ?? -1;
 $limit = $_REQUEST["limit"] ?? 50;
+$limit = intval($limit);
+
+
+$defaultPicture = "images/defaultProfilePicture.png";
+
+$result = $conn->query("SELECT socialprofile.picture, userID FROM socialprofile WHERE picture IS NOT NULL");
+
+$profilePictures = array();
+while ($result && $row = $result->fetch_assoc()) {
+    $profilePictures[$row["userID"]] = $row["picture"];
+}
 
 if (isset($_GET["partner"], $_GET["subject"]) && !empty($_SESSION["userid"])) {
     $taskView = false;
@@ -56,6 +68,10 @@ if (isset($_GET["partner"], $_GET["subject"]) && !empty($_SESSION["userid"])) {
     } else {
         $result = $conn->query("SELECT * FROM (SELECT * FROM taskmessages INNER JOIN UserData ON UserData.id = taskmessages.userID WHERE ( taskID = $taskID) ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC");
     }
+} elseif (isset($_REQUEST["group"])) {
+    $taskView = true;
+    $groupID = intval($_REQUEST["group"]);
+    $result = $conn->query("SELECT * FROM (SELECT message, picture, sent, sender AS userID, firstname, lastname FROM groupmessages INNER JOIN UserData ON UserData.id = groupmessages.sender WHERE groupID = $groupID ORDER BY groupmessages.sent DESC LIMIT $limit) as temp order by sent asc");
 } else {
     die('Invalid Request');
 }
@@ -68,6 +84,10 @@ if (!$result || $result->num_rows == 0) {
     while ($row = $result->fetch_assoc()) {
         $message = $row["message"];
         $picture = $row["picture"];
+        $profilePicture = $defaultPicture;
+        if (isset($profilePictures[$row["userID"]])) {
+            $profilePicture = "data:image/jpeg;base64," . base64_encode($profilePictures[$row["userID"]]);
+        }
 
         if ($taskView) { // firstname and lastname not available in normal query
             $firstname = $row["firstname"];
@@ -121,23 +141,27 @@ if (!$result || $result->num_rows == 0) {
         <?php endif; ?>
 
             <div class="row">
-                <div class="col-xs-12">
+                <div class="col-xs-12" <?php if ($taskView && ($row["userID"] != $userID)) : echo 'style="padding-top:10px"';
+                                        endif; ?>>
                     <div class="well <?php echo $pull; ?>" style="position:relative; background-color: <?php echo $color ?>;">
                         <?php if ($taskView) : ?>
-                            <span class="label label-default" style="display:block; top:-17px; <?php echo $alignment ?> position:absolute; background-color: white; color: black;"><?php echo $name . " - " . $messageDate; ?></span>
+                            <span class="label label-default" style="display:block; <?= ($row["userID"] != $userID) ? "top:-35px;" : "top:-17px;" ?> <?php echo $alignment ?> position:absolute; background-color: white; color: black;">
+                                 <?php if ($row["userID"] != $userID) : ?><img src='<?php echo $profilePicture; ?>' style='width:25px;height:25px;margin-right:5px;' class='img-circle' alt='Profile Picture'><?php endif; ?>
+                                 <?php echo $name . " - " . $messageDate; ?>
+                            </span>
                         <?php else : ?>
                             <?php if ($showseen) : ?>
                                 <span class="label label-default" style="display:block; top:-17px; right:0px; position:absolute; background-color: white; color: black;"><?php echo $name . " - " . $messageDate; ?></span>
                                 <i class="fa <?php echo $seen; ?>" style="display:block; top:0px; right:-3px; position:absolute; color:#9d9d9d;"></i>
-                            <?php elseif (!$showseen) : ?>
+                            <?php else : ?>
                                 <span class="label label-default" style="display:block; top:-17px; left:0px; position:absolute; background-color: white; color: black;"><?php echo $partner_name . " - " . $messageDate; ?></span>
                             <?php endif; ?>
                         <?php endif ?>
 
                         <div style='word-break: normal; word-wrap: normal;'>
                             <?php 
-                            if($picture){
-                                echo "<img src='data:image/jpeg;base64,".base64_encode($row["picture"])."' alt='Picture type not supported' style='max-width:100%;' >";
+                            if ($picture) {
+                                echo "<img src='data:image/jpeg;base64," . base64_encode($row["picture"]) . "' alt='Picture type not supported' style='max-width:100%;' >";
                             }
                                 // handle line breaks
                             $parts = explode("\n", $message);
@@ -156,11 +180,4 @@ if (!$result || $result->num_rows == 0) {
     }
 }
 
-function test_input($data)
-{
-    require dirname(__DIR__) . "/connection.php";
-    $data = $conn->escape_string($data);
-    $data = trim($data);
-    return $data;
-}
 ?>

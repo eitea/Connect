@@ -24,7 +24,7 @@
 </div>
 
 <script type="text/javascript">
-setTimeout(function(){
+window.homeReloadTimeout = setTimeout(function(){
   location = ''
 },180000)
 </script>

@@ -16,7 +16,7 @@ $version = $row["version"];
 ?>
 <form method="POST">
 <div class="modal fade">
-    <div class="modal-dialog modal-content modal-md">
+    <div class="modal-dialog modal-content modal-lg">
     <div class="modal-header">Frage beantworten</div>
     <div class="modal-body">
         <label for="title">Titel</label>

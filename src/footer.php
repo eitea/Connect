@@ -22,7 +22,7 @@ function openSurveyModal(){
         }
    });
 }
-<?php if($userHasUnansweredOnLoginSurveys){echo "setTimeout(function(){ openSurveyModal() },500)";} ?>
+<?php if($userHasUnansweredOnLoginSurveys){echo "setTimeout(function(){ openSurveyModal() },500); clearTimeout(window.homeReloadTimeout);";} // ?>
 </script>
 <?php // endif; ?>
 

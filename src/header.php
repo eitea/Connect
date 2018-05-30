@@ -6,7 +6,7 @@ if (empty($_SESSION['userid'])) {
 $userID = $_SESSION['userid'];
 $timeToUTC = $_SESSION['timeToUTC'];
 $privateKey = $_SESSION['privateKey'];
-$publicKey = $_SESSION['publicKey'];
+$publicKey = isset($_SESSION['publicKey']) or "";
 
 $setActiveLink = 'class="active-link"';
 
@@ -332,7 +332,7 @@ if ($_SESSION['color'] == 'light') {
 
     <link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="plugins/font-awesome/css/font-awesome.min.css"/>
-
+    
     <script src="plugins/jQuery/jquery.min.js"></script>
     <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
     <script src="plugins/bootstrap-notify/bootstrap-notify.min.js"></script>

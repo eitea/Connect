@@ -1772,6 +1772,53 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
+    $sql = "CREATE TABLE messagegroups (
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        subject VARCHAR(60)
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
+
+    $sql = "CREATE TABLE messagegroups_user (
+        userID INT(6) UNSIGNED,
+        groupID INT(6) UNSIGNED,
+        admin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (groupID) REFERENCES messagegroups(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        PRIMARY KEY (userID, groupID)
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
+
+    $sql = "CREATE TABLE groupmessages(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        groupID INT(6) UNSIGNED,
+        sender INT(6) UNSIGNED,
+        message TEXT,
+        picture MEDIUMBLOB,
+        sent DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (sender) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (groupID) REFERENCES messagegroups(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    }
+
+    $sql = "CREATE TABLE groupmessages_user (
+        userID INT(6) UNSIGNED,
+        messageID INT(6) UNSIGNED,
+        deleted ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+        seen DATETIME DEFAULT NULL,
+        PRIMARY KEY (userID, messageID),
+        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (messageID) REFERENCES groupmessages(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
+
 	$sql = "CREATE TABLE security_users(
 		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 		userID INT(6) UNSIGNED,
