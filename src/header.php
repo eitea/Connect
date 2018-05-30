@@ -348,7 +348,6 @@ if ($_SESSION['color'] == 'light') {
     <script type="text/javascript" src="plugins/maskEdit/jquery.mask.js" ></script>
 
     <script src="plugins/html2canvas/html2canvas.min.js"></script>
-    <script src="plugins/remember-state/remember-state.min.js"></script>
 
     <link href="plugins/animate.css/animate.css" rel="stylesheet" />
     <script src="plugins/lodash/lodash.js"></script>
