@@ -132,7 +132,9 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
     if(!$activeEncryption) return $message;
     $privateKey = base64_decode($privateKey);
     static $symmetric = false;
-    if(!$symmetric && $userID && $privateKey){
+	static $usedModule = '';
+    if((!$symmetric || $usedModule != $module) && $userID && $privateKey){
+		$usedModule = $module;
 		$result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND module = '$module' AND outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
 		if(is_array($module)){
 			$optionalID = $module[1];
@@ -141,7 +143,7 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
 				AND optionalID = '$optionalID' AND outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
 		}
         if($result && ( $row=$result->fetch_assoc() )){
-			//echo $row['privateKey'] .' --private access<br>';
+			//echo $row['privateKey'] .' --encrypted base64 private module key<br>';
             $cipher_private_module = base64_decode($row['privateKey']);
 			//echo ($cipher_private_module) .' --private key module<br>';
             $result = $conn->query("SELECT publicKey, symmetricKey FROM security_modules WHERE module = '$module' AND outDated = 'FALSE'");
@@ -151,12 +153,14 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
                 //decrypt access
                 $nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
                 $cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
-				// echo base64_encode($privateKey) .' --private <br> keypairsize: '.strlen($privateKey.$public_module ).'<br> public--';
-				// echo base64_encode($public_module);
+				//echo base64_encode($privateKey) .' --private <br> keypairsize: '.strlen($privateKey.$public_module ).'<br> public--';
+				//echo base64_encode($public_module);
 				$private_module = sodium_crypto_box_open($cipher_private_module, $nonce, $privateKey.$public_module);
+				//echo $private_module .'-- decrypted private module<br>';
 				$nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
 				$cipher_symmetric = mb_substr($cipher_symmetric, 24, null, '8bit');
 				$symmetric = sodium_crypto_box_open($cipher_symmetric, $nonce, $private_module.$public_module);
+				//echo base64_encode($symmetric) .' -- plain symmetric<br>';
 
                 //decrypt module
                 if($symmetric){
@@ -422,7 +426,7 @@ function getFilledOutTemplate($templateID, $bookingQuery = "") {
     return $html;
 }
 
-function uploadImage($file_field, $crop_square = false, $resize = true) { //should be named uploadImage
+function uploadImage($file_field, $crop_square = false, $resize = true) {
     //bytes
     $max_size = 5000000; //5mb
     //whitelist

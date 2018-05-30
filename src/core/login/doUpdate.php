@@ -2887,6 +2887,19 @@ if($row['version'] < 158){
     if (!$conn->query($sql)) {
         echo $conn->error;
     }
+
+	$conn->query("ALTER TABLE security_users ADD COLUMN checkSum VARCHAR(100)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Security: Userkey Checksum';
+	}
+	$conn->query("ALTER TABLE security_modules ADD COLUMN checkSum VARCHAR(100)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Security: Module Checksum';
+	}
 }
 
 // if($row['version'] < 159){}

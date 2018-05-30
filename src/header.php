@@ -6,7 +6,7 @@ if (empty($_SESSION['userid'])) {
 $userID = $_SESSION['userid'];
 $timeToUTC = $_SESSION['timeToUTC'];
 $privateKey = $_SESSION['privateKey'];
-$publicKey = isset($_SESSION['publicKey']) or "";
+$publicKey = $_SESSION['publicKey'];
 
 $setActiveLink = 'class="active-link"';
 
@@ -332,7 +332,7 @@ if ($_SESSION['color'] == 'light') {
 
     <link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="plugins/font-awesome/css/font-awesome.min.css"/>
-    
+
     <script src="plugins/jQuery/jquery.min.js"></script>
     <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
     <script src="plugins/bootstrap-notify/bootstrap-notify.min.js"></script>
@@ -384,9 +384,9 @@ if ($_SESSION['color'] == 'light') {
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-language" ></i><span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <form method="POST" class="navbar-form navbar-left">
-                                <li><button type="submit" class="btn-empty" name="ENGLISH"><img width="30px" height="20px" src="images/eng.png"></button> English</li>
+                                <li><button type="submit" class="btn-empty" name="ENGLISH"><img width="30px" height="20px" src="images/eng.png"> &nbsp English</button></li>
                                 <li class="divider"></li>
-                                <li><button type="submit" class="btn-empty" name="GERMAN"><img width="30px" height="20px" src="images/ger.png"></button> Deutsch</li>
+                                <li><button type="submit" class="btn-empty" name="GERMAN"><img width="30px" height="20px" src="images/ger.png"> &nbsp Deutsch</button></li>
                             </form>
                         </ul>
                     </li>
@@ -496,7 +496,8 @@ if ($_SESSION['color'] == 'light') {
           <div class="modal-body">
               <ul class="nav nav-tabs">
                   <li class="active"><a data-toggle="tab" href="#myModalPassword">Passwort</a></li>
-                  <li><a id="myModalPGPtab" data-toggle="tab" href="#myModalPGP">Security</a></li>
+                  <li><a id="header_keystab" data-toggle="tab" href="#header_keys">Security</a></li>
+				  <li><a data-toggle="tab" href="#header_keycheck">Key Check</a></li>
               </ul>
               <div class="tab-content">
                   <div id="myModalPassword" class="tab-pane fade in active"><br>
@@ -519,7 +520,7 @@ if ($_SESSION['color'] == 'light') {
                           </div>
                       </form>
                   </div>
-                  <div id="myModalPGP" class="tab-pane fade"><br>
+                  <div id="header_keys" class="tab-pane fade"><br>
                       <form method="POST">
                           <div class="col-md-12">
                               <label>Public Key</label>
@@ -543,12 +544,82 @@ if ($_SESSION['color'] == 'light') {
                           </div>
                       </form>
                   </div>
+				  <div id="header_keycheck" class="tab-pane fade"><br>
+					  <?php
+					  $keyPair = base64_decode($privateKey).base64_decode($publicKey);
+					  if(strlen($keyPair) != 64):
+						 //this sould never be the case.
+						 //TODO: if your keys are wrong, you can either try uploading old keys or let yourself generate a new pair. you loose all your access though.
+						 showError($lang['ERROR_UNEXPECTED']);
+						 $privateKey = $publicKey = false;
+					  else: ?>
+						  <div class="col-sm-6">Persönliche Schlüssel: </div>
+						  <div class="col-sm-6">
+							  <?php
+							  $decrypted = '';
+							  $checksum = 'Ma-6SV3 bmQhEoY'; //TODO: random check foreach(module)
+							  $result = $conn->query("SELECT id, checkSum FROM security_users WHERE outDated = 'FALSE' AND userID = $userID LIMIT 1");
+							  if($row = $result->fetch_assoc()){
+								  try{
+									  if($row['checkSum']){
+										  $ciphertext = base64_decode($row['checkSum']);
+										  $nonce = mb_substr($ciphertext, 0, 24, '8bit');
+										  $encrypted = mb_substr($ciphertext, 24, null, '8bit');
+										  $decrypted = sodium_crypto_box_open($encrypted, $nonce, $keyPair);
+										  if($decrypted == $checksum){
+											  echo '<p style="color:green;">O.K.</p>';
+										  } else {
+											  echo '<p style="color:red">DENIED</p>';
+										  }
+									  } else {
+										  $nonce = random_bytes(24);
+										  $ciphertext = base64_encode($nonce . sodium_crypto_box($checksum, $nonce, $keyPair));
+										  $conn->query("UPDATE security_users SET checkSum = '$ciphertext' WHERE id = ".$row['id']);
+										  echo $conn->error.'!';
+									  }
+								  } catch(Exception $e){
+									  echo $e;
+								  }
+							  } else {
+								  echo $conn->error .__LINE__;
+							  }
+							  ?>
+						  </div>
+					  <?php
+					  $result = $conn->query("SELECT module, checkSum, id FROM security_modules WHERE outDated = 'FALSE'");
+					  echo $conn->error;
+					  while($row = $result->fetch_assoc()){
+						  $err = '';
+						  echo '<div class="col-sm-6">'.$row['module'].'</div>';
+						  echo '<div class="col-sm-6">';
+						  try{
+							  if($row['checkSum']){
+								  $decrypted = secure_data($row['module'], $row['checkSum'], 'decrypt', $userID, $privateKey, $err);
+							  } else {
+								  $ciphertext = secure_data($row['module'], $checksum, 'encrypt', $userID, $privateKey, $err);
+								  $conn->query("UPDATE security_modules SET checkSum = '$ciphertext' WHERE id = ".$row['id']);
+								  echo $conn->error.'!';
+							  }
+							  if($decrypted == $checksum){
+								  echo '<p style="color:green;">O.K.</p>';
+							  } else {
+								  echo '<p style="color:red">DENIED</p>';
+
+							  }
+						  } catch(Exceptioon $e){
+							  echo $e;
+						  }
+						  echo '</div>';
+					  }
+				  endif;
+					  ?>
+				  </div>
               </div>
           </div>
       </div>
   </div>
 
-  <?php if(isset($_POST['unlockKeyDownload'])) echo '<script>$(document).ready(function(){$("#header-gears").click();$("#myModalPGPtab").click();});</script>'; ?>
+  <?php if(isset($_POST['unlockKeyDownload'])) echo '<script>$(document).ready(function(){$("#header-gears").click();$("#header_keystab").click();});</script>'; ?>
 
   <!-- /modal -->
   <?php if ($canUseSocialMedia == 'TRUE'): ?>
