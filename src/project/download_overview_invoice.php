@@ -133,7 +133,7 @@ while($result && ($row = $result->fetch_assoc())){
     $pdf->Cell($w[2],$h, sprintf('%.2f', $projectTime), 0, '', 'R');
 
     $sum += $projectTime; //5aeaefea49a8c
-    $y[] = $pdf->MultiColCell($w[3],$h,iconv('UTF-8', 'windows-1252', $projectText .$decimal));
+    $y[] = $pdf->MultiColCell($w[3],$h,iconv('UTF-8', 'windows-1252', $projectText));
 
     $pdf->Ln();
     $pdf->SetY(max($y));
