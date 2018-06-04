@@ -616,7 +616,7 @@ function create_tables($conn) {
         echo mysqli_error($conn);
     }
 
-    $sql = "CREATE TABLE teamRelationshipData (
+    $sql = "CREATE TABLE relationship_team_user (
         teamID INT(6) UNSIGNED,
         userID INT(6) UNSIGNED,
         skill INT(3) DEFAULT 0 NOT NULL,
@@ -662,7 +662,6 @@ function create_tables($conn) {
     $sql = "CREATE TABLE proposals(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         clientID INT(6) UNSIGNED,
-        status INT(2),
         curDate DATETIME DEFAULT CURRENT_TIMESTAMP,
         deliveryDate DATETIME,
         daysNetto INT(4),
@@ -688,6 +687,7 @@ function create_tables($conn) {
     $sql = "CREATE TABLE processHistory(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         id_number VARCHAR(12) NOT NULL,
+        status INT(2), 		
         processID INT(6) UNSIGNED,
         FOREIGN KEY (processID) REFERENCES proposals(id)
         ON UPDATE CASCADE

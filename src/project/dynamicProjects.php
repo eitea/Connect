@@ -49,7 +49,7 @@ function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$refe
     .'<div data-toggle="tooltip" title="'.round($timeOver,2).' Stunden" class="progress-bar progress-bar-danger" style="height:10px;width:'.$redBar.'%"></div></div>';
 }
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', "priority" => 0, 'employees' => ["user;".$userID]); //set_filter requirement
-$result = $conn->query("SELECT teamID FROM teamRelationshipData WHERE userID = $userID");
+$result = $conn->query("SELECT teamID FROM relationship_team_user WHERE userID = $userID");
 while($result && ( $row = $result->fetch_assoc())){
     $filterings['employees'][] = 'team;'.$row['teamID'];
 }
@@ -445,14 +445,14 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 			   LEFT JOIN ( SELECT userID, dynamicID, p.id, p.start FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00') tbl5
 				   ON tbl5.dynamicID = d.projectid
 			   LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
-			   LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
-			   WHERE d.isTemplate = 'FALSE' AND (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (teamRelationshipData.userID = $userID AND teamRelationshipData.skill >= d.level))
+			   LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN relationship_team_user ON relationship_team_user.teamID = dynamicprojectsteams.teamid
+			   WHERE d.isTemplate = 'FALSE' AND (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (relationship_team_user.userID = $userID AND relationship_team_user.skill >= d.level))
 			   $query_filter ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
 	   }
         // if($isDynamicProjectsAdmin == 'FALSE'){
 		// 	$nonAdminQuery = "LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid AND dynamicprojectsemployees.userid = $userID
 		// 	LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid
-		// 	LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid AND teamRelationshipData.userID = $userID";
+		// 	LEFT JOIN relationship_team_user ON relationship_team_user.teamID = dynamicprojectsteams.teamid AND relationship_team_user.userID = $userID";
         // }
 		//
 		// $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,

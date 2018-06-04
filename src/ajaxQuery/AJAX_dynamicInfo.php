@@ -20,8 +20,8 @@ $result = $conn->query("SELECT d.projectid, projectname, projectdescription, pro
     projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours
     FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
     LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
-    LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
-    WHERE (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (teamRelationshipData.userID = $userID AND teamRelationshipData.skill >= d.level))
+    LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN relationship_team_user ON relationship_team_user.teamID = dynamicprojectsteams.teamid
+    WHERE (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (relationship_team_user.userID = $userID AND relationship_team_user.skill >= d.level))
     AND d.projectstart <= UTC_TIMESTAMP and d.projectid = '$x'");
 $row = $result->fetch_assoc();
 $projectleader = $row['projectleader'];

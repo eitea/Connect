@@ -1553,7 +1553,7 @@ if($row['version'] < 126){ //25.01.2018
 }
 
 if($row['version'] < 127){ //29.01.2018
-    $conn->query("ALTER TABLE teamRelationshipData ADD COLUMN skill INT(3) DEFAULT 0 NOT NULL");
+    $conn->query("ALTER TABLE relationship_team_user ADD COLUMN skill INT(3) DEFAULT 0 NOT NULL");
     if ($conn->error) {
         echo $conn->error;
     } else {
@@ -2920,6 +2920,12 @@ if($row['version'] < 159){
 	if($conn->error){
 		echo $conn->error;
 	}
+
+	$conn->query("RENAME TABLE teamRelationshipData TO relationship_team_user");
+
+	$conn->query("ALTER TABLE processHistory ADD COLUMN status INT(2)");
+	$conn->query("UPDATE processHistory p SET status = (SELECT status FROM proposals WHERE id = p.processID)");
+	$conn->query("ALTER TABLE proposals DROP COLUMN status");
 }
 // if($row['version'] < 160){}
 // if($row['version'] < 161){}

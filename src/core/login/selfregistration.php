@@ -102,7 +102,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
         if(isset($_POST['team'])){
           foreach($_POST['team'] as $cmp){
-            $sql = "INSERT INTO $teamRelationshipTable (userID, teamID) VALUES($curID, $cmp)";
+            $sql = "INSERT INTO relationship_team_user (userID, teamID) VALUES($curID, $cmp)";
             $conn->query($sql);
           }
         }

@@ -31,7 +31,7 @@ $result = $conn->query(
              )
         UNION
         SELECT tr.userID userID FROM dsgvo_training_team_relations dtr
-        INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID
+        INNER JOIN relationship_team_user tr ON tr.teamID = dtr.teamID
         LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID
         WHERE tr.userID = $userID
         AND NOT EXISTS (
@@ -42,10 +42,10 @@ $result = $conn->query(
              WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
              )
         UNION
-        SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations 
+        SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations
         INNER JOIN relationship_company_client ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
-        LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID 
-        WHERE relationship_company_client.userID = $userID 
+        LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID
+        WHERE relationship_company_client.userID = $userID
         AND NOT EXISTS (
             SELECT userID
             FROM dsgvo_training_completed_questions
@@ -120,25 +120,25 @@ function parse_question($html){
 
 $result = $conn->query( // this gets all trainings the user can complete
     "SELECT tur.trainingID id, tr.name, tr.random
-     FROM dsgvo_training_user_relations tur 
-     INNER JOIN dsgvo_training tr 
-     ON tr.id = tur.trainingID 
+     FROM dsgvo_training_user_relations tur
+     INNER JOIN dsgvo_training tr
+     ON tr.id = tur.trainingID
      WHERE tur.userID = $userID
      UNION
      SELECT ttr.trainingID id, tr.name, tr.random
-     FROM dsgvo_training_team_relations ttr 
-     INNER JOIN teamRelationshipData trd 
-     ON trd.teamID = ttr.teamID  
-     INNER JOIN dsgvo_training tr 
-     ON tr.id = ttr.trainingID 
+     FROM dsgvo_training_team_relations ttr
+     INNER JOIN relationship_team_user trd
+     ON trd.teamID = ttr.teamID
+     INNER JOIN dsgvo_training tr
+     ON tr.id = ttr.trainingID
      WHERE trd.userID = $userID
      UNION
      SELECT ttr.trainingID id, tr.name, tr.random
-     FROM dsgvo_training_company_relations ttr 
-     INNER JOIN relationship_company_client trd 
-     ON trd.companyID = ttr.companyID  
-     INNER JOIN dsgvo_training tr 
-     ON tr.id = ttr.trainingID 
+     FROM dsgvo_training_company_relations ttr
+     INNER JOIN relationship_company_client trd
+     ON trd.companyID = ttr.companyID
+     INNER JOIN dsgvo_training tr
+     ON tr.id = ttr.trainingID
      WHERE trd.userID = $userID"
 );
 showError($conn->error);
@@ -150,12 +150,12 @@ while ($row = $result->fetch_assoc()){
     $result_question = false;
     if(!$doneSurveys){
         $result_question = $conn->query(
-            "SELECT tq.id, tq.text, t.onLogin FROM dsgvo_training_questions tq 
+            "SELECT tq.id, tq.text, t.onLogin FROM dsgvo_training_questions tq
             INNER JOIN dsgvo_training t ON t.id = tq.trainingID
-            WHERE tq.trainingID = $trainingID AND 
+            WHERE tq.trainingID = $trainingID AND
             NOT EXISTS (
-                SELECT userID 
-                FROM dsgvo_training_completed_questions 
+                SELECT userID
+                FROM dsgvo_training_completed_questions
                 LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
                 LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
                 WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
@@ -163,12 +163,12 @@ while ($row = $result->fetch_assoc()){
         ); // only select not completed questions
     }else{
         $result_question = $conn->query(
-            "SELECT tq.id, tq.text, t.onLogin FROM dsgvo_training_questions tq 
+            "SELECT tq.id, tq.text, t.onLogin FROM dsgvo_training_questions tq
             INNER JOIN dsgvo_training t ON t.id = tq.trainingID
-            WHERE tq.trainingID = $trainingID AND 
+            WHERE tq.trainingID = $trainingID AND
             EXISTS (
-                SELECT userID 
-                FROM dsgvo_training_completed_questions 
+                SELECT userID
+                FROM dsgvo_training_completed_questions
                 LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
                 LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
                 WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
@@ -213,7 +213,7 @@ if(!$hasQuestions){
 
     <div class="modal fade survey-modal">
         <div class="modal-dialog modal-content modal-md">
-            <div class="modal-header">Bitte beantworten Sie folgende Fragen 
+            <div class="modal-header">Bitte beantworten Sie folgende Fragen
             <a data-toggle="modal" data-target="#explain-surveys"><i class="fa fa-question-circle-o"></i></a>
             <span id="timeElement"></span>
             </div>
@@ -223,7 +223,7 @@ if(!$hasQuestions){
             <div class="modal-footer">
                 <button data-toggle="modal" data-target="#explain-surveys" class="btn btn-default" type="button">Hilfe</a>
                 <?php if($onLogin && $allowSuspension): ?>
-                  <button type="button" class="btn btn-warning" id="suspend_trainings_btn">Um einen Tag aufschieben</button> 
+                  <button type="button" class="btn btn-warning" id="suspend_trainings_btn">Um einen Tag aufschieben</button>
                 <?php endif; ?>
                 <?php if(!$onLogin): ?>  <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button> <?php endif; ?>
             </div>
@@ -255,7 +255,7 @@ if(!$hasQuestions){
                         $(".survey-modal .modal-footer").html('<button type="button" class="btn btn-default" data-dismiss="modal">OK</button>')
                         // $(".survey-modal").modal("hide");
                     },
-                    error: function (resp) { 
+                    error: function (resp) {
                         $("#surveyElement").html(resp) //stats
                         $(".survey-modal .modal-footer").html('<button type="button" class="btn btn-default" data-dismiss="modal">OK</button>')
                         // $(".survey-modal").modal("hide");
@@ -297,7 +297,7 @@ if(!$hasQuestions){
                         showSuccess(resp)
                         $(".survey-modal").modal("hide");
                     },
-                    error: function (resp) { 
+                    error: function (resp) {
                         showError(resp)
                         $(".survey-modal").modal("hide");
                     }
@@ -317,9 +317,9 @@ if(!$hasQuestions){
     <div class="modal-header h4">Trainings</div>
     <div class="modal-body">
         <div>
-            Jede dieser Seiten stellt ein Set von Fragen dar. 
+            Jede dieser Seiten stellt ein Set von Fragen dar.
             Jede Frage, die nicht mit (Pflichtfeld) markiert ist, ist optional und kann einfach übersprungen werden.
-            Übersprungene Fragen können später jederzeit nachgeholt werden. 
+            Übersprungene Fragen können später jederzeit nachgeholt werden.
         </div><br/>
         <div>
             Fragen können beliebig oft wiederholt werden, aber der Administrator kann auswählen, ob diese den vorhergehenden Versuch überschreiben.

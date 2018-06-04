@@ -116,7 +116,7 @@ $result = $conn->query( /* Test if user has any questions */
     "SELECT count(*) count FROM (
         SELECT userID FROM dsgvo_training_user_relations tur LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID
         UNION
-        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID
+        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN relationship_team_user tr ON tr.teamID = dtr.teamID
         LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID
         UNION
         SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations INNER JOIN relationship_company_client ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
@@ -141,7 +141,7 @@ if(!$userHasSurveys){
                  )
             UNION
             SELECT tr.userID userID FROM dsgvo_training_team_relations dtr
-            INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID
+            INNER JOIN relationship_team_user tr ON tr.teamID = dtr.teamID
             LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID
             WHERE tr.userID = $userID
             AND NOT EXISTS (
@@ -183,7 +183,7 @@ if($userHasUnansweredSurveys){ /* Test if user has unanswered questions that sho
                     WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
                  )
                 UNION
-                SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID INNER JOIN dsgvo_training t on t.id = dtr.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
+                SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN relationship_team_user tr ON tr.teamID = dtr.teamID INNER JOIN dsgvo_training t on t.id = dtr.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
                     SELECT userID
                     FROM dsgvo_training_completed_questions
                     LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
@@ -882,8 +882,8 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   <?php endif;?>
                   <?php
                   $result = $conn->query("SELECT d.projectid FROM dynamicprojects d LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
-                      LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
-                      WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") AND d.projectstatus = 'ACTIVE' AND (dynamicprojectsemployees.userid = $userID OR teamRelationshipData.userID = $userID)");
+                      LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN relationship_team_user ON relationship_team_user.teamID = dynamicprojectsteams.teamid
+                      WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") AND d.projectstatus = 'ACTIVE' AND (dynamicprojectsemployees.userid = $userID OR relationship_team_user.userID = $userID)");
                       echo $conn->error;
                       if (($result && $result->num_rows > 0) || $userHasSurveys || $isDynamicProjectsAdmin || $canCreateTasks): ?>
                       <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view">

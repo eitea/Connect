@@ -269,13 +269,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $canEditSuppliers = isset($_POST['canEditSuppliers']) ? 'TRUE' : 'FALSE';
         $canUseWorkflow = isset($_POST['canUseWorkflow']) ? 'TRUE' : 'FALSE'; //5ab7ae7596e5c
 
+		//TODO: we need to grant access to these too.
+		$conn->query("DELETE FROM relationship_company_client WHERE userID = $x");
 		if(isset($_POST['company'])){
 			$result = $conn->query("SELECT id FROM companyData");
 			while($row = $result->fetch_assoc()){
 				//just completely delete the relationship from table to avoid duplicate entries.
-				$conn->query("DELETE FROM $companyToUserRelationshipTable WHERE userID = $x AND companyID = " . $row['id']);
+				$conn->query("DELETE FROM relationship_company_client WHERE userID = $x AND companyID = " . $row['id']);
 				if(in_array($row['id'], $_POST['company'])){  //if company is checked, insert again
-					$conn->query("INSERT INTO $companyToUserRelationshipTable (companyID, userID) VALUES (".$row['id'].", $x)");
+					$conn->query("INSERT INTO relationship_company_client (companyID, userID) VALUES (".$row['id'].", $x)");
 				}
 			}
 		}
