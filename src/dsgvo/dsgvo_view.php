@@ -88,7 +88,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		}
 	}
 
-	if (isset($_FILES['uploadPDF']) && !empty($_FILES['uploadPDF']['name'])) {
+	if(!empty($_POST['delete-archive'])){
+		$uniqID = test_input($_POST['delete-archive']);
+		if($s3 = getS3Object()){
+			$s3->deleteObject(['Bucket' => $bucket, 'Key' => $uniqID]);
+		}
+		$conn->query("DELETE FROM archive WHERE uniqID = '$uniqID' AND category = 'AGREEMENT'");
+		if($conn->error){
+			showError($conn->error);
+		} else {
+			showSuccess($lang['OK_DELETE']);
+		}
+	} elseif (isset($_FILES['uploadPDF']) && !empty($_FILES['uploadPDF']['name'])) {
 		$file_info = pathinfo($_FILES['uploadPDF']['name']);
 		$ext = strtolower($file_info['extension']);
 		if($_FILES['uploadPDF']['size'] < 8000008 && $_FILES['uploadPDF']['type'] == 'application/pdf' && $ext == 'pdf') {
@@ -352,7 +363,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			echo '<td>'.mc_status('DSGVO').secure_data('DSGVO',$row['name'], 'decrypt', $userID, $privateKey).' - '.secure_data('DSGVO', $row['versionDescr'], 'decrypt').'</td>';
 			echo '<td>'.$row['validDate'].'</td>';
 			echo '<td>'.$row['status'].'</td>';
-			echo '<td><form method="POST" style="display:inline"><button type="submit" name="edit-meta" value="'.$row['id'].'" class="btn btn-default"><i class="fa fa-pencil"></i></button></form>
+			echo '<td><form method="POST" style="display:inline"><button type="submit" name="edit-meta" value="'.$row['id'].'" class="btn btn-default"><i class="fa fa-pencil"></i></button>
+			<button type="submit" name="delete-archive" value="'.$row['uniqID'].'" class="btn btn-default"><i class="fa fa-trash-o"></i></button></form>
 			<form method="POST" style="display:inline" action="../project/detailDownload" target="_blank"><input type="hidden" name="keyReference" value="DSGVO" />
 			<button type="submit" class="btn btn-default" name="download-file" value="'.$row['uniqID'].'"><i class="fa fa-download"></i></button></form>';
 			echo '</td>';
