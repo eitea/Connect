@@ -14,12 +14,15 @@ require __DIR__ . "/connection.php";
 require __DIR__ . "/utilities.php";
 require __DIR__ . "/validate.php";
 require __DIR__ . "/language.php";
+include 'version_number.php';
 
 if (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])){
 	ini_set('display_errors', 1);
 	ini_set('display_startup_errors', 1);
 	error_reporting(E_ALL);
 }
+
+if(!empty($_SESSION['version']) && $_SESSION['version'] != $VERSION_NUMBER) redirect('../user/logout');
 
 $result = $conn->query("SELECT id FROM identification LIMIT 1");
 if($row = $result->fetch_assoc()){
@@ -436,7 +439,7 @@ if ($_SESSION['color'] == 'light') {
       <div class="modal-dialog modal-content modal-sm">
           <div class="modal-header h4">Information</div>
           <div class="modal-body">
-              <a target="_blank" href='http://www.eitea.at'> EI-TEA Partner GmbH </a> - <?php include 'version_number.php'; echo $VERSION_TEXT;?><br><br>
+              <a target="_blank" href='http://www.eitea.at'> EI-TEA Partner GmbH </a> - <?php echo $VERSION_TEXT;?><br><br>
               The Licensor does not warrant that commencing upon the date of delivery or installation, that when operated in accordance with the documentation or other instructions provided by the Licensor,
               the Software will perform substantially in accordance with the functional specifications set forth in the documentation. The software is provided "as is", without warranty of any kind, express or implied.
               <br><br>

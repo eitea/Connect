@@ -2902,7 +2902,25 @@ if($row['version'] < 158){
 	}
 }
 
-// if($row['version'] < 159){}
+if($row['version'] < 159){
+	$conn->query("UPDATE dsgvo_vv_template_settings SET opt_descr = REPLACE(opt_descr, 'Applikation', 'Vorgang') WHERE opt_descr LIKE '%Applikation%'");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>DSGVO: Vorgang rename';
+	}
+
+	$conn->query("ALTER TABLE dsgvo_vv_settings MODIFY COLUMN setting MEDIUMTEXT NOT NULL");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>DSGVO: Max. Zeichenlänge';
+	}
+	$conn->query("ALTER TABLE dsgvo_vv_logs MODIFY COLUMN long_description TEXT");
+	if($conn->error){
+		echo $conn->error;
+	}
+}
 // if($row['version'] < 160){}
 // if($row['version'] < 161){}
 // if($row['version'] < 162){}

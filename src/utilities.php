@@ -159,6 +159,10 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
 				//echo $private_module .'-- decrypted private module<br>';
 				$nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
 				$cipher_symmetric = mb_substr($cipher_symmetric, 24, null, '8bit');
+				if(strlen($private_module.$public_module) != 64){
+					$err = 'module keys do not have the right size';
+					return $message;
+				}
 				$symmetric = sodium_crypto_box_open($cipher_symmetric, $nonce, $private_module.$public_module);
 				//echo base64_encode($symmetric) .' -- plain symmetric<br>';
 

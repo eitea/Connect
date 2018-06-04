@@ -5,6 +5,7 @@ $login_token = $_POST['token'];
 
 require dirname(dirname(__DIR__)) .'/connection.php';
 require dirname(dirname(__DIR__)) .'/utilities.php';
+include dirname(dirname(__DIR__)) .'/version_number.php';
 
 if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
     $result = $conn->query("SELECT COUNT(*) as total FROM UserData");
@@ -21,6 +22,7 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
         echo '</p>';
         if(crypt($_POST['tester_pass'], $row['psw']) == $row['psw']) {
             $_SESSION['userid'] = $row['id'];
+			$_SESSION['version'] = $VERSION_NUMBER;
             $_SESSION['firstname'] = $row['firstname'];
             $_SESSION['language'] = $row['preferredLang'];
             $_SESSION['timeToUTC'] = intval($_POST['funZone']);
@@ -46,7 +48,6 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
             $result = $conn->query("SELECT userID FROM roles WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'");
             if($result && $result->num_rows > 0){
                 require dirname(dirname(__DIR__)) ."/language.php";
-                include dirname(dirname(__DIR__)) .'/version_number.php';
                 //check for updates
                 $result = mysqli_query($conn, "SELECT version FROM configurationData;");
                 if(!$result || (($row = $result->fetch_assoc()) && $row['version'] < $VERSION_NUMBER)){

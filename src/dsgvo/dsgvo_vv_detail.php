@@ -269,7 +269,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                <div class="col-sm-6 bold">E-Mail</div><div class="col-sm-6 grey"><?php echo $row['mail']; ?><br></div>
 	            </div>
 	            <?php else: ?>
-	            <div class="panel-heading"><?php echo mc_status('DSGVO'); ?>Kurze Beschreibung der Applikation, bzw. den Zweck dieser Applikation</div>
+	            <div class="panel-heading"><?php echo mc_status('DSGVO'); ?>Kurze Beschreibung des Vorgangs, bzw. den Zweck dieses Vorgangs</div>
 	            <div class="panel-body">
 	                <textarea name="DESCRIPTION" style='resize:none' class="form-control" rows="5"><?php echo $settings['DESCRIPTION']['setting']; ?></textarea>
 	            </div>

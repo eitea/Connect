@@ -154,8 +154,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $conn->query("UPDATE UserData SET companyID = $val WHERE id = '$x'");
       }
       if (!empty($_POST['password']) && !empty($_POST['passwordConfirm'])) {
+
           if (strcmp($_POST['password'], $_POST['passwordConfirm']) == 0  && match_passwordpolicy($_POST['password'])) {
-              $psw = password_hash($password, PASSWORD_BCRYPT);
+              $psw = password_hash($_POST['password'], PASSWORD_BCRYPT);
               if($x == $userID){
                   $private_encrypt = simple_encryption($privateKey, $_POST['password']);
 				  $conn->query("UPDATE security_users SET privateKey = '$private_encrypted' WHERE userID = $userID AND outDated = 'FALSE'");
@@ -167,15 +168,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                   $user_public = sodium_crypto_box_publickey($keyPair);
 
                   $private_encrypt = simple_encryption($private, $_POST['password']);
-                  $conn->query("UPDATE UserData SET psw = '$psw', lastPswChange = UTC_TIMESTAMP, forcePwdChange = 1 WHERE id = '$x';");
+                  $conn->query("UPDATE UserData SET psw = '$psw', lastPswChange = UTC_TIMESTAMP, forcedPwdChange = 1 WHERE id = '$x';");
+				  $err = $conn->error;
 				  $conn->query("UPDATE security_users SET outDated = 'TRUE' WHERE userID = $x");
-				  $conn->query("INSERT INTO security_users (userID, publicKey, privateKey) VALUES ( $x, '".base64_encode($user_public)."', '$private_encrypt' )");
+				  $err = $conn->error;
+				  $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE userID = $x");
+				  $err .= $conn->error;
+				  $conn->query("INSERT INTO security_users (userID, publicKey, privateKey) VALUES ($x, '".base64_encode($user_public)."', '$private_encrypt' )");
+				  $err .= $conn->error;
+				  if($err){
+					  showError($err);
+				  } else {
+					  showSuccess('Passwort wurde erfolgreich geändert');
+				  }
               }
           } else {
-              echo '<div class="alert alert-danger fade in">';
-              echo '<a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-              echo '<strong>Could not change Passwords! </strong>Passwords did not match or were invalid. Password must be at least 8 characters long and contain at least one Capital Letter, one number and one special character.';
-              echo '</div>';
+			  showError('Could not change Passwords! Passwords did not match or were invalid.
+			  Password must be at least 8 characters long and contain at least one Capital Letter, one number and one special character');
           }
       }
 

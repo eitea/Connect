@@ -320,17 +320,17 @@ ini_set('max_execution_time',999);
 	Systembenutzer (mind. Alle 180 Tage)','Zugangskontrolle: automaischer Sperrmechanismus der Zugänge um Brut Force Attacken abzuwehren','Zugangskontrolle: Zwei-Faktor-Authentifizierung für externe Zugänge (VPN)',
 	'Wechseldatenträger: Sperre oder zumindest Einschränkung von Wechseldatenträger (USB-Stick, SD Karte, USB Geräte mit Speichermöglichkeiten…)',
 	'Infrastruktur: Verschlüsselung der gesamten Festplatte in PC und Notebooks','Infrastruktur: Network Access Control (NAC) im Netzwerk aktiv',
-	'Infrastruktur: Protokollierung der Verbindungen über die Firewall (mind. 180 Tage)','Infrastruktur: Einsatz einer Applikationsbasierter Firewall (next Generation Firewall)', 'Infrastruktur: Backup-Strategie, die mind. Alle 180 Tage getestet wird','Infrastruktur: Virenschutz (advanced Endpoint Protection)',
+	'Infrastruktur: Protokollierung der Verbindungen über die Firewall (mind. 180 Tage)','Infrastruktur: Einsatz einer Vorgangssbasierten Firewall (next Generation Firewall)', 'Infrastruktur: Backup-Strategie, die mind. Alle 180 Tage getestet wird','Infrastruktur: Virenschutz (advanced Endpoint Protection)',
 	'Infrastruktur: Regelmäßige Failover Tests, falls ein zweites Rechenzentrum vorhanden ist','Infrastruktur: Protokollierung von Zugriffen und Alarmierung bei unbefugten Lesen oder Schreiben',
 	'Weitergabekontrolle: Kein unbefugtes Lesen, Kopieren, Verändern oder Entfernen bei elektronischer Übertragung oder Transport, zB: Verschlüsselung, Virtual Private Networks (VPN), elektronische Signatur',
 	'Drucker und MFP Geräte: Verschlüsselung der eingebauten Datenträger.','Drucker und MFP Geräte: Secure Printing bei personenbezogenen Daten. Unter "secure printing" versteht man die zusätzliche Authentifizierung direkt am Drucker, um den Ausdruck zu erhalten.',
 	'Drucker und MFP Geräte: Bei Leasinggeräten, oder pay per Page Verträgen muss der Datenschutz zwischen den Vertragspartner genau geregelt werden (Vertrag).',
 	'Eingabekontrolle: Feststellung, ob und von wem personenbezogene Daten in Datenverarbeitungssysteme eingegeben, verändert oder entfernt worden sind, zB: Protokollierung, Dokumentenmanagement');
-	$app_opt_1 = array('', 'Name der verantwortlichen Stelle für diese Applikation', 'Beschreibung der betroffenen Personengruppen und der diesbezüglichen Daten oder Datenkategorien',
-	'Zweckbestimmung der Datenerhebung, Datenverarbeitung und Datennutzung', 'Regelfristen für die Löschung der Daten', 'Datenübermittlung in Drittländer', 'Einführungsdatum der Applikation','Liste der zugriffsberechtigten Personen');
+	$app_opt_1 = array('', 'Name der verantwortlichen Stelle für diesen Vorgang', 'Beschreibung der betroffenen Personengruppen und der diesbezüglichen Daten oder Datenkategorien',
+	'Zweckbestimmung der Datenerhebung, Datenverarbeitung und Datennutzung', 'Regelfristen für die Löschung der Daten', 'Datenübermittlung in Drittländer', 'Einführungsdatum des Vorgangs','Liste der zugriffsberechtigten Personen');
 	$app_opt_2 = array('', 'Pseudonymisierung: Falls die jeweilige Datenanwendung eine Pseudonymisierung unterstützt, wird diese aktiviert. Bei einer Pseudonymisierung werden personenbezogene Daten in der Anwendung entfernt und gesondert aufbewahrt.',
 	'Verschlüsselung der Daten: Sofern von der jeweiligen Datenverarbeitung möglich, werden die personenbezogenen Daten verschlüsselt und nicht als Plain-Text Daten gespeichert',
-	'Applikation: Backup-Strategie, die mind. Alle 180 Tage getestet wird', 'Applikation: Protokollierung von Zugriffen und Alarmierung bei unbefugten Lesen oder Schreiben',
+	'Vorgang: Backup-Strategie, die mind. Alle 180 Tage getestet wird', 'Vorgang: Protokollierung von Zugriffen und Alarmierung bei unbefugten Lesen oder Schreiben',
 	'Weitergabekontrolle: Kein unbefugtes Lesen, Kopieren, Verändern oder Entfernen bei elektronischer Übertragung oder Transport, zB: Verschlüsselung, Virtual Private Networks (VPN), elektronische Signatur',
 	'Vertraglich (bei externer Betreuung): Gib eine schriftliche Übereinkunft der Leistung und Verpflichtung mit dem entsprechenden Dienstleister der Software?',
 	'Eingabekontrolle: Feststellung, ob und von wem personenbezogene Daten in Datenverarbeitungssysteme eingegeben, verändert oder entfernt worden sind, zB: Protokollierung, Dokumentenmanagement');
@@ -394,7 +394,7 @@ ini_set('max_execution_time',999);
               $descr = 'Wurde eine Datenschutz-Folgeabschätzung durchgeführt?';
               $opt = 'EXTRA_FOLGE';
               $stmt->execute();
-              $descr = 'Gibt es eine aktuelle Dokumentation dieser Applikation?';
+              $descr = 'Gibt es eine aktuelle Dokumentation für diesen Vorgang?';
               $opt = 'EXTRA_DOC';
               $stmt->execute();
               $descr = '';

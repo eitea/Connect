@@ -26,6 +26,7 @@ if(!empty($_POST['loginName']) && !empty($_POST['password']) && isset($_POST['lo
     if($result && crypt($_POST['password'], $row['psw']) == $row['psw']) {
         $redirect = "../user/home";
         $_SESSION['userid'] = $row['id'];
+		$_SESSION['version'] = $VERSION_NUMBER;
         $_SESSION['firstname'] = $row['firstname'];
         $_SESSION['language'] = $row['preferredLang'];
         $_SESSION['timeToUTC'] = intval($_POST['funZone']);

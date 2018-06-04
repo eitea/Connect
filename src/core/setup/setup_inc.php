@@ -1201,7 +1201,7 @@ function create_tables($conn) {
         vv_id INT(6) UNSIGNED,
         setting_id INT(10) UNSIGNED,
         matrix_setting_id INT(10) UNSIGNED,
-        setting VARCHAR(850) NOT NULL,
+        setting MEDIUMTEXT NOT NULL,
         category VARCHAR(50),
         clientID INT(6) UNSIGNED,
         FOREIGN KEY (clientID) REFERENCES clientData(id)
@@ -1669,7 +1669,7 @@ function create_tables($conn) {
         log_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         short_description VARCHAR(100) NOT NULL,
         scope VARCHAR(100),
-        long_description VARCHAR(500),
+        long_description TEXT,
         FOREIGN KEY (user_id) REFERENCES UserData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
