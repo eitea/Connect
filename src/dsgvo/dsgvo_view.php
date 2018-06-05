@@ -50,8 +50,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$toDate = test_Date($_POST['meta-toDate'], 'Y-m-d') ? $_POST['meta-toDate'] : '0000-00-00';
 		$validDate = test_Date($_POST['meta-validDate'], 'Y-m-d') ? $_POST['meta-validDate'] : '0000-00-00';
 		$cPartner = test_input($_POST['meta-cPartner'], 1);
-		if($cPartner == 'employee') $cPartnerID = intval($_POST['meta-cPartner-employee']);
-		if($cPartner == 'contact') $cPartnerID = intval($_POST['meta-cPartner-contact']);
+		if($cPartner == 'employee'){
+			$cPartnerID = intval($_POST['meta-cPartner-employee']);
+		} elseif($cPartner == 'contact'){
+			$cPartnerID = intval($_POST['filterContact']);
+		} elseif($cPartner == 'free' && !empty($_POST['meta-free-existing'])){
+			$cPartnerID = intval($_POST['meta-free-existing']);
+		} elseif($cPartner =='free' && !empty($_POST['meta-free-firstname']) && !empty($_POST['meta-free-lastname'])){
+			$firstname = test_input($_POST['meta-free-firstname']);
+			$lastname = test_input($_POST['meta-free-lastname']);
+			$gender = test_input($_POST['meta-free-gender'], 1);
+			$email = test_input($_POST['meta-free-email']);
+			$conn->query("INSERT INTO contactPersons(firstname, lastname, email, gender, clientID) VALUES('$firstname', '$lastname', '$email', '$gender', NULL)");
+			$cPartnerID = $conn->insert_id;
+		}
 		$conn->query("UPDATE archive_meta SET parentID = $parentID, name = '$filename', description = '$descr', versionDescr = '$versionDescr', category = '$cat', status = '$status',
 			fromDate = '$fromDate', toDate = '$toDate', validDate = '$validDate', cPartner = '$cPartner', cPartnerID = '$cPartnerID', note = '$note' WHERE id = $metaID");
 		if($conn->error){
@@ -347,20 +359,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		<tr>
 			<th><?php echo $lang['CATEGORY']; //5b055b4696156 ?></th>
 			<th>Name</th>
-			<th>Gültigkeitsdatum</th>
+			<th>Vertragspartner</th>
+			<th><?php echo $lang['VALID_PERIOD']; ?></th>
 			<th>Status</th>
 			<th></th>
 		</tr>
 	</thead>
 	<tbody>
 		<?php
+		$stmt = $conn->prepare('SELECT firstname, lastname FROM contactPersons WHERE id = ? LIMIT 1');
+		$stmt->bind_param('i', $val);
 		$result = $conn->query("SELECT am.*, uniqID, c.name AS catName FROM archive INNER JOIN archive_meta am ON archive.id = am.archiveID
 			LEFT JOIN dsgvo_categories c ON c.id = am.category WHERE archive.category = 'AGREEMENT' AND archive.categoryID = '$cmpID' ");
 		echo $conn->error;
 		while($result && ($row = $result->fetch_assoc())){
-			echo '<tr>';
+			echo $row['status'] == 'PENDING' ? '<tr style="color:red">' : '<tr>';
 			echo '<td>'.$row['catName'].'</td>';
 			echo '<td>'.mc_status('DSGVO').secure_data('DSGVO',$row['name'], 'decrypt', $userID, $privateKey).' - '.secure_data('DSGVO', $row['versionDescr'], 'decrypt').'</td>';
+			echo '<td>';
+			if($row['cPartner'] == 'employee') echo $userID_toName[$row['cPartnerID']];
+			if($row['cPartner'] == 'free' || $row['cPartner'] == 'contact'){
+				$val = $row['cPartnerID'];
+				$stmt->execute();
+				$conRow = $stmt->get_result()->fetch_assoc();
+				echo $conRow['firstname'].' '.$conRow['lastname'];
+			}
+			echo '</td>';
 			echo '<td>'.$row['validDate'].'</td>';
 			echo '<td>'.$row['status'].'</td>';
 			echo '<td><form method="POST" style="display:inline"><button type="submit" name="edit-meta" value="'.$row['id'].'" class="btn btn-default"><i class="fa fa-pencil"></i></button>
@@ -372,6 +396,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 			if($row['status'] == 'PENDING') $openUpload = $row['id'];
 		}
+		$stmt->close();
 		?>
 	</tbody>
 </table>
@@ -426,26 +451,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	                <label><?php echo $lang['DOCUMENTS']; ?></label>
 	                <select id="send-select-doc" class="js-example-basic-single" name="send_document"><?php echo $doc_selects; ?></select>
 	                <br><br>
-	                <div class="row form-group">
-	                    <div class="col-sm-4">
-	                        <label><?php echo $lang['CLIENT']; ?></label>
-	                        <select class="js-example-basic-single" onchange="showContacts(this.value);">
-	                            <option value="">...</option>
-	                            <?php
-	                            $res = $conn->query("SELECT id, name FROM clientData WHERE companyID = $cmpID");
-	                            if ($res && $res->num_rows > 1) {echo '<option value="0">...</option>';}
-	                            while ($res && ($row_fc = $res->fetch_assoc())) {
-	                                echo "<option value='" . $row_fc['id'] . "' >" . $row_fc['name']. "</option>";
-	                                $filterClient = $row['id'];
-	                            }
-	                            ?>
-	                        </select>
-	                    </div>
-	                    <div class="col-sm-4">
-	                        <label><?php echo $lang['CONTACT_PERSON']; ?></label>
-	                        <select id="contactHint" class="js-example-basic-single" name="send_contact"></select>
-	                    </div>
-	                </div>
+	                <?php include dirname(__DIR__).'/misc/select_contact.php'; ?>
 	                <div class="row form-group checkbox">
 	                    <div class="col-sm-4"><label><input type="checkbox" name="send_andRead" /> + Lesen</label></div>
 	                    <div class="col-sm-4"><label><input type="checkbox" name="send_andAccept" /> + Akzeptieren</label></div>
@@ -555,14 +561,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <?php
 $result = false;
 if(!empty($openUpload) && is_numeric($openUpload)){
-	$result = $conn->query("SELECT * FROM archive_meta WHERE id = $openUpload LIMIT 1");
+	$result = $conn->query("SELECT m.*, uniqID FROM archive_meta m, archive WHERE archive.id = m.archiveID AND m.id = $openUpload LIMIT 1");
+	echo $conn->error;
 }
 if($result && ($row = $result->fetch_assoc())):
  ?>
-<form method="POST">
-	<div class="modal fade" id="edit-meta-modal">
-		<div class="modal-dialog modal-content modal-lg">
-			<div class="modal-header h4"><?php echo $lang['DOCUMENTS'].' - Detail '.$lang['DATA']; ?> </div>
+<div class="modal fade" id="edit-meta-modal">
+	<div class="modal-dialog modal-content modal-lg">
+		<div class="modal-header h4"><?php echo $lang['DOCUMENTS'].' - Detail '.$lang['DATA']; ?>
+			<form method="POST" style="display:inline;float:right" action="../project/detailDownload" target="_blank">
+				<input type="hidden" name="keyReference" value="DSGVO" />
+				<button type="submit" class="btn btn-default" name="download-file" value="<?php echo $row['uniqID']; ?>">Vorschau <i class="fa fa-download"></i></button>
+			</form>
+		 </div>
+			<form method="POST">
 			<div class="modal-body">
 				<div class="row">
 					<div class="col-md-6">
@@ -593,10 +605,11 @@ if($result && ($row = $result->fetch_assoc())):
 						<label>Subkategorie</label>
 						<select class="js-example-basic-single" name="meta-subcat">
 							<?php
-							$catresult = $conn->query("SELECT id, name FROM dsgvo_categories");
-							while($cats = $catresult->fetch_assoc()){
-								$checked = $cats['id'] == $row['category'] ? 'selected' : '';
-								echo '<option '.$checked.' value="'.$cats['id'].'">'.$cats['name'].'</option>';
+							$catresult = $conn->query("SELECT id, name FROM dsgvo_categories")->fetch_all();
+							$cats = array_combine(array_column($catresult, 0),array_column($catresult, 1));
+							foreach($cats as $key => $val){
+								$checked = $key == $row['category'] ? 'selected' : '';
+								echo "<option $checked value=\"$key\">$val</option>";
 							}
 							?>
 						</select>
@@ -622,26 +635,27 @@ if($result && ($row = $result->fetch_assoc())):
 						<select id="meta-parent" class="js-example-basic-single" name="meta-parent">
 							<option value=""> ... </option> <!--5b055b09c88df -->
 							<?php
-							$result = $conn->query("SELECT am.id, am.name, versionDescr FROM archive INNER JOIN archive_meta am ON archive.id = am.archiveID AND am.status != 'PENDING'
+							$result = $conn->query("SELECT am.id, am.name, am.category, versionDescr FROM archive INNER JOIN archive_meta am ON archive.id = am.archiveID AND am.status != 'PENDING'
 								WHERE archive.category = 'AGREEMENT' AND archive.categoryID = '$cmpID' ");
-							while($parentRow = $result->fetch_assoc()){
-								$selected = $row['parentID'] == $parentRow['id'] ? 'selected' : '';
-								echo '<option value="'.$parentRow['id'].'" '.$selected.'>'.secure_data('DSGVO',$parentRow['name'],'decrypt').' - '.secure_data('DSGVO', $parentRow['versionDescr'], 'decrypt').'</option>';
+							while($subRow = $result->fetch_assoc()){
+								$selected = $row['parentID'] == $subRow['id'] ? 'selected' : '';
+								echo '<option value="'.$subRow['id'].'" '.$selected.'>'.$cats[$subRow['category']].': '.secure_data('DSGVO',$subRow['name'],'decrypt').' - '.secure_data('DSGVO', $subRow['versionDescr'], 'decrypt').'</option>';
 							}
 							?>
 						</select>
 					</div>
 				</div>
 				<div class="row">
+					<?php $part = $row['cPartner'] ? $row['cPartner'] : 'employee'; //just for default view ?>
 					<div class="col-md-3">
 						<label>Vertragspartner</label>
 						<br>
-						<label><input type="radio" name="meta-cPartner" value="free">Frei</label><br>
-						<label><input type="radio" name="meta-cPartner" value="employee" checked><?php echo $lang['EMPLOYEE']; ?></label><br>
-						<label><input type="radio" name="meta-cPartner" value="contact"><?php echo $lang['ADDRESS_BOOK']; ?></label>
+						<label><input type="radio" name="meta-cPartner" value="free" <?php if($part == 'free') echo 'checked'; ?>>Frei</label><br>
+						<label><input type="radio" name="meta-cPartner" value="employee"<?php if($part == 'employee') echo 'checked'; ?>><?php echo $lang['EMPLOYEE']; ?></label><br>
+						<label><input type="radio" name="meta-cPartner" value="contact"<?php if($part == 'contact') echo 'checked'; ?>><?php echo $lang['ADDRESS_BOOK']; ?></label>
 					</div>
 					<div class="col-md-9">
-						<div id="meta-cPartner-employee" <?php if($row['cPartner'] != 'employee') echo 'style="display:none"'; ?> >
+						<div id="meta-cPartner-employee" <?php if($part != 'employee') echo 'style="display:none"'; ?> >
 							<label><?php echo $lang['EMPLOYEE']; ?></label>
 							<select class="js-example-basic-single" name="meta-cPartner-employee">
 								<?php
@@ -654,19 +668,48 @@ if($result && ($row = $result->fetch_assoc())):
 								?>
 							</select>
 						</div>
-						<div id="meta-cPartner-free" <?php if($row['cPartner'] != 'free') echo 'style="display:none"'; ?>>
+						<div id="meta-cPartner-free" <?php if($part != 'free') echo 'style="display:none"'; ?>>
+							<div class="row">
+								<div class="col-sm-12">
+									<label>Bestehender Kontakt</label>
+									<select id="meta-free-existing" class="js-example-basic-single" name="meta-free-existing">
+										<option value="">Neuer Kontakt ... </option>
+										<?php
+										$result = $conn->query("SELECT id, firstname, lastname FROM contactPersons WHERE clientID IS NULL");
+										while($subRow = $result->fetch_assoc()){
+											$selected = $row['cPartner'] == 'free' ? $row['cPartnerID'] == $subRow['id'] ? 'selected' : '' : '';
+											echo '<option '.$selected.' value="'.$subRow['id'].'">'.$subRow['firstname'].' '.$subRow['lastname'].'</option>';
+										}
+										?>
+									</select>
+								</div>
+							</div>
+							<div id="meta-cPartner-newfree" <?php if($row['cPartner'] == 'free') echo 'style="display:none;"'; ?>>
+								<div class="row">
+									<div class="col-sm-6">
+										<label><?php echo $lang['FIRSTNAME']; ?></label>
+										<input type="text" class="form-control" name="meta-free-firstname" value="" />
+									</div>
+									<div class="col-sm-6">
+										<label><?php echo $lang['LASTNAME']; ?></label>
+										<input type="text" class="form-control" name="meta-free-lastname" value="" />
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-sm-6">
+										<label><?php echo $lang['ADDRESS_FORM']; ?></label><br>
+		                                <label><input type="radio" value="male" name="meta-free-gender" checked /> <?php echo $lang['GENDER_TOSTRING']['male']; ?></label>
+		                                <label style="padding-left:25px;"><input type="radio" value="female" name="meta-free-gender" /> <?php echo $lang['GENDER_TOSTRING']['female']; ?></label>
+		                            </div>
+									<div class="col-sm-6">
+										<label>E-Mail</label>
+		                                <input type="email" class="form-control" name="meta-free-email" value="" />
+		                            </div>
+								</div>
+							</div>
 						</div>
-						<div id="meta-cPartner-contact" <?php if($row['cPartner'] != 'contact') echo 'style="display:none"'; ?>>
-							<label><?php echo $lang['CLIENT']; ?></label>
-							<select class="js-example-basic-single" name="meta-cPartnerID-contact">
-								<?php
-								$result = $conn->query("SELECT id, name FROM clientData WHERE companyID = $cmpID");
-								while($clientRow = $result->fetch_assoc()){
-									$selected = $row['cPartner'] == 'contact' ? ($row['cPartnerID'] == $clientRow['id'] ? 'selected' : '') : '';
-									echo '<option '.$selected.' value="'.$clientRow['id'].'">'.$clientRow['name'].'</option>';
-								}
-								?>
-							</select>
+						<div id="meta-cPartner-contact" <?php if($part != 'contact') echo 'style="display:none"'; ?>>
+							<?php if($part == 'contact') $filterings['contact'] = $row['cPartnerID']; include dirname(__DIR__).'/misc/select_contact.php'; ?>
 						</div>
 					</div>
 				</div>
@@ -685,12 +728,19 @@ if($result && ($row = $result->fetch_assoc())):
 				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
 				<button type="submit" class="btn btn-warning" name="save-meta" value="<?php echo $openUpload; ?>"><?php echo $lang['SAVE']; ?></button>
 			</div>
-		</div>
+		</form>
 	</div>
-</form>
+</div>
 <?php endif; ?>
 
 <script>
+$('#meta-free-existing').on('change', function(){
+	if(!$(this).val()){
+		$('#meta-cPartner-newfree').show();
+	} else {
+		$('#meta-cPartner-newfree').hide();
+	}
+});
 $('button[name=setSelect]').click(function(){
   $("#send-select-doc").val($(this).val()).trigger('change');
 });
@@ -700,17 +750,6 @@ $('input[name=meta-cPartner]').click(function(){
 	$('#meta-cPartner-contact').hide();
 	$('#meta-cPartner-'+$(this).val()).show();
 });
-function showContacts(client){
-  $.ajax({
-    url:'ajaxQuery/AJAX_getContacts.php',
-    data:{clientID:client},
-    type: 'get',
-    success : function(resp){
-      $('#contactHint').html(resp);
-    },
-    error : function(resp){}
-  });
-}
 $(document).ready(function(){
 	$('.datatable').DataTable({
 		language: {
@@ -728,12 +767,4 @@ $(document).ready(function(){
 });
 <?php if(!empty($openUpload)){ echo "setTimeout(function(){ $('#edit-meta-modal').modal('show'); }, 500)"; } ?>
 </script>
-
-<?php
-if (isset($filterClient)) {
-    echo '<script>';
-    echo "showContacts($filterClient)";
-    echo '</script>';
-}
-?>
 <?php include dirname(__DIR__) . '/footer.php';?>

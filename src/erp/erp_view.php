@@ -38,6 +38,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 		} else {
 			echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
 		}
+	} elseif(!empty($_POST['setComplete'])) {
+		$val = intval($_POST['setComplete']);
+		$conn->query("UPDATE processHistory SET status = 2 WHERE id = $val");
+		if($conn->error){
+			echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+		} else {
+			echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+		}
 	} elseif(isset($_POST['add_new_process']) && !empty($_POST['filterClient']) && !empty($_POST['nERP'])){
 		$val = intval($_POST['filterClient']);
 		$result = $conn->query("SELECT representative, paymentMethod, shipmentType FROM clientInfoData WHERE clientID = $val");
@@ -65,15 +73,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 		} else {
 			echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
 		}
-	} elseif(!empty($_POST['process1'])){
-		$val = intval($_POST['process1']);
-		$conn->query("UPDATE processHistory SET status = 0 WHERE id = $val");
-	} elseif(!empty($_POST['process2'])){
-		$val = intval($_POST['process2']);
-		$conn->query("UPDATE processHistory SET status = 1 WHERE id = $val");
-	} elseif(!empty($_POST['process3'])){
-		$val = intval($_POST['process3']);
-		$conn->query("UPDATE processHistory SET status = 2 WHERE id = $val");
 	}
 }
 if(isset($_GET['err'])){
@@ -158,13 +157,7 @@ if($result && ($row = $result->fetch_assoc())){ $showBalance = $row['erpOption']
 					if(count($available_companies) > 2){ echo '<td>'.$row['companyName'].'</td>'; }
 					echo '<td>'.$row['clientName'].'</td>';
 					echo '<td>'.$row['id_number'].'</td>';
-					echo '<td><div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">'
-					.$lang['OFFERSTATUS_TOSTRING'][$row['status']].' <span class="caret"></span></button>
-					<ul class="dropdown-menu"><form method="POST">
-					<li><button type="submit" value="'.$historyID.'" name="process1" class="btn btn-link">'.$lang['OFFERSTATUS_TOSTRING'][0].'</button></li>
-					<li><button type="submit" value="'.$historyID.'" name="process2" class="btn btn-link">'.$lang['OFFERSTATUS_TOSTRING'][1].'</button></li>
-					<li><button type="submit" value="'.$historyID.'" name="process3" class="btn btn-link">'.$lang['OFFERSTATUS_TOSTRING'][2].'</button></li>
-					</form></ul></div></td>';
+					echo '<td>'.$lang['OFFERSTATUS_TOSTRING'][intval($row['status'])].'</td>';
 					if($showBalance == 'TRUE'){
 						$balance = 0;
 						$stmt_balance->execute();
@@ -185,13 +178,26 @@ if($result && ($row = $result->fetch_assoc())){ $showBalance = $row['erpOption']
 					echo '<td>'.substr(md5($row['id']),0,8).'<i style="color:#'.substr(md5($row['id']),0,6).'" class="fa fa-circle"></i></td>';
 					echo '<td>'.date('d.m.Y', strtotime($row['curDate'])).'</td>';
 					echo '<td>';
-					echo "<a href='download?proc=$historyID' class='btn btn-default btn-sm' target='_blank'><i class='fa fa-download'></i></a> ";
+					if($current_transition == 'RE' && !$row['status']){
+						echo '<a data-target=".ask-complete-'.$historyID.'" data-toggle="modal" class="btn btn-default btn-sm" title="Download"><i class="fa fa-download"></i></a> ';
+						$modals .= '<form method="POST">
+						<div class="modal fade ask-complete-'.$historyID.'">
+						<div class="modal-dialog modal-sm modal-content">
+						<div class="modal-header"><h4 class="modal-title">'.$row['id_number'].'</h4></div>
+						<div class="modal-body">Wollen Sie diese Rechnung abschließen?</div>
+						<div class="modal-footer">
+						<a href="download?proc=$historyID" class="btn btn-default" target="_blank" onclick="$(\'.ask-complete-'.$historyID.'\').modal(\'hide\');">'.$lang['CONFIRM_CANCEL'].'</a>
+						<button type="submit" name="setComplete" class="btn btn-warning" value="'.$historyID.'">'.$lang['CONFIRM'].'</button>
+						</div> </div> </div> </form>';
+					} else {
+						echo "<a href='download?proc=$historyID' class='btn btn-default btn-sm' target='_blank'><i class='fa fa-download'></i></a> ";
+					}
 					echo '<form method="POST" style="display:inline"><button type="submit" class="btn btn-default btn-sm" name="copy_process" title="'.$lang['COPY'].'" value="'.$historyID.'"><i class="fa fa-files-o"></i></button></form> ';
 					echo '<a href="edit?val='.$historyID.'" title="'.$lang['EDIT'].'" class="btn btn-default btn-sm"><i class="fa fa-pencil"></i></a> ';
 
 					if($transitable){ //if open positions
 						if($current_transition != 'RE'){ echo '<button type="button" class="btn btn-default btn-sm" title="'.$lang['DELETE'].'" data-toggle="modal" data-target=".confirm-delete-'.$historyID.'"><i class="fa fa-trash-o"></i></button> '; }
-						echo '<a  style="margin-left: 20px" data-target=".choose-transition-'.$historyID.'" data-toggle="modal" class="btn btn-warning btn-sm" title="'.$lang['TRANSITION'].'"><i class="fa fa-arrow-right"></i></a>';
+						echo '<a style="margin-left: 20px" data-target=".choose-transition-'.$historyID.'" data-toggle="modal" class="btn btn-warning btn-sm" title="'.$lang['TRANSITION'].'"><i class="fa fa-arrow-right"></i></a>';
 
 						$modal_transits = '';
 						foreach($available_transitions as $t){
@@ -205,20 +211,15 @@ if($result && ($row = $result->fetch_assoc())){ $showBalance = $row['erpOption']
 						<div class="modal-footer">
 						<button type="button" data-dismiss="modal" class="btn btn-default">Cancel</button>
 						<button type="submit" class="btn btn-warning" name="translate">OK</button>
-						</div>
-						</div>
-						</div></form><form method="POST">
+						</div> </div> </div></form><form method="POST">
 						<div class="modal fade confirm-delete-'.$historyID.'">
 						<div class="modal-dialog modal-sm modal-content">
 						<div class="modal-header"><h4 class="modal-title">'.sprintf($lang['ASK_DELETE'], $row['id_number']).'</h4></div>
-						<div class="modal-body">#'.$lang['WARNING_DELETE_TRANSITION'].'</div>
+						<div class="modal-body">'.$lang['WARNING_DELETE_TRANSITION'].'</div>
 						<div class="modal-footer">
 						<button type="button" class="btn btn-default" data-dismiss="modal">'.$lang['CONFIRM_CANCEL'].'</button>
 						<button type="submit" name="delete_proposal" class="btn btn-warning" value="'.$historyID.'">'.$lang['CONFIRM'].'</button>
-						</div>
-						</div>
-						</div>
-						</form>';
+						</div> </div> </div> </form>';
 					} //endif transitable
 					echo '</td>';
 					echo '</tr>';
@@ -255,7 +256,6 @@ if($result && ($row = $result->fetch_assoc())){ $showBalance = $row['erpOption']
 			</div>
 		</form>
 
-
 		<script>
 		$(document).ready(function(){
 			$('.table').DataTable({
@@ -267,6 +267,11 @@ if($result && ($row = $result->fetch_assoc())){ $showBalance = $row['erpOption']
 				paging: true
 			});
 		});
+		<?php
+		if(!empty($_POST['setComplete'])){
+			echo 'window.location.replace("download?proc='.$_POST['setComplete'].'");';
+		}
+		?>
 	</script>
 </div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

@@ -317,7 +317,7 @@ ini_set('max_execution_time',999);
 	$base_opts = array('', 'Awarness: Regelmäßige Mitarbeiter Schulung in Bezug auf Datenschutzmanagement','Awarness: Risikoanalyse','Awarness: Datenschutz-Folgeabschätzung',
 	'Zutrittskontrolle: Schutz vor unbefugten Zutritt zu Server, Netzwerk und Storage','Zutrittskontrolle: Protokollierung der Zutritte in sensible Bereiche (z.B. Serverraum)',
 	'Zugangskontrolle: regelmäßige Passwortänderung der Benutzerpasswörter per Policy (mind. Alle 180 Tage)','Zugangskontrolle: regelmäßige Passwortänderung der administrativen Zugänge,
-	Systembenutzer (mind. Alle 180 Tage)','Zugangskontrolle: automaischer Sperrmechanismus der Zugänge um Brut Force Attacken abzuwehren','Zugangskontrolle: Zwei-Faktor-Authentifizierung für externe Zugänge (VPN)',
+	Systembenutzer (mind. Alle 180 Tage)','Zugangskontrolle: automatischer Sperrmechanismus der Zugänge um Brut Force Attacken abzuwehren','Zugangskontrolle: Zwei-Faktor-Authentifizierung für externe Zugänge (VPN)',
 	'Wechseldatenträger: Sperre oder zumindest Einschränkung von Wechseldatenträger (USB-Stick, SD Karte, USB Geräte mit Speichermöglichkeiten…)',
 	'Infrastruktur: Verschlüsselung der gesamten Festplatte in PC und Notebooks','Infrastruktur: Network Access Control (NAC) im Netzwerk aktiv',
 	'Infrastruktur: Protokollierung der Verbindungen über die Firewall (mind. 180 Tage)','Infrastruktur: Einsatz einer Vorgangssbasierten Firewall (next Generation Firewall)', 'Infrastruktur: Backup-Strategie, die mind. Alle 180 Tage getestet wird','Infrastruktur: Virenschutz (advanced Endpoint Protection)',

@@ -81,7 +81,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $res->free();
       //step3 - create new history and enter products with quantities
       $num = getNextERP($transit, $proposal_row['companyID']);
-      $conn->query("INSERT INTO processHistory (id_number, processID) VALUES('$num', ".$proposal_row['id'].")"); echo $conn->error;
+      $conn->query("INSERT INTO processHistory (id_number, processID, status) VALUES('$num', ".$proposal_row['id'].", 0)"); echo $conn->error;
       $historyID = $conn->insert_id;
       $stmt = $conn->prepare("INSERT INTO products (historyID, origin, position, name, price, quantity, description, taxID, cash, unit, purchase)
       VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); echo $conn->error;
