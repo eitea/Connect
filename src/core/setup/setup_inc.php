@@ -687,7 +687,7 @@ function create_tables($conn) {
     $sql = "CREATE TABLE processHistory(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         id_number VARCHAR(12) NOT NULL,
-        status INT(2), 		
+        status INT(2),
         processID INT(6) UNSIGNED,
         FOREIGN KEY (processID) REFERENCES proposals(id)
         ON UPDATE CASCADE
@@ -1244,6 +1244,7 @@ function create_tables($conn) {
         level INT(3) DEFAULT 0 NOT NULL,
         projecttags VARCHAR(250) DEFAULT '' NOT NULL,
         isTemplate ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL,
+		v2 VARCHAR(150) DEFAULT NULL,
         FOREIGN KEY (companyid) REFERENCES companyData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,

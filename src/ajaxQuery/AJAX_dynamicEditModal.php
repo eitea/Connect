@@ -51,7 +51,7 @@ if($x){
 <div class="modal fade" id="<?php if($dynrow['isTemplate']=='TRUE') echo "temp"; ?>editingModal-<?php echo $x; ?>">
     <div class="modal-dialog modal-lg" role="form">
         <div class="modal-content">
-            <form method="POST" id="projectForm<?php echo $x; ?>">
+            <form method="POST" id="projectForm<?php echo $x; ?>" enctype="multipart/form-data">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">Task editieren</h4>
@@ -61,7 +61,6 @@ if($x){
                     <ul class="nav nav-tabs">
                         <li class="active"><a data-toggle="tab" href="#projectBasics<?php echo $x; ?>">Basic*</a></li>
                         <li><a data-toggle="tab" href="#projectAdvanced<?php echo $x; ?>">Erweiterte Optionen</a></li>
-                        <li><a data-toggle="tab" href="#projectSeries<?php echo $x; ?>">Routine Aufgabe</a></li>
                     </ul>
                     <div class="tab-content">
                         <div id="projectBasics<?php echo $x; ?>" class="tab-pane fade in active"><br>
@@ -160,16 +159,16 @@ if($x){
                             </div>
                             <div class="row">
                                 <div class="col-md-4">
-                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?>*</label>
-                                <select class="form-control js-example-basic-single" name="priority">
-                                    <?php
-                                    for($i = 1; $i < 6; $i++){
-                                        $selected = $dynrow['projectpriority'] == $i ? 'selected' : '';
-                                        echo '<option value="'.$i.'" '.$selected.'>'.$lang['PRIORITY_TOSTRING'][$i].'</option>';
-                                    }
-                                    ?>
-                                </select><br>
-                            </div>
+	                                <label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?>*</label>
+	                                <select class="form-control js-example-basic-single" name="priority">
+	                                    <?php
+	                                    for($i = 1; $i < 6; $i++){
+	                                        $selected = $dynrow['projectpriority'] == $i ? 'selected' : '';
+	                                        echo '<option value="'.$i.'" '.$selected.'>'.$lang['PRIORITY_TOSTRING'][$i].'</option>';
+	                                    }
+	                                    ?>
+	                                </select><br>
+	                            </div>
                                 <div class="col-md-4">
                                     <label>Geschätzte Zeit <a data-toggle="collapse" href="#estimateCollapse-<?php echo $x; ?>"><i class="fa fa-question-circle-o"></i></a></label>
                                     <input type="text" class="form-control" value="<?php echo $dynrow['estimatedHours']; ?>" name="estimatedHours" /><br>
@@ -209,6 +208,20 @@ if($x){
                                 <textarea class="form-control projectDescriptionEditor tinymce-remember" name="description"><?php echo $dynrow['projectdescription']; ?></textarea>
                                 <br>
                             </div>
+							<div class="row">
+								<?php
+								$count = 0;
+								$result = $conn->query("SELECT uniqID FROM archive WHERE category = 'TASK' AND categoryID = '$x' ");
+								while($row = $result->fetch_assoc()){
+									$count++;
+									echo '<div class="col-sm-6"><input type="checkbox" name="deleteTaskFile[]" style="display:none" value="'.$row['uniqID'].'" /></div>'; //if checked -> delete;
+								}
+								while($count < 5){
+									echo '<div class="col-sm-6"><label class="btn btn-default">'. ++$count
+									.'. Datei Hochladen<input type="file" name="newTaskFiles[]" style="display:none" /></label></div>';
+								}
+								?>
+							</div>
                         </div>
                         <div id="projectAdvanced<?php echo $x; ?>" class="tab-pane fade"><br>
                             <div class="row">
@@ -284,94 +297,6 @@ if($x){
                                     </select>
                                     <?php endif; ?>
                                 </div>
-                            </div>
-                        </div>
-                        <div id="projectSeries<?php echo $x; ?>" class="tab-pane fade"><br>
-                            <div class="well">
-                                <div class="row">
-                                    <div class="col-sm-8">
-                                        <label><?php echo $lang["END"]; ?></label><br>
-                                        <label><input type="radio" name="endradio" value="" checked ><?php echo $lang["DYNAMIC_PROJECTS_SERIES_NO_END"]; ?></label><br>
-                                        <input type="radio" name="endradio" value="date">
-                                        <label><input type='text' class="form-control datepicker" name='enddate' placeholder="Enddatum" value="<?php echo $dynrow['projectend']; ?>"/></label><br>
-                                        <input type="radio" name="endradio" value="number" >
-                                        <label><input type='number' class="form-control" name='endnumber' placeholder="<?php echo $lang["DYNAMIC_PROJECTS_SERIES_REPETITIONS"]; ?>" ></label><br>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-12"><br> <!-- Once -->
-                                <label><?php echo $lang["SCHEDULE_TOSTRING"][0]; ?></label><br>
-                                <label><input type="radio"checked name="series" value="once" >Keine Wiederholungen</label><br>
-                            </div>
-                            <div class="col-md-12"><br> <!-- Daily -->
-                                <label><?php echo $lang["SCHEDULE_TOSTRING"][1]; ?></label><br>
-                                <input type="radio" name="series" value="daily_every_nth" >Jeden
-                                <label><input class="form-control" type="number" min="1" max="365" value="1" name="daily_days"></label> -ten Tag
-                                <br>
-                                <input type="radio" name="series" value="daily_every_weekday" >Montag bis Freitag <br>
-                            </div>
-                            <div class="col-md-12"><br> <!-- Weekly -->
-                                <label><?php echo $lang["SCHEDULE_TOSTRING"][2]; ?></label><br>
-                                <input type="radio" name="series" value="weekly" >Alle
-                                <label><input name="weekly_weeks" type="number" class="form-control" min="1" max="52" value="1" ></label> Wochen am
-                                <label>
-                                    <select class="form-control" name="weekly_day">
-                                        <?php
-                                        $modal_weeks = '';
-                                        $days_of_the_week = array("monday" => "Montag", "tuesday" => "Dienstag", "wednesday" => "Mittwoch", "thursday" => "Donnerstag", "friday" => "Freitag", "saturday" => "Samstag", "sunday" => "Sonntag");
-                                        foreach ($days_of_the_week as $key => $val) {
-                                            $modal_weeks .= "<option value='$key'>$val</option>";
-                                        }
-                                        echo $modal_weeks;
-                                        ?>
-                                    </select>
-                                </label>
-                                <br>
-                            </div>
-                            <div class="col-md-12"><br> <!-- Monthly -->
-                                <label><?php echo $lang["SCHEDULE_TOSTRING"][3]; ?></label><br>
-                                <input type="radio" name="series" value="monthly_day_of_month">Am
-                                <label><input name="monthly_day_of_month_day" class="form-control" value="1" type="number" min="1" max="31"></label> -ten Tag jedes
-                                <label><input name="monthly_day_of_month_month" value="1" class="form-control" type="number" min="1" max="12"></label> -ten Monats
-                                <br>
-                                <input type="radio"  name="series" value="monthly_nth_day_of_week">Am
-                                <label><input name="monthly_nth_day_of_week_nth" value="1" class="form-control" type="number" min="1" max="5"></label> -ten
-                                <label>
-                                    <select class="form-control" name="monthly_nth_day_of_week_day">
-                                        <?php echo $modal_weeks; ?>
-                                    </select>
-                                </label> jeden
-                                <label><input name="monthly_nth_day_of_week_month" value="1" class="form-control" type="number" min="1" max="12"></label> -ten Monat
-                                <br>
-                            </div>
-                            <div class="col-md-12"><br> <!-- Yearly -->
-                                <label><?php echo $lang["SCHEDULE_TOSTRING"][4]; ?></label><br>
-                                <input type="radio" name="series" value="yearly_nth_day_of_month">Jeden
-                                <label><input name="yearly_nth_day_of_month_nth" class="form-control" min="1" max="31" type="number" value="1"></label> -ten
-                                <label>
-                                    <select class="form-control" name="yearly_nth_day_of_month_month">
-                                        <?php
-                                        $months_of_the_year = array("JAN" => "Jänner", "FEB" => "Februar", "MAR" => "März", "APR" => "April", "MAY" => "Mai", "JUN" => "Juni", "JUL" => "Juli", "AUG" => "August", "SEPT" => "September", "OCT" => "Oktober", "NOV" => "November", "DEC" => "Dezember");
-                                        $modal_months = '';
-                                        foreach ($months_of_the_year as $key => $val) $modal_months .= "<option value='$key'>$val</option>";
-                                        echo $modal_months;
-                                        ?>
-                                    </select>
-                                </label>
-                                <br>
-                                <input type="radio" name="series" value="yearly_nth_day_of_week">Am
-                                <label><input name="yearly_nth_day_of_week_nth" value="1" class="form-control" min="1" max="5" type="number"></label> -ten
-                                <label>
-                                    <select class="form-control" name="yearly_nth_day_of_week_day">
-                                        <?php echo $modal_weeks; ?>
-                                    </select>
-                                </label> im
-                                <label>
-                                    <select name="yearly_nth_day_of_week_month" class="form-control" name="month">
-                                        <?php echo $modal_months; ?>
-                                    </select>
-                                </label>
-                                <br>
                             </div>
                         </div>
                     </div><!-- /tab-content -->

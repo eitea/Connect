@@ -634,7 +634,7 @@ function util_strip_prefix($subject, $prefix) {
     return $subject;
 }
 
-function getS3Object(){
+function getS3Object($bucket = ''){
 	global $conn;
 	require dirname(__DIR__) . DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.'aws'.DIRECTORY_SEPARATOR.'autoload.php';
 	$result = $conn->query("SELECT endpoint, awskey, secret FROM archiveconfig WHERE isActive = 'TRUE' LIMIT 1");
@@ -647,6 +647,11 @@ function getS3Object(){
 				'use_path_style_endpoint' => true,
 				'credentials' => array('key' => $row['awskey'], 'secret' => $row['secret'])
 			));
+			if($bucket){
+				if(!$s3->doesBucketExist($bucket)){
+					$s3->createBucket(['Bucket' => $bucket]);
+				}
+			}
 		} catch(Exception $e){
 			echo $e->getMessage();
 			return false;

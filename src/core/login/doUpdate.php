@@ -2926,7 +2926,28 @@ if($row['version'] < 159){
 	$conn->query("ALTER TABLE processHistory ADD COLUMN status INT(2)");
 	$conn->query("UPDATE processHistory p SET status = (SELECT status FROM proposals WHERE id = p.processID)");
 	$conn->query("ALTER TABLE proposals DROP COLUMN status");
+
+	//5b16313246c45
+	$conn->query("UPDATE dsgvo_vv_template_settings SET opt_descr = REPLACE(opt_descr, 'automatischer', 'automaischer') WHERE opt_descr LIKE '% automaischer %'");
+
+	$conn->query("ALTER TABLE dynamicprojects ADD COLUMN v2 VARCHAR(150) DEFAULT NULL");
+
+	$keypair = sodium_crypto_box_keypair();
+	$private = sodium_crypto_box_secretkey($keypair);
+	$public = sodium_crypto_box_publickey($keypair);
+	$nonce = random_bytes(24);
+	$conn->query("INSERT INTO security_modules (module, symmetricKey, publicKey, outDated, checkSum) VALUES('TASK', '', '".base64_encode($public)."', 'FALSE', '')");
+	echo $conn->error;
+	$result = $conn->query("SELECT userID, publicKey FROM security_users WHERE outDated = 'FALSE'");
+	while($row = $result->fetch_assoc()){
+		$user_public = base64_decode($row['publicKey']);
+		$nonce = random_bytes(24);
+		$encrypted = base64_encode($nonce . sodium_crypto_box($private, $nonce, $private.$user_public));
+		$conn->query("INSERT INTO security_access(userID, module, privateKey, outDated) VALUES(".$row['userID'].", 'TASK', '$encrypted', 'FALSE')");
+	}
+	echo $conn->error;
 }
+
 // if($row['version'] < 160){}
 // if($row['version'] < 161){}
 // if($row['version'] < 162){}

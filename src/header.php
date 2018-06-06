@@ -589,7 +589,7 @@ if ($_SESSION['color'] == 'light') {
 							  ?>
 						  </div>
 					  <?php
-					  $result = $conn->query("SELECT module, checkSum, id FROM security_modules WHERE outDated = 'FALSE'");
+					  $result = $conn->query("SELECT module, checkSum, id FROM security_modules WHERE outDated = 'FALSE' AND module != 'TASK'"); //nothing works with tasks
 					  echo $conn->error;
 					  while($row = $result->fetch_assoc()){
 						  $err = '';
@@ -609,7 +609,7 @@ if ($_SESSION['color'] == 'light') {
 								  echo '<p style="color:red">DENIED</p>';
 
 							  }
-						  } catch(Exceptioon $e){
+						  } catch(Exception $e){
 							  echo $e;
 						  }
 						  echo '</div>';

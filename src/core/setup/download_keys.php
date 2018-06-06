@@ -44,7 +44,8 @@ $bobPublicKey = sodium_crypto_box_publickey($bobKeypair);
 
 // On Alice's computer:
 $message = base64_encode(random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES));
-$aliceToBob = $aliceSecretKey . $alicePublicKey;
+$aliceToAlice = $aliceSecretKey . $alicePublicKey;
+$aliceToBob = $aliceSecretKey . $bobPublicKey;
 $nonce = random_bytes(24);
 $ciphertext = $nonce . sodium_crypto_box($message, $nonce, $aliceToBob);
 
@@ -53,7 +54,7 @@ $ciphertext = $nonce . sodium_crypto_box($message, $nonce, $aliceToBob);
 // $alice_sign_publickey = sodium_crypto_sign_publickey($alice_sign_kp);
 // $message = sodium_crypto_sign($message, $alice_sign_secretkey);
 
-// Alice can decrypt her own message too:
+// Alice can decrypt her own message too, but not without Bob:
 $nonce = mb_substr($ciphertext, 0, 24, '8bit');
 $encrypted = mb_substr($ciphertext, 24, null, '8bit');
 $decrypted = sodium_crypto_box_open($encrypted, $nonce, $aliceToBob);
@@ -62,12 +63,11 @@ echo $decrypted;
 echo "\n linebreak \n";
 
 // On Bob's computer:
-$bobToAlice = $bobSecretKey . $alicePublicKey;
-$nonce = mb_substr($ciphertext, 0, 24, '8bit');
-$encrypted = mb_substr($ciphertext, 24, null, '8bit');
-$decrypted = sodium_crypto_box_open($encrypted, $nonce, $bobToAlice);
-
-echo $decrypted;
+// $bobToAlice = $bobSecretKey . $alicePublicKey;
+// $nonce = mb_substr($ciphertext, 0, 24, '8bit');
+// $encrypted = mb_substr($ciphertext, 24, null, '8bit');
+// $decrypted = sodium_crypto_box_open($encrypted, $nonce, $bobToAlice);
+// echo $decrypted;
 // $original_msg = sodium_crypto_sign_open($decrypted, $alice_sign_publickey);
 // if ($original_msg === false) {
 //     echo "This is not from Alice";
