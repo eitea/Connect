@@ -10,7 +10,7 @@ $fileKey = test_input($_POST['download-file']);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-$arr = explode('_', $_POST['keyReference']);
+$arr = explode('_', test_input($_POST['keyReference']));
 
 $userID = $_SESSION['userid'];
 $privateKey = $_SESSION['privateKey'];
@@ -23,13 +23,15 @@ if($row = $result->fetch_assoc()){
 	die('No identifier found '.$conn->error);
 }
 
+$bucket = $identifier .'-uploads';
+
 $module = $arr[0];
+$symmetricOptional = '';
 if($module == 'PROJECT'){
 	$module = 'PRIVATE_PROJECT';
 	$symmetricOptional = "AND optionalID = '{$arr[1]}'";
 	$symmetricTableQuery = "LEFT JOIN security_projects s ON (s.projectID = optionalID AND s.outDated = 'FALSE')";
 } else {
-	$symmetricOptional = '';
 	$symmetricTableQuery = "LEFT JOIN security_modules s ON (s.module = a.module AND s.outDated = 'FALSE')";
 }
 
@@ -44,9 +46,13 @@ if($result && ($row = $result->fetch_assoc()) && $row['publicKey'] && $row['priv
 	$encrypted = mb_substr($cipher, 24, null, '8bit');
 	try {
 		$project_private = sodium_crypto_box_open($encrypted, $nonce, $keypair);
-		$cipher_symmetric = base64_decode($row['symmetricKey']);
-		$nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
-		$symmetricKey = sodium_crypto_box_open(mb_substr($cipher_symmetric, 24, null, '8bit'), $nonce, $project_private.base64_decode($row['publicKey']));
+		if($module == 'TASK'){
+			$bucket = $identifier .'-tasks';
+		} else {
+			$cipher_symmetric = base64_decode($row['symmetricKey']);
+			$nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
+			$symmetricKey = sodium_crypto_box_open(mb_substr($cipher_symmetric, 24, null, '8bit'), $nonce, $project_private.base64_decode($row['publicKey']));
+		}
 	} catch(Exception $e){
 		echo $e;
 	}
@@ -64,9 +70,8 @@ if($result && ($row = $result->fetch_assoc())){
             'use_path_style_endpoint' => true,
             'credentials' => array('key' => $row['awskey'], 'secret' => $row['secret'])
         ));
-
         $object = $s3->getObject(array(
-            'Bucket' => $identifier .'-uploads',
+            'Bucket' => $bucket,
             'Key' => $fileKey,
         ));
     } catch(Exception $e){
@@ -90,6 +95,10 @@ if(isset($object)){
 
 	if(isset($symmetricKey)){
 		echo simple_decryption($object[ 'Body' ], $symmetricKey);
+	} elseif($module == 'TASK'){
+		$result = $conn->query("SELECT v2 FROM dynamicprojects WHERE projectid = '{$arr[1]}'");
+		$row = $result->fetch_assoc();
+		echo asymmetric_encryption('TASK', $object[ 'Body' ], $userID, $privateKey, $row['v2']);
 	} else {
 		echo $object['Body'];
 	}

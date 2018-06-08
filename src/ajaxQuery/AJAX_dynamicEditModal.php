@@ -1,5 +1,6 @@
 <?php
 require dirname(__DIR__) . "/connection.php";
+require dirname(__DIR__) . "/utilities.php";
 require dirname(__DIR__) . "/language.php";
 if(!$_SERVER['REQUEST_METHOD'] == 'POST'){
     die("0");
@@ -8,6 +9,7 @@ $x = preg_replace("/[^A-Za-z0-9]/", '', $_POST['projectid']);
 $isDynamicProjectsAdmin = $_POST['isDPAdmin'];
 session_start();
 $userID = $_SESSION["userid"] or die("0");
+$privateKey = $_SESSION['privateKey'];
 
 $result = $conn->query("SELECT DISTINCT companyID FROM relationship_company_client WHERE userID = $userID OR $userID = 1");
 $available_companies = array('-1'); //care
@@ -111,7 +113,9 @@ if($x){
                             </div>
 
                             <div class="col-md-12"><small>*Auswahl ist Optional. Falls leer, entscheidet der Benutzer.</small><br><br></div>
-                            <div class="col-md-12"><label>Task Name*</label><input spellchecking="true" class="form-control" type="text" name="name" placeholder="Bezeichnung" maxlength="55" value="<?php echo $dynrow['projectname']; ?>" /><br></div>
+                            <div class="col-md-12"><label><?php echo mc_status('TASK'); ?> Task Name*</label>
+								<input spellchecking="true" class="form-control required-field" type="text" name="name" placeholder="Bezeichnung" maxlength="55" value="<?php echo asymmetric_encryption('TASK', $dynrow['projectname'], $userID, $privateKey, $dynrow['v2']); ?>" />
+							<br></div>
                             <?php
                             $modal_options = '';
                             if($isDynamicProjectsAdmin == 'TRUE'){
@@ -124,13 +128,13 @@ if($x){
                             <div class="row">
                                 <div class="col-md-6">
                                     <label><?php echo $lang["OWNER"]; ?>*</label>
-                                    <select class="select2-team-icons" name="owner">
+                                    <select class="select2-team-icons required-field" name="owner">
                                         <?php echo str_replace('<option value="'.$dynrow['projectowner'].'" ', '<option selected value="'.$dynrow['projectowner'].'" ', $modal_options); ?>
                                     </select><br>
                                 </div>
                                 <div class="col-md-6">
                                     <label><?php echo $lang["EMPLOYEE"]; ?>/ Team*</label>
-                                    <select class="select2-team-icons" name="employees[]" multiple="multiple">
+                                    <select class="select2-team-icons required-field" name="employees[]" multiple="multiple">
                                         <?php
                                         if($isDynamicProjectsAdmin != 'TRUE'){
                                             $result = str_replace('<option value="', '<option selected value="user;', $modal_options);
@@ -204,17 +208,21 @@ if($x){
                                 </select><small>Tags werden durch ',' oder ' ' automatisch getrennt.</small><br><br>
                             </div>
                             <div class="col-md-12">
-                                <label><?php echo $lang["DESCRIPTION"]; ?>* <small>(Max. 15MB)</small></label>
-                                <textarea class="form-control projectDescriptionEditor tinymce-remember" name="description"><?php echo $dynrow['projectdescription']; ?></textarea>
+                                <label><?php echo mc_status('TASK').' '.$lang["DESCRIPTION"]; ?>* <small>(Max. 15MB)</small></label>
+                                <textarea class="form-control projectDescriptionEditor required-field" name="description">
+									<?php echo asymmetric_encryption('TASK', $dynrow['projectdescription'], $userID, $privateKey, $dynrow['v2']); ?>
+								</textarea>
                                 <br>
                             </div>
 							<div class="row">
 								<?php
 								$count = 0;
-								$result = $conn->query("SELECT uniqID FROM archive WHERE category = 'TASK' AND categoryID = '$x' ");
+								$result = $conn->query("SELECT uniqID, name, type FROM archive WHERE category = 'TASK' AND categoryID = '$x' ");
 								while($row = $result->fetch_assoc()){
 									$count++;
-									echo '<div class="col-sm-6"><input type="checkbox" name="deleteTaskFile[]" style="display:none" value="'.$row['uniqID'].'" /></div>'; //if checked -> delete;
+									echo '<div class="col-sm-6 checkbox">
+									<label title="Löschen" onclick="$(this).parent().hide();"><input type="checkbox" name="deleteTaskFile[]" value="'.$row['uniqID'].'" style="visibility:hidden"/><i style="color:red" class="fa fa-times"></i></label> '
+									.$row['name'].'.'.$row['type'].'</div>'; //if checked -> delete;
 								}
 								while($count < 5){
 									echo '<div class="col-sm-6"><label class="btn btn-default">'. ++$count
@@ -304,7 +312,7 @@ if($x){
                 <div class="modal-footer">
                     <div class="pull-left"><?php echo $x; ?></div>
                     <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
-                    <button type="submit" class="btn btn-warning" name="editDynamicProject" value="<?php if($dynrow['isTemplate'] == 'FALSE')echo $x; ?>" ><?php echo $lang['SAVE']; ?></button>
+                    <button type="submit" class="btn btn-warning blinking" name="editDynamicProject" value="<?php if($dynrow['isTemplate'] == 'FALSE')echo $x; ?>" ><?php echo $lang['SAVE']; ?></button>
                 </div>
             </form>
         </div>

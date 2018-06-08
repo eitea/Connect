@@ -2948,6 +2948,9 @@ if($row['version'] < 159){
 	echo $conn->error;
 }
 
+$conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectname VARCHAR(250) NOT NULL");
+$conn->query("ALTER TABLE archive_meta MODIFY COLUMN cPartnerID VARCHAR(20)");
+
 // if($row['version'] < 160){}
 // if($row['version'] < 161){}
 // if($row['version'] < 162){}

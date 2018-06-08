@@ -1223,7 +1223,7 @@ function create_tables($conn) {
 
     $sql = "CREATE TABLE dynamicprojects(
         projectid VARCHAR(100) NOT NULL PRIMARY KEY,
-        projectname VARCHAR(60) NOT NULL,
+        projectname VARCHAR(250) NOT NULL,
         projectdescription MEDIUMTEXT NOT NULL,
         companyid INT(6) UNSIGNED NOT NULL,
         clientid INT(6) UNSIGNED,
@@ -1874,7 +1874,7 @@ function create_tables($conn) {
 		version INT(4) NOT NULL DEFAULT 1,
 		versionDescr VARCHAR(250),
 		cPartner VARCHAR(50),
-		cPartnerID INT(6),
+		cPartnerID VARCHAR(20),
 		note VARCHAR(500) NOT NULL DEFAULT '',
 		FOREIGN KEY (archiveID) REFERENCES archive(id)
 		ON UPDATE CASCADE ON DELETE CASCADE

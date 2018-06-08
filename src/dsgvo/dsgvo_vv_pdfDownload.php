@@ -130,7 +130,7 @@ while($result && ($vv_row = $result->fetch_assoc())){
 		$pdf->SetFont('Helvetica','',8);
 		$pdf->MultiCell(0, 5, iconv('UTF-8', 'windows-1252', 'DVR-Nummer: '.$settings['EXTRA_DVR']['setting']."\n".'DAN-Nummer: '.$settings['EXTRA_DAN']['setting']));
 	}
-	if(isset($settings['EXTRA_FOLGE'])){
+	if(!empty($settings['EXTRA_FOLGE'])){
 		$pdf->SetFont('Helvetica','B', 10);
 		$pdf->MultiCell(0, 5, iconv('UTF-8', 'windows-1252', $settings['EXTRA_FOLGE']['descr']), 0, 1);
 		$pdf->SetFont('Helvetica','',8);
@@ -142,7 +142,7 @@ while($result && ($vv_row = $result->fetch_assoc())){
 			if($settings['EXTRA_FOLGE_REASON']['setting']) $pdf->Cell(0, 5, iconv('UTF-8', 'windows-1252', $settings['EXTRA_FOLGE_REASON']['setting']), 0, 1);
 		}
 	}
-	if(isset($settings['EXTRA_DOC'])){
+	if(!empty($settings['EXTRA_DOC']) && isset($settings['EXTRA_DOC_CHOICE']['setting'])){
 		$pdf->SetFont('Helvetica','B', 10);
 		$pdf->MultiCell(0, 5, iconv('UTF-8', 'windows-1252', $settings['EXTRA_DOC']['descr']), 0, 1);
 		$pdf->SetFont('Helvetica','',8);
@@ -161,7 +161,6 @@ while($result && ($vv_row = $result->fetch_assoc())){
 		$pdf->MultiCell(0, 8, iconv('UTF-8', 'windows-1252', 'Auflistung der verarbeiteten Datenfelder und deren Übermittlung'), 0, 1);
 		$headers = array();
 		$headings = getSettings($vv_row['id'], $vv_row['templateID'], 'APP_HEAD_%', true);
-
 		$settings = getSettings($vv_row['id'], $vv_row['templateID'], 'APP_GROUP_%', false, $matrixID);
 		$i = 1;
 		foreach($settings as $key => $val){

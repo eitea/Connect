@@ -28,7 +28,7 @@
 	?>
 	<div class="col-md-6">
 		<label><?php echo $lang['CLIENT']; ?></label>
-		<select id="clientHint-<?php echo $val; ?>" class="js-example-basic-single" onchange="select_client['<?php echo $val; ?>'].showContacts(this.value, <?php echo $filterClient; ?>);">
+		<select id="clientHint-<?php echo $val; ?>" name="filterClient" class="js-example-basic-single" onchange="select_client['<?php echo $val; ?>'].showContacts(this.value, <?php echo $filterClient; ?>);">
 			<?php
 			if($filterCompany){
 				$res = $conn->query("SELECT id, name FROM clientData WHERE companyID = $filterCompany");

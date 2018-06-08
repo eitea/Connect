@@ -52,8 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$cPartner = test_input($_POST['meta-cPartner'], 1);
 		if($cPartner == 'employee'){
 			$cPartnerID = intval($_POST['meta-cPartner-employee']);
-		} elseif($cPartner == 'contact'){
-			$cPartnerID = intval($_POST['filterContact']);
+		} elseif($cPartner == 'contact' && !empty($_POST['filterClient'])){
+			$cPartnerID = intval($_POST['filterClient']);
+			if(!empty($_POST['filterContact'])) $cPartnerID .= ' '.intval($_POST['filterContact']);
 		} elseif($cPartner == 'free' && !empty($_POST['meta-free-existing'])){
 			$cPartnerID = intval($_POST['meta-free-existing']);
 		} elseif($cPartner =='free' && !empty($_POST['meta-free-firstname']) && !empty($_POST['meta-free-lastname'])){
@@ -369,6 +370,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		<?php
 		$stmt = $conn->prepare('SELECT firstname, lastname FROM contactPersons WHERE id = ? LIMIT 1');
 		$stmt->bind_param('i', $val);
+		$stmt_client = $conn->prepare('SELECT name FROM clientData WHERE id = ? LIMIT 1');
+		$stmt_client->bind_param('i', $val);
 		$result = $conn->query("SELECT am.*, uniqID, c.name AS catName FROM archive INNER JOIN archive_meta am ON archive.id = am.archiveID
 			LEFT JOIN dsgvo_categories c ON c.id = am.category WHERE archive.category = 'AGREEMENT' AND archive.categoryID = '$cmpID' ");
 		echo $conn->error;
@@ -378,7 +381,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			echo '<td>'.mc_status('DSGVO').secure_data('DSGVO',$row['name'], 'decrypt', $userID, $privateKey).' - '.secure_data('DSGVO', $row['versionDescr'], 'decrypt').'</td>';
 			echo '<td>';
 			if($row['cPartner'] == 'employee') echo $userID_toName[$row['cPartnerID']];
-			if($row['cPartner'] == 'free' || $row['cPartner'] == 'contact'){
+			if($row['cPartner'] == 'contact'){
+				$arr = explode(' ', $row['cPartnerID']);
+				$val = $arr[0];
+				$stmt_client->execute();
+				$conRow = $stmt_client->get_result()->fetch_assoc();
+				echo $conRow['name'];
+				if(isset($arr[1])){
+					$val = $arr[1];
+					$stmt->execute();
+					$conRow = $stmt->get_result()->fetch_assoc();
+					echo ' - '.$conRow['firstname'].' '.$conRow['lastname'];
+				}
+			}
+			if($row['cPartner'] == 'free'){
 				$val = $row['cPartnerID'];
 				$stmt->execute();
 				$conRow = $stmt->get_result()->fetch_assoc();
@@ -397,6 +413,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			if($row['status'] == 'PENDING') $openUpload = $row['id'];
 		}
 		$stmt->close();
+		$stmt_client->close();
 		?>
 	</tbody>
 </table>

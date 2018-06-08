@@ -560,7 +560,7 @@ if ($_SESSION['color'] == 'light') {
 						  <div class="col-sm-6">
 							  <?php
 							  $decrypted = '';
-							  $checksum = 'Ma-6SV3 bmQhEoY'; //TODO: random check foreach(module)
+							  $checksum = 'Ma-6SV3 bmQhEoY';
 							  $result = $conn->query("SELECT id, checkSum FROM security_users WHERE outDated = 'FALSE' AND userID = $userID LIMIT 1");
 							  if($row = $result->fetch_assoc()){
 								  try{
@@ -589,7 +589,7 @@ if ($_SESSION['color'] == 'light') {
 							  ?>
 						  </div>
 					  <?php
-					  $result = $conn->query("SELECT module, checkSum, id FROM security_modules WHERE outDated = 'FALSE' AND module != 'TASK'"); //nothing works with tasks
+					  $result = $conn->query("SELECT module, checkSum, id FROM security_modules WHERE module != 'TASK' AND outDated = 'FALSE'"); //nothing works with tasks
 					  echo $conn->error;
 					  while($row = $result->fetch_assoc()){
 						  $err = '';
@@ -607,7 +607,6 @@ if ($_SESSION['color'] == 'light') {
 								  echo '<p style="color:green;">O.K.</p>';
 							  } else {
 								  echo '<p style="color:red">DENIED</p>';
-
 							  }
 						  } catch(Exception $e){
 							  echo $e;

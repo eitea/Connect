@@ -361,7 +361,8 @@ $stmt_company_relationship->bind_param('i', $x);
                       <?php echo date('d.m.Y', strtotime($row['lastPswChange'])); ?>
                   </div>
                   <div class="col-md-3" >
-                    <button type="button" class="btn btn-danger btn-block" onClick="forcePswChange(<?php echo $x; ?>,event)" ><?php echo "Force Password Change"; ?></button>
+                    <button type="button" class="btn btn-link" onClick="forcePswChange(<?php echo $x; ?>,event)"
+						title="Der Benutzer wird beim nächsten Login dazu aufgefordert, sein Passwort zu ändern." >Letzte Passwort Änderung Erzwingen</button>
                   </div>
               </div>
               <div class="row">
@@ -523,10 +524,10 @@ $stmt_company_relationship->bind_param('i', $x);
               <div class="modal-dialog modal-md">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h4 class="modal-title">Do you really wish to delete <?php echo $row['firstname'].' '.$row['lastname']; ?> ?</h4>
+                    <h4 class="modal-title"><?php echo sprintf($lang['ASK_DELETE'], $row['firstname'].' '.$row['lastname']); ?></h4>
                   </div>
                   <div class="modal-body">
-                    All Stamps and Bookings belonging to this User will be lost forever. Do you still wish to proceed?
+                    Alle zugehörigen Daten zu diesem Benutzer werden gelöscht. Trotzdem fortfahren?
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">No, I'm sorry.</button>

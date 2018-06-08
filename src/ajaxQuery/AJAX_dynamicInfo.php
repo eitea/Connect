@@ -5,6 +5,7 @@ require dirname(__DIR__) . "/utilities.php";
 
 session_start();
 $userID = $_SESSION["userid"] or die("Session died");
+$privateKey = $_SESSION['privateKey'];
 $x = test_input($_GET['projectid'], 1);
 
 $result = $conn->query("SELECT activity, userID FROM dynamicprojectslogs WHERE projectid = '$x' AND
@@ -15,28 +16,21 @@ if (($row = $result->fetch_assoc()) && $row['activity'] != 'VIEWED') {
 $showMissingBookings = true;
 $missingBookingsArray = array();
 
-//see open tasks user is part of
 $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
-    projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours
+    projectpercentage, projecttags, v2, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours
     FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
     LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
     LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN relationship_team_user ON relationship_team_user.teamID = dynamicprojectsteams.teamid
     WHERE (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (relationship_team_user.userID = $userID AND relationship_team_user.skill >= d.level))
     AND d.projectstart <= UTC_TIMESTAMP and d.projectid = '$x'");
-$row = $result->fetch_assoc();
-$projectleader = $row['projectleader'];
+$dynrow = $result->fetch_assoc();
+$projectleader = $dynrow['projectleader'];
 
-// 5ac63505c0ecd
-$projectname = $row['projectname'];
-$stmt_booking = $conn->prepare("SELECT userID, p.id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = ?");
-$stmt_booking->bind_param('s', $x);
-$stmt_booking->execute();
-$isInUse = $stmt_booking->get_result(); //max 1 row
+$isInUse = $conn->query("SELECT userID, p.id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = '$x' LIMIT 1");
 $useRow = $isInUse->fetch_assoc();
 if($useRow){
     $showMissingBookings = false;
 }
-
 $result = $conn->query("SELECT DISTINCT companyID FROM relationship_company_client WHERE userID = $userID OR $userID = 1");
 $available_companies = array('-1'); //care
 while ($result && ($row = $result->fetch_assoc())) {
@@ -58,7 +52,7 @@ if($showMissingBookings){
     }
 
     //first of the day
-    $result = mysqli_query($conn, "SELECT * FROM $logTable WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00'");
+    $result = mysqli_query($conn, "SELECT * FROM logs WHERE userID = $userID AND timeEnd = '0000-00-00 00:00:00'");
     if ($result && $result->num_rows > 0) {
         $row = $result->fetch_assoc();
         $start = substr(carryOverAdder_Hours($row['time'], $row['timeToUTC']), 11, 5);
@@ -152,9 +146,7 @@ if (sizeof($missingBookingsArray) == 0) {
             <div class="tab-content">
                 <div id="projectDescription<?php echo $x; ?>" class="tab-pane fade in active"><br>
                     <?php
-                    $result = $conn->query("SELECT projectdescription, projectstatus, projectstart FROM dynamicprojects WHERE projectid = '$x'");
-                    $dynrow =  $result->fetch_assoc();
-                    $description = $dynrow['projectdescription'];
+					$description = asymmetric_encryption('TASK', $dynrow['projectdescription'], $userID, $privateKey, $dynrow['v2']);
                     $micro = $conn->query("SELECT * FROM microtasks WHERE projectid = '$x'");
                     if($micro){
                         while($nextmtask = $micro->fetch_assoc()){
@@ -237,14 +229,12 @@ if (sizeof($missingBookingsArray) == 0) {
 						</thead>
 						<tbody>
 							<?php
-							$result = $conn->query("SELECT uniqID, name, uploadDate FROM archive WHERE category = 'TASK' AND categoryID = '$x'");
+							$result = $conn->query("SELECT uniqID, name, uploadDate, type FROM archive WHERE category = 'TASK' AND categoryID = '$x'");
 							while($result && ($row = $result->fetch_assoc())){
 								echo '<tr>';
-								echo '<td>'.$row['name'].'</td>';
+								echo '<td>'.$row['name'].'.'.$row['type'].'</td>';
 								echo '<td>'.$row['uploadDate'].'</td>';
-								echo '<td><form method="POST" style="display:inline">
-								<button type="submit" class="btn btn-default" name="delete-file" value="'.$row['uniqID'].'"><i class="fa fa-trash-o"></i></button></form>
-								<form method="POST" style="display:inline" action="../project/detailDownload" target="_blank"><input type="hidden" name="keyReference" value="TASK_'.$x.'" />
+								echo '<td><form method="POST" style="display:inline" action="../project/detailDownload" target="_blank"><input type="hidden" name="keyReference" value="TASK_'.$x.'" />
 								<button type="submit" class="btn btn-default" name="download-file" value="'.$row['uniqID'].'"><i class="fa fa-download"></i></form></td>';
 								echo '</tr>';
 							}
@@ -252,151 +242,6 @@ if (sizeof($missingBookingsArray) == 0) {
 						</tbody>
 					</table>
 				</div>
-                <?php if(false): ?>
-                <!-- Project Messages -->
-                <div id="projectMessages<?php echo $x; ?>" class="tab-pane fade"><br>
-                    <!-- Subject bar -->
-                    <div id="subject_bar<?php echo $x; ?>" style="background-color: whitesmoke; border: 1px gainsboro solid; border-bottom: none; max-height: 10vh; padding: 10px;"><?php echo $projectname; ?></div>
-
-                    <!-- Messages -->
-                    <div class="pre-scrollable" id="messages<?php echo $x; ?>" style="background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh; padding-top: 5px"></div>
-
-                    <!-- Response Field -->
-                    <div id="chatinput<?php echo $x; ?>" style="padding-top: 5px;">
-                        <form name="chatInputForm<?php echo $x; ?>" autocomplete="off">
-                            <div class="input-group">
-                                <!-- TODO: set resize to none and create a js listerner to auto resize the textarea -->
-                                <textarea id="message<?php echo $x; ?>" wrap="hard" placeholder="Type a message" class="form-control" style="max-height: 11vh; resize: vertical;"></textarea>
-                                <span id="sendButton<?php echo $x; ?>" class="input-group-addon btn btn-default" type="submit"><?php echo $lang['SEND'] ?></span>
-                            </div>
-                        </form>
-
-
-                        <script>
-                            messageLimit<?php echo $x; ?> = 10;
-                            intervalID<?php echo $x; ?> = setInterval(function() {
-                                getMessages("<?php echo $x; ?>", "<?php echo $projectname ?>", "#messages<?php echo $x; ?>", false, 10);
-                            }, 1000);
-
-                            // scroll down when the tab gets shown
-                            $("#projectMessagesTab<?php echo $x; ?>").on('shown.bs.tab', function (e) {
-                                $("#messages<?php echo $x; ?>").scrollTop($("#messages<?php echo $x; ?>")[0].scrollHeight)
-                            });
-
-                            // remove the interval, when leaving the tab
-                            $("#projectMessagesTab<?php echo $x; ?>").on('hide.bs.tab', function (e) {
-                                clearInterval(intervalID<?php echo $x; ?>);
-                            });
-
-                            // send on enter
-                            var shiftPressed<?php echo "$x" ?> = false;
-                            $("#message<?php echo $x; ?>").keydown(function(event) {
-                                //shift + enter?
-                                if(shiftPressed<?php echo $x ?> && event.which == 13) {
-                                    $("#message<?php echo $x; ?>").append("<br>");
-                                } else {
-                                    // update shiftPressed when not pressed shift+enter
-                                    if(event.which == 16) shiftPressed<?php echo $x ?> = true; else shiftPressed<?php echo $x ?> = false;
-                                }
-
-                                if(event.which == 13 && !shiftPressed<?php echo $x ?>){
-                                    event.preventDefault();
-
-                                    if($("#message<?php echo $x; ?>").val().trim().length != 0){
-                                        messageLimit<?php echo $x; ?>++;
-                                        sendMessage("<?php echo $x; ?>", "<?php echo $projectname ?>", $("#message<?php echo $x; ?>").val(), "#messages<?php echo $x; ?>", messageLimit<?php echo $x; ?>);
-                                        $("#message<?php echo $x; ?>").val("")
-                                    }
-                                }
-                            });
-
-                            //submit
-                            $("#chatinput<?php echo $x; ?>").submit(function (e) {
-                                //prevent enter
-                                e.preventDefault()
-
-                                // send the message
-                                messageLimit<?php echo $x; ?>++;
-                                sendMessage("<?php echo $x; ?>", "<?php echo $projectname ?>", $("#message<?php echo $x; ?>").val(), "#messages<?php echo $x; ?>", messageLimit<?php echo $x; ?>);
-
-                                // clear the field
-                                $("#message<?php echo $x; ?>").val("")
-
-                                // prevent form redirect
-                                return false;
-                            })
-
-                            //scroll
-                            $("#messages<?php echo $x; ?>").scroll(function(){
-                                if($(this).scrollTop() == 0){
-                                    $(this).scrollTop(1);
-                                    messageLimit<?php echo $x; ?> += 1
-                                    getMessages("<?php echo $x; ?>", "<?php echo $projectname ?>", "#messages<?php echo $x; ?>", false, messageLimit<?php echo $x; ?>);
-                                }
-
-                            })
-
-                            //removes "do you really want to leave this site message"
-                            $(document).ready(function() {
-                                $(":input", document.chatInputForm+"<?php echo $x; ?>").bind("click", function() {
-                                    window.onbeforeunload = null;
-                                });
-                            });
-
-                            //###############################
-                            //         AJAX Scripts
-                            //###############################
-                            function getMessages(taskID, taskName, target, scroll = false, limit = 50) {
-                                if(taskID.length == 0 || taskName.length == 0) {
-                                    return;
-                                }
-
-                                $.ajax({
-                                    url: 'ajaxQuery/ajax_post_get_messages.php',
-                                    data: {
-                                        taskID: taskID,
-                                        taskName: taskName,
-                                        limit: limit,
-                                    },
-                                    type: 'GET',
-                                    success: function (response) {
-                                        if(response != "no messages"){
-                                            $(target).html(response);
-
-                                            //Scroll down
-                                            if (scroll) $("#messages<?php echo $x; ?>").scrollTop($("#messages<?php echo $x; ?>")[0].scrollHeight)
-                                        }else{
-                                            $(target).html('<div style="padding: 20px" class="text-center">No messages available</div>')
-                                        }
-                                    },
-                                    error: function (response) {
-                                        $(target).html(response);
-                                    },
-                                });
-                            }
-
-                            function sendMessage(taskID, taskName, message, target, limit = 50) {
-                                if(taskID.length == 0 || taskName.length == 0 || message.length == 0){
-                                    return;
-                                }
-
-                                $.ajax({
-                                    url: 'ajaxQuery/ajax_post_send_message.php',
-                                    data: {
-                                        taskID: taskID,
-                                        taskName: taskName,
-                                        message: message,
-                                    },
-                                    type: 'GET',
-                                    success: function (response) {
-                                        getMessages("<?php echo $x; ?>", "<?php echo $projectname ?>", "#messages<?php echo $x; ?>", true, limit);
-                                    },
-                                })
-                            }
-                        </script>
-                    </div>
-                </div>
-                <?php endif; ?>
 
                 <?php if($showMissingBookings): ?>
                 <div id="projectForgottenBooking<?php echo $x; ?>" class="tab-pane fade"><br>

@@ -156,6 +156,9 @@ function onPageLoad(){
       5: {pattern: /[0-5]/}
     }
   });
+  $('input[type="file"]').change(function() {
+	$(this).parent().after(' '+$(this).val().replace(/C:\\fakepath\\/i, ''));
+  });
 }
 $('.money').blur(function(e){
   var number = this.value;
@@ -196,9 +199,6 @@ $(document).ready(function() {
   if (sessionStorage.scrollTop != "undefined") {
     $(window).scrollTop(sessionStorage.scrollTop);
   }
-  $('input[type="file"]').change(function() {
-	  $(this).parent().after(' '+$(this).val().replace(/C:\\fakepath\\/i, ''));
-  });
 });
 </script>
 </body>
