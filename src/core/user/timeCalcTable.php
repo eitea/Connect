@@ -5,8 +5,8 @@ $filterings = array('logs' => array(0, 'checked'), 'date' => array(substr(getCur
 
 require dirname(dirname(__DIR__)) . '/Calculators/IntervalCalculator.php';
 if(isset($_POST['request_submit'])){
-  if(!empty($_POST['request_start'])){
-    $arr = explode(' ', $_POST['request_submit']); //0- indexIM, 1- date
+  $arr = explode(' ', $_POST['request_submit']); //0- indexIM, 1- date
+  if(!empty($_POST['request_start']) && isset($arr[1])){
     $startTime = $arr[1] .' '. test_input($_POST['request_start']).':00';
     if($_POST['request_open']){
       $endTime = '0000-00-00 00:00:00';
@@ -24,9 +24,10 @@ if(isset($_POST['request_submit'])){
     }
     $requestText = test_input($_POST['request_text']);
     if(test_Date($startTime)){
-      $sql = "INSERT INTO $userRequests(userID, fromDate, toDate, status, requestText, requestType, requestID, timeToUTC) VALUES($userID, '$startTime', '$endTime', '0', '$requestText', 'log', '".$arr[0]."', $timeToUTC )";
-      if($conn->query($sql)){
-        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_REQUEST'].'</div>';
+	  $conn->query("INSERT INTO userRequestsData(userID, fromDate, toDate, status, requestText, requestType, requestID, timeToUTC)
+		VALUES($userID, '$startTime', '$endTime', '0', '$requestText', 'log', '".$arr[0]."', $timeToUTC )");
+      if(!$conn->error){
+		showSuccess($lang['OK_REQUEST']);
       } else {
         echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
       }
@@ -39,7 +40,7 @@ if(isset($_POST['request_submit'])){
 } elseif(!empty($_POST['splits_save'])) {
   $x = intval($_POST['splits_save']);
   if(!empty($_POST['splits_from_'.$x]) && !empty($_POST['splits_to_'.$x])){
-    $result = $conn->query("SELECT id, timestampID, start, end, timeToUTC FROM $projectBookingTable INNER JOIN $logTable ON $logTable.indexIM = $projectBookingTable.timestampID WHERE id = $x AND bookingType = 'break'");
+    $result = $conn->query("SELECT id, timestampID, start, end, timeToUTC FROM projectBookingData INNER JOIN logs ON logs.indexIM = projectBookingData.timestampID WHERE id = $x AND bookingType = 'break'");
     if($result && ($row = $result->fetch_assoc())){
       $row['start'] = substr($row['start'],0, 16).':00'; //UTC
       $row['end'] = substr($row['end'],0, 16).':00';
@@ -48,7 +49,7 @@ if(isset($_POST['request_submit'])){
       //valid times
       if(timeDiff_Hours($row['start'], $split_A) >= 0 && timeDiff_Hours($split_B, $row['end']) >= 0 && timeDiff_Hours($split_A, $split_B) > 0){
         $splits_activity = intval($_POST['splits_activity_'.$x]);
-        $sql = "INSERT INTO $userRequests (userID, fromDate, toDate, status, requestText, requestType, requestID) VALUES($userID, '$split_A', '$split_B', '0', '$splits_activity', 'div', '$x')";
+        $sql = "INSERT INTO userRequestsData (userID, fromDate, toDate, status, requestText, requestType, requestID) VALUES($userID, '$split_A', '$split_B', '0', '$splits_activity', 'div', '$x')";
         if($conn->query($sql)){
           echo '<div class="alert alert-success fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.$lang['OK_REQUEST'].'</div>';
         }
@@ -56,7 +57,7 @@ if(isset($_POST['request_submit'])){
         echo '<div class="alert alert-danger"><a href="#" class="close" data-dismiss="alert">&times;</a>'.$lang['ERROR_TIMES_INVALID'].'</div>';
       }
     } else {
-      $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
+      $conn->query("UPDATE UserData SET strikeCount = strikecount + 1 WHERE id = $userID");
       echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Please do not try this again. It will not work.</strong> '.$lang['ERROR_STRIKE'].'</div>';
       include dirname(dirname(__DIR__)) . '/footer.php';
       die(); //TODO for later: we should create a strike system.
@@ -176,7 +177,7 @@ if(isset($_POST['request_submit'])){
             <div class="col-md-12">
               <label>Infotext</label>
               <input type="text" name="request_text" class="form-control" placeholder="(Optional)"/>
-              <small>Anfangs- und Endzeit müssen immer angegeben werden. Die Anfangszeit muss immer kleiner als die Endzeit sein. Leere Felder sind ungültig.
+              <small>Anfangs- und Endzeit müssen angegeben werden. Die Anfangszeit muss immer kleiner als die Endzeit sein. Leere Felder sind ungültig.
               Die Uhrzeit wird bei Bewilligung exakt auf die angegebenen Daten <u>ausgebessert</u>.  Sonderzeichen werden automatisch entfernt.</small>
             </div>
           </div>
@@ -221,7 +222,7 @@ if(isset($_POST['request_submit'])){
                   <th></th>
                 </thead>
                 <tbody>
-                  <?php 
+                  <?php
                   while($row = $bookingResult->fetch_assoc()) {
                     $A = substr(carryOverAdder_Hours($row['start'], $row['timeToUTC']), 11, 5);
                     $B = substr(carryOverAdder_Hours($row['end'], $row['timeToUTC']), 11, 5);

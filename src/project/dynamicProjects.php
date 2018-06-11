@@ -48,8 +48,10 @@ function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$refe
     .'<div data-toggle="tooltip" title="'.round($timeLeft,2).' Stunden" class="progress-bar progress-bar-success" style="height:10px;width:'.$greenBar.'%"></div>'
     .'<div data-toggle="tooltip" title="'.round($timeOver,2).' Stunden" class="progress-bar progress-bar-danger" style="height:10px;width:'.$redBar.'%"></div></div>';
 }
+
+
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', "priority" => 0, 'employees' => ["user;".$userID]); //set_filter requirement
-$result = $conn->query("SELECT teamID FROM teamRelationshipData WHERE userID = $userID");
+$result = $conn->query("SELECT teamID FROM relationship_team_user WHERE userID = $userID");
 while($result && ( $row = $result->fetch_assoc())){
     $filterings['employees'][] = 'team;'.$row['teamID'];
 }
@@ -227,6 +229,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $val = test_input($_POST['deleteProject']);
             $conn->query("DELETE FROM dynamicprojectslogs WHERE projectid = '$val'");
             $conn->query("DELETE FROM dynamicprojects WHERE projectid = '$val'");
+			$conn->query("DELETE FROM archive WHERE category = 'TASK' AND categoryID = '$val'"); //corpses, everyone, corpses!
             if($conn->error){
                 showError($conn->error);
             } else {
@@ -245,7 +248,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$id', 'CREATED', $userID)");
                 }
                 $null = null;
-                $name = test_input($_POST["name"]);
+                $name = asymmetric_encryption('TASK', test_input($_POST["name"]), $userID, $privateKey);
+				$v2Key = ($name == test_input($_POST["name"])) ? '' : $publicKey;
                 $description = $_POST["description"];
                 if(preg_match_all("/\[([^\]]*)\]\s*\{([^\[]*)\}/m",$description,$matches)&&count($matches[0])>0){
                     for($i = 0;$i<count($matches[0]);$i++){
@@ -261,12 +265,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                         }
                     }
                 }
+				$description = asymmetric_encryption('TASK', $description, $userID, $privateKey);
                 $company = $_POST["filterCompany"] ?? $available_companies[1];
                 $client = isset($_POST['filterClient']) ? intval($_POST['filterClient']) : '';
                 $project = isset($_POST['filterProject']) ? intval($_POST['filterProject']) : '';
                 $color = $_POST["color"] ? test_input($_POST['color']) : '#FFFFFF';
                 $start = $_POST["start"];
-                $end = $_POST["endradio"];
+                $end = '0000-00-00'; //temp fix for invalid end value (probs NULL)
                 $status = $_POST["status"];
                 $priority = intval($_POST["priority"]); //1-5
                 $owner = $_POST['owner'] ? intval($_POST["owner"]) : $userID;
@@ -277,7 +282,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 if($isDynamicProjectsAdmin == 'TRUE'){
                     $skill = intval($_POST['projectskill']);
                     $parent = test_input($_POST["parent"]); //dynamproject id
-                }else{
+                } else {
                     $skill = 0;
                     $parent = null;
                 }
@@ -287,35 +292,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 } else {
                     $tags = '';
                 }
-                // if ($end == "number") {
-                //     $end = $_POST["endnumber"] ?? "";
-                // } elseif ($end == "date") {
-                //     $end = $_POST["enddate"] ?? "";
-                // }
-                $series = $_POST["series"] ?? "once";
-                $series = new ProjectSeries($series, $start, $end);
-                $series->daily_days = (int) $_POST["daily_days"] ?? 1;
-                $series->weekly_weeks = (int) $_POST["weekly_weeks"] ?? 1;
-                $series->weekly_day = $_POST["weekly_day"] ?? "monday";
-                $series->monthly_day_of_month_day = (int) $_POST["monthly_day_of_month_day"] ?? 1;
-                $series->monthly_day_of_month_month = (int) $_POST["monthly_day_of_month_month"] ?? 1;
-                $series->monthly_nth_day_of_week_nth = (int) $_POST["monthly_nth_day_of_week_nth"] ?? 1;
-                $series->monthly_nth_day_of_week_day = $_POST["monthly_nth_day_of_week_day"] ?? "monday";
-                $series->monthly_nth_day_of_week_month = (int) $_POST["monthly_nth_day_of_week_month"] ?? 1;
-                $series->yearly_nth_day_of_month_nth = (int) $_POST["yearly_nth_day_of_month_nth"] ?? 1;
-                $series->yearly_nth_day_of_month_month = $_POST["yearly_nth_day_of_month_month"] ?? "JAN";
-                $series->yearly_nth_day_of_week_nth = (int) $_POST["yearly_nth_day_of_week_nth"] ?? 1;
-                $series->yearly_nth_day_of_week_day = $_POST["yearly_nth_day_of_week_day"] ?? "monday";
-                $series->yearly_nth_day_of_week_month = $_POST["yearly_nth_day_of_week_month"] ?? "JAN";
-                $nextDate = $series->get_next_date();
-                $series = base64_encode(serialize($series));
                 // PROJECT
-				$end = '0000-00-00'; //temp fix for invalid end value (probs NULL)
                 $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-                    projectpriority, projectparent, projectowner, projectleader, projectnextdate, projectseries, projectpercentage, estimatedHours, level, projecttags, isTemplate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("ssbiiissssisiisbisiss", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $null, $percentage, $estimate, $skill, $tags, $isTemplate);
+                    projectpriority, projectparent, projectowner, projectleader, projectnextdate, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("ssbiiissssisiisisisss", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $percentage, $estimate, $skill, $tags, $isTemplate, $v2Key);
                 $stmt->send_long_data(2, $description);
-                $stmt->send_long_data(12, $series);
                 $stmt->execute();
                 if(!$stmt->error){
                     $stmt->close();
@@ -341,6 +322,47 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                             $stmt->execute();
                         }
                     }
+					//FILES
+					$bucket = $identifier.'-tasks';
+					$s3 = getS3Object($bucket);
+					if($s3 && !empty($_POST['deleteTaskFile'])){
+						foreach($_POST['deleteTaskFile'] as $val){
+							$conn->query("DELETE FROM archive WHERE uniqID = '$val'");
+							if((!$conn->error)) $s3->deleteObject(['Bucket' => $bucket, 'Key' => $val]);
+						}
+					}
+					for ($i = 0; $i < count($_FILES['newTaskFiles']['name']); $i++) {
+						if($s3 && file_exists($_FILES['newTaskFiles']['tmp_name'][$i]) && is_uploaded_file($_FILES['newTaskFiles']['tmp_name'][$i])){
+							$file_info = pathinfo($_FILES['newTaskFiles']['name'][$i]);
+							$ext = test_input(strtolower($file_info['extension']));
+							$filetype = $_FILES['newTaskFiles']['type'][$i];
+							$accepted_types = ['application/octet-stream', 'application/msword', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'text/plain', 'application/pdf', 'application/zip',
+							'application/x-zip-compressed', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'multipart/x-zip',
+							'application/x-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+							if (!in_array($ext, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'zip', 'msg'])){
+								showError('Ungültige Dateiendung: '.$ext);
+							} elseif(!in_array($filetype, $accepted_types)) {
+								showError('Ungültiger Dateityp: '.$filetype);
+							} elseif ($_FILES['newTaskFiles']['size'][$i] > 15000000) { //15mb max
+								showError('Die maximale Dateigröße wurde überschritten (15 MB)');
+							} else {
+								$hashkey = uniqid('', true); //23 chars
+								$file_encrypt = asymmetric_encryption('TASK', file_get_contents($_FILES['newTaskFiles']['tmp_name'][$i]), $userID, $privateKey);
+								$s3->putObject(array(
+									'Bucket' => $bucket,
+									'Key' => $hashkey,
+									'Body' => $file_encrypt
+								));
+								$filename = test_input($file_info['filename']);
+								$conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uniqID, uploadUser)
+								VALUES ('TASK', '$id', '$filename', 'ROOT', '$ext', '$hashkey', $userID)");
+							}
+						}
+					}
+					$stmt->close();
+					$stmt = $conn->prepare("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES ('$id', ?, ?)"); echo $conn->error;
+                    $stmt->bind_param("is", $employee, $position);
+
                     showSuccess($lang['OK_ADD']);
                 } else {
                     showError($stmt->error);
@@ -416,7 +438,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 
 		if($isDynamicProjectsAdmin == 'TRUE'){ //see all access-legal tasks
 		   $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,
-			   projectpriority, projectowner, projectleader, projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
+			   projectpriority, projectowner, projectleader, projectpercentage, projecttags, v2, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
 			   clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours,
 			   tbl5.userID AS workingUser, tbl5.start AS workStart, tbl5.id AS workingID
 			   FROM dynamicprojects d
@@ -432,7 +454,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 			   ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
 	   } else {
 		   $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,
-			   projectpriority, projectowner, projectleader, projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
+			   projectpriority, projectowner, projectleader, projectpercentage, projecttags, v2, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
 			   clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours,
 			   tbl5.userID AS workingUser, tbl5.start AS workStart, tbl5.id AS workingID
 			   FROM dynamicprojects d
@@ -445,18 +467,18 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 			   LEFT JOIN ( SELECT userID, dynamicID, p.id, p.start FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00') tbl5
 				   ON tbl5.dynamicID = d.projectid
 			   LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
-			   LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
-			   WHERE d.isTemplate = 'FALSE' AND (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (teamRelationshipData.userID = $userID AND teamRelationshipData.skill >= d.level))
+			   LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN relationship_team_user ON relationship_team_user.teamID = dynamicprojectsteams.teamid
+			   WHERE d.isTemplate = 'FALSE' AND (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (relationship_team_user.userID = $userID AND relationship_team_user.skill >= d.level))
 			   $query_filter ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
 	   }
         // if($isDynamicProjectsAdmin == 'FALSE'){
 		// 	$nonAdminQuery = "LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid AND dynamicprojectsemployees.userid = $userID
 		// 	LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid
-		// 	LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid AND teamRelationshipData.userID = $userID";
+		// 	LEFT JOIN relationship_team_user ON relationship_team_user.teamID = dynamicprojectsteams.teamid AND relationship_team_user.userID = $userID";
         // }
 		//
 		// $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,
-		// 	projectpriority, projectowner, projectleader, projectpercentage, projecttags, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
+		// 	projectpriority, projectowner, projectleader, projectpercentage, projecttags, v2, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
 		// 	clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours,
 		// 	tbl4.activity, tbl5.userID AS workingUser, tbl5.start AS workStart, tbl5.id AS workingID
 		// 	FROM dynamicprojects d
@@ -486,7 +508,8 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             echo '<td>';
             // echo $row['activity'];
             if($row['estimatedHours'] || $row['currentHours']) echo generate_progress_bar($row['currentHours'], $row['estimatedHours']);
-            echo '<i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.$row['projectname'].' <div>';
+            echo '<i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.mc_status('TASK', $row['v2'])
+			.asymmetric_encryption('TASK', $row['projectname'],$userID, $privateKey, $row['v2']).' <div>';
             foreach(explode(',', $row['projecttags']) as $tag){
                 if($tag) echo '<span class="badge">'.$tag.'</span> ';
             }

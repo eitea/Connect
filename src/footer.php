@@ -156,6 +156,9 @@ function onPageLoad(){
       5: {pattern: /[0-5]/}
     }
   });
+  $('input[type="file"]').change(function() {
+	$(this).parent().after(' '+$(this).val().replace(/C:\\fakepath\\/i, ''));
+  });
 }
 $('.money').blur(function(e){
   var number = this.value;
@@ -167,7 +170,7 @@ $(document).ready(function() {
   onPageLoad();
   var isDirty = false;
   //triggers change in all input fields including text type
-  $(":input:not([type=search]):not(.not-dirty)").keyup(function(){
+  $("input:not([type=search]):not(.not-dirty)").change(function(){
     isDirty = true;
     var blink = $(this).closest('form').find('.blinking');
     if(!blink.length){ blink = $('.blinking'); }

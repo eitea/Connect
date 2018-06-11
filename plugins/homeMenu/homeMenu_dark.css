@@ -1,6 +1,6 @@
 
 /* General colors */
-.panel-default>.panel-heading{
+.panel-borderless.panel-default>.panel-heading{
   background-color:#555;
   border-radius: 0;
 }

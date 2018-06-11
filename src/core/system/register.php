@@ -47,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     if(!empty($_POST['mail']) && filter_var($_POST['mail'].$emailpostfix, FILTER_VALIDATE_EMAIL)){
       $email = test_input($_POST['mail']) .$emailpostfix;
-      $mail_result = $conn->query("SELECT email FROM $userTable WHERE email = '$email'");
+      $mail_result = $conn->query("SELECT email FROM UserData WHERE email = '$email'");
       if($mail_result && $mail_result->num_rows > 0){
         $accept = false;
         showError($lang['ERROR_EXISTING_EMAIL']);
@@ -97,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		}
         //create user
         $psw = password_hash($pass, PASSWORD_BCRYPT);
-        $sql = "INSERT INTO $userTable (firstname, lastname, psw, gender, email, beginningDate, real_email, forcedPwdChange)
+        $sql = "INSERT INTO UserData (firstname, lastname, psw, gender, email, beginningDate, real_email, forcedPwdChange)
         VALUES ('$firstname', '$lastname', '$psw', '$gender', '$email', '$begin', '$recipient', 1);";
         if($conn->query($sql)){
           $curID = mysqli_insert_id($conn);

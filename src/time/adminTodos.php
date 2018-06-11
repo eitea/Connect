@@ -71,8 +71,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   //vacation, special leave, compensatory time, school
   if(isset($_POST['okay'])){
     $requestID = $_POST['okay'];
-    $result = $conn->query("SELECT *, $intervalTable.id AS intervalID FROM $userRequests INNER JOIN $intervalTable ON $intervalTable.userID = $userRequests.userID
-    WHERE status = '0' AND $userRequests.id = $requestID AND $intervalTable.endDate IS NULL");
+    $result = $conn->query("SELECT *, $intervalTable.id AS intervalID FROM userRequestsData INNER JOIN $intervalTable ON $intervalTable.userID = userRequestsData.userID
+    WHERE status = '0' AND userRequestsData.id = $requestID AND $intervalTable.endDate IS NULL");
     if($result && ($row = $result->fetch_assoc())){
       $i = $row['fromDate'];
       $days = (timeDiff_Hours($i, $row['toDate'])/24) + 1; //days
@@ -98,19 +98,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $i = carryOverAdder_Hours($i, 24);
       }
       $answerText = test_input($_POST['answerText'. $requestID]); //inputs are always set
-      $conn->query("UPDATE $userRequests SET status = '2', answerText = '$answerText' WHERE id = $requestID");
+      $conn->query("UPDATE userRequestsData SET status = '2', answerText = '$answerText' WHERE id = $requestID");
     } else {
       echo $conn->error;
     }
   } elseif(isset($_POST['nokay'])){
     $requestID = $_POST['nokay'];
     $answerText = test_input($_POST['answerText'. $requestID]);
-    $conn->query("UPDATE $userRequests SET status = '1',answerText = '$answerText' WHERE id = $requestID");
+    $conn->query("UPDATE userRequestsData SET status = '1',answerText = '$answerText' WHERE id = $requestID");
   }
   //account
   if(isset($_POST['okay_acc'])){
     $requestID = $_POST['okay_acc'];
-    $conn->query("UPDATE $userRequests SET status = '2' WHERE id = $requestID");
+    $conn->query("UPDATE userRequestsData SET status = '2' WHERE id = $requestID");
     redirect("../system/users");
   } elseif(isset($_POST['nokay_acc'])){
     $requestID = $_POST['nokay_acc'];
@@ -119,7 +119,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   //log
   if(isset($_POST['okay_log'])){
     $requestID = intval($_POST['okay_log']);
-    $result = $conn->query("SELECT * FROM $userRequests WHERE id = $requestID");
+    $result = $conn->query("SELECT * FROM userRequestsData WHERE id = $requestID");
     $row = $result->fetch_assoc();
     $timeStart = $row['fromDate'];
     $timeFin = $row['toDate'];
@@ -139,22 +139,22 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     }
     if($conn->error){ echo $conn->error; } else {echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';}
     $answerText = test_input($_POST['answerText'. $requestID]);
-    $conn->query("UPDATE $userRequests SET status = '2',answerText = '$answerText' WHERE id = $requestID");
+    $conn->query("UPDATE userRequestsData SET status = '2',answerText = '$answerText' WHERE id = $requestID");
   } elseif(isset($_POST['nokay_log'])){
     $requestID = $_POST['nokay_log'];
     $answerText = test_input($_POST['answerText'. $requestID]);
-    $conn->query("UPDATE $userRequests SET status = '1',answerText = '$answerText' WHERE id = $requestID");
+    $conn->query("UPDATE userRequestsData SET status = '1',answerText = '$answerText' WHERE id = $requestID");
   }
   //break
   if(isset($_POST['okay_brk'])){ //does nothing
     $requestID = intval($_POST['okay_brk']);
     $answerText = test_input($_POST['answerText'. $requestID]);
-    $conn->query("UPDATE $userRequests SET status = '2', answerText = '$answerText' WHERE id = $requestID");
+    $conn->query("UPDATE userRequestsData SET status = '2', answerText = '$answerText' WHERE id = $requestID");
   } elseif(isset($_POST['nokay_brk'])){
     $requestID = intval($_POST['nokay_brk']);
     $answerText = $_POST['answerText'. $requestID];
-    $conn->query("UPDATE $userRequests SET status = '1', answerText = '$answerText' WHERE id = $requestID");
-    $result = $conn->query("SELECT requestID FROM $userRequests WHERE id = $requestID");
+    $conn->query("UPDATE userRequestsData SET status = '1', answerText = '$answerText' WHERE id = $requestID");
+    $result = $conn->query("SELECT requestID FROM userRequestsData WHERE id = $requestID");
     $row = $result->fetch_assoc();
     $bookingID = $row['requestID'];
     //delete break
@@ -165,10 +165,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['nokay_div'])){
     $requestID = intval($_POST['nokay_div']);
     $answerText = test_input($_POST['answerText'. $requestID]);
-    $conn->query("UPDATE $userRequests SET status = '1', answerText = '$answerText' WHERE id = $requestID");
+    $conn->query("UPDATE userRequestsData SET status = '1', answerText = '$answerText' WHERE id = $requestID");
   } elseif(isset($_POST['okay_div'])){
     $requestID = intval($_POST['okay_div']);
-    $result = $conn->query("SELECT * FROM $userRequests WHERE id = $requestID");
+    $result = $conn->query("SELECT * FROM userRequestsData WHERE id = $requestID");
     $row = $result->fetch_assoc();
     $bookingID = $row['requestID'];
     $split_A = $row['fromDate'];
@@ -198,17 +198,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       $conn->query("DELETE FROM $projectBookingTable WHERE id = ".$row['id']);
     }
     $answerText = test_input($_POST['answerText'. $requestID]);
-    $conn->query("UPDATE $userRequests SET status = '2', answerText = '$answerText' WHERE id = $requestID");
+    $conn->query("UPDATE userRequestsData SET status = '2', answerText = '$answerText' WHERE id = $requestID");
   }
 
   if(!empty($_POST['nokay_doc'])){
       $requestID = intval($_POST['nokay_doc']);
       $answerText = test_input($_POST['answerText'. $requestID]);
-      $conn->query("UPDATE $userRequests SET status = '1', answerText = '$answerText' WHERE id = $requestID");
+      $conn->query("UPDATE userRequestsData SET status = '1', answerText = '$answerText' WHERE id = $requestID");
   } elseif(!empty($_POST['okay_doc'])){
       $requestID = intval($_POST['okay_doc']);
       $answerText = test_input($_POST['answerText'. $requestID]);
-      $result = $conn->query("SELECT userID, fromDate, toDate, timeToUTC FROM $userRequests WHERE id = $requestID");
+      $result = $conn->query("SELECT userID, fromDate, toDate, timeToUTC FROM userRequestsData WHERE id = $requestID");
       $row = $result->fetch_assoc();
       $A = carryOverAdder_Hours($row['fromDate'], $row['timeToUTC'] * -1);
       $B = carryOverAdder_Hours($row['toDate'], $row['timeToUTC'] * -1);
@@ -225,7 +225,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       } else {
           //this one will create a mixed timestamp
           $conn->query("INSERT INTO logs (time, timeEnd, userID, timeToUTC, status) VALUES('$A', '$B', ".$row['userID'].", '".$row['timeToUTC']."', 3)");
-          $conn->query("UPDATE $userRequests SET status = '2', answerText = '$answerText' WHERE id = $requestID");
+          $conn->query("UPDATE userRequestsData SET status = '2', answerText = '$answerText' WHERE id = $requestID");
       }
   }
 
@@ -238,7 +238,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <!--GENERAL REQUESTS -------------------------------------------------------------------------->
 
 <?php
-$result = $conn->query("SELECT * FROM $userRequests WHERE status = '0'");
+$result = $conn->query("SELECT * FROM userRequestsData WHERE status = '0'");
 if($result && $result->num_rows > 0):
   echo '<h4>'.$lang['UNANSWERED_REQUESTS'].': </h4><br>';
 ?>

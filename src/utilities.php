@@ -132,42 +132,41 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
     if(!$activeEncryption) return $message;
     $privateKey = base64_decode($privateKey);
     static $symmetric = false;
-    if(!$symmetric && $userID && $privateKey){
-		$result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND module = '$module' AND outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
+	static $usedModule = '';
+    if((!$symmetric || $usedModule != $module) && $userID && $privateKey){
+		$usedModule = $module;
 		if(is_array($module)){
 			$optionalID = $module[1];
 			$module = $module[0];
-			$result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND module = '$module'
-				AND optionalID = '$optionalID' AND outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
+			$result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND module = '$module' AND optionalID = '$optionalID' AND outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
+		} else {
+			$result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND module = '$module' AND outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
 		}
         if($result && ( $row=$result->fetch_assoc() )){
-			//echo $row['privateKey'] .' --private access<br>';
+			//echo $row['privateKey'] .' --encrypted base64 private module key<br>';
             $cipher_private_module = base64_decode($row['privateKey']);
 			//echo ($cipher_private_module) .' --private key module<br>';
             $result = $conn->query("SELECT publicKey, symmetricKey FROM security_modules WHERE module = '$module' AND outDated = 'FALSE'");
             if($result && ( $row=$result->fetch_assoc() )){
-                $public_module = base64_decode($row['publicKey']);
-                $cipher_symmetric = base64_decode($row['symmetricKey']);
-                //decrypt access
-                $nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
-                $cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
-				// echo base64_encode($privateKey) .' --private <br> keypairsize: '.strlen($privateKey.$public_module ).'<br> public--';
-				// echo base64_encode($public_module);
+				$public_module = base64_decode($row['publicKey']);
+				$nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
+				$cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
 				$private_module = sodium_crypto_box_open($cipher_private_module, $nonce, $privateKey.$public_module);
+				//echo base64_encode($privateKey) .' --private <br> keypairsize: '.strlen($privateKey.$public_module ).'<br> public--';
+				//echo $private_module .'-- decrypted private module<br>';
+				if(strlen($private_module.$public_module) != 64){
+					$err = 'module keys do not have the right size';
+					return $message;
+				}
+				$cipher_symmetric = base64_decode($row['symmetricKey']);
 				$nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
 				$cipher_symmetric = mb_substr($cipher_symmetric, 24, null, '8bit');
 				$symmetric = sodium_crypto_box_open($cipher_symmetric, $nonce, $private_module.$public_module);
-
-                //decrypt module
-                if($symmetric){
-                    if($mode == 'encrypt'){
-                        return simple_encryption($message, $symmetric);
-                    } else {
-                        return simple_decryption($message, $symmetric);
-                    }
+				//echo base64_encode($symmetric) .' -- plain symmetric<br>';
+                if(!$symmetric){
+					$err = 'Could not retrieve symmetric Key';
+					return $message;
                 }
-                $err = 'Could not retrieve symmetric Key';
-                return $message;
             } elseif($result){
                 $err = 'Module encryption not active';
                 return $message;
@@ -175,10 +174,12 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
         } elseif($result){
             $err = 'User Access not found';
             return $message;
-        }
-        $err = $conn->error;
-        return $message;
-    } elseif($symmetric) {
+        } elseif($conn->error){
+			$err = $conn->error;
+			return $message;
+		}
+    }
+	if($symmetric) {
         if($mode == 'encrypt'){
             return simple_encryption($message, $symmetric);
         } else {
@@ -189,7 +190,52 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
     return $message;
 }
 
-function mc_status($module = ''){
+/*
+* decrypt: $mode = public user key (not from registered users, that's why)
+*/
+function asymmetric_encryption($module, $message, $userID, $privateKey, $mode = 'encrypt', &$err = ''){
+	global $conn;
+	$privateKey = base64_decode($privateKey);
+	static $activeEncryption = null;
+    if($activeEncryption === null){
+        $activeEncryption = true;
+        $result = $conn->query("SELECT activeEncryption FROM configurationData WHERE activeEncryption = 'TRUE'");
+        if(!$result || $result->num_rows < 1){ $activeEncryption = false; }
+    }
+    if(!$activeEncryption || !$mode) return $message; 	
+	$result = $conn->query("SELECT publicKey FROM security_modules WHERE module = '$module' AND outDated = 'FALSE' LIMIT 1");
+	if($result && ( $row=$result->fetch_assoc() )){
+		$public_module = base64_decode($row['publicKey']);
+		if($mode != 'encrypt'){ //decrypt - publicUser, privateModule
+			$mode = base64_decode($mode);
+			$result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND module = '$module' AND outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
+			if($result && ( $row=$result->fetch_assoc() )){
+				$cipher_private_module = base64_decode($row['privateKey']);
+				$nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
+				$encrypted = mb_substr($cipher_private_module, 24, null, '8bit');
+				// echo '<br> public module: '.$public_module;
+				// echo '<br> key:'.$privateKey;
+				$private_module = sodium_crypto_box_open($encrypted, $nonce, $privateKey.$public_module);
+				//echo '<br> private module: '.$private_module;
+				if(strlen($private_module.$mode) != 64){
+					$err = 'module keys do not have the right size: '.strlen($private_module.$mode);
+					return $message;
+				}
+				$message = base64_decode($message);
+				$nonce = mb_substr($message, 0, 24, '8bit');
+				$encrypted = mb_substr($message, 24, null, '8bit');
+				return sodium_crypto_box_open($encrypted, $nonce, $private_module.$mode);
+			}
+		} else { //encrypt - privateUser, publicModule
+			$nonce = random_bytes(24);
+			return base64_encode($nonce . sodium_crypto_box($message, $nonce, $privateKey.$public_module));
+		}
+	}
+	$err = $conn->error;
+	return $message;
+}
+
+function mc_status($module = '', $key = 1){
 	global $conn;
     static $encrypt = null;
     if($encrypt === null){
@@ -199,6 +245,7 @@ function mc_status($module = ''){
     }
 	$active_icon = '<i class="fa fa-lock text-success" aria-hidden="true" title="Encryption Aktiv. Verwendeter Schlüssel: '.$module.'"></i>';
 	$inactive_icon = '<i class="fa fa-unlock text-danger" aria-hidden="true" title="Encryption Inaktiv. Vorbereiteter Schlüssel: '.$module.'"></i>';
+	if(!$key) return $inactive_icon;
 	if($encrypt){
 		if($module){
 			$result = $conn->query("SELECT id FROM security_modules WHERE module = '$module' AND outDated = 'FALSE'");
@@ -422,7 +469,7 @@ function getFilledOutTemplate($templateID, $bookingQuery = "") {
     return $html;
 }
 
-function uploadImage($file_field, $crop_square = false, $resize = true) { //should be named uploadImage
+function uploadImage($file_field, $crop_square = false, $resize = true) {
     //bytes
     $max_size = 5000000; //5mb
     //whitelist
@@ -626,7 +673,7 @@ function util_strip_prefix($subject, $prefix) {
     return $subject;
 }
 
-function getS3Object(){
+function getS3Object($bucket = ''){
 	global $conn;
 	require dirname(__DIR__) . DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.'aws'.DIRECTORY_SEPARATOR.'autoload.php';
 	$result = $conn->query("SELECT endpoint, awskey, secret FROM archiveconfig WHERE isActive = 'TRUE' LIMIT 1");
@@ -639,6 +686,11 @@ function getS3Object(){
 				'use_path_style_endpoint' => true,
 				'credentials' => array('key' => $row['awskey'], 'secret' => $row['secret'])
 			));
+			if($bucket){
+				if(!$s3->doesBucketExist($bucket)){
+					$s3->createBucket(['Bucket' => $bucket]);
+				}
+			}
 		} catch(Exception $e){
 			echo $e->getMessage();
 			return false;

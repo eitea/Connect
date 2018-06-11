@@ -75,7 +75,7 @@ if($isProjectAdmin == 'TRUE' && $_SERVER['REQUEST_METHOD'] == 'POST'){
 	}
 }
 
-$s3 = getS3Object();
+$s3 = getS3Object($bucket);
 
 //doesnt need a projectID, since we are unique anyways
 if(!empty($_POST['delete-file'])){
@@ -192,23 +192,19 @@ if(!empty($_POST['delete-file'])){
 		$filetype = $_FILES['new-file-upload']['type'];
 		$accepted_types = ['application/msword', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'text/plain', 'application/pdf', 'application/zip',
 		'application/x-zip-compressed', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'multipart/x-zip',
-		'application/x-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-		if (!in_array($ext, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'zip'])){
+		'application/x-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-outlook'];
+		if (!in_array($ext, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'zip', 'msg'])){
 			showError('Ungültige Dateiendung: '.$ext);
 		} elseif(!in_array($filetype, $accepted_types)) {
 			showError('Ungültiger Dateityp: '.$filetype);
 		} elseif ($_FILES['new-file-upload']['size'] > 15000000) { //15mb max
 			showError('Die maximale Dateigröße wurde überschritten (15 MB)');
-		} elseif(empty($s3)) {
+		} elseif (empty($s3)) {
 			showError("Es konnte keine S3 Verbindung hergestellt werden. Stellen Sie sicher, dass unter den Archiv Optionen eine gültige Verbindung gespeichert wurde.");
 		} else {
 			$parent = test_input($_POST['add-new-file']);
 			try{
 				$hashkey = uniqid('', true); //23 chars
-				if(!$s3->doesBucketExist($bucket)){
-					$result = $s3->createBucket(['Bucket' => $bucket]);
-					if($result) showSuccess("Bucket $bucket Created");
-				}
 				$file_encrypt = simple_encryption(file_get_contents($_FILES['new-file-upload']['tmp_name']), $project_symmetric);
 				//$_FILES['file']['name']
 				$s3->putObject(array(

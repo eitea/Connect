@@ -6,7 +6,7 @@ if (empty($_SESSION['userid'])) {
 $userID = $_SESSION['userid'];
 $timeToUTC = $_SESSION['timeToUTC'];
 $privateKey = $_SESSION['privateKey'];
-$publicKey = isset($_SESSION['publicKey']) or "";
+$publicKey = $_SESSION['publicKey'];
 
 $setActiveLink = 'class="active-link"';
 
@@ -14,12 +14,15 @@ require __DIR__ . "/connection.php";
 require __DIR__ . "/utilities.php";
 require __DIR__ . "/validate.php";
 require __DIR__ . "/language.php";
+include 'version_number.php';
 
 if (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])){
 	ini_set('display_errors', 1);
 	ini_set('display_startup_errors', 1);
 	error_reporting(E_ALL);
 }
+
+if(!empty($_SESSION['version']) && $_SESSION['version'] != $VERSION_NUMBER) redirect('../user/logout');
 
 $result = $conn->query("SELECT id FROM identification LIMIT 1");
 if($row = $result->fetch_assoc()){
@@ -113,7 +116,7 @@ $result = $conn->query( /* Test if user has any questions */
     "SELECT count(*) count FROM (
         SELECT userID FROM dsgvo_training_user_relations tur LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID
         UNION
-        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID
+        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN relationship_team_user tr ON tr.teamID = dtr.teamID
         LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID
         UNION
         SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations INNER JOIN relationship_company_client ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
@@ -138,7 +141,7 @@ if(!$userHasSurveys){
                  )
             UNION
             SELECT tr.userID userID FROM dsgvo_training_team_relations dtr
-            INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID
+            INNER JOIN relationship_team_user tr ON tr.teamID = dtr.teamID
             LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID
             WHERE tr.userID = $userID
             AND NOT EXISTS (
@@ -180,7 +183,7 @@ if($userHasUnansweredSurveys){ /* Test if user has unanswered questions that sho
                     WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
                  )
                 UNION
-                SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN teamRelationshipData tr ON tr.teamID = dtr.teamID INNER JOIN dsgvo_training t on t.id = dtr.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
+                SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN relationship_team_user tr ON tr.teamID = dtr.teamID INNER JOIN dsgvo_training t on t.id = dtr.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
                     SELECT userID
                     FROM dsgvo_training_completed_questions
                     LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
@@ -332,7 +335,7 @@ if ($_SESSION['color'] == 'light') {
 
     <link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="plugins/font-awesome/css/font-awesome.min.css"/>
-    
+
     <script src="plugins/jQuery/jquery.min.js"></script>
     <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
     <script src="plugins/bootstrap-notify/bootstrap-notify.min.js"></script>
@@ -348,7 +351,6 @@ if ($_SESSION['color'] == 'light') {
     <script type="text/javascript" src="plugins/maskEdit/jquery.mask.js" ></script>
 
     <script src="plugins/html2canvas/html2canvas.min.js"></script>
-    <script src="plugins/remember-state/remember-state.min.js"></script>
 
     <link href="plugins/animate.css/animate.css" rel="stylesheet" />
     <script src="plugins/lodash/lodash.js"></script>
@@ -385,9 +387,9 @@ if ($_SESSION['color'] == 'light') {
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-language" ></i><span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <form method="POST" class="navbar-form navbar-left">
-                                <li><button type="submit" class="btn-empty" name="ENGLISH"><img width="30px" height="20px" src="images/eng.png"></button> English</li>
+                                <li><button type="submit" class="btn-empty" name="ENGLISH"><img width="30px" height="20px" src="images/eng.png"> &nbsp English</button></li>
                                 <li class="divider"></li>
-                                <li><button type="submit" class="btn-empty" name="GERMAN"><img width="30px" height="20px" src="images/ger.png"></button> Deutsch</li>
+                                <li><button type="submit" class="btn-empty" name="GERMAN"><img width="30px" height="20px" src="images/ger.png"> &nbsp Deutsch</button></li>
                             </form>
                         </ul>
                     </li>
@@ -437,7 +439,7 @@ if ($_SESSION['color'] == 'light') {
       <div class="modal-dialog modal-content modal-sm">
           <div class="modal-header h4">Information</div>
           <div class="modal-body">
-              <a target="_blank" href='http://www.eitea.at'> EI-TEA Partner GmbH </a> - <?php include 'version_number.php'; echo $VERSION_TEXT;?><br><br>
+              <a target="_blank" href='http://www.eitea.at'> EI-TEA Partner GmbH </a> - <?php echo $VERSION_TEXT;?><br><br>
               The Licensor does not warrant that commencing upon the date of delivery or installation, that when operated in accordance with the documentation or other instructions provided by the Licensor,
               the Software will perform substantially in accordance with the functional specifications set forth in the documentation. The software is provided "as is", without warranty of any kind, express or implied.
               <br><br>
@@ -497,7 +499,8 @@ if ($_SESSION['color'] == 'light') {
           <div class="modal-body">
               <ul class="nav nav-tabs">
                   <li class="active"><a data-toggle="tab" href="#myModalPassword">Passwort</a></li>
-                  <li><a id="myModalPGPtab" data-toggle="tab" href="#myModalPGP">Security</a></li>
+                  <li><a id="header_keystab" data-toggle="tab" href="#header_keys">Security</a></li>
+				  <li><a data-toggle="tab" href="#header_keycheck">Key Check</a></li>
               </ul>
               <div class="tab-content">
                   <div id="myModalPassword" class="tab-pane fade in active"><br>
@@ -520,7 +523,7 @@ if ($_SESSION['color'] == 'light') {
                           </div>
                       </form>
                   </div>
-                  <div id="myModalPGP" class="tab-pane fade"><br>
+                  <div id="header_keys" class="tab-pane fade"><br>
                       <form method="POST">
                           <div class="col-md-12">
                               <label>Public Key</label>
@@ -544,12 +547,81 @@ if ($_SESSION['color'] == 'light') {
                           </div>
                       </form>
                   </div>
+				  <div id="header_keycheck" class="tab-pane fade"><br>
+					  <?php
+					  $keyPair = base64_decode($privateKey).base64_decode($publicKey);
+					  if(strlen($keyPair) != 64):
+						 //this sould never be the case.
+						 //TODO: if your keys are wrong, you can either try uploading old keys or let yourself generate a new pair. you loose all your access though.
+						 showError($lang['ERROR_UNEXPECTED']);
+						 $privateKey = $publicKey = false;
+					  else: ?>
+						  <div class="col-sm-6">Persönliche Schlüssel: </div>
+						  <div class="col-sm-6">
+							  <?php
+							  $decrypted = '';
+							  $checksum = 'Ma-6SV3 bmQhEoY';
+							  $result = $conn->query("SELECT id, checkSum FROM security_users WHERE outDated = 'FALSE' AND userID = $userID LIMIT 1");
+							  if($row = $result->fetch_assoc()){
+								  try{
+									  if($row['checkSum']){
+										  $ciphertext = base64_decode($row['checkSum']);
+										  $nonce = mb_substr($ciphertext, 0, 24, '8bit');
+										  $encrypted = mb_substr($ciphertext, 24, null, '8bit');
+										  $decrypted = sodium_crypto_box_open($encrypted, $nonce, $keyPair);
+										  if($decrypted == $checksum){
+											  echo '<p style="color:green;">O.K.</p>';
+										  } else {
+											  echo '<p style="color:red">DENIED</p>';
+										  }
+									  } else {
+										  $nonce = random_bytes(24);
+										  $ciphertext = base64_encode($nonce . sodium_crypto_box($checksum, $nonce, $keyPair));
+										  $conn->query("UPDATE security_users SET checkSum = '$ciphertext' WHERE id = ".$row['id']);
+										  echo $conn->error.'!';
+									  }
+								  } catch(Exception $e){
+									  echo $e;
+								  }
+							  } else {
+								  echo $conn->error .__LINE__;
+							  }
+							  ?>
+						  </div>
+					  <?php
+					  $result = $conn->query("SELECT module, checkSum, id FROM security_modules WHERE module != 'TASK' AND outDated = 'FALSE'"); //nothing works with tasks
+					  echo $conn->error;
+					  while($row = $result->fetch_assoc()){
+						  $err = '';
+						  echo '<div class="col-sm-6">'.$row['module'].'</div>';
+						  echo '<div class="col-sm-6">';
+						  try{
+							  if($row['checkSum']){
+								  $decrypted = secure_data($row['module'], $row['checkSum'], 'decrypt', $userID, $privateKey, $err);
+							  } else {
+								  $ciphertext = secure_data($row['module'], $checksum, 'encrypt', $userID, $privateKey, $err);
+								  $conn->query("UPDATE security_modules SET checkSum = '$ciphertext' WHERE id = ".$row['id']);
+								  echo $conn->error.'!';
+							  }
+							  if($decrypted == $checksum){
+								  echo '<p style="color:green;">O.K.</p>';
+							  } else {
+								  echo '<p style="color:red">DENIED</p>';
+							  }
+						  } catch(Exception $e){
+							  echo $e;
+						  }
+						  echo '</div>';
+					  }
+				  endif;
+					  ?>
+				  </div>
               </div>
           </div>
       </div>
   </div>
 
-  <?php if(isset($_POST['unlockKeyDownload'])) echo '<script>$(document).ready(function(){$("#header-gears").click();$("#myModalPGPtab").click();});</script>'; ?>
+  <?php if(isset($_POST['unlockKeyDownload'])) echo '<script>$(document).ready(function(){$("#header-gears").click();$("#header_keystab").click();});</script>'; ?>
 
   <!-- /modal -->
   <?php if ($canUseSocialMedia == 'TRUE'): ?>
@@ -809,8 +881,8 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   <?php endif;?>
                   <?php
                   $result = $conn->query("SELECT d.projectid FROM dynamicprojects d LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
-                      LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN teamRelationshipData ON teamRelationshipData.teamID = dynamicprojectsteams.teamid
-                      WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") AND d.projectstatus = 'ACTIVE' AND (dynamicprojectsemployees.userid = $userID OR teamRelationshipData.userID = $userID)");
+                      LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN relationship_team_user ON relationship_team_user.teamID = dynamicprojectsteams.teamid
+                      WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") AND d.projectstatus = 'ACTIVE' AND (dynamicprojectsemployees.userid = $userID OR relationship_team_user.userID = $userID)");
                       echo $conn->error;
                       if (($result && $result->num_rows > 0) || $userHasSurveys || $isDynamicProjectsAdmin || $canCreateTasks): ?>
                       <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view">

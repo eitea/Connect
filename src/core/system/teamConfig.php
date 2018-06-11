@@ -12,7 +12,7 @@ if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
     foreach($_POST['createTeam_members'] AS $user){
         $user = intval($user);
         $skill = intval($_POST['createTeam_skill_'.$user]);
-        $conn->query("INSERT INTO teamRelationshipData(teamID, userID, skill) VALUES($teamID, $user, $skill)");
+        $conn->query("INSERT INTO relationship_team_user(teamID, userID, skill) VALUES($teamID, $user, $skill)");
     }
     if(!$conn->error){
         echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_CREATE'].'</div>';
@@ -27,7 +27,7 @@ if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
 } elseif(isset($_POST['removeMember']) && !empty($_POST['teamID'])){
     $teamID = intval($_POST['teamID']);
     $user = intval($_POST['removeMember']);
-    $conn->query("DELETE FROM teamRelationshipData WHERE userID = $user AND teamID = $teamID");
+    $conn->query("DELETE FROM relationship_team_user WHERE userID = $user AND teamID = $teamID");
     if(!$conn->error){
         echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
     }
@@ -36,7 +36,7 @@ if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
     foreach($_POST['saveTeam_users'] as $user){
         $user = intval($user);
         $skill = intval($_POST['saveTeam_skill_'.$user]);
-        $conn->query("UPDATE teamRelationshipData SET skill = $skill WHERE teamID = $teamID AND userID = $user");
+        $conn->query("UPDATE relationship_team_user SET skill = $skill WHERE teamID = $teamID AND userID = $user");
     }
     if(!$conn->error){
         echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
@@ -46,7 +46,7 @@ if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
     foreach($_POST['userIDs'] as $user){
         $user = intval($user);
         $skill = intval($_POST['hire_'.$user]);
-        $conn->query("INSERT INTO teamRelationshipData (teamID, userID, skill) VALUES ($teamID, $user, $skill)");
+        $conn->query("INSERT INTO relationship_team_user (teamID, userID, skill) VALUES ($teamID, $user, $skill)");
     }
     if(!$conn->error){
         echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
@@ -67,8 +67,8 @@ if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
 } elseif(!empty($_POST['department_flag'])){
     $teamID = intval($_POST['department_flag']);
     //$result = $conn->query("SELECT id FROM teamData WHERE isDepartment = 'TRUE'");
-    $result = $conn->query("SELECT userID FROM teamRelationshipData WHERE teamID = $teamID AND userID IN
-        (SELECT userID FROM teamRelationshipData, teamData WHERE teamData.id = teamID AND teamData.isDepartment = 'TRUE')");
+    $result = $conn->query("SELECT userID FROM relationship_team_user WHERE teamID = $teamID AND userID IN
+        (SELECT userID FROM relationship_team_user, teamData WHERE teamData.id = teamID AND teamData.isDepartment = 'TRUE')");
     if($result && $result->num_rows > 0){
         $row = $result->fetch_assoc();
         echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$userID_toName[$row['userID']].' befindet sich bereits in einer anderen Abteilung.</div>';
@@ -123,7 +123,7 @@ for($i = 0; $i < 11; $i++){
                 <div class="collapse <?php if($teamID == $activeTab) echo 'in'; ?>" id="teamCollapse-<?php echo $teamID; ?>">
                     <div class="panel-body container-fluid">
                         <?php
-                        $userResult = $conn->query("SELECT userID, skill FROM teamRelationshipData WHERE teamID = $teamID");
+                        $userResult = $conn->query("SELECT userID, skill FROM relationship_team_user WHERE teamID = $teamID");
                         while($userResult && ($userRow = $userResult->fetch_assoc())){
                             echo '<div class="col-xs-8 col-md-3">';
                             echo '<input type="hidden" name="saveTeam_users[]" value="'.$userRow['userID'].'">';
@@ -156,10 +156,10 @@ for($i = 0; $i < 11; $i++){
                             <tbody>
                                 <?php
                                 if($row['isDepartment'] == 'TRUE'){
-                                    $sql = "SELECT id, firstname, lastname FROM UserData WHERE id NOT IN (SELECT DISTINCT userID FROM teamRelationshipData WHERE teamID = $teamID)
-                                    AND id NOT IN (SELECT DISTINCT userID FROM teamRelationshipData, teamData WHERE teamData.id = teamID AND isDepartment = 'TRUE')";
+                                    $sql = "SELECT id, firstname, lastname FROM UserData WHERE id NOT IN (SELECT DISTINCT userID FROM relationship_team_user WHERE teamID = $teamID)
+                                    AND id NOT IN (SELECT DISTINCT userID FROM relationship_team_user, teamData WHERE teamData.id = teamID AND isDepartment = 'TRUE')";
                                 } else {
-                                    $sql = "SELECT id, firstname, lastname FROM UserData WHERE id NOT IN (SELECT DISTINCT userID FROM teamRelationshipData WHERE teamID = $teamID)";
+                                    $sql = "SELECT id, firstname, lastname FROM UserData WHERE id NOT IN (SELECT DISTINCT userID FROM relationship_team_user WHERE teamID = $teamID)";
                                 }
                                 $res_addmem = mysqli_query($conn, $sql);
                                 while ($res_addmem && ($row_addmem = $res_addmem->fetch_assoc())) {

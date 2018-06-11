@@ -242,9 +242,9 @@ $("#company_chooser").change(function () {
 											<select class="form-control duration-number-select" name="<?php echo $cat_row['opt_name']; ?>_NUMBER" >
 												<option value="default">Löschfrist - im Vorgang beschrieben</option>
 												<?php
-												for ($i = 1;$i<=30;++$i) {
-													$selected = (intval($cat_row['opt_duration']) === $i)?"selected":"";
-													echo "<option $selected value='$i'>$i</option>";
+												for ($k = 1;$k<=30;++$k) {
+													$selected = (intval($cat_row['opt_duration']) === $k)?"selected":"";
+													echo "<option $selected value='$k'>$k</option>";
 												}
 												?>
 											</select>
@@ -285,7 +285,7 @@ $("#company_chooser").change(function () {
 								<br>
 							</div>
 							<br>
-						<?php endwhile; ?>
+						<?php endwhile;?>
 						<div class="col-sm-12">
 							<label>Neue Gruppierung</label>
 							<div class="input-group">

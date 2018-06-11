@@ -616,7 +616,7 @@ function create_tables($conn) {
         echo mysqli_error($conn);
     }
 
-    $sql = "CREATE TABLE teamRelationshipData (
+    $sql = "CREATE TABLE relationship_team_user (
         teamID INT(6) UNSIGNED,
         userID INT(6) UNSIGNED,
         skill INT(3) DEFAULT 0 NOT NULL,
@@ -662,7 +662,6 @@ function create_tables($conn) {
     $sql = "CREATE TABLE proposals(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         clientID INT(6) UNSIGNED,
-        status INT(2),
         curDate DATETIME DEFAULT CURRENT_TIMESTAMP,
         deliveryDate DATETIME,
         daysNetto INT(4),
@@ -688,6 +687,7 @@ function create_tables($conn) {
     $sql = "CREATE TABLE processHistory(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         id_number VARCHAR(12) NOT NULL,
+        status INT(2),
         processID INT(6) UNSIGNED,
         FOREIGN KEY (processID) REFERENCES proposals(id)
         ON UPDATE CASCADE
@@ -1201,7 +1201,7 @@ function create_tables($conn) {
         vv_id INT(6) UNSIGNED,
         setting_id INT(10) UNSIGNED,
         matrix_setting_id INT(10) UNSIGNED,
-        setting VARCHAR(850) NOT NULL,
+        setting MEDIUMTEXT NOT NULL,
         category VARCHAR(50),
         clientID INT(6) UNSIGNED,
         FOREIGN KEY (clientID) REFERENCES clientData(id)
@@ -1223,7 +1223,7 @@ function create_tables($conn) {
 
     $sql = "CREATE TABLE dynamicprojects(
         projectid VARCHAR(100) NOT NULL PRIMARY KEY,
-        projectname VARCHAR(60) NOT NULL,
+        projectname VARCHAR(250) NOT NULL,
         projectdescription MEDIUMTEXT NOT NULL,
         companyid INT(6) UNSIGNED NOT NULL,
         clientid INT(6) UNSIGNED,
@@ -1244,6 +1244,7 @@ function create_tables($conn) {
         level INT(3) DEFAULT 0 NOT NULL,
         projecttags VARCHAR(250) DEFAULT '' NOT NULL,
         isTemplate ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL,
+		v2 VARCHAR(150) DEFAULT NULL,
         FOREIGN KEY (companyid) REFERENCES companyData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
@@ -1669,7 +1670,7 @@ function create_tables($conn) {
         log_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         short_description VARCHAR(100) NOT NULL,
         scope VARCHAR(100),
-        long_description VARCHAR(500),
+        long_description TEXT,
         FOREIGN KEY (user_id) REFERENCES UserData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -1873,7 +1874,7 @@ function create_tables($conn) {
 		version INT(4) NOT NULL DEFAULT 1,
 		versionDescr VARCHAR(250),
 		cPartner VARCHAR(50),
-		cPartnerID INT(6),
+		cPartnerID VARCHAR(20),
 		note VARCHAR(500) NOT NULL DEFAULT '',
 		FOREIGN KEY (archiveID) REFERENCES archive(id)
 		ON UPDATE CASCADE ON DELETE CASCADE

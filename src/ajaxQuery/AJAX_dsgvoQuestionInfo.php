@@ -1,4 +1,4 @@
-<?php 
+<?php
 if (!isset($_REQUEST["questionID"])){
     echo "error";
     die();
@@ -11,8 +11,8 @@ $result = $conn->query("SELECT title FROM dsgvo_training_questions WHERE id = $q
 $title = $result->fetch_assoc()["title"];
 $result = $conn->query(
     "SELECT userID, correct, firstname, lastname, tcq.version, tries, tcq.duration, tcq.lastAnswered
-     FROM dsgvo_training_questions tq 
-     INNER JOIN dsgvo_training_completed_questions tcq ON tcq.questionID = tq.id 
+     FROM dsgvo_training_questions tq
+     INNER JOIN dsgvo_training_completed_questions tcq ON tcq.questionID = tq.id
      INNER JOIN UserData ON UserData.id = tcq.userID
      WHERE tq.id = $questionID"
 );
@@ -44,7 +44,7 @@ $timesColorsArray = array();
                 </tr>
             </thead>
             <tbody>
-       <?php 
+       <?php
             $right = $wrong = $unanswered = 0;
             while($row = $result->fetch_assoc()){
                 $name = "${row['firstname']} ${row['lastname']}";
@@ -78,15 +78,15 @@ $timesColorsArray = array();
                  INNER JOIN UserData ud ON ud.id = dsgvo_training_user_relations.userID
                  WHERE dsgvo_training_questions.id = $questionID AND NOT EXISTS (SELECT questionID FROM dsgvo_training_completed_questions WHERE userID = ud.id AND questionID = $questionID)
                  UNION
-                 SELECT teamRelationshipData.userID, ud.firstname, ud.lastname FROM dsgvo_training_team_relations
-                 INNER JOIN teamRelationshipData ON teamRelationshipData.teamID = dsgvo_training_team_relations.teamID
+                 SELECT relationship_team_user.userID, ud.firstname, ud.lastname FROM dsgvo_training_team_relations
+                 INNER JOIN relationship_team_user ON relationship_team_user.teamID = dsgvo_training_team_relations.teamID
                  LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_team_relations.trainingID
-                 INNER JOIN UserData ud ON ud.id = teamRelationshipData.userID
+                 INNER JOIN UserData ud ON ud.id = relationship_team_user.userID
                  WHERE dsgvo_training_questions.id = $questionID AND NOT EXISTS (SELECT questionID FROM dsgvo_training_completed_questions WHERE userID = ud.id AND questionID = $questionID)
                  UNION
                  SELECT relationship_company_client.userID, firstname, lastname
-                 FROM dsgvo_training_company_relations 
-                 INNER JOIN relationship_company_client 
+                 FROM dsgvo_training_company_relations
+                 INNER JOIN relationship_company_client
                  ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
                  LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID
                  INNER JOIN UserData ud ON ud.id = relationship_company_client.userID
@@ -176,9 +176,9 @@ var triesChart = new Chart(ctx, {
         scales: {
             xAxes: [
                 {
-                    stacked: false, 
-                    ticks: { 
-                        beginAtZero: true 
+                    stacked: false,
+                    ticks: {
+                        beginAtZero: true
                     },
                     gridLines: {
                         color: "rgba(0, 0, 0, 0)",
@@ -190,7 +190,7 @@ var triesChart = new Chart(ctx, {
                     id: 'first-y-axis',
                     stacked: false,
                     position: 'left',
-                    ticks: { 
+                    ticks: {
                         beginAtZero: true,
                         display:false
                     },
@@ -202,7 +202,7 @@ var triesChart = new Chart(ctx, {
                     id: 'second-y-axis',
                     stacked: false,
                     position: 'right',
-                    ticks: { 
+                    ticks: {
                         beginAtZero: true,
                         display:false
                     }

@@ -1,4 +1,4 @@
-<?php 
+<?php
 if (!isset($_REQUEST["trainingID"])) {
     echo "error";
     die();
@@ -49,20 +49,20 @@ $companyID = $row["companyID"];
 $onLogin = $row["onLogin"];
 
 $result_user = $conn->query(
-    "SELECT userID, firstname, lastname FROM dsgvo_training_user_relations 
-     INNER JOIN UserData ON UserData.id = dsgvo_training_user_relations.userID 
+    "SELECT userID, firstname, lastname FROM dsgvo_training_user_relations
+     INNER JOIN UserData ON UserData.id = dsgvo_training_user_relations.userID
      WHERE trainingID = $trainingID
      UNION
-     SELECT teamRelationshipData.userID, firstname, lastname
-     FROM dsgvo_training_team_relations 
-     INNER JOIN teamRelationshipData 
-     ON teamRelationshipData.teamID = dsgvo_training_team_relations.teamID
-     INNER JOIN UserData ON UserData.id = teamRelationshipData.userID
+     SELECT relationship_team_user.userID, firstname, lastname
+     FROM dsgvo_training_team_relations
+     INNER JOIN relationship_team_user
+     ON relationship_team_user.teamID = dsgvo_training_team_relations.teamID
+     INNER JOIN UserData ON UserData.id = relationship_team_user.userID
      WHERE dsgvo_training_team_relations.trainingID = $trainingID
      UNION
      SELECT relationship_company_client.userID, firstname, lastname
-     FROM dsgvo_training_company_relations 
-     INNER JOIN relationship_company_client 
+     FROM dsgvo_training_company_relations
+     INNER JOIN relationship_company_client
      ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
      INNER JOIN UserData ON UserData.id = relationship_company_client.userID
      WHERE dsgvo_training_company_relations.trainingID = $trainingID"

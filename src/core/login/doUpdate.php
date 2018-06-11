@@ -1553,7 +1553,7 @@ if($row['version'] < 126){ //25.01.2018
 }
 
 if($row['version'] < 127){ //29.01.2018
-    $conn->query("ALTER TABLE teamRelationshipData ADD COLUMN skill INT(3) DEFAULT 0 NOT NULL");
+    $conn->query("ALTER TABLE relationship_team_user ADD COLUMN skill INT(3) DEFAULT 0 NOT NULL");
     if ($conn->error) {
         echo $conn->error;
     } else {
@@ -2887,9 +2887,70 @@ if($row['version'] < 158){
     if (!$conn->query($sql)) {
         echo $conn->error;
     }
+
+	$conn->query("ALTER TABLE security_users ADD COLUMN checkSum VARCHAR(100)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Security: Userkey Checksum';
+	}
+	$conn->query("ALTER TABLE security_modules ADD COLUMN checkSum VARCHAR(100)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Security: Module Checksum';
+	}
 }
 
-// if($row['version'] < 159){}
+if($row['version'] < 159){
+	$conn->query("UPDATE dsgvo_vv_template_settings SET opt_descr = REPLACE(opt_descr, 'Applikation', 'Vorgang') WHERE opt_descr LIKE '%Applikation%'");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>DSGVO: Vorgang rename';
+	}
+
+	$conn->query("ALTER TABLE dsgvo_vv_settings MODIFY COLUMN setting MEDIUMTEXT NOT NULL");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>DSGVO: Max. Zeichenlänge';
+	}
+	$conn->query("ALTER TABLE dsgvo_vv_logs MODIFY COLUMN long_description TEXT");
+	if($conn->error){
+		echo $conn->error;
+	}
+
+	$conn->query("RENAME TABLE teamRelationshipData TO relationship_team_user");
+
+	$conn->query("ALTER TABLE processHistory ADD COLUMN status INT(2)");
+	$conn->query("UPDATE processHistory p SET status = (SELECT status FROM proposals WHERE id = p.processID)");
+	$conn->query("ALTER TABLE proposals DROP COLUMN status");
+
+	//5b16313246c45
+	$conn->query("UPDATE dsgvo_vv_template_settings SET opt_descr = REPLACE(opt_descr, 'automatischer', 'automaischer') WHERE opt_descr LIKE '% automaischer %'");
+
+	$conn->query("ALTER TABLE dynamicprojects ADD COLUMN v2 VARCHAR(150) DEFAULT NULL");
+
+	$keypair = sodium_crypto_box_keypair();
+	$private = sodium_crypto_box_secretkey($keypair);
+	$public = sodium_crypto_box_publickey($keypair);
+	$nonce = random_bytes(24);
+	$conn->query("INSERT INTO security_modules (module, symmetricKey, publicKey, outDated, checkSum) VALUES('TASK', '', '".base64_encode($public)."', 'FALSE', '')");
+	echo $conn->error;
+	$result = $conn->query("SELECT userID, publicKey FROM security_users WHERE outDated = 'FALSE'");
+	while($row = $result->fetch_assoc()){
+		$user_public = base64_decode($row['publicKey']);
+		$nonce = random_bytes(24);
+		$encrypted = base64_encode($nonce . sodium_crypto_box($private, $nonce, $private.$user_public));
+		$conn->query("INSERT INTO security_access(userID, module, privateKey, outDated) VALUES(".$row['userID'].", 'TASK', '$encrypted', 'FALSE')");
+	}
+	echo $conn->error;
+}
+
+$conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectname VARCHAR(250) NOT NULL");
+$conn->query("ALTER TABLE archive_meta MODIFY COLUMN cPartnerID VARCHAR(20)");
+
 // if($row['version'] < 160){}
 // if($row['version'] < 161){}
 // if($row['version'] < 162){}
