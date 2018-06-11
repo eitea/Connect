@@ -90,7 +90,11 @@ function create_tables($conn) {
         detailMiddle VARCHAR(120),
         detailRight VARCHAR(120),
         uid VARCHAR(20),
-        istVersteuerer ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+        istVersteuerer ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+		companyRegister VARCHAR(80),
+		companyCommercialCourt VARCHAR(80),
+		companyWKOLink VARCHAR(150),
+		fax VARCHAR(60)
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);

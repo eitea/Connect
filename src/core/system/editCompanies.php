@@ -60,9 +60,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $left = max4Lines($_POST['general_detail_left']);
     $middle = max4Lines($_POST['general_detail_middle']);
     $right = max4Lines($_POST['general_detail_right']);
+	//5afc141e4a3c7
+	$register = test_input($_POST['general_companyRegister']);
+	$fax = test_input($_POST['general_fax']);
+	$court = test_input($_POST['general_companyCommercialCourt']);
+	$wko = test_input($_POST['general_companyWKOLink']);
+
     $conn->query("UPDATE companyData SET cmpDescription = '$descr',address = '$address', phone = '$phone', mail = '$mail', homepage = '$homepage', erpText = '$erpText',
-      detailLeft = '$left', detailMiddle = '$middle', detailRight = '$right', companyPostal = '$plz', uid = '$uid', companyCity = '$city' WHERE id = $cmpID");
-    echo mysqli_error($conn);
+      detailLeft = '$left', detailMiddle = '$middle', detailRight = '$right', companyPostal = '$plz', uid = '$uid', companyCity = '$city', fax = '$fax',
+	  companyRegister = '$register', companyCommercialCourt = '$court', companyWKOLink = '$wko' WHERE id = $cmpID");
+
+	  if($conn->error){
+		  showError($conn->error);
+	  } else {
+		  showSuccess($lang ['OK_SAVE']);
+	  }
   } elseif(isset($_POST['createNewProject']) && !empty($_POST['name'])){
    $name = test_input($_POST['name']);
    if(isset($_POST['status'])){
@@ -379,7 +391,7 @@ $result = $conn->query("SELECT c.*, s.publicKey FROM companyData c LEFT JOIN sec
 echo $conn->error;
 if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['id'], $available_companies)):
 ?>
-<div class="page-seperated-body page-header-fixed">
+<div class="page-seperated-body">
     <div class="page-header page-seperated-section">
         <h3><?php echo $lang['COMPANY'] .' - '.$companyRow['name']; ?>
             <div class="page-header-button-group">
@@ -388,7 +400,7 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
         </h3>
     </div>
 </div>
-<div class="page-seperated-body page-content-fixed-130">
+<div class="page-seperated-body">
 <form method="POST">
     <div class="modal fade cmp-delete-confirm-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
         <div class="modal-dialog modal-sm" role="document">
@@ -468,6 +480,18 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
         <input type="text" maxlength="54" class="form-control" name="general_city" value="<?php echo $companyRow['companyCity'];?>" />
       </div>
     </div>
+	<div class="row">
+		<div class="col-sm-3"><label>Firmenbuchnummer</label></div>
+		<div class="col-sm-9">
+			<input type="text" name="general_companyRegister" value="<?php echo $companyRow['companyRegister']; ?>" class="form-control" maxlength="80"/>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-3"><label>Firmenbuchgericht</label></div>
+		<div class="col-sm-9">
+			<input type="text" name="general_companyCommercialCourt" value="<?php echo $companyRow['companyCommercialCourt']; ?>" class="form-control" maxlength="80"/>
+		</div>
+	</div>
     <div class="row">
       <div class="col-sm-3"><label>UID</label></div>
       <div class="col-sm-9">
@@ -476,9 +500,13 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
     </div>
     <div class="row">
       <div class="col-sm-3"><label><?php echo $lang['PHONE_NUMBER']; ?></label></div>
-      <div class="col-sm-9">
+      <div class="col-sm-4">
         <input type="text" class="form-control" name="general_phone" placeholder="Tel nr." value="<?php echo $companyRow['phone'];?>"/>
       </div>
+	  <div class="col-sm-1 text-center"><label>Fax</label></div>
+	  <div class="col-sm-4">
+	  	<input type="text" maxlength="60" class="form-control" name="general_fax" placeholder="Fax nr." value="<?php echo $companyRow['fax'];?>"/>
+	  </div>
     </div>
     <div class="row">
       <div class="col-sm-3"><label>E-Mail</label></div>
@@ -486,6 +514,12 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
         <input type="mail" class="form-control"  name="general_mail" placeholder="E-Mail" value="<?php echo $companyRow['mail'];?>" />
       </div>
     </div>
+	<div class="row">
+		<div class="col-sm-3"><label>Link zur WKO</label></div>
+		<div class="col-sm-9">
+			<input type="text" name="general_companyWKOLink" value="<?php echo $companyRow['companyWKOLink']; ?>" class="form-control" maxlength="140"/>
+		</div>
+	</div>
     <div class="row">
       <div class="col-sm-3"><label>Homepage</label></div>
       <div class="col-sm-9">

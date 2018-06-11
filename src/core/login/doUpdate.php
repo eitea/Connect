@@ -33,55 +33,20 @@ html,body{
 }
 </style>
 
-<script>
-document.onreadystatechange = function () {
-  var state = document.readyState
-  if (state == 'complete') {
-    document.getElementById("content").style.display = "block";
-  } else {
-    move();
-  }
-}
-function move() {
-  var elem = document.getElementById("progress");
-  var elem_text = document.getElementById("progress_text");
-  var width = 10;
-  var id = setInterval(frame, 20); //calling frame every Xms, 10ms = 1 second
-  function frame() {
-    if (width >= 100) {
-      clearInterval(id);
-    } else {
-      width++;
-      elem.style.width = width + '%';
-      elem_text.innerHTML = width * 1  + '%';
-    }
-  }
-}
-</script>
-
 <body>
   <div id="progressBar_grey">
     <div id="progress_text">0%</div>
     <div id="progress">.</div>
   </div>
-  <div id="content" style="display:none;">
 <br>
 <?php
 require dirname(dirname(__DIR__)) . "/connection.php";
 require dirname(dirname(__DIR__)) . "/utilities.php";
 include dirname(dirname(__DIR__)) . '/validate.php';
-set_time_limit(999);
+set_time_limit(240);
 $result = mysqli_query($conn, "SELECT version FROM configurationData;");
-if(!$result){ //can be removed later on
-    $result = mysqli_query($conn, "SELECT version FROM ldapConfigTab;");
-    $row = $result->fetch_assoc();
-    $conn->query("ALTER TABLE configurationData ADD COLUMN version INT(5) DEFAULT ".$row['version']." NOT NULL");
-    if($conn->error){
-        echo $conn->error;
-    } else {
-        echo '<br>Table Update: Cleanup';
-    }
-    $conn->query("DROP TABLE ldapConfigTab");
+if(!$result){
+    die($conn->error);
 } else {
     $row = $result->fetch_assoc();
 }
@@ -2948,10 +2913,17 @@ if($row['version'] < 159){
 	echo $conn->error;
 }
 
-$conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectname VARCHAR(250) NOT NULL");
-$conn->query("ALTER TABLE archive_meta MODIFY COLUMN cPartnerID VARCHAR(20)");
 
-// if($row['version'] < 160){}
+if($row['version'] < 160){
+	$conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectname VARCHAR(250) NOT NULL");
+	$conn->query("ALTER TABLE archive_meta MODIFY COLUMN cPartnerID VARCHAR(20)");
+
+	//5afc141e4a3c7
+	$conn->query("ALTER TABLE companyData ADD COLUMN companyRegister VARCHAR(80)");
+	$conn->query("ALTER TABLE companyData ADD COLUMN companyCommercialCourt VARCHAR(80)");
+	$conn->query("ALTER TABLE companyData ADD COLUMN companyWKOLink VARCHAR(150)");
+	$conn->query("ALTER TABLE companyData ADD COLUMN fax VARCHAR(60)");
+}
 // if($row['version'] < 161){}
 // if($row['version'] < 162){}
 // if($row['version'] < 163){}
@@ -2965,11 +2937,24 @@ echo '<br><br>Update wurde beendet. Klicken sie auf "Weiter", wenn sie nicht aut
   window.setInterval(function(){
     window.location.href="../user/home";
   }, 4000);
+
+var elem = document.getElementById("progress");
+var elem_text = document.getElementById("progress_text");
+var width = 10;
+var id = setInterval(frame, 20); //calling frame every Xms, 10ms = 1 second
+function frame() {
+	if (width >= 100) {
+	  clearInterval(id);
+	} else {
+	  width++;
+	  elem.style.width = width + '%';
+	  elem_text.innerHTML = width * 1  + '%';
+	}
+}
 </script>
 
 <noscript>
   <meta http-equiv="refresh" content="0;url='.$url.'" />';
 </noscript>
-</div>
 </body>
 </html>
