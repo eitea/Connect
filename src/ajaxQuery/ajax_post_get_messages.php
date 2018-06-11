@@ -72,6 +72,7 @@ if (isset($_GET["partner"], $_GET["subject"]) && !empty($_SESSION["userid"])) {
     $taskView = true;
     $groupID = intval($_REQUEST["group"]);
     $result = $conn->query("SELECT * FROM (SELECT message, picture, sent, sender AS userID, firstname, lastname FROM groupmessages INNER JOIN UserData ON UserData.id = groupmessages.sender WHERE groupID = $groupID ORDER BY groupmessages.sent DESC LIMIT $limit) as temp order by sent asc");
+    $conn->query("INSERT INTO groupmessages_user (userID, messageID, seen) SELECT $userID, id, 'TRUE' FROM groupmessages WHERE groupID = $groupID ON DUPLICATE KEY UPDATE seen = 'TRUE'");
 } else {
     die('Invalid Request');
 }

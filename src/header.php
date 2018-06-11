@@ -773,10 +773,10 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 
                     <script>
                     $( document ).ready(function() {
-                        setInterval(function(){udpateBadge("#globalMessagingBadge")}, 10000); //10 seconds
+                        setInterval(function(){udpateHeaderBadge("#globalMessagingBadge")}, 10000); //10 seconds
                     });
 
-                    function udpateBadge(target) {
+                    function udpateHeaderBadge(target) {
                         $.ajax({
                             url: 'ajaxQuery/ajax_post_get_alerts.php',
                             type: 'GET',
@@ -790,7 +790,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             },
                         });
                     }
-                    udpateBadge("#globalMessagingBadge"); // initial page render
+                    udpateHeaderBadge("#globalMessagingBadge"); // initial page render
                     </script>
                   </li>
 				  <?php
