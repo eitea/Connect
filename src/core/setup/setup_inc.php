@@ -426,7 +426,7 @@ function create_tables($conn) {
         firstname VARCHAR(45),
         nameAddition VARCHAR(45),
         address_Street VARCHAR(100),
-        address_Country VARCHAR(50),
+        address_Country INT(6) UNSIGNED,
         address_Country_Postal VARCHAR(20),
         address_Country_City VARCHAR(50),
         address_Addition VARCHAR(150),
@@ -822,6 +822,8 @@ function create_tables($conn) {
 		clientStep INT(2),
 		supplierNum VARCHAR(12),
 		supplierStep INT(2),
+		euService VARCHAR(150),
+		euDelivery VARCHAR(150),
 		FOREIGN KEY (companyID) REFERENCES companyData(id)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE

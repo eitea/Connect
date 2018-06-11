@@ -2920,10 +2920,58 @@ if($row['version'] < 160){
 
 	//5afc141e4a3c7
 	$conn->query("ALTER TABLE companyData ADD COLUMN companyRegister VARCHAR(80)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Mandant: Firmenbuchnummer';
+	}
 	$conn->query("ALTER TABLE companyData ADD COLUMN companyCommercialCourt VARCHAR(80)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Mandant: Firmenbuchgericht';
+	}
 	$conn->query("ALTER TABLE companyData ADD COLUMN companyWKOLink VARCHAR(150)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Mandant: Link zur WKO';
+	}
 	$conn->query("ALTER TABLE companyData ADD COLUMN fax VARCHAR(60)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Mandant: Fax Nr.';
+	}
+
+	//5b17cd451c685
+	$conn->query("UPDATE travelCountryData SET countryName = 'Österreich', identifier = 'AT' WHERE id = 1"); //just in case
+
+	$conn->query("UPDATE clientInfoData c SET address_Country = (SELECT id FROM travelCountryData t WHERE c.address_country = t.countryName )");
+	$conn->query("ALTER TABLE clientInfoData MODIFY COLUMN address_Country INT(6) UNSIGNED");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Adressbuch: Länderauswahl';
+	}
+
+	//5b17d3a5b9341
+	$conn->query("ALTER TABLE erp_settings ADD COLUMN euDelivery VARCHAR(150)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>ERP: EU Lieferung';
+	}
+	$conn->query("ALTER TABLE erp_settings ADD COLUMN euService VARCHAR(150)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>ERP: EU Leistung';
+	}
 }
+
+
+
 // if($row['version'] < 161){}
 // if($row['version'] < 162){}
 // if($row['version'] < 163){}
