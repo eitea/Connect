@@ -1,4 +1,4 @@
-0	Österreich	26,40	15,00
+AT	Österreich	26,40	15,00
 AFG	Afghanistan	31,80	27,70
 AL	Albanien	27,90	20,90
 ANG	Angola	43,60	41,40
