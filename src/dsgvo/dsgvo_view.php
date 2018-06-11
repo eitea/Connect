@@ -726,7 +726,14 @@ if($result && ($row = $result->fetch_assoc())):
 							</div>
 						</div>
 						<div id="meta-cPartner-contact" <?php if($part != 'contact') echo 'style="display:none"'; ?>>
-							<?php if($part == 'contact') $filterings['contact'] = $row['cPartnerID']; include dirname(__DIR__).'/misc/select_contact.php'; ?>
+							<?php
+							if($part == 'contact'){ //5b1a6c79d7b3b
+								$arr = explode(' ', $row['cPartnerID']);
+								$filterings['client'] = $arr[0];
+								if(!empty($arr[1])) $filterings['contact'] = $arr[1];
+							}
+							include dirname(__DIR__).'/misc/select_contact.php';
+							?>
 						</div>
 					</div>
 				</div>
