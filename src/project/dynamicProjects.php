@@ -336,9 +336,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 							$file_info = pathinfo($_FILES['newTaskFiles']['name'][$i]);
 							$ext = test_input(strtolower($file_info['extension']));
 							$filetype = $_FILES['newTaskFiles']['type'][$i];
-							$accepted_types = ['application/msword', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'text/plain', 'application/pdf', 'application/zip',
+							$accepted_types = ['application/octet-stream', 'application/msword', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'text/plain', 'application/pdf', 'application/zip',
 							'application/x-zip-compressed', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'multipart/x-zip',
-							'application/x-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-outlook'];
+							'application/x-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 							if (!in_array($ext, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'zip', 'msg'])){
 								showError('Ungültige Dateiendung: '.$ext);
 							} elseif(!in_array($filetype, $accepted_types)) {
