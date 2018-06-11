@@ -762,7 +762,7 @@ FROM contactPersons LEFT JOIN position ON position.id = position LEFT JOIN exter
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-default" onclick="$('#add-contact-person<?php echo $x; ?>').modal('hide');">Cancel</button>
                 <button type="submit" name="addContact" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
             </div>
         </div>
