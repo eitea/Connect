@@ -55,7 +55,7 @@ $disabled = $isGroupAdmin ? "" : "disabled"
                 ?>
             </select><br><br>
             <label>Admins</label>
-                <select id="members-select" <?= $disabled ?> class="js-example-basic-single" name="admins[]" multiple="multiple">
+                <select id="admins-select" <?= $disabled ?> class="js-example-basic-single" name="admins[]" multiple="multiple">
                 <?php
                 $result = $conn->query("SELECT UserData.id id, firstname, lastname FROM UserData");
                 while ($result && ($row = $result->fetch_assoc())) {
@@ -84,11 +84,16 @@ $disabled = $isGroupAdmin ? "" : "disabled"
 </form>
 <script>
 $("#delete-warning-members").hide();
-$("#members-select").change(function(event){
-    if(event.target.value){
+$("#members-select").change(displayWarning)
+$("#admins-select").change(displayWarning)
+function displayWarning(event){
+    mv = $("#members-select").val();
+    av = $("#admins-select").val();
+    console.log(mv,av);
+    if((mv && mv.length > 0 ) || (av && av.length > 0)){
         $("#delete-warning-members").fadeOut();
     }else{
         $("#delete-warning-members").fadeIn();
     }
-})
+}
 </script>
