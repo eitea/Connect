@@ -47,18 +47,66 @@ while($result && $row = $result->fetch_assoc()){
 				$encrypted_header = asymmetric_encryption('TASK', imap_fetchheader($imap, $mail_number), 0, $secret);
 				$structure = imap_fetchstructure($imap, $mail_number);
 
+				//print_r($structure);
+
 				$html = '';
 				$projectid = uniqid();
-				$i = 0;
-				while(isset($structure->parts[$i])){
-					$filename = $filetype = '';
-					if($structure->parts[$i]->ifparameters){
-						foreach($structure->parts[$i]->parameters as $object){ //loops through filename, size, dates of attachments or mails.
-							if(strtolower($object->attribute) == 'name'){
-								$filename = $object->value;
-								$filetype = strtolower($structure->parts[$i]->subtype);
-							} elseif(strtolower($object->attribute) =='charset'){
-								$html = imap_fetchbody($imap, $mail_number, $i+1);
+				if(isset($structure->parts[0])){
+					for($i = 0; $i < count($structure->parts); $i++){
+						$filename = $filetype = '';
+						if($structure->parts[$i]->ifparameters){
+							foreach($structure->parts[$i]->parameters as $object){ //loops through filename, size, dates of attachments or mails.
+								if(strtolower($object->attribute) == 'name'){
+									$filename = $object->value;
+									$filetype = strtolower($structure->parts[$i]->subtype);
+								} elseif(strtolower($object->attribute) =='charset'){
+									$html = imap_fetchbody($imap, $mail_number, $i+1);
+									if($structure->parts[$i]->encoding == 3) { /* 3 = BASE64 encoding */
+										$html = base64_decode($html);
+									} elseif($structure->parts[$i]->encoding == 4) { /* 4 = QUOTED-PRINTABLE encoding */
+										$html = quoted_printable_decode($html);
+									}
+									$html = iconv($object->value, 'UTF-8', $html);
+								}
+							}
+						}
+						if(!$filename && $structure->parts[$i]->ifdparameters){
+							foreach($structure->parts[$i]->dparameters as $object){
+								if(strtolower($object->attribute) == 'filename'){
+									$filename = $object->value;
+									$filetype = strtolower($structure->parts[$i]->subtype);
+								}
+							}
+						}
+						if($filename){
+							$filename = pathinfo($filename, PATHINFO_FILENAME);
+							$attachment_body = imap_fetchbody($imap, $mail_number, $i+1);
+							if($structure->parts[$i]->encoding == 3) {
+								$attachment_body = base64_decode($attachment_body);
+							} elseif($structure->parts[$i]->encoding == 4) {
+								$attachment_body = quoted_printable_decode($attachment_body);
+							}
+							if(in_array($filetype, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'zip', 'msg', 'jpg', 'jpeg', 'png', 'gif'])){
+								$archiveID = uniqid('', true);
+								$stmt_insertarchive->execute();
+								$s3->putObject(array(
+									'Bucket' => $bucket,
+									'Key' => $archiveID,
+									'Body' => asymmetric_encryption('TASK', $attachment_body, 0, $secret)
+								));
+								if($structure->parts[$i]->ifid){
+									$attachmentId = trim($structure->parts[$i]->id, " <>");
+									$html = str_replace("cid:$attachmentId", "cid:$archiveID", $html); //replace the image with the archive id. makes it easier.
+								}
+							}
+						}
+					} //endwhile(parts)
+				} else {
+					echo "Helloo";
+					if($structure->ifparameters){
+						foreach($structure->parameters as $object){ //loops through filename, size, dates of attachments or mails.
+							if(strtolower($object->attribute) =='charset'){
+								$html = imap_fetchbody($imap, $mail_number, 1);
 								if($structure->parts[$i]->encoding == 3) { /* 3 = BASE64 encoding */
 									$html = base64_decode($html);
 								} elseif($structure->parts[$i]->encoding == 4) { /* 4 = QUOTED-PRINTABLE encoding */
@@ -68,42 +116,11 @@ while($result && $row = $result->fetch_assoc()){
 							}
 						}
 					}
-					if(!$filename && $structure->parts[$i]->ifdparameters){
-						foreach($structure->parts[$i]->dparameters as $object){
-							if(strtolower($object->attribute) == 'filename'){
-								$filename = $object->value;
-								$filetype = strtolower($structure->parts[$i]->subtype);
-							}
-						}
-					}
-					if($filename){
-						$filename = pathinfo($filename, PATHINFO_FILENAME);
-						$attachment_body = imap_fetchbody($imap, $mail_number, $i+1);
-						if($structure->parts[$i]->encoding == 3) {
-							$attachment_body = base64_decode($attachment_body);
-						} elseif($structure->parts[$i]->encoding == 4) {
-							$attachment_body = quoted_printable_decode($attachment_body);
-						}
-						if(in_array($filetype, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'zip', 'msg', 'jpg', 'jpeg', 'png', 'gif'])){
-							$archiveID = uniqid('', true);
-							$stmt_insertarchive->execute();
-							$s3->putObject(array(
-								'Bucket' => $bucket,
-								'Key' => $archiveID,
-								'Body' => asymmetric_encryption('TASK', $attachment_body, 0, $secret)
-							));
-							if($structure->parts[$i]->ifid){
-								$attachmentId = trim($structure->parts[$i]->id, " <>");
-								$html = str_replace("cid:$attachmentId", "cid:$archiveID", $html); //replace the image with the archive id. makes it easier.
-							}
-						}
-					}
-					$i++;
-				} //endwhile(parts)
+				}
+
 
 				//dynamicproject
 				$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$projectid', 'CREATED', 1)");
-
 				$html = asymmetric_encryption('TASK', $html, 0, $secret);
 				$name = asymmetric_encryption('TASK', substr_replace($header->subject, '', $pos, strlen($rule['subject'])), 0, $secret);
 				$conn->query("INSERT INTO dynamicprojects(

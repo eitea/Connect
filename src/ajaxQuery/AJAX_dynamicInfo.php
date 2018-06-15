@@ -165,7 +165,7 @@ if (sizeof($missingBookingsArray) == 0) {
 							} else {
 								$identifier = uniqid('');
 								$conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
-							} 							
+							}
 							$description = asymmetric_encryption('TASK', $dynrow['projectdescription'], $userID, $privateKey, $dynrow['v2']);
 							$result = $conn->query("SELECT uniqID, name, uploadDate, type FROM archive WHERE category = 'TASK' AND categoryID = '$x'");
 							if($result && $result->num_rows > 0){
@@ -188,7 +188,7 @@ if (sizeof($missingBookingsArray) == 0) {
 									if(strpos($description, $row['uniqID'])){
 										$description = str_replace("cid:".$row['uniqID'], "data:image/jpeg;base64,".base64_encode(asymmetric_encryption('TASK', $object[ 'Body' ], $userID, $privateKey, $dynrow['v2'])), $description);
 									} else {
-
+										$description .= '<img style="width:80%;" src="data:image/jpeg;base64,'.base64_encode(asymmetric_encryption('TASK', $object[ 'Body' ], $userID, $privateKey, $dynrow['v2'])).'" />';
 									}
 								}
 							}
