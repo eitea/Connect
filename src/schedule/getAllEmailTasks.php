@@ -47,7 +47,7 @@ while($result && $row = $result->fetch_assoc()){
 				$encrypted_header = asymmetric_encryption('TASK', imap_fetchheader($imap, $mail_number), 0, $secret);
 				$structure = imap_fetchstructure($imap, $mail_number);
 
-				//print_r($structure);
+				print_r($structure);
 
 				$html = '';
 				$projectid = uniqid();
@@ -102,11 +102,11 @@ while($result && $row = $result->fetch_assoc()){
 						}
 					} //endwhile(parts)
 				} else {
-					echo "Helloo";
 					if($structure->ifparameters){
 						foreach($structure->parameters as $object){ //loops through filename, size, dates of attachments or mails.
 							if(strtolower($object->attribute) =='charset'){
 								$html = imap_fetchbody($imap, $mail_number, 1);
+								if(!$html) imap_fetchbody($imap, $mail_number, 1.2);
 								if($structure->parts[$i]->encoding == 3) { /* 3 = BASE64 encoding */
 									$html = base64_decode($html);
 								} elseif($structure->parts[$i]->encoding == 4) { /* 4 = QUOTED-PRINTABLE encoding */
@@ -118,6 +118,7 @@ while($result && $row = $result->fetch_assoc()){
 					}
 				}
 
+				echo $html;
 
 				//dynamicproject
 				$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$projectid', 'CREATED', 1)");
@@ -139,7 +140,6 @@ while($result && $row = $result->fetch_assoc()){
 			}
 
         } //end foreach mail
-		//delete if not able to move
 		if(!imap_mail_move($imap, implode(',', $move_sequence), $archive)) imap_expunge($imap);
     }
 	imap_close($imap);
