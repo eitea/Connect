@@ -45,7 +45,7 @@ ini_set('max_execution_time',999);
   <!-- /navbar -->
   <?php
   function test_input($data) {
-    $data = preg_replace("~[^A-Za-z0-9\-.öäüÖÄÜ_ ]~", "", $data);
+    $data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€§#$%()+*öäüÖÄÜß_ ]~", "", $data);
     $data = trim($data);
     return $data;
   }

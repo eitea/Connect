@@ -16,7 +16,7 @@ include dirname(dirname(__DIR__)) .'/version_number.php';
 
 $invalidLogin = "";
 
-if(!empty($_POST['loginName']) && !empty($_POST['password']) && isset($_POST['loginButton'])) {
+if(!empty($_POST['loginName']) && !empty($_POST['password'])) {
     $result = $conn->query("SELECT * FROM UserData WHERE email = '" . test_input($_POST['loginName']) . "' ");
     if($result){
         $row = $result->fetch_assoc();
@@ -89,7 +89,7 @@ if($result && $result->num_rows > 0){
         <form method="POST" style="display:inline-block">
             <label for="in">E-Mail: </label>  <input id="in" type="text" name="loginName" value="" autofocus /><br>
             <label for="pw">Password: </label> <input id="pw" type="password" name="password" value="" /><br>
-            <input type="submit" name="cancelButton" value="Cancel" /> <input type="submit" name="loginButton" value="Submit" /><br>
+            <button type="submit" class="cancelButton">Cancel</button> <button type="submit" class="loginButton">Submit</button><br>
             <input type="text" readonly name="invalidLogin" style="border:0; background:0; color:white; text-align:right;" value="<?php echo $invalidLogin; ?>" />
             <div class="robot-control"><input type="number" id="funZone" name="funZone" readonly><input type="text" name="captcha" value="" /></div>
         </form>

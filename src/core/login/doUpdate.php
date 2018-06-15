@@ -2784,12 +2784,6 @@ if($row['version'] < 156){
 	}
 }
 
-
-
-//$conn->query("DELETE FROM UserData WHERE id = 1");
-//$conn->query("UPDATE UserData SET id = 1 WHERE id = 2");
-//update: social tables, archive tables, messages,  leaders/ responisbles/ supervisors, uploadUser
-
 if($row['version'] < 157){
 	$conn->query("ALTER TABLE UserData ADD COLUMN supervisor INT(6) DEFAULT NULL ");
 	$conn->query("CREATE TABLE dsgvo_categories(
@@ -2968,14 +2962,74 @@ if($row['version'] < 160){
 	} else {
 		echo '<br>ERP: EU Leistung';
 	}
+
+	//5b050794ee954
+	$conn->query("DELETE FROM UserData WHERE id = 1");
+	$conn->query("UPDATE UserData SET id = 1 WHERE id = 2");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Benutzer: Admin entfernt';
+	}
+	$conn->query("UPDATE dynamicprojects SET projectleader = 1 WHERE projectleader = 2");
+	$conn->query("UPDATE archive SET uploadUser = 1 WHERE uploadUser = 2");
+
+	//5b1f67f86c983
+	$sql = "CREATE TABLE workflowRules (
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		workflowID INT(10),
+		templateID VARCHAR(100),
+		position INT(4),
+		subject VARCHAR(100),
+		fromAddress VARCHAR(100),
+		toAddress VARCHAR(100),
+		FOREIGN KEY (templateID) REFERENCES dynamicprojects(projectid)
+		ON UPDATE CASCADE
+		ON DELETE SET NULL,
+		FOREIGN KEY (workflowID) REFERENCES emailprojects(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+		echo '<br>Workflow: Update';
+	}
+
+	$result = $conn->query("SELECT * FROM taskemailrules");
+	$i = 1;
+	while($row = $result->fetch_assoc()){
+		$id = uniqid();
+		$conn->query("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor,
+			projectstatus, projectpriority, projectparent, projectowner, projectleader, estimatedHours, isTemplate)
+		    VALUES ('$id', '{$row['identifier']}', '', '{$row['company']}', '{$row['client']}', '{$row['clientproject']}', '{$row['color']}',
+			'{$row['status']}', '{$row['priority']}', '{$row['parent']}', '{$row['owner']}', '{$row['leader']}', '{$row['estimatedHours']}', 'TRUE')");
+			echo $conn->error;
+	   $conn->query("INSERT INTO workflowRules (workflowID, templateID, position, subject) VALUES ('{$row['emailaccount']}', '$id', $i, '{$row['identifier']}') ");
+	   echo $conn->error;
+   }
+
+	$conn->query("DROP TABLE taskemailrules");
+
+	$conn->query("DROP TABLE dynamicprojectsnotes");
+	$conn->query("DROP TABLE dynamicprojectspictures");
+
+	$conn->query("ALTER TABLE dynamicprojects ADD COLUMN projectmailheader TEXT NOT NULL DEFAULT ''");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Tasks: Verschlüsselter email Header';
+	}
 }
-
-
 
 // if($row['version'] < 161){}
 // if($row['version'] < 162){}
 // if($row['version'] < 163){}
 // if($row['version'] < 164){}
+
+//cleanups for maintainable db sizes
+$conn->query("DELETE FROM `checkinLogs` WHERE id <= ( SELECT id FROM ( SELECT id FROM `checkinLogs` ORDER BY id DESC LIMIT 1 OFFSET 100 ) foo )");echo $conn->error;
+$conn->query("DELETE FROM `dsgvo_vv_logs` WHERE id <= ( SELECT id FROM ( SELECT id FROM `dsgvo_vv_logs` ORDER BY id DESC LIMIT 1 OFFSET 300 ) foo )");echo $conn->error;
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';
 $conn->query("UPDATE configurationData SET version=$VERSION_NUMBER");

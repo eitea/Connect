@@ -9,8 +9,6 @@
             if(file_exists(__DIR__.DIRECTORY_SEPARATOR.'helpcenter'.DIRECTORY_SEPARATOR.'h_'.$this_page)){
                 include __DIR__ .DIRECTORY_SEPARATOR.'helpcenter'.DIRECTORY_SEPARATOR.'h_'.$this_page;
             } else {
-                require_once __DIR__.DIRECTORY_SEPARATOR.'sourcefinder.php';
-                echo $sourceid["$this_page"] ?? null;
                 include __DIR__.DIRECTORY_SEPARATOR.'helpcenter'.DIRECTORY_SEPARATOR.'default.php';
             }
              ?>

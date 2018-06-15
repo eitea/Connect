@@ -69,8 +69,6 @@ FROM contactPersons LEFT JOIN position ON position.id = position LEFT JOIN exter
                         <div id="project<?php echo $x; ?>" class="tab-pane fade <?php if ($activeTab == 'project') {echo 'in active';} ?>">
                             <h3><?php echo $lang['PROJECTS']; ?>
                               <div class="page-header-button-group">
-                                  <button type="submit" class="btn btn-default" name='delete_projects' title="<?php echo $lang['DELETE']; ?>" ><i class="fa fa-trash-o"></i></button>
-
 								  <a type="button" class="btn btn-default" href="../project/view?custID=<?php echo $x; //5ad46a0e150ec ?>" title="Bearbeiten"><i class="fa fa-pencil"></i></a>
                               </div>
                             </h3>

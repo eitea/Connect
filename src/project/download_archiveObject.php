@@ -63,13 +63,7 @@ if($result && ($row = $result->fetch_assoc()) && $row['publicKey'] && $row['priv
 $result = $conn->query("SELECT endpoint, awskey, secret FROM archiveconfig WHERE isActive = 'TRUE' LIMIT 1");
 if($result && ($row = $result->fetch_assoc())){
     try{
-        $s3 = new Aws\S3\S3Client(array(
-            'version' => 'latest',
-            'region' => '',
-            'endpoint' => $row['endpoint'],
-            'use_path_style_endpoint' => true,
-            'credentials' => array('key' => $row['awskey'], 'secret' => $row['secret'])
-        ));
+        $s3 = getS3Object($bucket);
         $object = $s3->getObject(array(
             'Bucket' => $bucket,
             'Key' => $fileKey,

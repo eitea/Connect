@@ -13,19 +13,18 @@ $result = $conn->query("SELECT activity, userID FROM dynamicprojectslogs WHERE p
 if (($row = $result->fetch_assoc()) && $row['activity'] != 'VIEWED') {
     $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$x', 'VIEWED', $userID)");
 }
-$showMissingBookings = true;
-$missingBookingsArray = array();
 
-$result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus, projectpriority, projectowner, projectleader,
-    projectpercentage, projecttags, v2, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName, clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours
-    FROM dynamicprojects d LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
-    LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
+$result = $conn->query("SELECT projectname, projectdescription, projectstart, projectstatus, projectleader,
+	projectmailheader, projectpercentage, v2, d.companyid, d.clientid, d.clientprojectid
+    FROM dynamicprojects d LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
     LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN relationship_team_user ON relationship_team_user.teamID = dynamicprojectsteams.teamid
     WHERE (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (relationship_team_user.userID = $userID AND relationship_team_user.skill >= d.level))
     AND d.projectstart <= UTC_TIMESTAMP and d.projectid = '$x'");
 $dynrow = $result->fetch_assoc();
 $projectleader = $dynrow['projectleader'];
 
+$showMissingBookings = true;
+$missingBookingsArray = array();
 $isInUse = $conn->query("SELECT userID, p.id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00' AND dynamicID = '$x' LIMIT 1");
 $useRow = $isInUse->fetch_assoc();
 if($useRow){
@@ -39,7 +38,12 @@ while ($result && ($row = $result->fetch_assoc())) {
 
 if($showMissingBookings){
     echo $conn->error;
-    $occupation = array('bookingID' => $useRow['id'], 'dynamicID' => $x, 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage']);
+    $occupation = array('bookingID' => $useRow['id'],
+	'dynamicID' => $x,
+	'companyid' => $dynrow['companyid'],
+	'clientid' => $dynrow['clientid'],
+	'projectid' => $dynrow['clientprojectid'],
+	'percentage' => $dynrow['projectpercentage']);
     // /copied from dynamicProjects
 
     // from userProjecting:
@@ -144,11 +148,58 @@ if (sizeof($missingBookingsArray) == 0) {
                 <?php if($showMissingBookings): ?><li><a data-toggle="tab" href="#projectForgottenBooking<?php echo $x; ?>">Zeit nachbuchen</a></li><?php endif; ?>
             </ul>
             <div class="tab-content">
+				<div id="projectInfoData<?php echo $x; ?>" class="tab-pane fade"><br>
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Upload Datum</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php
+							$result = $conn->query("SELECT id FROM identification LIMIT 1");
+							if($row = $result->fetch_assoc()){
+								$identifier = $row['id'];
+							} else {
+								$identifier = uniqid('');
+								$conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
+							} 							
+							$description = asymmetric_encryption('TASK', $dynrow['projectdescription'], $userID, $privateKey, $dynrow['v2']);
+							$result = $conn->query("SELECT uniqID, name, uploadDate, type FROM archive WHERE category = 'TASK' AND categoryID = '$x'");
+							if($result && $result->num_rows > 0){
+								$bucket = $identifier .'-tasks';
+								$s3 = getS3Object($bucket);
+							}
+							while($result && ($row = $result->fetch_assoc())){
+								echo '<tr>';
+								echo '<td>'.$row['name'].'.'.$row['type'].'</td>';
+								echo '<td>'.$row['uploadDate'].'</td>';
+								echo '<td><form method="POST" style="display:inline" action="../project/detailDownload" target="_blank"><input type="hidden" name="keyReference" value="TASK_'.$x.'" />
+								<button type="submit" class="btn btn-default" name="download-file" value="'.$row['uniqID'].'"><i class="fa fa-download"></i></form></td>';
+								echo '</tr>';
+								if($row['type'] == 'jpg' || $row['type'] == 'jpeg'){
+							        $object = $s3->getObject(array(
+							            'Bucket' => $bucket,
+							            'Key' => $row['uniqID']
+							        ));
+
+									if(strpos($description, $row['uniqID'])){
+										$description = str_replace("cid:".$row['uniqID'], "data:image/jpeg;base64,".base64_encode(asymmetric_encryption('TASK', $object[ 'Body' ], $userID, $privateKey, $dynrow['v2'])), $description);
+									} else {
+
+									}
+								}
+							}
+							?>
+						</tbody>
+					</table>
+				</div>
                 <div id="projectDescription<?php echo $x; ?>" class="tab-pane fade in active"><br>
                     <?php
-					$description = asymmetric_encryption('TASK', $dynrow['projectdescription'], $userID, $privateKey, $dynrow['v2']);
                     $micro = $conn->query("SELECT * FROM microtasks WHERE projectid = '$x'");
-                    if($micro){
+                    if($micro && $micro->num_rows > 0){
                         while($nextmtask = $micro->fetch_assoc()){
                             if($nextmtask['ischecked'] == 'TRUE'){
                                 $mtaskid = $nextmtask['microtaskid'];
@@ -217,32 +268,12 @@ if (sizeof($missingBookingsArray) == 0) {
                             ?>
                         </tbody>
                     </table>
+					<?php
+					if($dynrow['projectmailheader']){ //5b1fe6dbb361a
+						echo '<br><label>E-Mail Header</label><br><pre>'.asymmetric_encryption('TASK', $dynrow['projectmailheader'], $userID, $privateKey, $dynrow['v2']).'</pre>';
+					}
+					?>
                 </div>
-				<div id="projectInfoData<?php echo $x; ?>" class="tab-pane fade"><br>
-					<table class="table table-hover">
-						<thead>
-							<tr>
-								<th>Name</th>
-								<th>Upload Datum</th>
-								<th></th>
-							</tr>
-						</thead>
-						<tbody>
-							<?php
-							$result = $conn->query("SELECT uniqID, name, uploadDate, type FROM archive WHERE category = 'TASK' AND categoryID = '$x'");
-							while($result && ($row = $result->fetch_assoc())){
-								echo '<tr>';
-								echo '<td>'.$row['name'].'.'.$row['type'].'</td>';
-								echo '<td>'.$row['uploadDate'].'</td>';
-								echo '<td><form method="POST" style="display:inline" action="../project/detailDownload" target="_blank"><input type="hidden" name="keyReference" value="TASK_'.$x.'" />
-								<button type="submit" class="btn btn-default" name="download-file" value="'.$row['uniqID'].'"><i class="fa fa-download"></i></form></td>';
-								echo '</tr>';
-							}
-							?>
-						</tbody>
-					</table>
-				</div>
-
                 <?php if($showMissingBookings): ?>
                 <div id="projectForgottenBooking<?php echo $x; ?>" class="tab-pane fade"><br>
                 <form method="POST">

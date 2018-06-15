@@ -214,7 +214,50 @@ if($userHasUnansweredSurveys){ /* Test if user has unanswered questions that sho
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['stampIn']) || isset($_POST['stampOut'])) {
-        require __DIR__ . "/misc/ckInOut.php";
+		function checkIn($userID) {
+		  global $conn;
+		  global $timeToUTC;
+		  $result = $conn->query("SELECT indexIM, status, time, timeEnd FROM logs WHERE userID = $userID AND time LIKE '".substr(getCurrentTimestamp(), 0, 10). " %'");
+		  //user already has a stamp for today
+		  if($result && $result->num_rows > 0){
+		    $row = $result->fetch_assoc();
+		    $id = $row['indexIM'];
+		    if($row['status'] && $row['status'] != 5){ //mixed
+		      $conn->query("INSERT INTO mixedInfoData (timestampID, status, timeStart, timeEnd) VALUES($id, '".$row['status']."', '".$row['time']."', '".$row['timeEnd']."')");
+		      $conn->query("UPDATE logs SET status = '5', time = UTC_TIMESTAMP, timeToUTC = $timeToUTC  WHERE indexIM =". $row['indexIM']);
+		    } else {
+		      //create a break stamping if youre not early (a silly admin edit)
+		      if(timeDiff_Hours($row['timeEnd'], getCurrentTimestamp()) > 0){
+		        $conn->query("INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType) VALUES('".$row['timeEnd']."', UTC_TIMESTAMP, $id, 'Checkin auto-break', 'break')");
+		      }
+		    }
+		    //update timestamp
+		    $conn->query("UPDATE logs SET timeEnd = '0000-00-00 00:00:00' WHERE indexIM = $id");
+		    echo mysqli_error($conn);
+		  } else { //create new stamp
+		    $conn->query("INSERT INTO logs (time, userID, status, timeToUTC) VALUES (UTC_TIMESTAMP, $userID, '0', $timeToUTC);");
+		    echo mysqli_error($conn);
+		    $id = $conn->insert_id;
+		  }
+		  //$conn->query("INSERT INTO checkinLogs (timestampID, remoteAddr, userAgent) VALUES($id, '".$_SERVER['REMOTE_ADDR']."', '".$_SERVER['HTTP_USER_AGENT']."')");
+		}
+
+		//will return empty if all was okay
+		function checkOut($userID, $emoji = 0) {
+		  global $conn;
+		  $query = "SELECT time, indexIM, emoji FROM logs WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID ";
+		  $result= mysqli_query($conn, $query);
+		  $row = $result->fetch_assoc();
+
+		  $indexIM = $row['indexIM'];
+		  $start = $row['time'];
+		  if($row['emoji']) $emoji = ($emoji + $row['emoji']) / 2;
+		  if(rand(1,2) == 1) { $emoji = floor($emoji); } else { $emoji = ceil($emoji); }
+
+		  $sql = "UPDATE logs SET timeEnd = UTC_TIMESTAMP, emoji = $emoji WHERE indexIM = $indexIM;";
+		  $conn->query($sql);
+		  return mysqli_error($conn);
+		}
         if (isset($_POST['stampIn'])) {
             checkIn($userID);
             $validation_output = showInfo($lang['INFO_CHECKIN'], 1);
@@ -562,7 +605,7 @@ if ($_SESSION['color'] == 'light') {
 							  $decrypted = '';
 							  $checksum = 'Ma-6SV3 bmQhEoY';
 							  $result = $conn->query("SELECT id, checkSum FROM security_users WHERE outDated = 'FALSE' AND userID = $userID LIMIT 1");
-							  if($row = $result->fetch_assoc()){
+							  if($result && ($row = $result->fetch_assoc())){
 								  try{
 									  if($row['checkSum']){
 										  $ciphertext = base64_decode($row['checkSum']);
@@ -591,7 +634,7 @@ if ($_SESSION['color'] == 'light') {
 					  <?php
 					  $result = $conn->query("SELECT module, checkSum, id FROM security_modules WHERE module != 'TASK' AND outDated = 'FALSE'"); //nothing works with tasks
 					  echo $conn->error;
-					  while($row = $result->fetch_assoc()){
+					  while($result && ($row = $result->fetch_assoc())){
 						  $err = '';
 						  echo '<div class="col-sm-6">'.$row['module'].'</div>';
 						  echo '<div class="col-sm-6">';

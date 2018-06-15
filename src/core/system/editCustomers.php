@@ -17,6 +17,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         } else { // no detailTable found -> create one
             $conn->query("INSERT INTO clientInfoData (clientID) VALUES($filterClient)");
             $detailID = $conn->insert_id;
+			$insert_clientID = $filterClient; //5b2253d633c0d
             echo mysqli_error($conn);
         }
         //always update
@@ -26,7 +27,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $name = test_input($_POST['edit_name']);
             $companyID = intval($_POST['edit_company']);
             $number = test_input($_POST['edit_clientNumber']);
-            $conn->query("UPDATE $clientTable SET name = '$name', companyID = $companyID, clientNumber = '$number' WHERE id = $filterClient");
+            $conn->query("UPDATE clientData SET name = '$name', companyID = $companyID, clientNumber = '$number' WHERE id = $filterClient");
         }
         if (isset($_POST['gender'])) {
             $val = $_POST['gender'];
@@ -237,75 +238,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $stmt->bind_param('sssi', $bankName, $ibanVal, $bicVal, $val);
             $stmt->execute();
             $stmt->close();
-            if ($conn->error) {
-                echo $conn->error;
-            } else {
-                echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_SAVE'] . '</div>';
-            }
-        } elseif (isset($_POST['delete_projects']) && !empty($_POST['delete_projects_index'])) {
-            $activeTab = 'project';
-            foreach ($_POST['delete_projects_index'] as $x) {
-                $x = intval($x);
-                $conn->query("DELETE FROM $projectTable WHERE id = $x;");
-            }
-            if ($conn->error) {
-                echo $conn->error;
-            } else {
-                echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_DELETE'] . '</div>';
-            }
-        } elseif (isset($_POST['add']) && !empty($_POST['name'])) {
-            $activeTab = 'project';
-            $name = test_input($_POST['name']);
-            $status = "";
-            if (isset($_POST['status'])) {
-                $status = "checked";
-            }
-            $hourlyPrice = floatval(test_input($_POST['hourlyPrice']));
-            $hours = floatval(test_input($_POST['hours']));
-            if (isset($_POST['createField_1'])) {
-                $field_1 = 'TRUE';
-            } else {
-                $field_1 = 'FALSE';
-            }
-            if (isset($_POST['createField_2'])) {
-                $field_2 = 'TRUE';
-            } else {
-                $field_2 = 'FALSE';
-            }
-            if (isset($_POST['createField_3'])) {
-                $field_3 = 'TRUE';
-            } else {
-                $field_3 = 'FALSE';
-            }
-            $conn->query("INSERT INTO $projectTable (clientID, name, status, hours, hourlyPrice, field_1, field_2, field_3) VALUES($filterClient, '$name', '$status', '$hours', '$hourlyPrice', '$field_1', '$field_2', '$field_3')");
-            if ($conn->error) {
-                echo $conn->error;
-            } else {
-                echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_ADD'] . '</div>';
-            }
-        } elseif (isset($_POST['save'])) {
-            $activeTab = 'project';
-            $projectID = intval($_POST['save']);
-            $hours = floatval(test_input($_POST['boughtHours']));
-            $hourlyPrice = floatval(test_input($_POST['pricedHours']));
-            $status = isset($_POST['productive']) ? 'checked' : '';
-            // checkboxes are not set at all if they're not checked
-            if (isset($_POST['addField_1_' . $projectID])) {
-                $field_1 = 'TRUE';
-            } else {
-                $field_1 = 'FALSE';
-            }
-            if (isset($_POST['addField_2_' . $projectID])) {
-                $field_2 = 'TRUE';
-            } else {
-                $field_2 = 'FALSE';
-            }
-            if (isset($_POST['addField_3_' . $projectID])) {
-                $field_3 = 'TRUE';
-            } else {
-                $field_3 = 'FALSE';
-            }
-            $conn->query("UPDATE $projectTable SET hours = '$hours', hourlyPrice = '$hourlyPrice', status='$status', field_1 = '$field_1', field_2 = '$field_2', field_3 = '$field_3' WHERE id = $projectID");
             if ($conn->error) {
                 echo $conn->error;
             } else {
