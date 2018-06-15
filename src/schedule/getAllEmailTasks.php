@@ -120,12 +120,12 @@ while($result && $row = $result->fetch_assoc()){
 							}
 							if(in_array($filetype, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'zip', 'msg', 'jpg', 'jpeg', 'png', 'gif'])){
 								$archiveID = uniqid('', true);
-								// $stmt_insertarchive->execute();
-								// $s3->putObject(array(
-								// 	'Bucket' => $bucket,
-								// 	'Key' => $archiveID,
-								// 	'Body' => asymmetric_encryption('TASK', $attachment_body, 0, $secret)
-								// ));
+								$stmt_insertarchive->execute();
+								$s3->putObject(array(
+									'Bucket' => $bucket,
+									'Key' => $archiveID,
+									'Body' => asymmetric_encryption('TASK', $attachment_body, 0, $secret)
+								));
 								if($structure->parts[$i]->ifid){
 									$attachmentId = trim($structure->parts[$i]->id, " <>");
 									$html = str_replace("cid:$attachmentId", "cid:$archiveID", $html); //replace the image with the archive id. makes it easier.
@@ -138,26 +138,26 @@ while($result && $row = $result->fetch_assoc()){
 				echo $html;
 
 				//dynamicproject
-				// $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$projectid', 'CREATED', 1)");
-				// $html = asymmetric_encryption('TASK', $html, 0, $secret);
-				// $name = asymmetric_encryption('TASK', substr_replace($header->subject, '', $pos, strlen($rule['subject'])), 0, $secret);
-				// $conn->query("INSERT INTO dynamicprojects(
-				// projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-				// projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2, projectmailheader)
-				// SELECT '$projectid', '$name', '$html', companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-				// projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, 'FALSE', '$v2', '$encrypted_header'
-				// FROM dynamicprojects WHERE projectid = '{$rule['templateID']}'"); echo $conn->error;
-				//
-				// $conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) SELECT '$projectid', userid, position FROM dynamicprojectsemployees WHERE projectid = '{$rule['templateID']}'");
-				// echo $conn->error;
-				// $conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) SELECT '$projectid', teamid FROM dynamicprojectsteams WHERE projectid = '{$rule['templateID']}'");
-				// echo $conn->error;
-				// $move_sequence[] = $mail_number;
-				// imap_delete($imap, $mail_number);
+				$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$projectid', 'CREATED', 1)");
+				$html = asymmetric_encryption('TASK', $html, 0, $secret);
+				$name = asymmetric_encryption('TASK', substr_replace($header->subject, '', $pos, strlen($rule['subject'])), 0, $secret);
+				$conn->query("INSERT INTO dynamicprojects(
+				projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
+				projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2, projectmailheader)
+				SELECT '$projectid', '$name', '$html', companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
+				projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, 'FALSE', '$v2', '$encrypted_header'
+				FROM dynamicprojects WHERE projectid = '{$rule['templateID']}'"); echo $conn->error;
+
+				$conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) SELECT '$projectid', userid, position FROM dynamicprojectsemployees WHERE projectid = '{$rule['templateID']}'");
+				echo $conn->error;
+				$conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) SELECT '$projectid', teamid FROM dynamicprojectsteams WHERE projectid = '{$rule['templateID']}'");
+				echo $conn->error;
+				$move_sequence[] = $mail_number;
+				imap_delete($imap, $mail_number);
 			}
 
         } //end foreach mail
-		//if(!imap_mail_move($imap, implode(',', $move_sequence), $archive)) imap_expunge($imap);
+		if(!imap_mail_move($imap, implode(',', $move_sequence), $archive)) imap_expunge($imap);
     }
 	imap_close($imap);
 }
