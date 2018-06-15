@@ -99,13 +99,14 @@ while($result && $row = $result->fetch_assoc()){
 								foreach($structure->parts[$i]->parts[$j]->parameters as $object){
 									if(strtolower($object->attribute) =='charset' && $structure->parts[$i]->parts[$j]->subtype == 'HTML'){
 										$html = imap_fetchbody($imap, $mail_number, $i + 2);
-										echo 'FETCHED SOMETHING: '.$html;
-										if($structure->parts[$i]->encoding == 3) { /* 3 = BASE64 encoding */
+
+										if($structure->parts[$i]->parts[$j]->encoding == 3) { /* 3 = BASE64 encoding */
 											$html = base64_decode($html);
-										} elseif($structure->parts[$i]->encoding == 4) { /* 4 = QUOTED-PRINTABLE encoding */
+										} elseif($structure->parts[$i]->parts[$j]->encoding == 4) { /* 4 = QUOTED-PRINTABLE encoding */
 											$html = quoted_printable_decode($html);
 										}
-										$html = iconv($object->value, 'UTF-8', $html);
+										//$html = iconv($object->value, 'UTF-8', $html);
+										//echo 'FETCHED SOMETHING: '.$html;
 									}
 								}
 							}
