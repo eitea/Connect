@@ -47,11 +47,26 @@ while($result && $row = $result->fetch_assoc()){
 				$encrypted_header = asymmetric_encryption('TASK', imap_fetchheader($imap, $mail_number), 0, $secret);
 				$structure = imap_fetchstructure($imap, $mail_number);
 
-				print_r($structure);
+				//print_r($structure);
 
 				$html = '';
 				$projectid = uniqid();
-				if(isset($structure->parts[0])){
+				if(empty($structure->parts[0])){
+					if($structure->ifparameters){
+						foreach($structure->parameters as $object){ //loops through filename, size, dates of attachments or mails.
+							if(strtolower($object->attribute) =='charset'){
+								$html = imap_fetchbody($imap, $mail_number, 1);
+								if(!$html) imap_fetchbody($imap, $mail_number, 1.2);
+								if($structure->parts[$i]->encoding == 3) { /* 3 = BASE64 encoding */
+									$html = base64_decode($html);
+								} elseif($structure->parts[$i]->encoding == 4) { /* 4 = QUOTED-PRINTABLE encoding */
+									$html = quoted_printable_decode($html);
+								}
+								$html = iconv($object->value, 'UTF-8', $html);
+							}
+						}
+					}
+				} else {
 					for($i = 0; $i < count($structure->parts); $i++){
 						$filename = $filetype = '';
 						if($structure->parts[$i]->ifparameters){
@@ -78,6 +93,23 @@ while($result && $row = $result->fetch_assoc()){
 								}
 							}
 						}
+						//TODO: this should be inside a recursion
+						if(!$html && isset($structure->parts[$i]->parts[0])){
+							for($j = 0; $j < count($structure->parts[$i]->parts[$j]); $j++){
+								foreach($structure->parts[$i]->parts[$j]->parameters as $object){
+									if(strtolower($object->attribute) =='charset' && $structure->parts[$i]->parts[$j]->subtype == 'HTML'){
+										$html = imap_fetchbody($imap, $mail_number, $i + 2);
+										echo 'FETCHED SOMETHING: '.$html;
+										if($structure->parts[$i]->encoding == 3) { /* 3 = BASE64 encoding */
+											$html = base64_decode($html);
+										} elseif($structure->parts[$i]->encoding == 4) { /* 4 = QUOTED-PRINTABLE encoding */
+											$html = quoted_printable_decode($html);
+										}
+										$html = iconv($object->value, 'UTF-8', $html);
+									}
+								}
+							}
+						}
 						if($filename){
 							$filename = pathinfo($filename, PATHINFO_FILENAME);
 							$attachment_body = imap_fetchbody($imap, $mail_number, $i+1);
@@ -88,12 +120,12 @@ while($result && $row = $result->fetch_assoc()){
 							}
 							if(in_array($filetype, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'zip', 'msg', 'jpg', 'jpeg', 'png', 'gif'])){
 								$archiveID = uniqid('', true);
-								$stmt_insertarchive->execute();
-								$s3->putObject(array(
-									'Bucket' => $bucket,
-									'Key' => $archiveID,
-									'Body' => asymmetric_encryption('TASK', $attachment_body, 0, $secret)
-								));
+								// $stmt_insertarchive->execute();
+								// $s3->putObject(array(
+								// 	'Bucket' => $bucket,
+								// 	'Key' => $archiveID,
+								// 	'Body' => asymmetric_encryption('TASK', $attachment_body, 0, $secret)
+								// ));
 								if($structure->parts[$i]->ifid){
 									$attachmentId = trim($structure->parts[$i]->id, " <>");
 									$html = str_replace("cid:$attachmentId", "cid:$archiveID", $html); //replace the image with the archive id. makes it easier.
@@ -101,46 +133,31 @@ while($result && $row = $result->fetch_assoc()){
 							}
 						}
 					} //endwhile(parts)
-				} else {
-					if($structure->ifparameters){
-						foreach($structure->parameters as $object){ //loops through filename, size, dates of attachments or mails.
-							if(strtolower($object->attribute) =='charset'){
-								$html = imap_fetchbody($imap, $mail_number, 1);
-								if(!$html) imap_fetchbody($imap, $mail_number, 1.2);
-								if($structure->parts[$i]->encoding == 3) { /* 3 = BASE64 encoding */
-									$html = base64_decode($html);
-								} elseif($structure->parts[$i]->encoding == 4) { /* 4 = QUOTED-PRINTABLE encoding */
-									$html = quoted_printable_decode($html);
-								}
-								$html = iconv($object->value, 'UTF-8', $html);
-							}
-						}
-					}
 				}
 
 				echo $html;
 
 				//dynamicproject
-				$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$projectid', 'CREATED', 1)");
-				$html = asymmetric_encryption('TASK', $html, 0, $secret);
-				$name = asymmetric_encryption('TASK', substr_replace($header->subject, '', $pos, strlen($rule['subject'])), 0, $secret);
-				$conn->query("INSERT INTO dynamicprojects(
-				projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-				projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2, projectmailheader)
-				SELECT '$projectid', '$name', '$html', companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-				projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, 'FALSE', '$v2', '$encrypted_header'
-				FROM dynamicprojects WHERE projectid = '{$rule['templateID']}'"); echo $conn->error;
-
-				$conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) SELECT '$projectid', userid, position FROM dynamicprojectsemployees WHERE projectid = '{$rule['templateID']}'");
-				echo $conn->error;
-				$conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) SELECT '$projectid', teamid FROM dynamicprojectsteams WHERE projectid = '{$rule['templateID']}'");
-				echo $conn->error;
-				$move_sequence[] = $mail_number;
-				imap_delete($imap, $mail_number);
+				// $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$projectid', 'CREATED', 1)");
+				// $html = asymmetric_encryption('TASK', $html, 0, $secret);
+				// $name = asymmetric_encryption('TASK', substr_replace($header->subject, '', $pos, strlen($rule['subject'])), 0, $secret);
+				// $conn->query("INSERT INTO dynamicprojects(
+				// projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
+				// projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2, projectmailheader)
+				// SELECT '$projectid', '$name', '$html', companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
+				// projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, 'FALSE', '$v2', '$encrypted_header'
+				// FROM dynamicprojects WHERE projectid = '{$rule['templateID']}'"); echo $conn->error;
+				//
+				// $conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) SELECT '$projectid', userid, position FROM dynamicprojectsemployees WHERE projectid = '{$rule['templateID']}'");
+				// echo $conn->error;
+				// $conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) SELECT '$projectid', teamid FROM dynamicprojectsteams WHERE projectid = '{$rule['templateID']}'");
+				// echo $conn->error;
+				// $move_sequence[] = $mail_number;
+				// imap_delete($imap, $mail_number);
 			}
 
         } //end foreach mail
-		if(!imap_mail_move($imap, implode(',', $move_sequence), $archive)) imap_expunge($imap);
+		//if(!imap_mail_move($imap, implode(',', $move_sequence), $archive)) imap_expunge($imap);
     }
 	imap_close($imap);
 }
