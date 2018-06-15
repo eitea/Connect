@@ -2896,6 +2896,7 @@ if($row['version'] < 159){
 	$public = sodium_crypto_box_publickey($keypair);
 	$nonce = random_bytes(24);
 	$conn->query("INSERT INTO security_modules (module, symmetricKey, publicKey, outDated, checkSum) VALUES('TASK', '', '".base64_encode($public)."', 'FALSE', '')");
+
 	echo $conn->error;
 	$result = $conn->query("SELECT userID, publicKey FROM security_users WHERE outDated = 'FALSE'");
 	while($row = $result->fetch_assoc()){

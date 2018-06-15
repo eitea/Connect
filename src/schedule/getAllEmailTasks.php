@@ -95,7 +95,7 @@ while($result && $row = $result->fetch_assoc()){
 						}
 						//TODO: this should be inside a recursion
 						if(!$html && isset($structure->parts[$i]->parts[0])){
-							for($j = 0; $j < count($structure->parts[$i]->parts[$j]); $j++){
+							for($j = 0; $j < count($structure->parts[$i]->parts); $j++){
 								foreach($structure->parts[$i]->parts[$j]->parameters as $object){
 									if(strtolower($object->attribute) =='charset' && $structure->parts[$i]->parts[$j]->subtype == 'HTML'){
 										$html = imap_fetchbody($imap, $mail_number, $i + 2);
@@ -135,7 +135,7 @@ while($result && $row = $result->fetch_assoc()){
 					} //endwhile(parts)
 				}
 
-				echo $html;
+				//echo $html;
 
 				//dynamicproject
 				$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$projectid', 'CREATED', 1)");
