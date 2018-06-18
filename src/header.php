@@ -1311,11 +1311,11 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <?php
       $result = $conn->query("SELECT expiration, expirationDuration, expirationType FROM policyData"); echo $conn->error;
       $row = $result->fetch_assoc();
-      if($row['expiration'] == 'TRUE' || $userdata['forcedPwdChange']){ //can a password expire?
+      if($row['expiration'] == 'TRUE' || $userdata['forcedPwdChange'] == 1){ //can a password expire?
           $pswDate = date('Y-m-d', strtotime("+".$row['expirationDuration']." months", strtotime($userdata['lastPswChange'])));
-          if(timeDiff_Hours($pswDate, getCurrentTimestamp()) > 0 || $userdata['forcedPwdChange']){ //has my password actually expired?
+          if(timeDiff_Hours($pswDate, getCurrentTimestamp()) > 0 || $userdata['forcedPwdChange'] == 1){ //has my password actually expired?
               showError('<strong>Your Password has expired. </strong> Please change it by clicking on the gears in the top right corner.');
-              if($row['expirationType'] == 'FORCE' || $userdata['forcedPwdChange']){ //force the change
+              if($row['expirationType'] == 'FORCE' || $userdata['forcedPwdChange'] == 1){ //force the change
                   include 'footer.php';
                   die();
               }

@@ -293,9 +293,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 					$tags = '';
 				}
 				// PROJECT
-				$stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-					projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-				$stmt->bind_param("ssbiiissssisiisisisss", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $percentage, $estimate, $skill, $tags, $isTemplate, $v2Key);
+				$stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart,
+					projectend, projectstatus, projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2) 
+					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+				$stmt->bind_param("ssbiiissssisiisisiss", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $percentage, $estimate, $skill, $tags, $isTemplate, $v2Key);
 				$stmt->send_long_data(2, $description);
 				$stmt->execute();
 				if(!$stmt->error){

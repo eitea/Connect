@@ -116,7 +116,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 		} else {
 			showError("Kein Template");
 		}
-
+	} elseif(!empty($_POST['positions'])){
+		foreach($_POST['positions'] as $val){
+			$arr = explode('_', $val);
+			$conn->query("UPDATE workflowRules SET position = '".$arr[1]."' WHERE id =".$arr[0]);
+		}
 	}
 }
 ?>
@@ -172,19 +176,28 @@ while ($row = $result->fetch_assoc()) {
 			<div class="col-xs-1">Position</div>
 			<div class="col-xs-2"></div>
 		</div>';
-		$i = 0;
+		$options = '';
+
+		$j = 1;
 		while($rule = $res->fetch_assoc()){
 			echo '<div class="row" style="border-top:1px solid lightgrey">';
 			echo '<div class="col-xs-2">' . $rule['subject'].'</div>';
 			echo '<div class="col-xs-2">' . $rule['fromAddress'] . '</div>';
 			echo '<div class="col-xs-2">' . $rule['toAddress'] . '</div>';
 			echo '<div class="col-xs-2">' . asymmetric_encryption('TASK', $rule['projectname'], $userID, $privateKey, $rule['v2']) . '</div>';
-			echo '<div class="col-xs-1"><input type="number" disabled name="position[]" class="form-control" value="'.++$i.'" /></div>';
+			echo '<div class="col-xs-1"><select name="position[]" class="form-control">';
+			for($i=1;$i<=$res->num_rows;$i++){
+				$selected = (++$j == $i) ? 'selected' : '';
+				echo "<option $selected value='{$rule['id']}_$i'>$i</option>";
+			}
+			echo '</select></div>';
 			echo '<div class="col-xs-2"><button type="submit" name="deleteRule" value="'.$rule['id'].'" class="btn btn-default"><i class="fa fa-trash-o"></i></button></div>';
 			echo '</div>';
 		}
 		echo '</div>';
 	}
+
+	//TODO: tasks editieren, rules editieren, resonse hinzufügen
 	echo '</form>';
 }
 ?>

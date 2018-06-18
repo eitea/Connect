@@ -3,10 +3,6 @@
 require_once dirname(__DIR__)."/connection.php";
 require_once dirname(__DIR__)."/utilities.php";
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 $result = $conn->query("SELECT id FROM identification LIMIT 1");
 if($row = $result->fetch_assoc()){
 	$identifier = $row['id'];
