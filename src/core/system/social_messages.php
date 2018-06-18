@@ -678,6 +678,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         })
     }
 
+    function showGroupMessageInfo(messageID){
+        setCurrentModal({messageID: messageID},"get","ajaxQuery/ajax_post_get_message_information.php")
+    }
+
     function onModalLoad() {
         $(".js-example-basic-single").select2();
     }

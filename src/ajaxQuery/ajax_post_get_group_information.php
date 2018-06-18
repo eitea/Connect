@@ -54,7 +54,7 @@ $disabled = $isGroupAdmin ? "" : "disabled"
                 }
                 ?>
             </select><br><br>
-            <label>Admins</label>
+            <label>Administratoren</label>
                 <select id="admins-select" <?= $disabled ?> class="js-example-basic-single" name="admins[]" multiple="multiple">
                 <?php
                 $result = $conn->query("SELECT UserData.id id, firstname, lastname FROM UserData");

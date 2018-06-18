@@ -6,7 +6,7 @@ require dirname(__DIR__) . DIRECTORY_SEPARATOR . "utilities.php";
 $userID = $_SESSION["userid"] ?? -1;
 $limit = $_REQUEST["limit"] ?? 50;
 $limit = intval($limit);
-
+$isGroupView = false;
 
 $defaultPicture = "images/defaultProfilePicture.png";
 
@@ -71,8 +71,10 @@ if (isset($_GET["partner"], $_GET["subject"]) && !empty($_SESSION["userid"])) {
 } elseif (isset($_REQUEST["group"])) {
     $taskView = true;
     $groupID = intval($_REQUEST["group"]);
-    $result = $conn->query("SELECT * FROM (SELECT message, picture, sent, sender AS userID, firstname, lastname FROM groupmessages INNER JOIN UserData ON UserData.id = groupmessages.sender WHERE groupID = $groupID ORDER BY groupmessages.sent DESC LIMIT $limit) as temp order by sent asc");
-    $conn->query("INSERT INTO groupmessages_user (userID, messageID, seen) SELECT $userID, id, 'TRUE' FROM groupmessages WHERE groupID = $groupID ON DUPLICATE KEY UPDATE seen = 'TRUE'");
+    $result = $conn->query("SELECT * FROM (SELECT message, picture, sent, sender AS userID, firstname, lastname, groupmessages.id FROM groupmessages INNER JOIN UserData ON UserData.id = groupmessages.sender WHERE groupID = $groupID ORDER BY groupmessages.sent DESC LIMIT $limit) as temp order by sent asc");
+    $conn->query("INSERT INTO groupmessages_user (userID, messageID, seen) SELECT $userID, id, CURRENT_TIMESTAMP FROM groupmessages WHERE groupID = $groupID ON DUPLICATE KEY UPDATE seen = CURRENT_TIMESTAMP");
+    echo $conn->error;
+    $isGroupView = true;
 } else {
     die('Invalid Request');
 }
@@ -83,9 +85,11 @@ if (!$result || $result->num_rows == 0) {
 } else {
     // process the result
     while ($row = $result->fetch_assoc()) {
+        $messageID = isset($row["id"]) ? $row["id"] : -1;
         $message = $row["message"];
         $picture = $row["picture"];
         $profilePicture = $defaultPicture;
+        $partnerID = $row["userID"];
         if (isset($profilePictures[$row["userID"]])) {
             $profilePicture = "data:image/jpeg;base64," . base64_encode($profilePictures[$row["userID"]]);
         }
@@ -149,6 +153,25 @@ if (!$result || $result->num_rows == 0) {
                             <span class="label label-default" style="display:block; <?= ($row["userID"] != $userID) ? "top:-35px;" : "top:-17px;" ?> <?php echo $alignment ?> position:absolute; background-color: white; color: black;">
                                  <?php if ($row["userID"] != $userID) : ?><img src='<?php echo $profilePicture; ?>' style='width:25px;height:25px;margin-right:5px;' class='img-circle' alt='Profile Picture'><?php endif; ?>
                                  <?php echo $name . " - " . $messageDate; ?>
+                                 <?php if ($isGroupView) : ?>
+                                 <div class="input-group-btn" style="display: inline-block;">
+                                    <button type="button" class="btn btn-default  dropdown-toggle" data-toggle="dropdown" style="border: none; background-color: transparent; outline: none;color:black;box-shadow: none !important;">
+                                        <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right clearfix" role="menu" aria-labelledby="menu">
+                                        <li>
+                                            <a role="menuitem" href="#" onclick="showUserProfile(<?= $partnerID ?>)">
+                                                <i class="fa fa-user" aria-hidden="true"></i> User Info
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a role="menuitem" href="#" onclick="showGroupMessageInfo(<?= $messageID ?>)">
+                                                <i class="fa fa-envelope-o" aria-hidden="true"></i> Details
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <?php endif; ?>
                             </span>
                         <?php else : ?>
                             <?php if ($showseen) : ?>
