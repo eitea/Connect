@@ -3,6 +3,10 @@
 require_once dirname(__DIR__)."/connection.php";
 require_once dirname(__DIR__)."/utilities.php";
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 $result = $conn->query("SELECT id FROM identification LIMIT 1");
 if($row = $result->fetch_assoc()){
 	$identifier = $row['id'];
@@ -45,98 +49,43 @@ while($result && $row = $result->fetch_assoc()){
 				$v2 = base64_encode(sodium_crypto_box_publickey($keypair));
 				$secret = base64_encode(sodium_crypto_box_secretkey($keypair));
 				$encrypted_header = asymmetric_encryption('TASK', imap_fetchheader($imap, $mail_number), 0, $secret);
-				$structure = imap_fetchstructure($imap, $mail_number);
-
-				//print_r($structure);
 
 				$html = '';
 				$projectid = uniqid();
-				if(empty($structure->parts[0])){
-					if($structure->ifparameters){
-						foreach($structure->parameters as $object){ //loops through filename, size, dates of attachments or mails.
-							if(strtolower($object->attribute) =='charset'){
-								$html = imap_fetchbody($imap, $mail_number, 1);
-								if(!$html) imap_fetchbody($imap, $mail_number, 1.2);
-								if($structure->parts[$i]->encoding == 3) { /* 3 = BASE64 encoding */
-									$html = base64_decode($html);
-								} elseif($structure->parts[$i]->encoding == 4) { /* 4 = QUOTED-PRINTABLE encoding */
-									$html = quoted_printable_decode($html);
+				foreach(create_part_array(imap_fetchstructure($imap, $mail_number)) as $partoverview){
+					$part = $partoverview['part_object'];
+					$content = imap_fetchbody($imap, $mail_number, $partoverview['part_number']);
+					if($part->encoding == 3){
+						$content = base64_decode($content);
+					} elseif($part->encoding == 4){
+						$content = quoted_printable_decode($content);
+					}
+					if($part->ifparameters) $params = $part->parameters;
+					if($part->ifdparameters) $params = $part->dparameters;
+					foreach($params as $object){
+						if($part->ifdisposition && ($part->disposition == 'attachment' || $part->disposition == 'inline')){
+							if($object->attribute == 'filename' || $object->attribute == 'name'){
+								$filename = pathinfo($object->value, PATHINFO_FILENAME);
+								$filetype = strtolower($part->subtype);
+								$archiveID = uniqid('', true);
+								if(in_array($filetype, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'zip', 'msg', 'jpg', 'jpeg', 'png', 'gif'])){
+									$stmt_insertarchive->execute();
+									$s3->putObject(array(
+										'Bucket' => $bucket,
+										'Key' => $archiveID,
+										'Body' => asymmetric_encryption('TASK', $content, 0, $secret)
+									));
+									if($part->ifid && $part->disposition == 'inline'){
+										$attachmentId = trim($part->id, " <>");
+										$html = str_replace("cid:$attachmentId", "cid:$archiveID", $html); //replace the image with the archive id. makes it easier.
+									}
 								}
-								$html = iconv($object->value, 'UTF-8', $html);
 							}
+						} elseif($object->attribute == 'charset' && !empty($params)){
+							$html = iconv($object->value, 'UTF-8//TRANSLIT', trim($content));
 						}
 					}
-				} else {
-					for($i = 0; $i < count($structure->parts); $i++){
-						$filename = $filetype = '';
-						if($structure->parts[$i]->ifparameters){
-							foreach($structure->parts[$i]->parameters as $object){ //loops through filename, size, dates of attachments or mails.
-								if(strtolower($object->attribute) == 'name'){
-									$filename = $object->value;
-									$filetype = strtolower($structure->parts[$i]->subtype);
-								} elseif(strtolower($object->attribute) =='charset'){
-									$html = imap_fetchbody($imap, $mail_number, $i+1);
-									if($structure->parts[$i]->encoding == 3) { /* 3 = BASE64 encoding */
-										$html = base64_decode($html);
-									} elseif($structure->parts[$i]->encoding == 4) { /* 4 = QUOTED-PRINTABLE encoding */
-										$html = quoted_printable_decode($html);
-									}
-									$html = iconv($object->value, 'UTF-8', $html);
-								}
-							}
-						}
-						if(!$filename && $structure->parts[$i]->ifdparameters){
-							foreach($structure->parts[$i]->dparameters as $object){
-								if(strtolower($object->attribute) == 'filename'){
-									$filename = $object->value;
-									$filetype = strtolower($structure->parts[$i]->subtype);
-								}
-							}
-						}
-						//TODO: this should be inside a recursion
-						if(!$html && isset($structure->parts[$i]->parts[0])){
-							for($j = 0; $j < count($structure->parts[$i]->parts); $j++){
-								foreach($structure->parts[$i]->parts[$j]->parameters as $object){
-									if(strtolower($object->attribute) =='charset' && $structure->parts[$i]->parts[$j]->subtype == 'HTML'){
-										$html = imap_fetchbody($imap, $mail_number, $i + 2);
-
-										if($structure->parts[$i]->parts[$j]->encoding == 3) { /* 3 = BASE64 encoding */
-											$html = base64_decode($html);
-										} elseif($structure->parts[$i]->parts[$j]->encoding == 4) { /* 4 = QUOTED-PRINTABLE encoding */
-											$html = quoted_printable_decode($html);
-										}
-										//$html = iconv($object->value, 'UTF-8', $html);
-										//echo 'FETCHED SOMETHING: '.$html;
-									}
-								}
-							}
-						}
-						if($filename){
-							$filename = pathinfo($filename, PATHINFO_FILENAME);
-							$attachment_body = imap_fetchbody($imap, $mail_number, $i+1);
-							if($structure->parts[$i]->encoding == 3) {
-								$attachment_body = base64_decode($attachment_body);
-							} elseif($structure->parts[$i]->encoding == 4) {
-								$attachment_body = quoted_printable_decode($attachment_body);
-							}
-							if(in_array($filetype, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'zip', 'msg', 'jpg', 'jpeg', 'png', 'gif'])){
-								$archiveID = uniqid('', true);
-								$stmt_insertarchive->execute();
-								$s3->putObject(array(
-									'Bucket' => $bucket,
-									'Key' => $archiveID,
-									'Body' => asymmetric_encryption('TASK', $attachment_body, 0, $secret)
-								));
-								if($structure->parts[$i]->ifid){
-									$attachmentId = trim($structure->parts[$i]->id, " <>");
-									$html = str_replace("cid:$attachmentId", "cid:$archiveID", $html); //replace the image with the archive id. makes it easier.
-								}
-							}
-						}
-					} //endwhile(parts)
 				}
-
-				//echo $html;
 
 				//dynamicproject
 				$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$projectid', 'CREATED', 1)");
@@ -164,5 +113,43 @@ while($result && $row = $result->fetch_assoc()){
 }
 $stmt_insertarchive->close();
 echo $conn->error;
+
+function create_part_array($structure, $prefix="") {
+	//print_r($structure);
+	if (sizeof($structure->parts) > 0) {    // There some sub parts
+		foreach ($structure->parts as $count => $part) {
+			add_part_to_array($part, $prefix.($count+1), $part_array);
+		}
+	} else {    // Email does not have a seperate mime attachment for text
+		$part_array[] = array('part_number' => $prefix.'1', 'part_object' => $obj);
+	}
+	//print_r($part_array);
+	return $part_array;
+}
+function add_part_to_array($obj, $partno, & $part_array) {
+	$part_array[] = array('part_number' => $partno, 'part_object' => $obj);
+	if ($obj->type == 2) { // Check to see if the part is an attached email message, as in the RFC-822 type
+		if (sizeof($obj->parts) > 0) {    // Check to see if the email has parts
+			foreach ($obj->parts as $count => $part) {
+				// Iterate here again to compensate for the broken way that imap_fetchbody() handles attachments
+				if (sizeof($part->parts) > 0) {
+					foreach ($part->parts as $count2 => $part2) {
+						add_part_to_array($part2, $partno.".".($count2+1), $part_array);
+					}
+				} else {    // Attached email does not have a seperate mime attachment for text
+					$part_array[] = array('part_number' => $partno.'.'.($count+1), 'part_object' => $obj);
+				}
+			}
+		} else {    // Not sure if this is possible
+			$part_array[] = array('part_number' => $prefix.'.1', 'part_object' => $obj);
+		}
+	} else {    // If there are more sub-parts, expand them out.
+		if (!empty($obj->parts) && sizeof($obj->parts) > 0) {
+			foreach ($obj->parts as $count => $p) {
+				add_part_to_array($p, $partno.".".($count+1), $part_array);
+			}
+		}
+	}
+}
 ?>
 </pre>
