@@ -612,6 +612,7 @@ function create_tables($conn) {
         leader INT(6),
         leaderreplacement INT(6),
         isDepartment ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE',
+		email VARCHAR(100),
         FOREIGN KEY (companyID) REFERENCES companyData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -1404,6 +1405,7 @@ function create_tables($conn) {
 		subject VARCHAR(100),
 		fromAddress VARCHAR(100),
 		toAddress VARCHAR(100),
+		autoResponse TEXT,
 		FOREIGN KEY (templateID) REFERENCES dynamicprojects(projectid)
 		ON UPDATE CASCADE
 		ON DELETE SET NULL,
