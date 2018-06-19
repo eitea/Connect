@@ -49,13 +49,12 @@ function isHoliday($ts) {
     }
     return false;
 }
-//name should be clean_input or sanitize_input..
+
 function test_input($data, $strong = false) {
-    //REGEXString
     if($strong){
         $data = preg_replace("/[^A-Za-z0-9]/", ' ', $data);
     } else {
-        $data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€§#$%()+*öäüÖÄÜß_ ]~", ' ', $data);
+        $data = preg_replace("~[^A-Za-z0-9\-?!=:.,/@€§#$%()+*öäüÖÄÜß_\\n ]~", ' ', $data);
         //$regex_names = "/([^-_@A-Za-z0-9ąa̧ ɓçđɗɖęȩə̧ɛ̧ƒɠħɦįi̧ ɨɨ̧ƙłm̧ ɲǫo̧ øơɔ̧ɍşţŧųu̧ ưʉy̨ƴæɑðǝəɛɣıĳɩŋœɔʊĸßʃþʋƿȝʒʔáàȧâäǟǎăāãåǽǣćċĉčďḍḑḓéèėêëěĕēẽe̊ ẹġĝǧğg̃ ģĥḥíìiîïǐĭīĩịĵķǩĺļľŀḽm̂ m̄ ŉńn̂ ṅn̈ ňn̄ ñņṋóòôȯȱöȫǒŏōõȭőọǿơp̄ ŕřŗśŝṡšşṣťțṭṱúùûüǔŭūũűůụẃẁŵẅýỳŷÿȳỹźżžẓǯÁÀȦÂÄǞǍĂĀÃÅǼǢĆĊĈČĎḌḐḒÉÈĖÊËĚĔĒẼE̊ ẸĠĜǦĞG̃ ĢĤḤÍÌIÎÏǏĬĪĨỊĴĶǨĹĻĽĿḼM̂ M̄ ʼNŃN̂ ṄN̈ ŇN̄ ÑŅṊÓÒÔȮȰÖȪǑŎŌÕȬŐỌǾƠP̄ ŔŘŖŚŜṠŠŞṢŤȚṬṰÚÙÛÜǓŬŪŨŰŮỤẂẀŴẄÝỲŶŸȲỸŹŻŽẒǮĄA̧ ƁÇĐƊƉĘȨƏ̧Ɛ̧ƑƓĦꞪĮI̧ ƗƗ̧ƘŁM̧ ƝǪO̧ ØƠƆ̧ɌŞŢŦŲU̧ ƯɄY̨ƳÆⱭÐƎƏƐƔIĲƖŊŒƆƱĸƩÞƲȜƷʔ]+)/";
         //$data = preg_replace_callback($regex_names, function($m){ return convToUTF8($m[1]); }, $data);
     }
@@ -704,45 +703,48 @@ function getS3Object($bucket = ''){
 
 
 use PHPMailer\PHPMailer\PHPMailer;
-function send_standard_email($recipient, $content){
-  require dirname(__DIR__).'/plugins/phpMailer/autoload.php';
-  global $conn;
+function send_standard_email($recipient, $content, $subject=''){
+	require dirname(__DIR__).'/plugins/phpMailer/autoload.php';
+	global $conn;
 
-  //send mail
-  $mail = new PHPMailer();
-  $mail->CharSet = 'UTF-8';
-  $mail->Encoding = "base64";
-  $mail->IsSMTP();
+	//send mail
+	$mail = new PHPMailer();
+	$mail->CharSet = 'UTF-8';
+	$mail->Encoding = "base64";
+	$mail->IsSMTP();
 
-  $result = $conn->query("SELECT host, username, password, port, smtpSecure, sender, senderName FROM mailingOptions LIMIT 1");
-  if(!$result || $result->num_rows < 1) return 'Keine E-Mail Einstellungen hinterlegt'; //5ac712bc31939
-  $row = $result->fetch_assoc();
+	$result = $conn->query("SELECT host, username, password, port, smtpSecure, sender, senderName FROM mailingOptions LIMIT 1");
+	if(!$result || $result->num_rows < 1) return 'Keine E-Mail Einstellungen hinterlegt'; //5ac712bc31939
+	$row = $result->fetch_assoc();
 
-  if(!empty($row['username']) && !empty($row['password'])){
-      $mail->SMTPAuth   = true;
-      $mail->Username   = $row['username'];
-      $mail->Password   = $row['password'];
-  } else {
-      $mail->SMTPAuth   = false;
-  }
+	if(!empty($row['username']) && !empty($row['password'])){
+		$mail->SMTPAuth   = true;
+		$mail->Username   = $row['username'];
+		$mail->Password   = $row['password'];
+	} else {
+		$mail->SMTPAuth   = false;
+	}
 
-  if(empty($row['smptSecure'])){
-      $mail->SMTPSecure = $row['smtpSecure'];
-  }
+	if(empty($row['smptSecure'])){
+		$mail->SMTPSecure = $row['smtpSecure'];
+	}
 
-  $mail->Host       = $row['host'];
-  $mail->Port       = $row['port'];
-  $mail->setFrom($row['sender'], $row['senderName']);
-  //$mail->addReplyTo($row['replyEmail']);
+	$mail->Host       = $row['host'];
+	$mail->Port       = $row['port'];
+	$mail->setFrom($row['sender'], $row['senderName']);
+	//$mail->addReplyTo($row['replyEmail']);
+	$mail->addAddress($recipient);
+	$mail->isHTML(true);
 
-  $mail->addAddress($recipient);
-  $mail->isHTML(true);
+	if($subject) {
+		$mail->Subject = $subject;
+	} else {
+		$mail->Subject = 'Connect';
+	}
+	$mail->Body    =  $content;
+	$mail->AltBody = 'Your e-mail provider does not support HTML. Use an Html Viewer to format this email. '. $content;
 
-  $mail->Subject = 'Connect';
-  $mail->Body    =  $content;
-  $mail->AltBody = 'Your e-mail provider does not support HTML. Use an Html Viewer to format this email. '. $content;
-
-  if(!$mail->send()) return $mail->ErrorInfo;
+	if(!$mail->send()) return $mail->ErrorInfo;
 }
 
 //TODO: bad design, redo

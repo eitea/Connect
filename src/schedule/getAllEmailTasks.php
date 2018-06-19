@@ -36,7 +36,8 @@ while($result && $row = $result->fetch_assoc()){
             $header = imap_headerinfo($imap, $mail_number);
 			$match = true;
 			$pos = strpos($header->subject, $rule['subject']);
-			if($rule['fromAddress'] && strpos($header->from[0]->mailbox.'@'.$header->from[0]->host, $rule['fromAddress']) === false ) $match = false;
+			$sender = $header->from[0]->mailbox.'@'.$header->from[0]->host;
+			if($rule['fromAddress'] && strpos($sender, $rule['fromAddress']) === false ) $match = false;
 			if($rule['toAddress'] && $header->to[0]->mailbox.'@'.$header->to[0]->host != $rule['toAddress']) $match = false;
 			if($rule['subject'] && $pos === false) $match = false;
 
@@ -94,6 +95,7 @@ while($result && $row = $result->fetch_assoc()){
 				projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, 'FALSE', '$v2', '$encrypted_header'
 				FROM dynamicprojects WHERE projectid = '{$rule['templateID']}'"); echo $conn->error;
 
+				if($rule['autoResponse']) send_standard_email($sender, $rule['autoResponse'], "Connect - Ticket Nr. [$projectid]"); //5b20ad39615f9
 				$conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) SELECT '$projectid', userid, position FROM dynamicprojectsemployees WHERE projectid = '{$rule['templateID']}'");
 				echo $conn->error;
 				$conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) SELECT '$projectid', teamid FROM dynamicprojectsteams WHERE projectid = '{$rule['templateID']}'");
