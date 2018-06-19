@@ -33,55 +33,20 @@ html,body{
 }
 </style>
 
-<script>
-document.onreadystatechange = function () {
-  var state = document.readyState
-  if (state == 'complete') {
-    document.getElementById("content").style.display = "block";
-  } else {
-    move();
-  }
-}
-function move() {
-  var elem = document.getElementById("progress");
-  var elem_text = document.getElementById("progress_text");
-  var width = 10;
-  var id = setInterval(frame, 20); //calling frame every Xms, 10ms = 1 second
-  function frame() {
-    if (width >= 100) {
-      clearInterval(id);
-    } else {
-      width++;
-      elem.style.width = width + '%';
-      elem_text.innerHTML = width * 1  + '%';
-    }
-  }
-}
-</script>
-
 <body>
   <div id="progressBar_grey">
     <div id="progress_text">0%</div>
     <div id="progress">.</div>
   </div>
-  <div id="content" style="display:none;">
 <br>
 <?php
 require dirname(dirname(__DIR__)) . "/connection.php";
 require dirname(dirname(__DIR__)) . "/utilities.php";
 include dirname(dirname(__DIR__)) . '/validate.php';
-set_time_limit(999);
+set_time_limit(240);
 $result = mysqli_query($conn, "SELECT version FROM configurationData;");
-if(!$result){ //can be removed later on
-    $result = mysqli_query($conn, "SELECT version FROM ldapConfigTab;");
-    $row = $result->fetch_assoc();
-    $conn->query("ALTER TABLE configurationData ADD COLUMN version INT(5) DEFAULT ".$row['version']." NOT NULL");
-    if($conn->error){
-        echo $conn->error;
-    } else {
-        echo '<br>Table Update: Cleanup';
-    }
-    $conn->query("DROP TABLE ldapConfigTab");
+if(!$result){
+    die($conn->error);
 } else {
     $row = $result->fetch_assoc();
 }
@@ -2819,12 +2784,6 @@ if($row['version'] < 156){
 	}
 }
 
-
-
-//$conn->query("DELETE FROM UserData WHERE id = 1");
-//$conn->query("UPDATE UserData SET id = 1 WHERE id = 2");
-//update: social tables, archive tables, messages,  leaders/ responisbles/ supervisors, uploadUser
-
 if($row['version'] < 157){
 	$conn->query("ALTER TABLE UserData ADD COLUMN supervisor INT(6) DEFAULT NULL ");
 	$conn->query("CREATE TABLE dsgvo_categories(
@@ -2937,6 +2896,7 @@ if($row['version'] < 159){
 	$public = sodium_crypto_box_publickey($keypair);
 	$nonce = random_bytes(24);
 	$conn->query("INSERT INTO security_modules (module, symmetricKey, publicKey, outDated, checkSum) VALUES('TASK', '', '".base64_encode($public)."', 'FALSE', '')");
+
 	echo $conn->error;
 	$result = $conn->query("SELECT userID, publicKey FROM security_users WHERE outDated = 'FALSE'");
 	while($row = $result->fetch_assoc()){
@@ -2948,14 +2908,129 @@ if($row['version'] < 159){
 	echo $conn->error;
 }
 
-$conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectname VARCHAR(250) NOT NULL");
-$conn->query("ALTER TABLE archive_meta MODIFY COLUMN cPartnerID VARCHAR(20)");
 
-// if($row['version'] < 160){}
+if($row['version'] < 160){
+	$conn->query("ALTER TABLE dynamicprojects MODIFY COLUMN projectname VARCHAR(250) NOT NULL");
+	$conn->query("ALTER TABLE archive_meta MODIFY COLUMN cPartnerID VARCHAR(20)");
+
+	//5afc141e4a3c7
+	$conn->query("ALTER TABLE companyData ADD COLUMN companyRegister VARCHAR(80)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Mandant: Firmenbuchnummer';
+	}
+	$conn->query("ALTER TABLE companyData ADD COLUMN companyCommercialCourt VARCHAR(80)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Mandant: Firmenbuchgericht';
+	}
+	$conn->query("ALTER TABLE companyData ADD COLUMN companyWKOLink VARCHAR(150)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Mandant: Link zur WKO';
+	}
+	$conn->query("ALTER TABLE companyData ADD COLUMN fax VARCHAR(60)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Mandant: Fax Nr.';
+	}
+
+	//5b17cd451c685
+	$conn->query("UPDATE travelCountryData SET countryName = 'Österreich', identifier = 'AT' WHERE id = 1"); //just in case
+
+	$conn->query("UPDATE clientInfoData c SET address_Country = (SELECT id FROM travelCountryData t WHERE c.address_country = t.countryName )");
+	$conn->query("ALTER TABLE clientInfoData MODIFY COLUMN address_Country INT(6) UNSIGNED");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Adressbuch: Länderauswahl';
+	}
+
+	//5b17d3a5b9341
+	$conn->query("ALTER TABLE erp_settings ADD COLUMN euDelivery VARCHAR(150)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>ERP: EU Lieferung';
+	}
+	$conn->query("ALTER TABLE erp_settings ADD COLUMN euService VARCHAR(150)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>ERP: EU Leistung';
+	}
+
+	//5b050794ee954
+	$conn->query("DELETE FROM UserData WHERE id = 1");
+	$conn->query("UPDATE UserData SET id = 1 WHERE id = 2");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Benutzer: Admin entfernt';
+	}
+	$conn->query("UPDATE dynamicprojects SET projectleader = 1 WHERE projectleader = 2");
+	$conn->query("UPDATE archive SET uploadUser = 1 WHERE uploadUser = 2");
+
+	//5b1f67f86c983
+	$sql = "CREATE TABLE workflowRules (
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		workflowID INT(10),
+		templateID VARCHAR(100),
+		position INT(4),
+		subject VARCHAR(100),
+		fromAddress VARCHAR(100),
+		toAddress VARCHAR(100),
+		FOREIGN KEY (templateID) REFERENCES dynamicprojects(projectid)
+		ON UPDATE CASCADE
+		ON DELETE SET NULL,
+		FOREIGN KEY (workflowID) REFERENCES emailprojects(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    } else {
+		echo '<br>Workflow: Update';
+	}
+
+	$result = $conn->query("SELECT * FROM taskemailrules");
+	$i = 1;
+	while($row = $result->fetch_assoc()){
+		$id = uniqid();
+		$conn->query("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor,
+			projectstatus, projectpriority, projectparent, projectowner, projectleader, estimatedHours, isTemplate)
+		    VALUES ('$id', '{$row['identifier']}', '', '{$row['company']}', '{$row['client']}', '{$row['clientproject']}', '{$row['color']}',
+			'{$row['status']}', '{$row['priority']}', '{$row['parent']}', '{$row['owner']}', '{$row['leader']}', '{$row['estimatedHours']}', 'TRUE')");
+			echo $conn->error;
+	   $conn->query("INSERT INTO workflowRules (workflowID, templateID, position, subject) VALUES ('{$row['emailaccount']}', '$id', $i, '{$row['identifier']}') ");
+	   echo $conn->error;
+   }
+
+	$conn->query("DROP TABLE taskemailrules");
+
+	$conn->query("DROP TABLE dynamicprojectsnotes");
+	$conn->query("DROP TABLE dynamicprojectspictures");
+
+	$conn->query("ALTER TABLE dynamicprojects ADD COLUMN projectmailheader TEXT NOT NULL DEFAULT ''");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Tasks: Verschlüsselter email Header';
+	}
+}
+
 // if($row['version'] < 161){}
 // if($row['version'] < 162){}
 // if($row['version'] < 163){}
 // if($row['version'] < 164){}
+
+//cleanups for maintainable db sizes
+$conn->query("DELETE FROM `checkinLogs` WHERE id <= ( SELECT id FROM ( SELECT id FROM `checkinLogs` ORDER BY id DESC LIMIT 1 OFFSET 100 ) foo )");echo $conn->error;
+$conn->query("DELETE FROM `dsgvo_vv_logs` WHERE id <= ( SELECT id FROM ( SELECT id FROM `dsgvo_vv_logs` ORDER BY id DESC LIMIT 1 OFFSET 300 ) foo )");echo $conn->error;
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';
 $conn->query("UPDATE configurationData SET version=$VERSION_NUMBER");
@@ -2965,11 +3040,24 @@ echo '<br><br>Update wurde beendet. Klicken sie auf "Weiter", wenn sie nicht aut
   window.setInterval(function(){
     window.location.href="../user/home";
   }, 4000);
+
+var elem = document.getElementById("progress");
+var elem_text = document.getElementById("progress_text");
+var width = 10;
+var id = setInterval(frame, 20); //calling frame every Xms, 10ms = 1 second
+function frame() {
+	if (width >= 100) {
+	  clearInterval(id);
+	} else {
+	  width++;
+	  elem.style.width = width + '%';
+	  elem_text.innerHTML = width * 1  + '%';
+	}
+}
 </script>
 
 <noscript>
   <meta http-equiv="refresh" content="0;url='.$url.'" />';
 </noscript>
-</div>
 </body>
 </html>

@@ -14,19 +14,21 @@ session_start();
 $userID = $_SESSION["userid"] or die("0");
 //enableToClients($userID);
 // get corresponding id from detailTable
-$result = $conn->query("SELECT * FROM $clientDetailTable WHERE clientId = $x");
+$result = $conn->query("SELECT * FROM clientInfoData WHERE clientID = $x");
 if ($result && ($row = $result->fetch_assoc())) {
     $detailID = $row['id'];
 } else { // no detailTable found -> create one
-    $conn->query("INSERT INTO $clientDetailTable (clientID) VALUES($x)");
+    $conn->query("INSERT INTO clientInfoData (clientID) VALUES($x)");
     $detailID = $conn->insert_id;
     echo mysqli_error($conn);
+
+	$result = $conn->query("SELECT * FROM clientInfoData WHERE id = $detailID");
+	$row = $result->fetch_assoc();
 }
 $activeTab = 'home';
 $result = $conn->query("SELECT name, clientNumber, companyID FROM clientData WHERE id = $x");
 $rowClient = $result->fetch_assoc();
-$result = $conn->query("SELECT * FROM clientInfoData WHERE id = $detailID");
-$row = $result->fetch_assoc();
+
 $result = $conn->query("SELECT DISTINCT companyID FROM relationship_company_client WHERE userID = $userID OR $userID = 1");
 $available_companies = array('-1'); //care
 while ($result && ($rowc = $result->fetch_assoc())) {
@@ -67,8 +69,6 @@ FROM contactPersons LEFT JOIN position ON position.id = position LEFT JOIN exter
                         <div id="project<?php echo $x; ?>" class="tab-pane fade <?php if ($activeTab == 'project') {echo 'in active';} ?>">
                             <h3><?php echo $lang['PROJECTS']; ?>
                               <div class="page-header-button-group">
-                                  <button type="submit" class="btn btn-default" name='delete_projects' title="<?php echo $lang['DELETE']; ?>" ><i class="fa fa-trash-o"></i></button>
-
 								  <a type="button" class="btn btn-default" href="../project/view?custID=<?php echo $x; //5ad46a0e150ec ?>" title="Bearbeiten"><i class="fa fa-pencil"></i></a>
                               </div>
                             </h3>
@@ -176,7 +176,16 @@ FROM contactPersons LEFT JOIN position ON position.id = position LEFT JOIN exter
                                 <input type="text" class="form-control" name="address_Street" value="<?php echo $row['address_Street']; ?>" placeholder="<?php echo $lang['STREET']; ?>"/>
                             </div>
                             <div class="col-sm-5">
-                                <input type="text" class="form-control" name="address_Country" value="<?php echo $row['address_Country']; ?>" placeholder="<?php echo $lang['COUNTRY']; ?>"/>
+								<select class="js-example-basic-single" name="address_Country">
+									<option value=""><?php echo $lang['COUNTRY']; ?> ... </option>
+									<?php //5b17cd451c685
+									$result = $conn->query("SELECT id, countryName, identifier FROM travelCountryData"); echo $conn->error;
+									while($rowc = $result->fetch_assoc()){
+										$selected = $rowc['id'] == $row['address_Country'] ? 'selected' : '';
+										echo '<option value="'.$rowc['id'].'" '.$selected.'>'.$rowc['identifier'].' - '.$rowc['countryName'].'</option>';
+									}
+									?>
+								</select>
                             </div>
                         </div>
                         <div class="row form-group">
@@ -751,7 +760,7 @@ FROM contactPersons LEFT JOIN position ON position.id = position LEFT JOIN exter
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-default" onclick="$('#add-contact-person<?php echo $x; ?>').modal('hide');">Cancel</button>
                 <button type="submit" name="addContact" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
             </div>
         </div>

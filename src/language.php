@@ -590,12 +590,6 @@ $lang_ger['FIELDS_REQUIRED'] = 'Felder werden benötigt';
 $lang_eng['FILE'] = 'File';
 $lang_ger['FILE'] = 'Datei';
 
-$lang_eng['FILTER_HELP'] = '*Your E-Mail Subject will be scaned for this EXACT term and if an E-Mail gets found this Part of the Subject will be cut out, the rest will be the Title for the Task.';
-$lang_ger['FILTER_HELP'] = '*Der Betreff Ihrer E-Mails wird nach GENAU diesem Begriff untersucht und sollte es einen Treffer geben wird dieser Teil aus dem Betreff herausgeschnitten und der Rest des Betreffs wird der Titel des Tasks.';
-
-$lang_eng['FILTER_PLACEHOLDER'] = 'Detection term in the email subject e.g. *AutoTask*';
-$lang_ger['FILTER_PLACEHOLDER'] = 'Erkennung im E-Mail-Betreff z.B. *AutoTask*';
-
 $lang_eng['FINANCES'] = 'Finances';
 $lang_ger['FINANCES'] = 'Finanzen';
 

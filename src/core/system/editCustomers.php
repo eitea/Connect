@@ -11,174 +11,175 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $filterClient = intval($_POST['saveID']);
         $activeTab = 'home';
         // get corresponding id from detailTable
-        $result = $conn->query("SELECT id FROM $clientDetailTable WHERE clientId = $filterClient LIMIT 1");
+        $result = $conn->query("SELECT id FROM clientInfoData WHERE clientId = $filterClient LIMIT 1");
         if ($result && ($row = $result->fetch_assoc())) {
             $detailID = $row['id'];
         } else { // no detailTable found -> create one
-            $conn->query("INSERT INTO $clientDetailTable (clientID) VALUES($filterClient)");
+            $conn->query("INSERT INTO clientInfoData (clientID) VALUES($filterClient)");
             $detailID = $conn->insert_id;
+			$insert_clientID = $filterClient; //5b2253d633c0d
             echo mysqli_error($conn);
         }
         //always update
         $val = isset($_POST['contactType']) ? test_input($_POST['contactType']) : '';
-        $conn->query("UPDATE $clientDetailTable SET contactType = '$val' WHERE id = $detailID");
+        $conn->query("UPDATE clientInfoData SET contactType = '$val' WHERE id = $detailID");
         if (!empty($_POST['edit_name'])) {
             $name = test_input($_POST['edit_name']);
             $companyID = intval($_POST['edit_company']);
             $number = test_input($_POST['edit_clientNumber']);
-            $conn->query("UPDATE $clientTable SET name = '$name', companyID = $companyID, clientNumber = '$number' WHERE id = $filterClient");
+            $conn->query("UPDATE clientData SET name = '$name', companyID = $companyID, clientNumber = '$number' WHERE id = $filterClient");
         }
         if (isset($_POST['gender'])) {
             $val = $_POST['gender'];
-            $conn->query("UPDATE $clientDetailTable SET gender = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET gender = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['title'])) {
             $val = test_input($_POST['title']);
-            $conn->query("UPDATE $clientDetailTable SET title = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET title = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['name'])) {
             $val = test_input($_POST['name']);
-            $conn->query("UPDATE $clientDetailTable SET name = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET name = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['firstname'])) {
             $val = test_input($_POST['firstname']);
-            $conn->query("UPDATE $clientDetailTable SET firstname = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET firstname = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['nameAddition'])) {
             $val = test_input($_POST['nameAddition']);
-            $conn->query("UPDATE $clientDetailTable SET nameAddition = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET nameAddition = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['address_Street'])) {
             $val = test_input($_POST['address_Street']);
-            $conn->query("UPDATE $clientDetailTable SET address_Street = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET address_Street = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['address_Country'])) {
             $val = test_input($_POST['address_Country']);
-            $conn->query("UPDATE $clientDetailTable SET address_Country = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET address_Country = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['address_Country_City'])) {
             $val = test_input($_POST['address_Country_City']);
-            $conn->query("UPDATE $clientDetailTable SET address_Country_City = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET address_Country_City = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['address_Country_Postal'])) {
             $val = test_input($_POST['address_Country_Postal']);
-            $conn->query("UPDATE $clientDetailTable SET address_Country_Postal = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET address_Country_Postal = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['address_Addition'])) {
             $val = test_input($_POST['address_Addition']);
-            $conn->query("UPDATE $clientDetailTable SET address_Addition = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET address_Addition = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['phone'])) {
             $val = test_input($_POST['phone']);
-            $conn->query("UPDATE $clientDetailTable SET phone = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET phone = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['fax_number'])) {
             $val = test_input($_POST['fax_number']);
-            $conn->query("UPDATE $clientDetailTable SET fax_number = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET fax_number = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['homepage'])) {
             $val = test_input($_POST['homepage']);
-            $conn->query("UPDATE $clientDetailTable SET homepage = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET homepage = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['mail']) && filter_var($_POST['mail'], FILTER_VALIDATE_EMAIL)) {
             $val = test_input($_POST['mail']);
-            $conn->query("UPDATE $clientDetailTable SET mail = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET mail = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['debitNumber'])) {
             $val = intval($_POST['debitNumber']);
-            $conn->query("UPDATE $clientDetailTable SET debitNumber = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET debitNumber = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['datev'])) {
             $val = intval($_POST['datev']);
-            $conn->query("UPDATE $clientDetailTable SET datev = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET datev = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['accountName'])) {
             $val = test_input($_POST['accountName']);
-            $conn->query("UPDATE $clientDetailTable SET accountName = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET accountName = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['taxnumber'])) {
             $val = test_input($_POST['taxnumber']);
-            $conn->query("UPDATE $clientDetailTable SET taxnumber = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET taxnumber = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['vatnumber'])) {
             $val = test_input($_POST['vatnumber']);
-            $conn->query("UPDATE $clientDetailTable SET vatnumber = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET vatnumber = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['taxArea'])) {
             $val = test_input($_POST['taxArea']);
-            $conn->query("UPDATE $clientDetailTable SET taxArea = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET taxArea = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['customerGroup'])) {
             $val = test_input($_POST['customerGroup']);
-            $conn->query("UPDATE $clientDetailTable SET customerGroup = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET customerGroup = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['representative'])) {
             $val = test_input($_POST['representative']);
-            $conn->query("UPDATE $clientDetailTable SET representative = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET representative = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['blockDelivery'])) {
-            $conn->query("UPDATE $clientDetailTable SET blockDelivery = 'true' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET blockDelivery = 'true' WHERE id = $detailID");
         } else {
-            $conn->query("UPDATE $clientDetailTable SET blockDelivery = 'false' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET blockDelivery = 'false' WHERE id = $detailID");
         }
         if (isset($_POST['paymentMethod'])) {
             $val = test_input($_POST['paymentMethod']);
-            $conn->query("UPDATE $clientDetailTable SET paymentMethod = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET paymentMethod = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['shipmentType'])) {
             $val = test_input($_POST['shipmentType']);
-            $conn->query("UPDATE $clientDetailTable SET shipmentType = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET shipmentType = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['creditLimit'])) {
             $val = floatval($_POST['creditLimit']);
-            $conn->query("UPDATE $clientDetailTable SET creditLimit = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET creditLimit = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['eBill'])) {
-            $conn->query("UPDATE $clientDetailTable SET eBill = 'true' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET eBill = 'true' WHERE id = $detailID");
         } else {
-            $conn->query("UPDATE $clientDetailTable SET eBill = 'false' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET eBill = 'false' WHERE id = $detailID");
         }
         if (isset($_POST['lastFaktura']) && test_Date($_POST['lastFaktura'] . ':00')) {
             $val = $_POST['lastFaktura'] . ':00';
-            $conn->query("UPDATE $clientDetailTable SET lastFaktura = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET lastFaktura = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['billingMailAddress']) && filter_var($_POST['billingMailAddress'], FILTER_VALIDATE_EMAIL)) {
             $val = test_input($_POST['billingMailAddress']);
-            $conn->query("UPDATE $clientDetailTable SET billingMailAddress = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET billingMailAddress = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['billDelivery'])) {
             $val = test_input($_POST['billDelivery']);
-            $conn->query("UPDATE $clientDetailTable SET billDelivery = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET billDelivery = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['warningEnabled'])) {
-            $conn->query("UPDATE $clientDetailTable SET warningEnabled = 'true' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET warningEnabled = 'true' WHERE id = $detailID");
         } else {
-            $conn->query("UPDATE $clientDetailTable SET warningEnabled = 'false' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET warningEnabled = 'false' WHERE id = $detailID");
         }
         if (isset($_POST['karenztage'])) {
             $val = intval($_POST['karenztage']);
-            $conn->query("UPDATE $clientDetailTable SET karenztage = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET karenztage = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['lastWarning']) && test_Date($_POST['lastWarning'] . ':00')) {
             $val = $_POST['lastWarning'] . ':00';
-            $conn->query("UPDATE $clientDetailTable SET lastFaktura = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET lastFaktura = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['warning1'])) {
             $val = floatval($_POST['warning1']);
-            $conn->query("UPDATE $clientDetailTable SET warning1 = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET warning1 = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['warning2'])) {
             $val = floatval($_POST['warning2']);
-            $conn->query("UPDATE $clientDetailTable SET warning2 = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET warning2 = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['warning3'])) {
             $val = floatval($_POST['warning3']);
-            $conn->query("UPDATE $clientDetailTable SET warning3 = '$val' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET warning3 = '$val' WHERE id = $detailID");
         }
         if (isset($_POST['calculateInterest'])) {
-            $conn->query("UPDATE $clientDetailTable SET calculateInterest = 'true' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET calculateInterest = 'true' WHERE id = $detailID");
         } else {
-            $conn->query("UPDATE $clientDetailTable SET calculateInterest = 'false' WHERE id = $detailID");
+            $conn->query("UPDATE clientInfoData SET calculateInterest = 'false' WHERE id = $detailID");
         }
         if ($conn->error) {
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
@@ -242,75 +243,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             } else {
                 echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_SAVE'] . '</div>';
             }
-        } elseif (isset($_POST['delete_projects']) && !empty($_POST['delete_projects_index'])) {
-            $activeTab = 'project';
-            foreach ($_POST['delete_projects_index'] as $x) {
-                $x = intval($x);
-                $conn->query("DELETE FROM $projectTable WHERE id = $x;");
-            }
-            if ($conn->error) {
-                echo $conn->error;
-            } else {
-                echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_DELETE'] . '</div>';
-            }
-        } elseif (isset($_POST['add']) && !empty($_POST['name'])) {
-            $activeTab = 'project';
-            $name = test_input($_POST['name']);
-            $status = "";
-            if (isset($_POST['status'])) {
-                $status = "checked";
-            }
-            $hourlyPrice = floatval(test_input($_POST['hourlyPrice']));
-            $hours = floatval(test_input($_POST['hours']));
-            if (isset($_POST['createField_1'])) {
-                $field_1 = 'TRUE';
-            } else {
-                $field_1 = 'FALSE';
-            }
-            if (isset($_POST['createField_2'])) {
-                $field_2 = 'TRUE';
-            } else {
-                $field_2 = 'FALSE';
-            }
-            if (isset($_POST['createField_3'])) {
-                $field_3 = 'TRUE';
-            } else {
-                $field_3 = 'FALSE';
-            }
-            $conn->query("INSERT INTO $projectTable (clientID, name, status, hours, hourlyPrice, field_1, field_2, field_3) VALUES($filterClient, '$name', '$status', '$hours', '$hourlyPrice', '$field_1', '$field_2', '$field_3')");
-            if ($conn->error) {
-                echo $conn->error;
-            } else {
-                echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_ADD'] . '</div>';
-            }
-        } elseif (isset($_POST['save'])) {
-            $activeTab = 'project';
-            $projectID = intval($_POST['save']);
-            $hours = floatval(test_input($_POST['boughtHours']));
-            $hourlyPrice = floatval(test_input($_POST['pricedHours']));
-            $status = isset($_POST['productive']) ? 'checked' : '';
-            // checkboxes are not set at all if they're not checked
-            if (isset($_POST['addField_1_' . $projectID])) {
-                $field_1 = 'TRUE';
-            } else {
-                $field_1 = 'FALSE';
-            }
-            if (isset($_POST['addField_2_' . $projectID])) {
-                $field_2 = 'TRUE';
-            } else {
-                $field_2 = 'FALSE';
-            }
-            if (isset($_POST['addField_3_' . $projectID])) {
-                $field_3 = 'TRUE';
-            } else {
-                $field_3 = 'FALSE';
-            }
-            $conn->query("UPDATE $projectTable SET hours = '$hours', hourlyPrice = '$hourlyPrice', status='$status', field_1 = '$field_1', field_2 = '$field_2', field_3 = '$field_3' WHERE id = $projectID");
-            if ($conn->error) {
-                echo $conn->error;
-            } else {
-                echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_SAVE'] . '</div>';
-            }
         } elseif (!empty($_POST['deleteContact'])) {
             $val = intval($_POST['deleteContact']);
             $conn->query("DELETE FROM contactPersons WHERE id = $val");
@@ -336,6 +268,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             if ($conn->error) {
                 echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
             } else {
+				$insert_clientID = $filterClient;
                 echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_ADD'] . '</div>';
             }
         } elseif (isset($_POST['editContact']) && !empty($_POST['edit_contacts_firstname']) && !empty($_POST['edit_contacts_lastname']) && !empty($_POST['edit_contacts_gender']) && !empty($_POST['edit_contacts_email'])) {
@@ -356,6 +289,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             if ($conn->error) {
                 echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
             } else {
+				$insert_clientID = $filterClient;
                 echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['OK_SAVE'] . '</div>';
             }
         }
@@ -379,6 +313,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
             $conn->query("INSERT INTO external_users (contactID, login_mail, login_pw, publicKey, privateKey) VALUES($contactID, '$login', '$psw', '$public', '$private_encrypt')");
             if(!$conn->error){
+				$insert_clientID = $filterClient;
                 echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>';
             } else {
                 echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
@@ -525,7 +460,7 @@ WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clie
     });
 
     <?php
-    //5aba4f8f6ced5
+    //5aba4f8f6ced5, 5b1a6e1e0ec36
     if(isset($insert_clientID)){
         echo '$("button[name=\'editModal\'][value=\''.$insert_clientID.'\']").click();';
     }

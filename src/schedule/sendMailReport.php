@@ -87,7 +87,7 @@ while($resultContent && ($rowContent = $resultContent->fetch_assoc())){
   $mail->AltBody = "Your e-mail provider does not support HTML. To apply formatting, use an html viewer." . $content;
   if(!$mail->send()){
     $errorInfo = $mail->ErrorInfo;
-    $conn->query("INSERT INTO $mailLogsTable(sentTo, messageLog) VALUES('$recipients', '$errorInfo')");
+    $conn->query("INSERT INTO mailLogs(sentTo, messageLog) VALUES('$recipients', '$errorInfo')");
     echo $errorInfo;
   } else {
     //echo "<script>window.close();</script>";

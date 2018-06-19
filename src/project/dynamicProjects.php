@@ -238,90 +238,91 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
         if(isset($_POST['editDynamicProject'])){ //new projects
 			$setEdit = false;
-            if(isset($available_companies[1]) && !empty($_POST['name']) && !empty($_POST['description']) && !empty($_POST['owner']) && test_Date($_POST['start'], 'Y-m-d') && !empty($_POST['employees'])){
-                $id = uniqid();
-                if(!empty($_POST['editDynamicProject'])){ //existing
-                    $id =  test_input($_POST['editDynamicProject']);
-                    $conn->query("DELETE FROM dynamicprojects WHERE projectid = '$id'"); echo $conn->error; //fk does the rest
-                    $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$id', 'EDITED', $userID)");
-                } else { //new
-                    $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$id', 'CREATED', $userID)");
-                }
-                $null = null;
-                $name = asymmetric_encryption('TASK', test_input($_POST["name"]), $userID, $privateKey);
+			if(isset($available_companies[1]) && !empty($_POST['name']) && !empty($_POST['description']) && !empty($_POST['owner']) && test_Date($_POST['start'], 'Y-m-d') && !empty($_POST['employees'])){
+				$id = uniqid();
+				if(!empty($_POST['editDynamicProject'])){ //existing
+					$id =  test_input($_POST['editDynamicProject']);
+					$conn->query("DELETE FROM dynamicprojects WHERE projectid = '$id'"); echo $conn->error; //fk does the rest
+					$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$id', 'EDITED', $userID)");
+				} else { //new
+					$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$id', 'CREATED', $userID)");
+				}
+				$null = null;
+				$name = asymmetric_encryption('TASK', test_input($_POST["name"]), $userID, $privateKey);
 				$v2Key = ($name == test_input($_POST["name"])) ? '' : $publicKey;
-                $description = $_POST["description"];
-                if(preg_match_all("/\[([^\]]*)\]\s*\{([^\[]*)\}/m",$description,$matches)&&count($matches[0])>0){
-                    for($i = 0;$i<count($matches[0]);$i++){
-                        $mname = strip_tags($matches[1][$i]);
-                        $info = strip_tags($matches[2][$i]);
-                        $mid = uniqid();
-                        $conn->query("INSERT INTO microtasks VALUES('$id','$mid','$mname','FALSE',null,null)");
-                        $checkbox = "<input type='checkbox' id='$mid' disabled title=''><b>".$mname."</b><br>".$info."</input>";
-                        $mname = preg_quote($mname);
-                        $description = preg_replace("/\[($mname)\]\s*\{([^\[]*)\}/m",$checkbox,$description,1);
-                        if($conn->error){
-                            showError($conn->error);
-                        }
-                    }
-                }
+				$description = $_POST["description"];
+				if(preg_match_all("/\[([^\]]*)\]\s*\{([^\[]*)\}/m",$description,$matches)&&count($matches[0])>0){
+					for($i = 0;$i<count($matches[0]);$i++){
+						$mname = strip_tags($matches[1][$i]);
+						$info = strip_tags($matches[2][$i]);
+						$mid = uniqid();
+						$conn->query("INSERT INTO microtasks VALUES('$id','$mid','$mname','FALSE',null,null)");
+						$checkbox = "<input type='checkbox' id='$mid' disabled title=''><b>".$mname."</b><br>".$info."</input>";
+						$mname = preg_quote($mname);
+						$description = preg_replace("/\[($mname)\]\s*\{([^\[]*)\}/m",$checkbox,$description,1);
+						if($conn->error){
+							showError($conn->error);
+						}
+					}
+				}
 				$description = asymmetric_encryption('TASK', $description, $userID, $privateKey);
-                $company = $_POST["filterCompany"] ?? $available_companies[1];
-                $client = isset($_POST['filterClient']) ? intval($_POST['filterClient']) : '';
-                $project = isset($_POST['filterProject']) ? intval($_POST['filterProject']) : '';
-                $color = $_POST["color"] ? test_input($_POST['color']) : '#FFFFFF';
-                $start = $_POST["start"];
-                $end = '0000-00-00'; //temp fix for invalid end value (probs NULL)
-                $status = $_POST["status"];
-                $priority = intval($_POST["priority"]); //1-5
-                $owner = $_POST['owner'] ? intval($_POST["owner"]) : $userID;
-                $leader = isset($_POST['leader']) ? intval($_POST['leader']) : '';
-                $percentage = intval($_POST['completed']);
-                $estimate = test_input($_POST['estimatedHours']);
-                $isTemplate = isset($_POST['isTemplate']) ? 'TRUE' : 'FALSE';
-                if($isDynamicProjectsAdmin == 'TRUE'){
-                    $skill = intval($_POST['projectskill']);
-                    $parent = test_input($_POST["parent"]); //dynamproject id
-                } else {
-                    $skill = 0;
-                    $parent = null;
-                }
-                if($status == 'COMPLETED') $percentage = 100;
-                if(!empty($_POST['projecttags'])){
-                    $tags = implode(',', array_map( function($data){ return preg_replace("/[^A-Za-z0-9]/", '', $data); }, $_POST['projecttags'])); //strictly map and implode the tags
-                } else {
-                    $tags = '';
-                }
-                // PROJECT
-                $stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-                    projectpriority, projectparent, projectowner, projectleader, projectnextdate, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("ssbiiissssisiisisisss", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $nextDate, $percentage, $estimate, $skill, $tags, $isTemplate, $v2Key);
-                $stmt->send_long_data(2, $description);
-                $stmt->execute();
-                if(!$stmt->error){
-                    $stmt->close();
+				$company = $_POST["filterCompany"] ?? $available_companies[1];
+				$client = isset($_POST['filterClient']) ? intval($_POST['filterClient']) : '';
+				$project = isset($_POST['filterProject']) ? intval($_POST['filterProject']) : '';
+				$color = $_POST["color"] ? test_input($_POST['color']) : '#FFFFFF';
+				$start = $_POST["start"];
+				$end = '0000-00-00'; //temp fix for invalid end value (probs NULL)
+				$status = $_POST["status"];
+				$priority = intval($_POST["priority"]); //1-5
+				$owner = $_POST['owner'] ? intval($_POST["owner"]) : $userID;
+				$leader = isset($_POST['leader']) ? intval($_POST['leader']) : '';
+				$percentage = intval($_POST['completed']);
+				$estimate = test_input($_POST['estimatedHours']);
+				$isTemplate = isset($_POST['isTemplate']) ? 'TRUE' : 'FALSE';
+				if($isDynamicProjectsAdmin == 'TRUE'){
+					$skill = intval($_POST['projectskill']);
+					$parent = test_input($_POST["parent"]); //dynamproject id
+				} else {
+					$skill = 0;
+					$parent = null;
+				}
+				if($status == 'COMPLETED') $percentage = 100;
+				if(!empty($_POST['projecttags'])){
+					$tags = implode(',', array_map( function($data){ return preg_replace("/[^A-Za-z0-9]/", '', $data); }, $_POST['projecttags'])); //strictly map and implode the tags
+				} else {
+					$tags = '';
+				}
+				// PROJECT
+				$stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart,
+					projectend, projectstatus, projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2) 
+					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+				$stmt->bind_param("ssbiiissssisiisisiss", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $percentage, $estimate, $skill, $tags, $isTemplate, $v2Key);
+				$stmt->send_long_data(2, $description);
+				$stmt->execute();
+				if(!$stmt->error){
+					$stmt->close();
 					$setEdit = true;
-                    //EMPLOYEES
-                    $stmt = $conn->prepare("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES ('$id', ?, ?)"); echo $conn->error;
-                    $stmt->bind_param("is", $employee, $position);
-                    $position = 'normal';
-                    foreach ($_POST["employees"] as $employee) {
-                        $emp_array = explode(";", $employee);
-                        if ($emp_array[0] == "user") {
-                            $employee = intval($emp_array[1]);
-                            $stmt->execute();
-                        } else {
-                            $team = intval($emp_array[1]);
-                            $conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) VALUES ('$id',$team)");
-                        }
-                    }
-                    if(isset($_POST['optionalemployees']) && !empty($_POST['optionalemployees'])){
-                        $position = 'optional';
-                        foreach ($_POST['optionalemployees'] as $optional_employee) {
-                            $employee = intval($optional_employee);
-                            $stmt->execute();
-                        }
-                    }
+					//EMPLOYEES
+					$stmt = $conn->prepare("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES ('$id', ?, ?)"); echo $conn->error;
+					$stmt->bind_param("is", $employee, $position);
+					$position = 'normal';
+					foreach ($_POST["employees"] as $employee) {
+						$emp_array = explode(";", $employee);
+						if ($emp_array[0] == "user") {
+							$employee = intval($emp_array[1]);
+							$stmt->execute();
+						} else {
+							$team = intval($emp_array[1]);
+							$conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) VALUES ('$id',$team)");
+						}
+					}
+					if(isset($_POST['optionalemployees']) && !empty($_POST['optionalemployees'])){
+						$position = 'optional';
+						foreach ($_POST['optionalemployees'] as $optional_employee) {
+							$employee = intval($optional_employee);
+							$stmt->execute();
+						}
+					}
 					//FILES
 					$bucket = $identifier.'-tasks';
 					$s3 = getS3Object($bucket);
@@ -361,18 +362,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 					}
 					$stmt->close();
 					$stmt = $conn->prepare("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES ('$id', ?, ?)"); echo $conn->error;
-                    $stmt->bind_param("is", $employee, $position);
+					$stmt->bind_param("is", $employee, $position);
 
-                    showSuccess($lang['OK_ADD']);
-                } else {
-                    showError($stmt->error);
-                }
-                $stmt->close();
-            } else {
-                showError($lang['ERROR_MISSING_FIELDS']);
-                if(empty($_POST['owner'])) showError('Fehlend: Projektbesitzer');
-                if(empty($_POST['employees'])) showError('Fehlend: Mitarbeiter');
-            }
+					showSuccess($lang['OK_ADD']);
+				} else {
+					showError($stmt->error);
+				}
+				$stmt->close();
+			} else {
+				showError($lang['ERROR_MISSING_FIELDS']);
+				if(empty($_POST['owner'])) showError('Fehlend: Projektbesitzer');
+				if(empty($_POST['employees'])) showError('Fehlend: Mitarbeiter');
+			}
         }
     } // end if dynamic Admin
 } //end if POST
@@ -392,7 +393,6 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             <th><?php echo $lang["COMPANY"].' - '.$lang["CLIENT"].' - '.$lang["PROJECT"]; ?></th>
             <th><?php echo $lang["BEGIN"]; ?></th>
             <th><?php echo $lang["END"]; ?></th>
-            <th>Routine</th>
             <th>Status</th>
             <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PRIORITY"]; ?></th>
             <th><?php echo $lang["EMPLOYEE"]; ?></th>
@@ -520,11 +520,6 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             $B = $row['projectend'] == '0000-00-00' ? '' : substr($row['projectend'],0,10);
             echo '<td>'.$A.'</td>';
             echo '<td>'.$B.'</td>';
-            if($row['projectseries']){
-                echo '<td><i class="fa fa-clock-o"></i></td>';
-            } else {
-                echo '<td><i class="fa fa-times" style="color:red" title="Keine Routine"></i></td>';
-            }
             echo '<td>';
             if($row['workingUser']){ echo 'WORKING<br><small>'.$userID_toName[$row['workingUser']].'</small>'; } else { echo $row['projectstatus']; }
             if($row['projectstatus'] != 'COMPLETED'){ echo ' ('.$row['projectpercentage'].'%)'; }

@@ -21,6 +21,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
  			 showSuccess($lang['OK_DELETE']);
  		 }
 	  }
+  } elseif(!empty($_POST['edit_company_name']) && strlen($_POST['edit_company_name']) < 25){ //5afc0fe66b5a3
+	  $val = test_input($_POST['edit_company_name']);
+	  $conn->query("UPDATE companyData SET name = '$val' WHERE id = $cmpID");
   } elseif(isset($_POST['delete_logo'])){
     if(!mysqli_error($conn)){
       $conn->query("UPDATE companyData SET logo = '' WHERE id = $cmpID");
@@ -60,9 +63,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $left = max4Lines($_POST['general_detail_left']);
     $middle = max4Lines($_POST['general_detail_middle']);
     $right = max4Lines($_POST['general_detail_right']);
+	//5afc141e4a3c7
+	$register = test_input($_POST['general_companyRegister']);
+	$fax = test_input($_POST['general_fax']);
+	$court = test_input($_POST['general_companyCommercialCourt']);
+	$wko = test_input($_POST['general_companyWKOLink']);
+
     $conn->query("UPDATE companyData SET cmpDescription = '$descr',address = '$address', phone = '$phone', mail = '$mail', homepage = '$homepage', erpText = '$erpText',
-      detailLeft = '$left', detailMiddle = '$middle', detailRight = '$right', companyPostal = '$plz', uid = '$uid', companyCity = '$city' WHERE id = $cmpID");
-    echo mysqli_error($conn);
+      detailLeft = '$left', detailMiddle = '$middle', detailRight = '$right', companyPostal = '$plz', uid = '$uid', companyCity = '$city', fax = '$fax',
+	  companyRegister = '$register', companyCommercialCourt = '$court', companyWKOLink = '$wko' WHERE id = $cmpID");
+
+	  if($conn->error){
+		  showError($conn->error);
+	  } else {
+		  showSuccess($lang ['OK_SAVE']);
+	  }
   } elseif(isset($_POST['createNewProject']) && !empty($_POST['name'])){
    $name = test_input($_POST['name']);
    if(isset($_POST['status'])){
@@ -129,9 +144,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
    $clientStep = abs(intval($_POST['erp_clientStep']));
    $supplierNum = test_input($_POST['erp_supplierNum']);
    $supplierStep = abs(intval($_POST['erp_supplierStep']));
+   $euSer = test_input($_POST['erp_euService']);
+   $euDel = test_input($_POST['erp_euDelivery']);
 
    $conn->query("UPDATE erp_settings SET erp_ang = $erp_ang, erp_aub = $erp_aub, erp_re = $erp_re, erp_lfs = $erp_lfs, erp_gut = $erp_gut, erp_stn = $erp_stn,
-    clientNum = '$clientNum', clientStep = $clientStep, supplierNum = '$supplierNum', supplierStep = $supplierStep WHERE companyID = $cmpID");
+    clientNum = '$clientNum', clientStep = $clientStep, supplierNum = '$supplierNum', supplierStep = $supplierStep, euDelivery = '$euDel', euService = '$euSer' WHERE companyID = $cmpID");
    if($conn->error){
 	 echo '<div class="alert alert-danger alert-over"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
    } else {
@@ -379,35 +396,47 @@ $result = $conn->query("SELECT c.*, s.publicKey FROM companyData c LEFT JOIN sec
 echo $conn->error;
 if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['id'], $available_companies)):
 ?>
-<div class="page-seperated-body page-header-fixed">
+<div class="page-seperated-body">
     <div class="page-header page-seperated-section">
         <h3><?php echo $lang['COMPANY'] .' - '.$companyRow['name']; ?>
             <div class="page-header-button-group">
                 <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target=".cmp-delete-confirm-modal" title="<?php echo $lang['DELETE']; ?>"><i class="fa fa-trash-o"></i></button>
-            </div>
+				<button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target=".cmp-edit-name" title="<?php echo $lang['EDIT']; ?>"><i class="fa fa-pencil"></i></button>
+			</div>
         </h3>
     </div>
 </div>
-<div class="page-seperated-body page-content-fixed-130">
-<form method="POST">
-    <div class="modal fade cmp-delete-confirm-modal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
-        <div class="modal-dialog modal-sm" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title"><?php echo sprintf($lang['ASK_DELETE'], $companyRow['name']); ?></h4>
-                </div>
-                <div class="modal-body">
-                    <?php echo $lang['WARNING_DELETE_COMPANY']; ?>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CONFIRM_CANCEL']; ?></button>
-                    <button type="submit" name='deleteCompany' class="btn btn-warning"><?php echo $lang['CONFIRM']; ?></button>
-                </div>
+
+
+<div class="modal fade cmp-delete-confirm-modal" tabindex="-1" >
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header"> <h4 class="modal-title"><?php echo sprintf($lang['ASK_DELETE'], $companyRow['name']); ?></h4> </div>
+            <div class="modal-body"> <?php echo $lang['WARNING_DELETE_COMPANY']; ?> </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CONFIRM_CANCEL']; ?></button>
+                <form method="POST"><button type="submit" name='deleteCompany' class="btn btn-warning"><?php echo $lang['CONFIRM']; ?></button></form>
             </div>
         </div>
     </div>
-</form>
+</div>
 
+<div class="modal fade cmp-edit-name" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+			<form method="POST">
+                <div class="modal-header"> <h4 class="modal-title"><?php echo sprintf($lang['ASK_DELETE'], $companyRow['name']); ?></h4> </div>
+                <div class="modal-body"><input type="text" name="edit_company_name" value="<?php echo $companyRow['name']; ?>" maxlength="20" class="form-control"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
+                </div>
+			</form>
+        </div>
+    </div>
+</div>
+
+<div class="page-seperated-body">
 <!-- LOGO -->
 <form method="post" enctype="multipart/form-data" class="page-seperated-section">
     <div class="container-fluid">
@@ -468,6 +497,18 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
         <input type="text" maxlength="54" class="form-control" name="general_city" value="<?php echo $companyRow['companyCity'];?>" />
       </div>
     </div>
+	<div class="row">
+		<div class="col-sm-3"><label>Firmenbuchnummer</label></div>
+		<div class="col-sm-9">
+			<input type="text" name="general_companyRegister" value="<?php echo $companyRow['companyRegister']; ?>" class="form-control" maxlength="80"/>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-3"><label>Firmenbuchgericht</label></div>
+		<div class="col-sm-9">
+			<input type="text" name="general_companyCommercialCourt" value="<?php echo $companyRow['companyCommercialCourt']; ?>" class="form-control" maxlength="80"/>
+		</div>
+	</div>
     <div class="row">
       <div class="col-sm-3"><label>UID</label></div>
       <div class="col-sm-9">
@@ -476,9 +517,13 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
     </div>
     <div class="row">
       <div class="col-sm-3"><label><?php echo $lang['PHONE_NUMBER']; ?></label></div>
-      <div class="col-sm-9">
+      <div class="col-sm-4">
         <input type="text" class="form-control" name="general_phone" placeholder="Tel nr." value="<?php echo $companyRow['phone'];?>"/>
       </div>
+	  <div class="col-sm-1 text-center"><label>Fax</label></div>
+	  <div class="col-sm-4">
+	  	<input type="text" maxlength="60" class="form-control" name="general_fax" placeholder="Fax nr." value="<?php echo $companyRow['fax'];?>"/>
+	  </div>
     </div>
     <div class="row">
       <div class="col-sm-3"><label>E-Mail</label></div>
@@ -486,6 +531,12 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
         <input type="mail" class="form-control"  name="general_mail" placeholder="E-Mail" value="<?php echo $companyRow['mail'];?>" />
       </div>
     </div>
+	<div class="row">
+		<div class="col-sm-3"><label>Link zur WKO</label></div>
+		<div class="col-sm-9">
+			<input type="text" name="general_companyWKOLink" value="<?php echo $companyRow['companyWKOLink']; ?>" class="form-control" maxlength="140"/>
+		</div>
+	</div>
     <div class="row">
       <div class="col-sm-3"><label>Homepage</label></div>
       <div class="col-sm-9">
@@ -882,6 +933,7 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
 $result = $conn->query("SELECT * FROM erp_settings WHERE companyID = $cmpID LIMIT 1");
 if($result->num_rows < 1){
 	$conn->query("INSERT INTO erp_settings (companyID, clientNum, clientStep, supplierNum, supplierStep) VALUES ($cmpID, '1000', 1, '1000', 1)");
+	$result = $conn->query("SELECT * FROM erp_settings WHERE companyID = $cmpID LIMIT 1");
 }
 $row = $result->fetch_assoc();
 ?>
@@ -891,7 +943,7 @@ $row = $result->fetch_assoc();
       <button type="submit" class="btn btn-default blinking" name="save_erp_numbers"><i class="fa fa-floppy-o"></i></button>
     </div>
   </h4>
-  <div class="container-fluid">
+  <div class="row">
     <br>
     <div class="collapse" id="erp_number_info">
       <div class="well">
@@ -913,8 +965,7 @@ $row = $result->fetch_assoc();
       <input type="number" class="form-control" name="erp_re" value="<?php echo $row['erp_re']; ?>" min="1"/>
     </div>
   </div>
-  <br>
-  <div class="container-fluid">
+  <div class="row">
     <div class="col-md-4">
       <label><?php echo $lang['PROPOSAL_TOSTRING']['LFS']; ?></label>
       <input type="number" class="form-control" name="erp_lfs" value="<?php echo $row['erp_lfs']; ?>" min="1"/>
@@ -927,17 +978,29 @@ $row = $result->fetch_assoc();
       <label><?php echo $lang['PROPOSAL_TOSTRING']['STN']; ?></label>
       <input type="number" class="form-control" name="erp_stn" value="<?php echo $row['erp_stn']; ?>" min="1"/>
     </div>
-  </div><br>
+  </div>
   <br>
-  <div class="container-fluid">
+  <div class="row">
     <div class="col-md-4"><label>Kundennummernkreis</label><input type="text" name="erp_clientNum" class="form-control" placeholder="Anfangswert" value="<?php echo $row['clientNum']; ?>"/></div>
     <div class="col-md-3"><label>Schrittweite</label><input type="number" name="erp_clientStep" class="form-control" value="<?php echo $row['clientStep']; ?>"/></div>
   </div>
-  <br>
-  <div class="container-fluid">
+  <div class="row">
     <div class="col-md-4"><label>Lieferantennummernkreis</label><input type="text" name="erp_supplierNum" class="form-control" placeholder="Anfangswert" value="<?php echo $row['supplierNum']; ?>"/></div>
     <div class="col-md-3"><label>Schrittweite</label><input type="number" name="erp_supplierStep" class="form-control" value="<?php echo $row['supplierStep']; ?>"/></div>
     <small><i class="fa fa-arrow-right"></i> Buchstaben werden immmer an den Anfang gestellt</small>
+  </div>
+
+  <div class="row">
+	  <div class="col-md-6">
+	  	<label>EU-Lieferung</label><br>
+		<small>Ust-freie innergemeinschaftliche Lieferung i.S. § 4 Nr. 1b in Verbindung mit § 6a UStG. Ihre EG-Identnr</small><br>
+		<input type="text" name="erp_euDelivery" class="form-control" value="<?php echo $row['euDelivery']; //5b17d3a5b9341 ?>" maxlength="150">
+	  </div>
+	  <div class="col-md-6">
+	  	<label>EU-Leistung</label><br>
+		<small>Es wird darauf hingewiesen, dass die Steuerschuld iSd § 19 Abs. 1a UStG auf den Leistungsempfänger übergeht.</small><br>
+		<input type="text" name="erp_euService" class="form-control" value="<?php echo $row['euService']; //5b17d3a5b9341 ?>" maxlength="150">
+	  </div>
   </div>
 </form><br>
 

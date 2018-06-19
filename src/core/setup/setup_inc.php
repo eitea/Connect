@@ -90,7 +90,11 @@ function create_tables($conn) {
         detailMiddle VARCHAR(120),
         detailRight VARCHAR(120),
         uid VARCHAR(20),
-        istVersteuerer ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+        istVersteuerer ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+		companyRegister VARCHAR(80),
+		companyCommercialCourt VARCHAR(80),
+		companyWKOLink VARCHAR(150),
+		fax VARCHAR(60)
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -422,7 +426,7 @@ function create_tables($conn) {
         firstname VARCHAR(45),
         nameAddition VARCHAR(45),
         address_Street VARCHAR(100),
-        address_Country VARCHAR(50),
+        address_Country INT(6) UNSIGNED,
         address_Country_Postal VARCHAR(20),
         address_Country_City VARCHAR(50),
         address_Addition VARCHAR(150),
@@ -818,6 +822,8 @@ function create_tables($conn) {
 		clientStep INT(2),
 		supplierNum VARCHAR(12),
 		supplierStep INT(2),
+		euService VARCHAR(150),
+		euDelivery VARCHAR(150),
 		FOREIGN KEY (companyID) REFERENCES companyData(id)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE
@@ -1244,6 +1250,7 @@ function create_tables($conn) {
         level INT(3) DEFAULT 0 NOT NULL,
         projecttags VARCHAR(250) DEFAULT '' NOT NULL,
         isTemplate ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL,
+		projectmailheader TEXT NOT NULL DEFAULT '',
 		v2 VARCHAR(150) DEFAULT NULL,
         FOREIGN KEY (companyid) REFERENCES companyData(id)
         ON UPDATE CASCADE
@@ -1265,31 +1272,6 @@ function create_tables($conn) {
         ON UPDATE CASCADE
         ON DELETE CASCADE,
         FOREIGN KEY (userid) REFERENCES UserData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-    );";
-    if (!$conn->query($sql)) {
-        echo $conn->error;
-    }
-
-    $sql = "CREATE TABLE dynamicprojectspictures(
-        projectid VARCHAR(100) NOT NULL,
-        picture MEDIUMBLOB,
-        FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-    );";
-    if (!$conn->query($sql)) {
-        echo $conn->error;
-    }
-
-    $sql = "CREATE TABLE dynamicprojectsnotes(
-        projectid VARCHAR(100) NOT NULL,
-        noteid INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        notedate DATETIME DEFAULT CURRENT_TIMESTAMP,
-        notetext VARCHAR(1000),
-        notecreator INT(6),
-        FOREIGN KEY (projectid) REFERENCES dynamicprojects(projectid)
         ON UPDATE CASCADE
         ON DELETE CASCADE
     );";
@@ -1414,27 +1396,24 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
-    $sql = "CREATE TABLE taskemailrules (
-        id int(6) NOT NULL AUTO_INCREMENT,
-        identifier varchar(20) NOT NULL,
-        company int(6) NOT NULL,
-        client int(6) NOT NULL,
-        clientproject int(6) DEFAULT NULL,
-        color varchar(10) NOT NULL DEFAULT '#FFFFFF',
-        status enum('ACTIVE','DEACTIVATED','DRAFT','COMPLETED') NOT NULL DEFAULT 'ACTIVE',
-        priority int(6) NOT NULL DEFAULT '3',
-        parent varchar(100) DEFAULT NULL,
-        owner int(6) NOT NULL,
-        employees varchar(100) NOT NULL,
-        optionalemployees varchar(100) DEFAULT NULL,
-        emailaccount int(6) NOT NULL,
-        leader int(6) DEFAULT NULL,
-        estimatedHours varchar(100) NOT NULL DEFAULT '0',
-        PRIMARY KEY (id)
-       )";
-        if(!$conn->query($sql)){
-            echo $conn->error;
-        }
+    $sql = "CREATE TABLE workflowRules (
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		workflowID INT(10),
+		templateID VARCHAR(100),
+		position INT(4),
+		subject VARCHAR(100),
+		fromAddress VARCHAR(100),
+		toAddress VARCHAR(100),
+		FOREIGN KEY (templateID) REFERENCES dynamicprojects(projectid)
+		ON UPDATE CASCADE
+		ON DELETE SET NULL,
+		FOREIGN KEY (workflowID) REFERENCES emailprojects(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+    )";
+    if(!$conn->query($sql)){
+        echo $conn->error;
+    }
 
     $sql = "CREATE TABLE microtasks (
         projectid varchar(100) NOT NULL,
@@ -1612,7 +1591,8 @@ function create_tables($conn) {
         recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         symmetricKey VARCHAR(150) NOT NULL,
         publicKey VARCHAR(150) NOT NULL,
-        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
+        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+		checkSum VARCHAR(100)
     )";
     if(!$conn->query($sql)){
         echo $conn->error;
@@ -1661,6 +1641,22 @@ function create_tables($conn) {
         ON DELETE CASCADE
     )";
     if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
+	$sql = "CREATE TABLE security_users(
+		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		userID INT(6) UNSIGNED,
+		publicKey VARCHAR(150) NOT NULL,
+		privateKey VARCHAR(150) NOT NULL,
+		recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+		checkSum VARCHAR(100),
+		FOREIGN KEY (userID) REFERENCES UserData(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+	)";
+	if (!$conn->query($sql)) {
         echo $conn->error;
     }
 
@@ -1818,21 +1814,6 @@ function create_tables($conn) {
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
-    }
-
-	$sql = "CREATE TABLE security_users(
-		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-		userID INT(6) UNSIGNED,
-		publicKey VARCHAR(150) NOT NULL,
-		privateKey VARCHAR(150) NOT NULL,
-		recentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        outDated ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-		FOREIGN KEY (userID) REFERENCES UserData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-	)";
-	if (!$conn->query($sql)) {
-        echo $conn->error;
     }
 
 	$sql = "CREATE TABLE folder_default_sturctures(

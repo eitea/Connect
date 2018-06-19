@@ -245,9 +245,10 @@ if($result && ($row = $result->fetch_assoc())): ?>
   </thead>
   <tbody>
     <?php
-    $sql = "SELECT * FROM $travelTable INNER JOIN $travelCountryTable ON $travelCountryTable.id = $travelTable.countryID WHERE travelDayStart LIKE '$currentMonth%' AND userID = $userID";
-    $result = $conn->query($sql);
-    $durationSum = $daySum = $kmSum = $kmPaySum = $hotelSum = $hosting10Sum = $hosting20Sum = $expensesSum = $totalSum = 0;
+    $result = $conn->query("SELECT * FROM travelBookings INNER JOIN travelCountryData ON travelCountryData.id = travelBookings.countryID
+		WHERE travelDayStart LIKE '$currentMonth%' AND userID = $userID");
+	echo $conn->error;
+	$durationSum = $daySum = $kmSum = $kmPaySum = $hotelSum = $hosting10Sum = $hosting20Sum = $expensesSum = $totalSum = 0;
     while($result && ($row = $result->fetch_assoc())):
       $countryMun = $row['dayPay'];
       $timeDiff = timeDiff_Hours($row['travelDayStart'], $row['travelDayEnd']);
@@ -261,7 +262,6 @@ if($result && ($row = $result->fetch_assoc())): ?>
       $drovenKM = $row['kmEnd'] - $row['kmStart'];
       $drovenKMPay = $drovenKM * $kmMoney;
       $total = ($drovenKM * $kmMoney) + $row['hotelCosts'] + $row['hosting10'] + $row['hosting20'] + $row['expenses'];
-
 
       $durationSum += $timeDiff;
       $daySum += $dayPay;
@@ -343,7 +343,7 @@ if($result && ($row = $result->fetch_assoc())): ?>
     <div class="col-md-2">
       <select class="js-example-basic-single btn-block" name="addCountry">
         <?php
-        $result = mysqli_query($conn, "SELECT * FROM $travelCountryTable");
+        $result = mysqli_query($conn, "SELECT id, countryName FROM travelCountryData");
         while($result && ($row = $result->fetch_assoc())){
           echo "<option value=".$row['id'].">".$row['countryName']."</option>";
         }

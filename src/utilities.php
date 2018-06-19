@@ -202,7 +202,7 @@ function asymmetric_encryption($module, $message, $userID, $privateKey, $mode = 
         $result = $conn->query("SELECT activeEncryption FROM configurationData WHERE activeEncryption = 'TRUE'");
         if(!$result || $result->num_rows < 1){ $activeEncryption = false; }
     }
-    if(!$activeEncryption || !$mode) return $message; 	
+    if(!$activeEncryption || !$mode) return $message;
 	$result = $conn->query("SELECT publicKey FROM security_modules WHERE module = '$module' AND outDated = 'FALSE' LIMIT 1");
 	if($result && ( $row=$result->fetch_assoc() )){
 		$public_module = base64_decode($row['publicKey']);
@@ -695,6 +695,9 @@ function getS3Object($bucket = ''){
 			echo $e->getMessage();
 			return false;
 		}
+	} else {
+		echo $conn->error;
+		return false;
 	}
 	return $s3;
 }

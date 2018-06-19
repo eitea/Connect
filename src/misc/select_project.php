@@ -1,5 +1,6 @@
 <div class="row">
   <?php
+  $select_project_uniqid = uniqid();
   $filterCompany = empty($filterings['company']) ? (empty($filterCompany) ? 0 : $filterCompany) : $filterings['company'];
   $filterClient = empty($filterings['client']) ? empty($filterClient) ? 0 : $filterCompany : $filterings['client'];
   $filterProject = empty($filterings['project']) ? empty($filterProject) ? 0 : $filterCompany : $filterings['project'];
@@ -21,12 +22,12 @@
   ?>
   <div class="col-sm-4">
     <label><?php echo $lang['CLIENT']; ?></label>
-    <select id="clientHint" class="js-example-basic-single" name="filterClient" onchange="select_client.showProjects(this.value, '<?php echo $filterProject; ?>');">
+    <select id="clientHint<?php echo $select_project_uniqid; ?>" class="js-example-basic-single" name="filterClient" onchange="select_client.showProjects(this.value, '<?php echo $filterProject; ?>');">
     </select>
   </div>
   <div class="col-sm-4">
     <label><?php echo $lang['PROJECT']; ?></label>
-    <select id="projectHint" class="js-example-basic-single" name="filterProject">
+    <select id="projectHint<?php echo $select_project_uniqid; ?>" class="js-example-basic-single" name="filterProject">
     </select>
   </div>
 </div>
@@ -39,7 +40,7 @@ var select_client = {
         data:{companyID:company, clientID:client},
         type: 'get',
         success : function(resp){
-          $("#clientHint").html(resp);
+          $("#clientHint<?php echo $select_project_uniqid; ?>").html(resp);
         },
         error : function(resp){}
       });
@@ -52,7 +53,7 @@ var select_client = {
         data:{clientID:client, projectID:project},
         type: 'get',
         success : function(resp){
-          $("#projectHint").html(resp);
+          $("#projectHint<?php echo $select_project_uniqid; ?>").html(resp);
         },
         error : function(resp){}
       });

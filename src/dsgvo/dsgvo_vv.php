@@ -53,7 +53,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         } else {
             showSuccess($lang['OK_DELETE']);
         }
-    }
+    } elseif(!empty($_POST['edit_app']) && !empty($_POST['edit_app_name'])){ //5b166972057a4
+		$val = intval($_POST['edit_app']);
+		$newname = test_input($_POST['edit_app_name']);
+		$conn->query("UPDATE dsgvo_vv SET name = '$newname' WHERE id = $val");
+		if($conn->error){
+            showError($conn->error);
+        } else {
+            showSuccess($lang['OK_SAVE']);
+        }
+	}
 
     if(!empty($_POST['delete_template'])){
         $val = intval($_POST['delete_template']);
@@ -183,7 +192,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <div class="row">
             <form method="POST">
                 <div class="panel panel-default col-sm-5 col-sm-offset-1">
-                    <a href="vDetail?v=<?php echo $id ?>&n=<?php echo $cmpID; ?>" class="btn btn-link"><?php echo $name; ?></a>
+                    <a href="vDetail?v=<?php echo $id; ?>&n=<?php echo $cmpID; ?>" class="btn btn-link"><?php echo $name; ?></a>
+					<a type="button" data-toggle="modal" href="#edit-app" data-name="<?php echo $name; ?>" data-valid="<?php echo $id; ?>"><i class="fa fa-pencil"></i></a>
                 </div>
                 <div class="col-sm-5">
                     <div class="input-group">
@@ -226,6 +236,24 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                 <button type="submit" class="btn btn-warning" name="add_app"><?php echo $lang['SAVE']; ?></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="edit-app" class="modal fade">
+    <div class="modal-dialog modal-content modal-sm">
+        <form method="POST">
+            <div class="modal-header h4">Vorgang Editieren</div>
+            <div class="modal-body">
+                <div class="row">
+                    <label>Name</label>
+                    <input type="text" name="edit_app_name" class="form-control" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-warning" name="edit_app"><?php echo $lang['SAVE']; ?></button>
             </div>
         </form>
     </div>
@@ -365,6 +393,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <script>
 $("button[name='delete_app']").click(function() {
     return confirm("Are you sure you want to delete this item?");
+});
+
+$('#edit-app').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget);
+  $(this).find('input[name=edit_app_name]').val(button.data('name'));
+  $(this).find('button[name=edit_app]').val(button.data('valid'));
 });
 </script>
 <?php include dirname(__DIR__) . '/footer.php'; ?>
