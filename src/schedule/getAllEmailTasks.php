@@ -91,9 +91,9 @@ while($result && $row = $result->fetch_assoc()){
 				$conn->query("INSERT INTO dynamicprojects(
 				projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
 				projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2, projectmailheader)
-				SELECT '$projectid', '$name', '$html', companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-				projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, 'FALSE', '$v2', '$encrypted_header'
-				FROM dynamicprojects WHERE projectid = '{$rule['templateID']}'"); echo $conn->error;
+				SELECT '$projectid', '$name', '$html', companyid, clientid, clientprojectid, projectcolor, IF(projectstart='0000-00-00', UTC_TIMESTAMP , projectstart),
+				projectend, projectstatus, projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, 'FALSE',
+				'$v2', '$encrypted_header' FROM dynamicprojects WHERE projectid = '{$rule['templateID']}'"); echo $conn->error;
 
 				if($rule['autoResponse']) send_standard_email($sender, $rule['autoResponse'], "Connect - Ticket Nr. [$projectid]"); //5b20ad39615f9
 				$conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) SELECT '$projectid', userid, position FROM dynamicprojectsemployees WHERE projectid = '{$rule['templateID']}'");

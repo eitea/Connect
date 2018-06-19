@@ -47,7 +47,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 		$response = trim(test_input($_POST['rule_autoResponse'])); //5b20ad39615f9
 		if(!empty($_POST['rule_template'])){
 			$templateID = test_input($_POST['rule_template']);
-		} elseif(!empty($_POST['name']) && !empty($_POST['owner']) && test_Date($_POST['start'], 'Y-m-d') && !empty($_POST['employees'])) {
+		} elseif(!empty($_POST['name']) && !empty($_POST['owner']) && !empty($_POST['employees'])) {
 			$templateID = uniqid();
 			$name = asymmetric_encryption('TASK', test_input($_POST["name"]), $userID, $privateKey);
 			$v2Key = ($name == test_input($_POST["name"])) ? '' : $publicKey;
@@ -136,8 +136,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <div class="page-header"><h3>Workflow
 	<div class="page-header-button-group">
 		<a data-toggle="modal" href="#new-account" class="btn btn-default" title="New..."><i class="fa fa-plus"></i></a>
+		<button type="button" class="btn btn-default" data-toggle="modal" data-target="#taskTemplateEditor-modal">Task Templates</button>
 	</div>
 </h3></div>
+<?php include __DIR__.'/taskTemplateEditor.php'; ?>
 
 <div class="row bold">
 	<div class="col-xs-2">Server</div>
@@ -215,7 +217,7 @@ while ($row = $result->fetch_assoc()) {
 		echo '</div>';
 	}
 
-	//TODO: tasks editieren, resonse hinzufügen
+	//TODO: templates editieren
 	echo '</form>';
 }
 ?>

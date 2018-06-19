@@ -55,24 +55,32 @@ $result = $conn->query("SELECT teamID FROM relationship_team_user WHERE userID =
 while($result && ( $row = $result->fetch_assoc())){
     $filterings['employees'][] = 'team;'.$row['teamID'];
 }
+$templateResult = $conn->query("SELECT projectname,projectid,v2 FROM dynamicprojects WHERE isTemplate = 'TRUE'");
 ?>
 <div class="page-header-fixed">
-<div class="page-header"><h3>Tasks<div class="page-header-button-group">
-    <?php include dirname(__DIR__) . '/misc/set_filter.php'; ?>
-    <?php if($isDynamicProjectsAdmin == 'TRUE'|| $canCreateTasks == 'TRUE'): ?>
-        <div class="dropdown" style="display:inline;">
-            <button class="btn btn-default dropdown-toggle" id="dropdownAddTask" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" type="button"><i class="fa fa-plus"></i></button>
-            <ul class="dropdown-menu" aria-labelledby="dropdownAddTask" >
-                <div class="container-fluid">
-                    <li ><button class="btn btn-default btn-block" data-toggle="modal" data-target="#editingModal-" >New</button></li>
-                    <li class="divider"></li>
-                    <li ><button class="btn btn-default btn-block" data-toggle="modal" data-target="#template-list-modal" >From Template</button></li>
-                </div>
-            </ul>
-        </div>
-    <?php endif; ?>
-</div></h3></div>
+	<div class="page-header"><h3>Tasks<div class="page-header-button-group">
+	    <?php include dirname(__DIR__) . '/misc/set_filter.php';
+		if($isDynamicProjectsAdmin == 'TRUE'|| $canCreateTasks == 'TRUE'):
+			if($templateResult->num_rows > 0): ?>
+	        <div class="dropdown" style="display:inline;">
+	            <button class="btn btn-default dropdown-toggle" id="dropdownAddTask" data-toggle="dropdown" type="button"><i class="fa fa-plus"></i></button>
+				<ul class="dropdown-menu" aria-labelledby="dropdownAddTask" >
+	                <div class="container-fluid">
+	                    <li ><button class="btn btn-default btn-block" data-toggle="modal" data-target="#editingModal-" >Neu</button></li>
+	                    <li class="divider"></li>
+	                    <li ><button class="btn btn-default btn-block" data-toggle="modal" data-target="#template-list-modal" >Template</button></li>
+	                </div>
+	            </ul>
+	        </div>
+			<?php else : ?>
+				<button class="btn btn-default dropdown-toggle" id="dropdownAddTask" data-toggle="dropdown" type="button"><i class="fa fa-plus"></i></button>
+			<?php endif; ?>
+			<button type="button" class="btn btn-default" data-toggle="modal" data-target="#taskTemplateEditor-modal">Task Templates</button>
+		<?php endif; ?>
+	</div></h3></div>
 </div>
+
+<?php include __DIR__.'/taskTemplateEditor.php'; ?>
 <div class="page-content-fixed-100">
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
@@ -238,7 +246,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
         if(isset($_POST['editDynamicProject'])){ //new projects
 			$setEdit = false;
-			if(isset($available_companies[1]) && !empty($_POST['name']) && !empty($_POST['description']) && !empty($_POST['owner']) && test_Date($_POST['start'], 'Y-m-d') && !empty($_POST['employees'])){
+			if(isset($available_companies[1]) && !empty($_POST['name']) && !empty($_POST['owner']) && !empty($_POST['employees']) && !empty($_POST['description'])){
 				$id = uniqid();
 				if(!empty($_POST['editDynamicProject'])){ //existing
 					$id =  test_input($_POST['editDynamicProject']);
@@ -251,7 +259,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 				$name = asymmetric_encryption('TASK', test_input($_POST["name"]), $userID, $privateKey);
 				$v2Key = ($name == test_input($_POST["name"])) ? '' : $publicKey;
 				$description = $_POST["description"];
-				if(preg_match_all("/\[([^\]]*)\]\s*\{([^\[]*)\}/m",$description,$matches)&&count($matches[0])>0){
+				if(preg_match_all("/\[([^\]]*)\]\s*\{([^\[]*)\}/m",$description,$matches) && count($matches[0])>0){
 					for($i = 0;$i<count($matches[0]);$i++){
 						$mname = strip_tags($matches[1][$i]);
 						$info = strip_tags($matches[2][$i]);
@@ -294,7 +302,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 				}
 				// PROJECT
 				$stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart,
-					projectend, projectstatus, projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2) 
+					projectend, projectstatus, projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2)
 					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 				$stmt->bind_param("ssbiiissssisiisisiss", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $percentage, $estimate, $skill, $tags, $isTemplate, $v2Key);
 				$stmt->send_long_data(2, $description);
@@ -332,38 +340,39 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 							if((!$conn->error)) $s3->deleteObject(['Bucket' => $bucket, 'Key' => $val]);
 						}
 					}
-					for ($i = 0; $i < count($_FILES['newTaskFiles']['name']); $i++) {
-						if($s3 && file_exists($_FILES['newTaskFiles']['tmp_name'][$i]) && is_uploaded_file($_FILES['newTaskFiles']['tmp_name'][$i])){
-							$file_info = pathinfo($_FILES['newTaskFiles']['name'][$i]);
-							$ext = test_input(strtolower($file_info['extension']));
-							$filetype = $_FILES['newTaskFiles']['type'][$i];
-							$accepted_types = ['application/octet-stream', 'application/msword', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'text/plain', 'application/pdf', 'application/zip',
-							'application/x-zip-compressed', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'multipart/x-zip',
-							'application/x-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-							if (!in_array($ext, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'zip', 'msg'])){
-								showError('Ungültige Dateiendung: '.$ext);
-							} elseif(!in_array($filetype, $accepted_types)) {
-								showError('Ungültiger Dateityp: '.$filetype);
-							} elseif ($_FILES['newTaskFiles']['size'][$i] > 15000000) { //15mb max
-								showError('Die maximale Dateigröße wurde überschritten (15 MB)');
-							} else {
-								$hashkey = uniqid('', true); //23 chars
-								$file_encrypt = asymmetric_encryption('TASK', file_get_contents($_FILES['newTaskFiles']['tmp_name'][$i]), $userID, $privateKey);
-								$s3->putObject(array(
-									'Bucket' => $bucket,
-									'Key' => $hashkey,
-									'Body' => $file_encrypt
-								));
-								$filename = test_input($file_info['filename']);
-								$conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uniqID, uploadUser)
-								VALUES ('TASK', '$id', '$filename', 'ROOT', '$ext', '$hashkey', $userID)");
+					if(isset($_FILES['newTaskFiles'])){
+						for ($i = 0; $i < count($_FILES['newTaskFiles']['name']); $i++) {
+							if($s3 && file_exists($_FILES['newTaskFiles']['tmp_name'][$i]) && is_uploaded_file($_FILES['newTaskFiles']['tmp_name'][$i])){
+								$file_info = pathinfo($_FILES['newTaskFiles']['name'][$i]);
+								$ext = test_input(strtolower($file_info['extension']));
+								$filetype = $_FILES['newTaskFiles']['type'][$i];
+								$accepted_types = ['application/octet-stream', 'application/msword', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'text/plain', 'application/pdf', 'application/zip',
+								'application/x-zip-compressed', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'multipart/x-zip',
+								'application/x-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+								if (!in_array($ext, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'zip', 'msg'])){
+									showError('Ungültige Dateiendung: '.$ext);
+								} elseif(!in_array($filetype, $accepted_types)) {
+									showError('Ungültiger Dateityp: '.$filetype);
+								} elseif ($_FILES['newTaskFiles']['size'][$i] > 15000000) { //15mb max
+									showError('Die maximale Dateigröße wurde überschritten (15 MB)');
+								} else {
+									$hashkey = uniqid('', true); //23 chars
+									$file_encrypt = asymmetric_encryption('TASK', file_get_contents($_FILES['newTaskFiles']['tmp_name'][$i]), $userID, $privateKey);
+									$s3->putObject(array(
+										'Bucket' => $bucket,
+										'Key' => $hashkey,
+										'Body' => $file_encrypt
+									));
+									$filename = test_input($file_info['filename']);
+									$conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uniqID, uploadUser)
+									VALUES ('TASK', '$id', '$filename', 'ROOT', '$ext', '$hashkey', $userID)");
+								}
 							}
 						}
 					}
 					$stmt->close();
 					$stmt = $conn->prepare("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES ('$id', ?, ?)"); echo $conn->error;
 					$stmt->bind_param("is", $employee, $position);
-
 					showSuccess($lang['OK_ADD']);
 				} else {
 					showError($stmt->error);
@@ -798,36 +807,27 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 </form>
 <div id="editingModalDiv">
     <?php echo $modals; ?>
-    <div id="selectTemplate" >
-        <div class="modal fade" id="template-list-modal">
-            <form method="POST" onsubmit=' return setUpDeleteTemplate()'>
-            <div class="modal-dialog modal-content modal-md">
-                <div class="modal-header h4"><button type="button" class="close"><span>&times;</span></button><?php echo "Templates" ?></div>
-                <div class="modal-body">
-                    <div class="col-md-12">
-                        <label>Select Template</label>
-                    </div>
-                    <div class="col-md-9">
-                        <select id="templateSelect" class="form-control select2-templates" >
-                            <option value="-1" >New...</option>
-                            <?php $tempresult = $conn->query("SELECT projectname,projectid FROM dynamicprojects WHERE isTemplate = 'TRUE'");
-                                  while($tempresult && ($template = $tempresult->fetch_assoc())){
-                                      echo '<option value="'.$template['projectid'].'" >'.$template['projectname'].'</option>';
-                                  }
-                            ?>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <button type="button" class="btn btn-warning" onclick="editTemplate()" ><i class="fa fa-pencil"></i></button>
-                        <button type="submit" name="deleteProject" class="btn btn-warning" ><i class="fa fa-trash-o"></i></button>
-                    </div>
+    <div class="modal fade" id="template-list-modal">
+        <div class="modal-dialog modal-content modal-md">
+            <div class="modal-header h4"><button type="button" class="close"><span>&times;</span></button><?php echo "Templates" ?></div>
+            <div class="modal-body">
+                <div class="col-md-12">
+                    <label>Template auswählen</label>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-warning" onclick="activateTemplate(event)" ><?php echo $lang['APPLY']; ?></button>
+                <div class="col-md-9">
+                    <select id="template-select" class="js-example-basic-single" >
+						<?php
+						while($templateResult && ($template = $templateResult->fetch_assoc())){
+							echo '<option value="'.$template['projectid'].'" >'.asymmetric_encryption('TASK', $template['projectname'], $userID, $privateKey, $template['v2']).'</option>';
+						}
+                        ?>
+                    </select>
                 </div>
             </div>
-            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-warning" id="templateActivate" ><?php echo $lang['APPLY']; ?></button>
+            </div>
         </div>
     </div>
     <?php if($occupation): ?>
@@ -946,8 +946,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 <script>
 $('button[name="deleteProject"]').click(function(){
-    var c = confirm("Wollen Sie diesen Task wirklich löschen?");
-    return c;
+    return confirm("Wollen Sie diesen Task wirklich löschen?");
 });
 $("#bookCompletedCheckbox").change(function(){
     $("#bookCompleted").attr('readonly', this.checked);
@@ -964,12 +963,18 @@ $('#occupation_booking_fields_toggle').change(function(){
         $("#occupation_booking_fields").show();
     }
 });
+$('#templateActivate').on('click', function(){
+	var id = $('#template-select').val();
+	$("#template-list-modal").modal('hide');
+    if(existingModals.indexOf(id) == -1){
+        appendModal(id);
+    } else {
+        $('#editingModal-'+id).modal('show');
+    }
+});
 function formatState (state) {
     if (!state.id) { return state.text; }
-    var $state = $(
-        '<span><i class="fa fa-' + state.element.dataset.icon + '"></i> ' + state.text + '</span>'
-    );
-    return $state;
+    return $('<span><i class="fa fa-' + state.element.dataset.icon + '"></i> ' + state.text + '</span>');
 };
 function dynamicOnLoad(modID){
     if(typeof modID === 'undefined') modID = '';
@@ -980,9 +985,6 @@ function dynamicOnLoad(modID){
     $(".js-example-tokenizer").select2({
         tags: true,
         tokenSeparators: [',', ' ']
-    });
-    $(".select2-templates").select2({
-        minimumResultsForSearch: Infinity
     });
     $('[data-toggle="tooltip"]').tooltip();
     $('button[name="take_task"]').on('click', function(){
@@ -1090,7 +1092,7 @@ function appendModal(index){
         if(index){
             $('#editingModal-'+index).modal('show');
         } else {
-			<?php if(isset($setEdit) && !$setEdit): //5ae9e4ee9e35f ?>
+			<?php if(isset($setEdit) && !$setEdit && isset($_POST['description'])): //5ae9e4ee9e35f ?>
 			setTimeout(function(){
 				$("#editingModal-").modal("show");
 				tinyMCE.activeEditor.setContent('<?php echo $_POST['description']; ?>');
@@ -1156,63 +1158,7 @@ function showProjects(client, project, place){
         });
     }
 }
-function activateTemplate(event){
-    id = $(".select2-templates").select2('data');
-    if(id[0].id == -1){
-        //Create new Template
-        $("#template-list-modal").modal('hide');
-        $("#editingModal- .modal-title")[0].innerText = "Template editieren";
-        isTemplate = document.createElement("input");
-        isTemplate.name = "isTemplate";
-        isTemplate.id = "isTemplate";
-        isTemplate.style = "visibility: hidden; height:1px; width:1px";
-        $("#editingModal- form")[0].appendChild(isTemplate);
-        $("#editingModal-").modal('show');
-    } else {
-        $("#template-list-modal").modal('hide');
-        var index = id[0].id;
-        if(existingModals.indexOf(index) == -1){
-            appendModal(index);
-        } else {
-            $('#editingModal-'+index).modal('show');
-        }
-    }
-}
-function setUpDeleteTemplate(){
-    id =  $(".select2-templates").select2("data");
-    if(id[0].id==-1){
-        return false;
-    } else {
-        $("#selectTemplate button[name=deleteProject]")[0].value = id[0].id;
-    }
-}
-function editTemplate(){
-    id =  $(".select2-templates").select2("data");
-    if(id[0].id==-1){
-     return false;
-    }else{
-        $("#template-list-modal").modal('hide');
-        $.ajax({
-        url:'ajaxQuery/AJAX_dynamicEditModal.php',
-        data:{projectid: id[0].id,isDPAdmin: "<?php echo $isDynamicProjectsAdmin ?>"},
-        type: 'post',
-        success : function(resp){
-            resp = resp.replace('name="editDynamicProject" value=""','name="editDynamicProject" value="'+id[0].id+'"');
-            resp = resp.replace('</form>','<input name="isTemplate" style="visibility:hidden;height:1px;width:1px;" ></input></form>');
-            $("#editingModalDiv").append(resp);
-            //existingModals.push(index);
-            onPageLoad();
-            dynamicOnLoad();
-        },
-        error : function(resp){},
-        complete: function(resp){
-            if(id[0].id){
-                $('#tempeditingModal-'+id[0].id).modal('show');
-            }
-        }
-        });
-    }
-}
+
 $('.table').on('click', 'button[name=editModal]', function(){
     var index = $(this).val();
   if(existingModals.indexOf(index) == -1){
@@ -1221,11 +1167,6 @@ $('.table').on('click', 'button[name=editModal]', function(){
     $('#editingModal-'+index).modal('show');
   }
 });
-// function resetNewTask(){
-//     $("#editingModal- .modal-title")[0].innerText = "Task editieren";
-//     isTemplate = $("#editingModal- #isTemplate")[0];
-//     $("#editingModal- form")[0].removeChild(isTemplate);
-// }
 function reviewChange(event,id){
     projectid = id;
     needsReview = event.target.checked ? 'TRUE' : 'FALSE';
