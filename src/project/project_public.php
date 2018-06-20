@@ -94,26 +94,6 @@ if(!empty($_POST['delete-file'])){
 } elseif(!empty($_POST['saveThisProject'])){
 	$active_modal = $x = intval($_POST['saveThisProject']);
 
-	//decrypt the projects private key
-	$result = $conn->query("SELECT privateKey, s.publicKey, s.symmetricKey FROM security_access LEFT JOIN security_projects s ON (s.projectID = optionalID AND s.outDated = 'FALSE')
-	WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$x' AND userID = $userID AND security_access.outDated = 'FALSE' LIMIT 1");
-	if($result && ($row = $result->fetch_assoc()) && $row['publicKey'] && $row['privateKey']){
-		$keypair = base64_decode($privateKey).base64_decode($row['publicKey']);
-		$cipher = base64_decode($row['privateKey']);
-		$nonce = mb_substr($cipher, 0, 24, '8bit');
-		$encrypted = mb_substr($cipher, 24, null, '8bit');
-		try {
-			$project_private = sodium_crypto_box_open($encrypted, $nonce, $keypair);
-			$cipher_symmetric = base64_decode($row['symmetricKey']);
-			$nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
-			$project_symmetric = sodium_crypto_box_open(mb_substr($cipher_symmetric, 24, null, '8bit'), $nonce, $project_private.base64_decode($row['publicKey']));
-		} catch(Exception $e){
-			echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
-		}
-	} else {
-		showError($conn->error." - No Access");
-	}
-
 	if(isset($_POST['saveGeneral'])){
 		$hours = floatval(test_input($_POST['project_hours']));
 		$hourlyPrice = floatval(test_input($_POST['project_hourlyPrice']));
@@ -146,28 +126,43 @@ if(!empty($_POST['delete-file'])){
 				if($conn->error){ showError($conn->error); } else { showSuccess($lang['SAVE']); }
 			}
 		}
-	} elseif(isset($_POST['hire']) && $project_private){
-		if(!empty($_POST['userID'])){
-			$stmt = $conn->prepare("INSERT INTO relationship_project_user (projectID, userID, access, expirationDate) VALUES($x, ?, 'READ', '0000-00-00')"); echo $conn->error;
-			$stmt->bind_param('i', $val);
-			for($i = 0; $i < count($_POST['userID']); $i++){
-				$val = intval($_POST['userID'][$i]);
-				insert_access_user($x, $val, $project_private);
-				$stmt->execute();
-				echo $stmt->error;
+	} elseif(isset($_POST['hire'])){
+		$result = $conn->query("SELECT privateKey, s.publicKey FROM security_access LEFT JOIN security_projects s ON (s.projectID = optionalID AND s.outDated = 'FALSE')
+		WHERE module = 'PRIVATE_PROJECT' AND optionalID = '$x' AND userID = $userID AND security_access.outDated = 'FALSE' LIMIT 1");
+		if($result && ($row = $result->fetch_assoc()) && $row['publicKey'] && $row['privateKey']){
+			$keypair = base64_decode($privateKey).base64_decode($row['publicKey']);
+			$cipher = base64_decode($row['privateKey']);
+			$nonce = mb_substr($cipher, 0, 24, '8bit');
+			$encrypted = mb_substr($cipher, 24, null, '8bit');
+			try {
+				$project_private = sodium_crypto_box_open($encrypted, $nonce, $keypair);
+				if(!empty($_POST['userID'])){
+					$stmt = $conn->prepare("INSERT INTO relationship_project_user (projectID, userID, access, expirationDate) VALUES($x, ?, 'READ', '0000-00-00')"); echo $conn->error;
+					$stmt->bind_param('i', $val);
+					for($i = 0; $i < count($_POST['userID']); $i++){
+						$val = intval($_POST['userID'][$i]);
+						insert_access_user($x, $val, $project_private);
+						$stmt->execute();
+						echo $stmt->error;
+					}
+					$stmt->close();
+				}
+				if(!empty($_POST['externID'])){
+					$stmt = $conn->prepare("INSERT INTO relationship_project_extern (projectID, userID, access, expirationDate) VALUES($x, ?, 'READ', '0000-00-00')"); echo $conn->error;
+					$stmt->bind_param('i', $val);
+					for($i = 0; $i < count($_POST['externID']); $i++){
+						$val = intval($_POST['externID'][$i]);
+						insert_access_user($x, $val, $project_private, 1);
+						$stmt->execute();
+						echo $stmt->error;
+					}
+					$stmt->close();
+				}
+			} catch(Exception $e){
+				echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$e.'</div>';
 			}
-			$stmt->close();
-		}
-		if(!empty($_POST['externID'])){
-			$stmt = $conn->prepare("INSERT INTO relationship_project_extern (projectID, userID, access, expirationDate) VALUES($x, ?, 'READ', '0000-00-00')"); echo $conn->error;
-			$stmt->bind_param('i', $val);
-			for($i = 0; $i < count($_POST['externID']); $i++){
-				$val = intval($_POST['externID'][$i]);
-				insert_access_user($x, $val, $project_private, 1);
-				$stmt->execute();
-				echo $stmt->error;
-			}
-			$stmt->close();
+		} else {
+			showError($conn->error." - No Access");
 		}
     } elseif(!empty($_POST['removeUser'])){
 		$val = intval($_POST['removeUser']);
@@ -186,26 +181,19 @@ if(!empty($_POST['delete-file'])){
 		} else {
 			echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_DELETE'].'</div>';
 		}
-	} elseif($project_symmetric && !empty($_POST['add-new-file']) && isset($_FILES['new-file-upload'])){
+	} elseif(!empty($_POST['add-new-file']) && isset($_FILES['new-file-upload'])){
 		$file_info = pathinfo($_FILES['new-file-upload']['name']);
 		$ext = strtolower($file_info['extension']);
 		$filetype = $_FILES['new-file-upload']['type'];
-		$accepted_types = ['application/msword', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'text/plain', 'application/pdf', 'application/zip',
-		'application/x-zip-compressed', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'multipart/x-zip',
-		'application/x-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-outlook'];
-		if (!in_array($ext, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'zip', 'msg'])){
-			showError('Ungültige Dateiendung: '.$ext);
-		} elseif(!in_array($filetype, $accepted_types)) {
-			showError('Ungültiger Dateityp: '.$filetype);
-		} elseif ($_FILES['new-file-upload']['size'] > 15000000) { //15mb max
-			showError('Die maximale Dateigröße wurde überschritten (15 MB)');
+		if (!validate_file($err, $ext, $_FILES['new-file-upload']['size'])){
+			showError($err);
 		} elseif (empty($s3)) {
 			showError("Es konnte keine S3 Verbindung hergestellt werden. Stellen Sie sicher, dass unter den Archiv Optionen eine gültige Verbindung gespeichert wurde.");
 		} else {
 			$parent = test_input($_POST['add-new-file']);
 			try{
 				$hashkey = uniqid('', true); //23 chars
-				$file_encrypt = simple_encryption(file_get_contents($_FILES['new-file-upload']['tmp_name']), $project_symmetric);
+				$file_encrypt = secure_data(['PRIVATE_PROJECT', $x], file_get_contents($_FILES['new-file-upload']['tmp_name']), 'encrypt', $userID, $privateKey);
 				//$_FILES['file']['name']
 				$s3->putObject(array(
 					'Bucket' => $bucket,

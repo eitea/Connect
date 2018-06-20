@@ -146,6 +146,7 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
             $cipher_private_module = base64_decode($row['privateKey']);
 			//echo ($cipher_private_module) .' --private key module<br>';
             $result = $conn->query("SELECT publicKey, symmetricKey FROM security_modules WHERE module = '$module' AND outDated = 'FALSE'");
+			if($module == 'PRIVATE_PROJECT') $result = $conn->query("SELECT publicKey, symmetricKey FROM security_projects WHERE projectID = $optionalID AND outDated = 'FALSE'");
             if($result && ( $row=$result->fetch_assoc() )){
 				$public_module = base64_decode($row['publicKey']);
 				$nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
@@ -779,4 +780,15 @@ function showSuccess($message, $toString = false){
         return "<script>$(document).ready(function(){showSuccess('$message')})</script>";
     }
     echo "<script>$(document).ready(function(){showSuccess('$message')})</script>";
+}
+
+function validate_file(&$err, $extension, $filesize, $mime = ''){
+	$err = '';
+	if(!in_array($extension, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'zip', 'msg','jpg', 'jpeg', 'png', 'gif'])){ $err = "Invalid File extension $extension"; }
+	if($filesize > 15000000){ $err = "File too big"; }
+	if($mime && !in_array($mime, ['application/msword', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'text/plain', 'application/pdf', 'application/zip',
+	'application/x-zip-compressed', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'multipart/x-zip',
+	'application/x-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-outlook'])){ $err = "Invalid filetype $mime"; }
+
+	return empty($err);
 }

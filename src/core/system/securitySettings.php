@@ -356,12 +356,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 			$conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'ERP' AND userID = $x");
 		}
 
-		if(!empty($_POST['canLogin'])){ //5b2931a15ad87
-			$conn->query("UPDATE UserData SET canLogin = 'TRUE' WHERE id = $x");
-		} else {
-			$conn->query("UPDATE UserData SET canLogin = 'FALSE' WHERE id = $x");
-		}
-
         $conn->query("UPDATE roles SET isDSGVOAdmin = '$isDSGVOAdmin', isCoreAdmin = '$isCoreAdmin', isDynamicProjectsAdmin = '$isDynamicProjectsAdmin', isTimeAdmin = '$isTimeAdmin',
         isProjectAdmin = '$isProjectAdmin', isReportAdmin = '$isReportAdmin', isERPAdmin = '$isERPAdmin', isFinanceAdmin = '$isFinanceAdmin', canStamp = '$canStamp', canBook = '$canBook',
         canEditTemplates = '$canEditTemplates', canUseSocialMedia = '$canUseSocialMedia', canCreateTasks = '$canCreateTasks', canUseArchive = '$canUseArchive', canUseClients = '$canUseClients',
@@ -552,14 +546,6 @@ if(!empty($key_downloads)){
                                 </label>
                             </div>
                         </div>
-                        <br><hr>
-						<div class="row checkbox">
-							<div class="col-md-3">
-                                <label>
-                                    <input type="checkbox" name="canLogin" <?php if($row['canLogin'] == 'TRUE'){echo 'checked';} ?> />Login
-                                </label>
-                            </div>
-						</div>
 						<br>
                         <div class="row">
                             <div class="col-sm-2 col-sm-offset-10 text-right">

@@ -71,8 +71,9 @@ if(!function_exists('drawFolder')){
 				<div class="page-header-button-group">
 					<div class="btn-group"><a class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" title="Hochladen..."><i class="fa fa-upload"></i></a>
 						<ul class="dropdown-menu">
-							<li><a data-toggle="modal" data-target="#modal-new-folder-<?php echo $upload_viewer['categoryID']; ?>">Neuer Ordner</a></li>
-							<li><a data-toggle="modal" data-target="#modal-new-file-<?php echo $upload_viewer['categoryID']; ?>">File</a></li>
+							<li><a data-toggle="modal" data-target="#modal-new-folder-<?php echo $upload_viewer['categoryID']; ?>"><i class="fa fa-folder-open-o"></i> Neuer Ordner</a></li>
+							<li class="divider"></li>
+							<li><a data-toggle="modal" data-target="#modal-new-file-<?php echo $upload_viewer['categoryID']; ?>"><i class="fa fa-file-o"></i> Datei Hochladen</a></li>
 						</ul>
 					</div>
 				</div>
