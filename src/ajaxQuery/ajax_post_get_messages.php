@@ -60,13 +60,13 @@ if (isset($_GET["partner"], $_GET["subject"]) && !empty($_SESSION["userid"])) {
     echo $conn->error;
 } elseif (isset($_GET["taskID"]) && !empty($_SESSION["userid"])) {
     $taskView = true;
-    $taskID = intval($_GET["taskID"]);
+    $taskID = test_input($_GET["taskID"]);
 
     if (isset($_GET["taskName"])) {
         $taskName = test_input($_GET["taskName"]);
-        $result = $conn->query("SELECT * FROM (SELECT * FROM taskmessages INNER JOIN UserData ON UserData.id = taskmessages.userID WHERE ( taskID = $taskID and taskName = '$taskName' ) ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC");
+        $result = $conn->query("SELECT * FROM (SELECT * FROM taskmessages INNER JOIN UserData ON UserData.id = taskmessages.userID WHERE ( taskID = '$taskID' and taskName = '$taskName' ) ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC");
     } else {
-        $result = $conn->query("SELECT * FROM (SELECT * FROM taskmessages INNER JOIN UserData ON UserData.id = taskmessages.userID WHERE ( taskID = $taskID) ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC");
+        $result = $conn->query("SELECT * FROM (SELECT * FROM taskmessages INNER JOIN UserData ON UserData.id = taskmessages.userID WHERE ( taskID = '$taskID') ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC");
     }
 } elseif (isset($_REQUEST["group"])) {
     $taskView = true;

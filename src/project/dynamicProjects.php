@@ -567,7 +567,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             if($filterings['tasks'] == 'ACTIVE_PLANNED') echo '<label><input type="checkbox" name="icalID[]" value="'.$x.'" checked /> .ical</label>';
 
             // always show the messages button (5ac63505c0ecd)
-            echo "<button type='button' class='btn btn-default' title='Nachrichten' data-toggle='modal' data-target='#messages-$x'><i class='fa fa-commenting-o'></i></button>";
+            echo "<button type='button' class='btn btn-default' title='Nachrichten' data-toggle='modal' data-chat-id='$x' data-target='#messages-$x'><i class='fa fa-commenting-o'></i></button>";
 
             echo '</td>';
             echo '</tr>';
@@ -630,11 +630,12 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                             if(response != "no messages") {
                                 $("#subject_bar'.$x.'").show();
                                 $("#messages-div-'.$x.'").show();
-
-                                $(target).html(response);
-
+                                if (window.lastMessageResponse != response) $(target).html(response);
+                                
                                 //Scroll down
-                                if (scroll) $(target).scrollTop($(target)[0].scrollHeight)
+                                // if (scroll) $(target).scrollTop($(target)[0].scrollHeight)
+                                // if (window.lastMessageResponse != response && scroll) $(target).scrollTop($(target)[0].scrollHeight)
+                                window.lastMessageResponse = response;
                             }else{
                                 // hide the messages div and subject bar, when no messages available
                                 $("#subject_bar'.$x.'").hide();
@@ -682,7 +683,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 
                     messageLimit'.$x.' = 10;
                     buttonIntervalID'.$x.' = setInterval(function() {
-                        getMessages("'.$x.'", "#messages-div-'.$x.'", false, messageLimit'.$x.');
+                        getMessages("'.$x.'", "#messages-div-'.$x.'", true, messageLimit'.$x.');
                     }, 1000);
                 });
 
@@ -1274,7 +1275,35 @@ $(document).ready(function() {
         window.dispatchEvent(new Event('resize'));
         $('.table').trigger('column-reorder.dt');
     }, 500);
+    checkMessageBadges();
+    setTimeout(function(){
+        checkMessageBadges();
+    }, 10000)
 });
+
+function checkMessageBadges(){
+    $chats = $("[data-chat-id]")
+    chats = $chats.map(function(){
+        return $(this).data("chat-id");
+    }).get() // get all chat ids as array
+    $.ajax({
+        url: 'ajaxQuery/ajax_post_get_alerts.php',
+        dataType: 'json',
+        data: { projects: chats },
+        cache: false,
+        type: 'GET',
+        processData: true,
+        contentType: "application/json",
+        success: function(response){
+            for(chat in response){
+                $("[data-chat-id=" + chat + "]").html('<i class="fa fa-commenting-o"></i>' + response[chat])
+            }
+        },
+        error: function(error){
+            console.error(error)
+        }
+    })
+}
 </script>
 </div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>
