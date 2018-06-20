@@ -19,15 +19,15 @@ Please test the setup after every change.
 function create_tables($conn) {
     $sql = "CREATE TABLE UserData (
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		email VARCHAR(50) UNIQUE NOT NULL,
+		psw VARCHAR(60) NOT NULL,
         firstname VARCHAR(30),
         lastname VARCHAR(30) NOT NULL,
-        psw VARCHAR(60) NOT NULL,
         coreTime TIME DEFAULT '08:00:00',
         terminalPin INT(8) DEFAULT 4321,
         lastPswChange DATETIME DEFAULT CURRENT_TIMESTAMP,
         beginningDate DATETIME DEFAULT CURRENT_TIMESTAMP,
         exitDate DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
-        email VARCHAR(50) UNIQUE NOT NULL,
         gender ENUM('female', 'male'),
         preferredLang ENUM('ENG', 'GER', 'FRA', 'ITA') DEFAULT 'GER',
         kmMoney DECIMAL(4,2) DEFAULT 0.42,
@@ -38,10 +38,11 @@ function create_tables($conn) {
         erpOption VARCHAR(10) DEFAULT 'TRUE',
         strikeCount INT(3) DEFAULT 0,
         birthday DATE,
-        displayBirthday ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
         companyID INT(6) UNSIGNED,
 		supervisor INT(6) DEFAULT NULL,
-        lastLogin DATETIME DEFAULT NULL
+        lastLogin DATETIME DEFAULT NULL,
+		displayBirthday ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE',
+		canLogin ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'TRUE'
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);

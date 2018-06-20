@@ -3012,7 +3012,6 @@ if($row['version'] < 160){
    }
 
 	$conn->query("DROP TABLE taskemailrules");
-
 	$conn->query("DROP TABLE dynamicprojectsnotes");
 	$conn->query("DROP TABLE dynamicprojectspictures");
 
@@ -3025,13 +3024,14 @@ if($row['version'] < 160){
 }
 
 if($row['version'] < 161){
+	//5b20ad39615f9
 	$conn->query("ALTER TABLE workflowRules ADD COLUMN autoResponse TEXT");
 	if($conn->error){
 		echo $conn->error;
 	} else {
 		echo '<br>Workflow: Auto Response';
 	}
-
+	//5b28952ad8a9a
 	$conn->query("ALTER TABLE teamData ADD COLUMN email VARCHAR(100)");
 	if($conn->error){
 		echo $conn->error;
@@ -3039,7 +3039,17 @@ if($row['version'] < 161){
 		echo '<br>Teams: E-Mail Adresse';
 	}
 }
-// if($row['version'] < 162){}
+
+if($row['version'] < 162){
+	//5b2931a15ad87
+	$conn->query("ALTER TABLE UserData ADD COLUMN canLogin ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'TRUE'");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Benutzer: Login-Sperre';
+	}
+}
+
 // if($row['version'] < 163){}
 // if($row['version'] < 164){}
 // if($row['version'] < 165){}

@@ -18,13 +18,10 @@ $invalidLogin = "";
 
 if(!empty($_POST['loginName']) && !empty($_POST['password'])) {
     $result = $conn->query("SELECT * FROM UserData WHERE email = '" . test_input($_POST['loginName']) . "' ");
-    if($result){
-        $row = $result->fetch_assoc();
-    } else {
-        echo $conn->error;
-    }
-    if($result && crypt($_POST['password'], $row['psw']) == $row['psw']) {
-        $redirect = "../user/home";
+    if($result && ($row = $result->fetch_assoc()) && crypt($_POST['password'], $row['psw']) == $row['psw']){
+		if(isset($row['canLogin']) && $row['canLogin'] == 'FALSE'){ // 5b2931a15ad87
+			die('Login gesperrt');
+		}
         $_SESSION['userid'] = $row['id'];
 		$_SESSION['version'] = $VERSION_NUMBER;
         $_SESSION['firstname'] = $row['firstname'];
@@ -44,7 +41,7 @@ if(!empty($_POST['loginName']) && !empty($_POST['password'])) {
                 $conn->query("INSERT INTO security_users(userID, publicKey, privateKey) VALUES('".$row['id']."', '$user_public', '$encrypted')"); //5ae9e3e1e84e5
                 $_SESSION['privateKey'] = $private;
 				$_SESSION['publicKey'] = $user_public;
-            }else{
+            } else {
                 $_SESSION['privateKey'] = "";
             }
         } else {
@@ -56,7 +53,7 @@ if(!empty($_POST['loginName']) && !empty($_POST['password'])) {
         $sql = "SELECT userID FROM roles WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
         $result = $conn->query($sql);
         if($result && $result->num_rows > 0){
-            require dirname(dirname(__DIR__)) ."/language.php";
+            require dirname(dirname(__DIR__)) .'/language.php';
             //check for updates
             $result = mysqli_query($conn, "SELECT version FROM configurationData;");
             if(!$result || (($row = $result->fetch_assoc()) && $row['version'] < $VERSION_NUMBER)){
@@ -64,9 +61,9 @@ if(!empty($_POST['loginName']) && !empty($_POST['password'])) {
                 die ($lang['UPDATE_REQUIRED']. $lang['AUTOREDIRECT']. '<a href="update">update</a>');
             }
         }
-        redirect($redirect);
+        redirect('../user/home');
     } else {
-        $invalidLogin = "Invalid Username/ Password!";
+        $invalidLogin = 'Invalid Username/ Password! '.$conn->error;
     }
 }
 

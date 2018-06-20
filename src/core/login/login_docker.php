@@ -16,6 +16,9 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
 } elseif(!empty($_POST['tester_pass']) && !empty($_POST['tester_mail'])){
     $result = $conn->query("SELECT * FROM UserData WHERE email = '" . test_input($_POST['tester_mail']) . "' ");
     if($row = $result->fetch_assoc()){
+		if(isset($row['canLogin']) && $row['canLogin'] == 'FALSE'){ // 5b2931a15ad87
+			die('Login gesperrt');
+		}
         session_start();
         echo '<p style="color:white">';
         var_dump($row); //the if below will sometimes not work without this, do not ask why
