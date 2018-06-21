@@ -49,10 +49,11 @@ function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$refe
     .'<div data-toggle="tooltip" title="'.round($timeOver,2).' Stunden" class="progress-bar progress-bar-danger" style="height:10px;width:'.$redBar.'%"></div></div>';
 }
 
-
+$available_teams = array();
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', "priority" => 0, 'employees' => ["user;".$userID]); //set_filter requirement
 $result = $conn->query("SELECT teamID FROM relationship_team_user WHERE userID = $userID");
 while($result && ( $row = $result->fetch_assoc())){
+	$available_teams[] = $row['teamID'];
     $filterings['employees'][] = 'team;'.$row['teamID'];
 }
 $templateResult = $conn->query("SELECT projectname,projectid,v2 FROM dynamicprojects WHERE isTemplate = 'TRUE'");
@@ -73,7 +74,7 @@ $templateResult = $conn->query("SELECT projectname,projectid,v2 FROM dynamicproj
 	            </ul>
 	        </div>
 			<?php else : ?>
-				<button class="btn btn-default dropdown-toggle" id="dropdownAddTask" data-toggle="dropdown" type="button"><i class="fa fa-plus"></i></button>
+				<button class="btn btn-default" data-toggle="modal" data-target="#editingModal-" ><i class="fa fa-plus"></i></button>
 			<?php endif; ?>
 			<button type="button" class="btn btn-default" data-toggle="modal" data-target="#taskTemplateEditor-modal">Task Templates</button>
 		<?php endif; ?>
@@ -438,73 +439,35 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             if($arr[0] == 'team') $filter_team .= " OR conteamsids LIKE '%{$arr[1]}%'";
         }
 
-        if($filter_emps || $filter_team) $query_filter .= " AND ($filter_emps OR $filter_team)";
-
-		$nonAdminQuery = '';
+        if($filter_emps || $filter_team) $query_filter .= " AND (d.projectleader = $userID OR d.projectowner = $userID OR $filter_emps OR $filter_team)";
 
         $result = $conn->query("SELECT id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND logs.userID = $userID AND `end` = '0000-00-00 00:00:00' LIMIT 1");
         $hasActiveBooking = $result->num_rows;
 
-		if($isDynamicProjectsAdmin == 'TRUE'){ //see all access-legal tasks
-		   $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,
-			   projectpriority, projectowner, projectleader, projectpercentage, projecttags, v2, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
-			   clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours,
-			   tbl5.userID AS workingUser, tbl5.start AS workStart, tbl5.id AS workingID
-			   FROM dynamicprojects d
-			   LEFT JOIN ( SELECT projectid, GROUP_CONCAT(userid SEPARATOR ' ') AS conemployees FROM dynamicprojectsemployees GROUP BY projectid ) tbl ON tbl.projectid = d.projectid
-			   LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
-			   LEFT JOIN ( SELECT t.projectid, GROUP_CONCAT(teamData.name SEPARATOR ',<br>') AS conteams, GROUP_CONCAT(teamData.id SEPARATOR ' ') AS conteamsids FROM dynamicprojectsteams t
-				   LEFT JOIN teamData ON teamData.id = t.teamid GROUP BY t.projectid ) tbl2 ON tbl2.projectid = d.projectid
-			   LEFT JOIN ( SELECT p.dynamicID, SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) AS currentHours
-				   FROM projectBookingData p GROUP BY dynamicID) tbl3 ON tbl3.dynamicID = d.projectid
-			   LEFT JOIN ( SELECT userID, dynamicID, p.id, p.start FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00') tbl5
-				   ON tbl5.dynamicID = d.projectid
-			   WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter
-			   ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
-	   } else {
-		   $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,
-			   projectpriority, projectowner, projectleader, projectpercentage, projecttags, v2, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
-			   clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours,
-			   tbl5.userID AS workingUser, tbl5.start AS workStart, tbl5.id AS workingID
-			   FROM dynamicprojects d
-			   LEFT JOIN ( SELECT projectid, GROUP_CONCAT(userid SEPARATOR ' ') AS conemployees FROM dynamicprojectsemployees GROUP BY projectid ) tbl ON tbl.projectid = d.projectid
-			   LEFT JOIN ( SELECT t.projectid, GROUP_CONCAT(teamData.name SEPARATOR ',<br>') AS conteams, GROUP_CONCAT(teamData.id SEPARATOR ' ') AS conteamsids FROM dynamicprojectsteams t
-				   LEFT JOIN teamData ON teamData.id = t.teamid GROUP BY t.projectid ) tbl2 ON tbl2.projectid = d.projectid
-			   LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
-			   LEFT JOIN ( SELECT p.dynamicID, SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) AS currentHours
-				   FROM projectBookingData p GROUP BY dynamicID) tbl3 ON tbl3.dynamicID = d.projectid
-			   LEFT JOIN ( SELECT userID, dynamicID, p.id, p.start FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00') tbl5
-				   ON tbl5.dynamicID = d.projectid
-			   LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
-			   LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN relationship_team_user ON relationship_team_user.teamID = dynamicprojectsteams.teamid
-			   WHERE d.isTemplate = 'FALSE' AND (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (relationship_team_user.userID = $userID AND relationship_team_user.skill >= d.level))
-			   $query_filter ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
-	   }
-        // if($isDynamicProjectsAdmin == 'FALSE'){
-		// 	$nonAdminQuery = "LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid AND dynamicprojectsemployees.userid = $userID
-		// 	LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid
-		// 	LEFT JOIN relationship_team_user ON relationship_team_user.teamID = dynamicprojectsteams.teamid AND relationship_team_user.userID = $userID";
-        // }
-		//
-		// $result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,
-		// 	projectpriority, projectowner, projectleader, projectpercentage, projecttags, v2, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
-		// 	clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours,
-		// 	tbl4.activity, tbl5.userID AS workingUser, tbl5.start AS workStart, tbl5.id AS workingID
-		// 	FROM dynamicprojects d
-		// 	LEFT JOIN ( SELECT projectid, GROUP_CONCAT(userid SEPARATOR ' ') AS conemployees FROM dynamicprojectsemployees GROUP BY projectid ) tbl ON tbl.projectid = d.projectid
-		// 	LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
-		// 	LEFT JOIN ( SELECT t.projectid, GROUP_CONCAT(teamData.name SEPARATOR ',<br>') AS conteams, GROUP_CONCAT(teamData.id SEPARATOR ' ') AS conteamsids FROM dynamicprojectsteams t
-		// 		LEFT JOIN teamData ON teamData.id = t.teamid GROUP BY t.projectid ) tbl2 ON tbl2.projectid = d.projectid
-		// 	LEFT JOIN ( SELECT p.dynamicID, SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) AS currentHours
-		// 		FROM projectBookingData p GROUP BY dynamicID) tbl3 ON tbl3.dynamicID = d.projectid
-		// 	LEFT JOIN ( SELECT userID, dynamicID, p.id, p.start FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00') tbl5
-		// 		ON tbl5.dynamicID = d.projectid
-		// 	$nonAdminQuery
-		// 	LEFT JOIN ( SELECT activity, projectid FROM dynamicprojectslogs
-		// 		WHERE ((activity = 'VIEWED' AND userID = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID))
-		// 		AND id IN ( SELECT MAX(id) FROM dynamicprojectslogs GROUP BY projectid)) tbl4 ON tbl4.projectid = d.projectid
-		// 	WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") $query_filter
-		// 	ORDER BY projectpriority DESC, projectstatus, projectstart ASC");
+	    $nonAdminQuery = '';
+        if($isDynamicProjectsAdmin == 'FALSE'){
+			foreach($available_teams as $val) $nonAdminQuery .= " OR conteamsids LIKE '%$val%' ";
+			$nonAdminQuery = "AND (d.projectowner = $userID OR d.projectleader = $userID OR conemployees LIKE '% $userID %' $nonAdminQuery)";
+        }
+
+		$result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,
+			projectpriority, projectowner, projectleader, projectpercentage, projecttags, v2, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
+			clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours,
+			tbl5.userID AS workingUser, tbl5.start AS workStart, tbl5.id AS workingID
+			FROM dynamicprojects d
+			LEFT JOIN ( SELECT projectid, GROUP_CONCAT(userid SEPARATOR ' ') AS conemployees FROM dynamicprojectsemployees GROUP BY projectid ) tbl ON tbl.projectid = d.projectid
+			LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
+			LEFT JOIN ( SELECT t.projectid, GROUP_CONCAT(teamData.name SEPARATOR ',<br>') AS conteams, GROUP_CONCAT(teamData.id SEPARATOR ' ') AS conteamsids FROM dynamicprojectsteams t
+				LEFT JOIN teamData ON teamData.id = t.teamid GROUP BY t.projectid ) tbl2 ON tbl2.projectid = d.projectid
+			LEFT JOIN ( SELECT p.dynamicID, SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) AS currentHours
+				FROM projectBookingData p GROUP BY dynamicID) tbl3 ON tbl3.dynamicID = d.projectid
+			LEFT JOIN ( SELECT userID, dynamicID, p.id, p.start FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00') tbl5
+				ON tbl5.dynamicID = d.projectid
+			LEFT JOIN ( SELECT activity, projectid FROM dynamicprojectslogs
+				WHERE ((activity = 'VIEWED' AND userID = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID))
+				AND id IN ( SELECT MAX(id) FROM dynamicprojectslogs GROUP BY projectid)) tbl4 ON tbl4.projectid = d.projectid
+			WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") $nonAdminQuery $query_filter
+			ORDER BY workingUser DESC, projectpriority DESC, projectstatus, projectstart");
 
 
         echo $conn->error;
@@ -1019,35 +982,35 @@ function dynamicOnLoad(modID){
         // images_upload_url: 'postAcceptor.php',
         // here we add custom filepicker only to Image dialog
         file_picker_types: 'file image media',
-        init_instance_callback: function (editor) {
-            editor.on('paste', function (e) {
-                //console.log(e.clipboardData.types.includes("text/rtf"));
-                if(e.clipboardData.types.includes("text/rtf")){
-                    var clipboardData, pastedData;
-                // Stop data actually being pasted into div
-                e.preventDefault();
-                // Get pasted data via clipboard API
-                clipboardData = e.clipboardData || window.clipboardData;
-                pastedData = clipboardData.getData('text/rtf');
-                var stringToBinaryArray = function(txt) {
-                    var buffer = new ArrayBuffer(txt.length);
-                    var bufferView = new Uint8Array(buffer);
-                    for (var i = 0; i < txt.length; i++) {
-                        bufferView[i] = txt.charCodeAt(i);
-                    }
-                    return buffer;
-                }
-                var settings = {};
-                var doc = new RTFJS.Document(stringToBinaryArray(pastedData), settings);
-                var part = doc.render();
-                //console.log(part);
-                for(i=0;i<part.length;i++){
-                    part[i][0].innerHTML = part[i][0].innerHTML.replace("[Unsupported image format]","");
-                    this.execCommand("mceInsertContent",false,part[i][0].innerHTML);
-                }
-                }
-            });
-        },
+        // init_instance_callback: function (editor) { //5b28df25a2b93
+        //     editor.on('paste', function (e) {
+        //         //console.log(e.clipboardData.types.includes("text/rtf"));
+        //         if(e.clipboardData.types.includes("text/rtf")){
+        //             var clipboardData, pastedData;
+        //         // Stop data actually being pasted into div
+        //         e.preventDefault();
+        //         // Get pasted data via clipboard API
+        //         clipboardData = e.clipboardData || window.clipboardData;
+        //         pastedData = clipboardData.getData('text/rtf');
+        //         var stringToBinaryArray = function(txt) {
+        //             var buffer = new ArrayBuffer(txt.length);
+        //             var bufferView = new Uint8Array(buffer);
+        //             for (var i = 0; i < txt.length; i++) {
+        //                 bufferView[i] = txt.charCodeAt(i);
+        //             }
+        //             return buffer;
+        //         }
+        //         var settings = {};
+        //         var doc = new RTFJS.Document(stringToBinaryArray(pastedData), settings);
+        //         var part = doc.render();
+        //         //console.log(part);
+        //         for(i=0;i<part.length;i++){
+        //             part[i][0].innerHTML = part[i][0].innerHTML.replace("[Unsupported image format]","");
+        //             this.execCommand("mceInsertContent",false,part[i][0].innerHTML);
+        //         }
+        //         }
+        //     });
+        // },
         // and here's our custom image picker
         file_picker_callback: function(cb, value, meta) {
             var input = document.createElement('input');
@@ -1087,7 +1050,7 @@ function appendModal(index){
       onPageLoad();
       dynamicOnLoad(index);
     },
-    error : function(resp){},
+    error : function(resp){alert(resp);},
     complete: function(resp){
         if(index){
             $('#editingModal-'+index).modal('show');
