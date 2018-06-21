@@ -1580,6 +1580,7 @@ function create_tables($conn) {
     $conn->query("CREATE TABLE dsgvo_vv_logs (
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         user_id INT(6) UNSIGNED,
+		vvID VARCHAR(10),
         log_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         short_description VARCHAR(100) NOT NULL,
         scope VARCHAR(100),

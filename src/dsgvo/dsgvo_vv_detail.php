@@ -29,7 +29,7 @@ if($matrix_result){
     showError($conn->error);
 }
 
-$stmt_insert_vv_log = $conn->prepare("INSERT INTO dsgvo_vv_logs (user_id,short_description,long_description,scope) VALUES ($userID,?,?,?)");
+$stmt_insert_vv_log = $conn->prepare("INSERT INTO dsgvo_vv_logs (user_id, vvID, short_description,long_description,scope) VALUES ($userID, '$vvID', ?,?,?)");
 showError($conn->error);
 $last_encryption_error = "";
 $stmt_insert_vv_log->bind_param("sss", $stmt_insert_vv_log_short_description, $stmt_insert_vv_log_long_description, $stmt_insert_vv_log_scope);
@@ -728,6 +728,15 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	<?php endif;?>
 	</div>
 </form>
+
+<?php
+//5af9b976aa8a6
+$result = $conn->query("SELECT user_id, log_time FROM dsgvo_vv_logs WHERE vvID = '$vvID' ORDER BY log_time DESC LIMIT 1");
+if($result && ($row = $result->fetch_assoc())){
+	echo '<small><i>Zuletzt bearbeitet: '.$userID_toName[$row['user_id']].' - '.$row['log_time'].'</i></small>';
+}
+?>
+
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 <script>
 	$('#add-cate').on('show.bs.modal', function (event) {

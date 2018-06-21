@@ -3044,6 +3044,9 @@ if($row['version'] < 162){
 	$conn->query("DROP TABLE uploadedfiles");
 	$conn->query("DROP TABLE sharedfiles");
 	$conn->query("DROP TABLE share");
+
+	//5af9b976aa8a6
+	$conn->query("ALTER TABLE dsgvo_vv_logs ADD COLUMN vvID VARCHAR(10)");
 }
 
 // if($row['version'] < 163){}
@@ -3056,7 +3059,7 @@ if($row['version'] < 162){
 
 //cleanups for maintainable db sizes
 $conn->query("DELETE FROM `checkinLogs` WHERE id <= ( SELECT id FROM ( SELECT id FROM `checkinLogs` ORDER BY id DESC LIMIT 1 OFFSET 100 ) foo )");echo $conn->error;
-$conn->query("DELETE FROM `dsgvo_vv_logs` WHERE id <= ( SELECT id FROM ( SELECT id FROM `dsgvo_vv_logs` ORDER BY id DESC LIMIT 1 OFFSET 300 ) foo )");echo $conn->error;
+$conn->query("DELETE FROM `dsgvo_vv_logs` WHERE id <= ( SELECT id FROM ( SELECT id FROM `dsgvo_vv_logs` ORDER BY id DESC LIMIT 1 OFFSET 400 ) foo )");echo $conn->error;
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';
 $conn->query("UPDATE configurationData SET version=$VERSION_NUMBER");
