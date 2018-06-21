@@ -45,6 +45,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 		$senders = test_input($_POST['rule_senders']);
 		$receiver = test_input($_POST['rule_receiver']);
 		$response = trim(test_input($_POST['rule_autoResponse'])); //5b20ad39615f9
+		$templateID = false;
 		if(!empty($_POST['rule_template'])){
 			$templateID = test_input($_POST['rule_template']);
 		} elseif(!empty($_POST['name']) && !empty($_POST['owner']) && !empty($_POST['employees'])) {
@@ -52,8 +53,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 			$name = asymmetric_encryption('TASK', test_input($_POST["name"]), $userID, $privateKey);
 			$v2Key = ($name == test_input($_POST["name"])) ? '' : $publicKey;
 			$company = $_POST["filterCompany"] ?? $available_companies[1];
-			$client = isset($_POST['filterClient']) ? intval($_POST['filterClient']) : '';
-			$project = isset($_POST['filterProject']) ? intval($_POST['filterProject']) : '';
+			$client = isset($_POST['filterClient']) ? intval($_POST['filterClient']) : 'NULL';
+			$project = isset($_POST['filterProject']) ? intval($_POST['filterProject']) : 'NULL';
 			$color = $_POST["color"] ? test_input($_POST['color']) : '#FFFFFF';
 			$start = $_POST["start"];
 			$end = '0000-00-00'; //temp fix for invalid end value (probs NULL)
@@ -79,7 +80,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 			$conn->query("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
 			projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2) VALUES (
 			'$templateID', '$name', '', $company, $client, $project, '$color', '$start', '$end', '$status', $priority, '$parent', $owner, $leader, $percentage, '$estimate',
-			$skill, '$tags', 'TRUE', '$v2Key' )");
+			$skill, '$tags', 'TRUE', '$v2Key' )"); echo $conn->error;
 			if(!$conn->error){
 				//EMPLOYEES
 				$stmt = $conn->prepare("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES ('$templateID', ?, ?)"); echo $conn->error;
@@ -103,7 +104,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 					}
 				}
 			} else {
-				$templateID = false;
 				showError($conn->error);
 			}
 		}
@@ -117,7 +117,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 					autoResponse = '$response' WHERE id = $val");
 			}
 			if($conn->error){
-				showError($conn->error);
+				showError($conn->error . "$templateID");
 			} else {
 				showSuccess($lang['OK_SAVE']);
 			}
@@ -308,7 +308,6 @@ while ($row = $result->fetch_assoc()) {
 									<?php
 									$result = $conn->query("SELECT projectid, projectname, v2 FROM dynamicprojects
 										WHERE isTemplate = 'TRUE' AND companyid IN (".implode(', ', $available_companies).")");
-										echo $conn->error;
 									while($row = $result->fetch_assoc()){
 										echo '<option value="'.$row['projectid'].'">'.asymmetric_encryption('TASK', $row['projectname'], $userID, $privateKey, $row['v2']).'</option>';
 									}

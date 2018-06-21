@@ -1310,23 +1310,6 @@ function create_tables($conn) {
         ON DELETE CASCADE
     )");
 
-    $sql = "CREATE TABLE sharedgroups (
-        id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        name varchar(50) NOT NULL,
-		companyID INT(6) UNSIGNED,
-        dateOfBirth timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        ttl int(10) NOT NULL,
-        uri varchar(128) NOT NULL,
-        owner int(11) NOT NULL,
-        KEY owner (owner),
-		FOREIGN KEY (companyID) REFERENCES companyData(id)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
-    )";
-    if (!$conn->query($sql)) {
-        echo mysqli_error($conn);
-    }
-
     $sql = "CREATE TABLE document_customs(
         id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         companyID INT(6) UNSIGNED,

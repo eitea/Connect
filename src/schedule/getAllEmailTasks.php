@@ -35,7 +35,7 @@ while($result && $row = $result->fetch_assoc()){
         foreach(imap_search($imap, 'ALL') as $mail_number){
             $header = imap_headerinfo($imap, $mail_number);
 			$match = true;
-			$pos = strpos($header->subject, $rule['subject']);
+			$pos = $rule['subject'] ? strpos($header->subject, $rule['subject']) : false;
 			$sender = $header->from[0]->mailbox.'@'.$header->from[0]->host;
 			if($rule['fromAddress'] && strpos($sender, $rule['fromAddress']) === false ) $match = false;
 			if($rule['toAddress'] && $header->to[0]->mailbox.'@'.$header->to[0]->host != $rule['toAddress']) $match = false;
@@ -93,19 +93,19 @@ while($result && $row = $result->fetch_assoc()){
 				projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2, projectmailheader)
 				SELECT '$projectid', '$name', '$html', companyid, clientid, clientprojectid, projectcolor, IF(projectstart='0000-00-00', UTC_TIMESTAMP , projectstart),
 				projectend, projectstatus, projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, 'FALSE',
-				'$v2', '$encrypted_header' FROM dynamicprojects WHERE projectid = '{$rule['templateID']}'"); echo $conn->error;
-
+				'$v2', '$encrypted_header' FROM dynamicprojects WHERE projectid = '{$rule['templateID']}'");
+				echo $conn->error;
 				if($rule['autoResponse']) send_standard_email($sender, $rule['autoResponse'], "Connect - Ticket Nr. [$projectid]"); //5b20ad39615f9
 				$conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) SELECT '$projectid', userid, position FROM dynamicprojectsemployees WHERE projectid = '{$rule['templateID']}'");
 				echo $conn->error;
 				$conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) SELECT '$projectid', teamid FROM dynamicprojectsteams WHERE projectid = '{$rule['templateID']}'");
 				echo $conn->error;
 				$move_sequence[] = $mail_number;
-				imap_delete($imap, $mail_number);
+				//imap_delete($imap, $mail_number);
 			}
 
         } //end foreach mail
-		if(!imap_mail_move($imap, implode(',', $move_sequence), $archive)) imap_expunge($imap);
+		//if(!imap_mail_move($imap, implode(',', $move_sequence), $archive)) imap_expunge($imap);
     }
 	imap_close($imap);
 }
@@ -114,12 +114,12 @@ echo $conn->error;
 
 function create_part_array($structure, $prefix="") {
 	//print_r($structure);
-	if (sizeof($structure->parts) > 0) {    // There some sub parts
+	if (!empty($structure->parts) && sizeof($structure->parts) > 0) {    // There some sub parts
 		foreach ($structure->parts as $count => $part) {
 			add_part_to_array($part, $prefix.($count+1), $part_array);
 		}
 	} else {    // Email does not have a seperate mime attachment for text
-		$part_array[] = array('part_number' => $prefix.'1', 'part_object' => $obj);
+		$part_array[] = array('part_number' => $prefix.'1', 'part_object' => $structure);
 	}
 	//print_r($part_array);
 	return $part_array;
