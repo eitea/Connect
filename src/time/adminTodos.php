@@ -23,12 +23,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
           //unexpected missing break error
           if($missingBreak < 0 || $missingBreak > $row['hoursOfRest']*60) {echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['ERROR_UNEXPECTED'].": $missingBreak $indexIM </div>"; break;}
           $break_begin = $row_book['end'];
-          $break_end = carryOverAdder_Minutes($break_begin, $missingBreak);
+          $break_end = carryOverAdder_Hours($break_begin, $missingBreak / 60);
           $conn->query("INSERT INTO projectBookingData (start, end, bookingType, infoText, timestampID) VALUES ('$break_begin', '$break_end', 'break', 'Admin Autocorrected Lunchbreak', $indexIM)");
           echo mysqli_error($conn);
         } else {
-          $break_begin = carryOverAdder_Minutes($row['time'], $row['pauseAfterHours'] * 60);
-          $break_end = carryOverAdder_Minutes($break_begin, $row['hoursOfRest'] * 60);
+          $break_begin = carryOverAdder_Hours($row['time'], $row['pauseAfterHours']);
+          $break_end = carryOverAdder_Hours($break_begin, $row['hoursOfRest']);
           $conn->query("INSERT INTO projectBookingData (start, end, bookingType, infoText, timestampID) VALUES ('$break_begin', '$break_end', 'break', 'Admin Autocorrected Lunchbreak', $indexIM)");
           echo mysqli_error($conn);
         }
@@ -43,8 +43,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       //date for query in projectbookingTable
       $date = substr($row['time'],0,10);
       //first, match expectedHours. if user has booking, overwrite this var
-      $adjustedTime = carryOverAdder_Hours($row['time'], floor($row[strtolower(date('D', strtotime($row['time'])))]));
-      $adjustedTime = carryOverAdder_Minutes($adjustedTime, (($row[strtolower(date('D', strtotime($row['time'])))] * 60) % 60));
+      $adjustedTime = carryOverAdder_Hours($row['time'], $row[strtolower(date('D', strtotime($row['time'])))]);
       //adjust to match expectedHours OR last projectbooking, if any of these even exist
       $result = $conn->query("SELECT canBook FROM $roleTable WHERE userID = ".$row['userID']);
       if(($rowCanBook = $result->fetch_assoc()) && $rowCanBook['canBook'] == 'TRUE'){
@@ -79,10 +78,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       for($j = 0; $j < $days; $j++){
         $expected = isHoliday($i) ? 0 : $row[strtolower(date('D', strtotime($i)))];
         if($expected != 0){ //only insert if expectedHours != 0
-          $expectedHours = floor($expected);
-          $expectedMinutes = ($expected * 60) % 60;
-          $i2 = carryOverAdder_Hours($i, $expectedHours);
-          $i2 = carryOverAdder_Minutes($i2, $expectedMinutes);
+          $i2 = carryOverAdder_Hours($i, $expected);
           if($row['requestType'] == 'vac'){
             $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', ".$row['userID'].", '0', '1')";
           } elseif($row['requestType'] == 'scl'){

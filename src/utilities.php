@@ -12,31 +12,19 @@ function getCurrentTimestamp() {
 }
 
 function carryOverAdder_Hours($a, $b) {
-    $b = round($b);
-    if ($a == '0000-00-00 00:00:00') {
-        return $a;
-    }
+    if ($a == '0000-00-00 00:00:00') { return $a; }
     $date = new DateTime($a);
     if ($b < 0) {
         $b *= -1;
-        $date->sub(new DateInterval("PT" . $b . "H"));
+		$hours = round($b);
+        $date->sub(new DateInterval("PT" . $hours . "H"));
+		$minutes = round(($b - $hours) * 60);
+		$date->sub(new DateInterval("PT" . $minutes . "M"));
     } else {
-        $date->add(new DateInterval("PT" . $b . "H"));
-    }
-    return $date->format('Y-m-d H:i:s');
-}
-
-function carryOverAdder_Minutes($a, $b) {
-    $b = round($b);
-    if ($a == '0000-00-00 00:00:00') {
-        return $a;
-    }
-    $date = new DateTime($a);
-    if ($b < 0) {
-        $b *= -1;
-        $date->sub(new DateInterval("PT" . $b . "M"));
-    } else {
-        $date->add(new DateInterval("PT" . $b . "M"));
+		$hours = round($b);
+        $date->add(new DateInterval("PT" . $hours . "H"));
+		$minutes = round(($b - $hours) * 60);
+		$date->add(new DateInterval("PT" . $b . "M"));
     }
     return $date->format('Y-m-d H:i:s');
 }

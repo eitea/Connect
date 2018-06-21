@@ -30,7 +30,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $status = intval($_POST['newActivity']);
         $addBreakVal = floatval($_POST['addBreakValues']);
         if($addBreakVal){ //add a break
-            $breakEnd = carryOverAdder_Minutes($timeStart, intval($addBreakVal*60));
+            $breakEnd = carryOverAdder_Hours($timeStart, $addBreakVal);
             $conn->query("INSERT INTO projectBookingData (start, end, timestampID, infoText, bookingType) VALUES('$timeStart', '$breakEnd', $imm, 'Administrative Break', 'break')");
         }
         if($timeFin == '0000-00-00 00:00:00' || $timeFin == ':00' || $_POST['is_open']){
@@ -62,7 +62,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         //create break for new timestamp
         if($newBreakVal != 0){
             $timeStart = carryOverAdder_Hours($timeStart, 4);
-            $timeFin = carryOverAdder_Minutes($timeStart, intval($newBreakVal*60));
+            $timeFin = carryOverAdder_Hours($timeStart, $newBreakVal);
             $conn->query("INSERT INTO $projectBookingTable (start, end, timestampID, infoText, bookingType) VALUES('$timeStart', '$timeFin', $insertID, 'Newly created Timestamp break', 'break')");
         }
         if($conn->error){ echo $conn->error; } else { echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_ADD'].'</div>'; }
@@ -78,7 +78,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 if ($result && ($row = $result->fetch_assoc())) {
                     $expected = isHoliday($i) ? 0 : $row[strtolower(date('D', strtotime($i)))];
                     if($expected != 0){
-                        $i2 = carryOverAdder_Minutes($i, intval($expected * 60));
+                        $i2 = carryOverAdder_Hours($i, $expected);
                         $sql = "INSERT INTO $logTable (time, timeEnd, userID, timeToUTC, status) VALUES('$i', '$i2', $filterID, '0', '$status')";
                         $conn->query($sql);
                     }
