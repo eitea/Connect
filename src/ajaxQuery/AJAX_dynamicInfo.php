@@ -133,6 +133,7 @@ if (sizeof($missingBookingsArray) == 0) {
     $showMissingBookings = false;
 }
 // missingBookingsArray now contains all available timestamps where booking data is missing
+$archiveResult = $conn->query("SELECT uniqID, name, uploadDate, type FROM archive WHERE category = 'TASK' AND categoryID = '$x'");
 ?>
 
 <div id="infoModal-<?php echo $x; ?>" class="modal fade">
@@ -143,7 +144,9 @@ if (sizeof($missingBookingsArray) == 0) {
                 <li class="active"><a data-toggle="tab" href="#projectDescription<?php echo $x; ?>">Beschreibung</a></li>
                 <li><a data-toggle="tab" href="#projectInfoBookings<?php echo $x; ?>">Buchungen</a></li>
                 <li><a data-toggle="tab" href="#projectInfoLogs<?php echo $x; ?>">Logs</a></li>
-				<li><a data-toggle="tab" href="#projectInfoData<?php echo $x; ?>">Dateien</a></li>
+				<li><a data-toggle="tab" href="#projectInfoData<?php echo $x; ?>">Dateien
+					<?php if($archiveResult && $archiveResult->num_rows > 0) echo '<span class="badge">'.$archiveResult->num_rows.'</span>'; //5b2b907550d12 ?></a>
+				</li>
                 <?php if(false): ?><li><a data-toggle="tab" href="#projectMessages<?php echo $x; ?>" id="projectMessagesTab<?php echo $x; ?>">Messages</a></li><?php endif; ?>
                 <?php if($showMissingBookings): ?><li><a data-toggle="tab" href="#projectForgottenBooking<?php echo $x; ?>">Zeit nachbuchen</a></li><?php endif; ?>
             </ul>
@@ -167,12 +170,12 @@ if (sizeof($missingBookingsArray) == 0) {
 								$conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
 							}
 							$description = asymmetric_encryption('TASK', $dynrow['projectdescription'], $userID, $privateKey, $dynrow['v2']);
-							$result = $conn->query("SELECT uniqID, name, uploadDate, type FROM archive WHERE category = 'TASK' AND categoryID = '$x'");
-							if($result && $result->num_rows > 0){
+
+							if($archiveResult && $archiveResult->num_rows > 0){
 								$bucket = $identifier .'-tasks';
 								$s3 = getS3Object($bucket);
 							}
-							while($result && ($row = $result->fetch_assoc())){
+							while($archiveResult && ($row = $archiveResult->fetch_assoc())){
 								echo '<tr>';
 								echo '<td>'.$row['name'].'.'.$row['type'].'</td>';
 								echo '<td>'.$row['uploadDate'].'</td>';
