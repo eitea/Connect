@@ -29,6 +29,7 @@ if(!empty($_POST['loginName']) && !empty($_POST['password'])) {
         $_SESSION['timeToUTC'] = intval($_POST['funZone']);
         $_SESSION['filterings'] = array();
         $_SESSION['color'] = $row['color'];
+		$_SESSION['start'] = getCurrentTimestamp();
         $conn->query("UPDATE UserData SET lastLogin = UTC_TIMESTAMP WHERE id = ".$row['id']); //5ac7126421a8b
         //check key pairs
 		$key_res = $conn->query("SELECT privateKey, publicKey FROM security_users WHERE outDated = 'FALSE' AND userID = ".$row['id']);

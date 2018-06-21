@@ -1302,24 +1302,6 @@ if ($row['version'] < 123) {
         echo '<br>s3Groups';
     }
 
-    $conn->query("CREATE TABLE uploadedfiles (
-	  id INT NOT NULL AUTO_INCREMENT ,
-	  uploadername VARCHAR NOT NULL ,
-	  filename VARCHAR(20) NOT NULL ,
-	  filetype VARCHAR(10) NOT NULL ,
-	  hashkey VARCHAR(32) NOT NULL ,
-	  filesize BIGINT(20) NOT NULL ,
-	  uploaddate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-	  notes TEXT NULL ,
-	  PRIMARY KEY (id),
-	  UNIQUE hashkey (hashkey)
-	  )");
-    if ($conn->error) {
-        $conn->error;
-    } else {
-        echo '<br>s3Upload';
-    }
-
     $conn->query("ALTER TABLE contactPersons ADD COLUMN dial VARCHAR(20)");
     if ($conn->error) {
         echo $conn->error;
@@ -3048,6 +3030,20 @@ if($row['version'] < 162){
 	} else {
 		echo '<br>Benutzer: Login-Sperre';
 	}
+
+	$conn->query("ALTER TABLE configurationData ADD COLUMN sessionTime DECIMAL(4,2) DEFAULT 4.0 NOT NULL");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Security: Session Timer';
+	}
+
+	$conn->query("DROP TABLE archive_savedfiles");
+	$conn->query("DROP TABLE archive_folders");
+	$conn->query("DROP TABLE archive_editfiles");
+	$conn->query("DROP TABLE uploadedfiles");
+	$conn->query("DROP TABLE sharedfiles");
+	$conn->query("DROP TABLE share");
 }
 
 // if($row['version'] < 163){}

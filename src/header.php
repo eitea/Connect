@@ -71,9 +71,19 @@ if($result && ($userdata = $result->fetch_assoc())) {
 } else {
     echo $conn->error;
 }
-$result = $conn->query("SELECT firstTimeWizard FROM configurationData");
-if ($result && ($row = $result->fetch_assoc()) && $row['firstTimeWizard'] == 'FALSE') {
-    redirect('../setup/wizard');
+$result = $conn->query("SELECT firstTimeWizard, bookingTimeBuffer, cooldownTimer, sessionTime FROM configurationData");
+if ($result && ($row = $result->fetch_assoc())) {
+    if($row['firstTimeWizard'] == 'FALSE') redirect('../setup/wizard');
+	if(isset($_SESSION['start']) && timeDiff_Hours($_SESSION['start'], getCurrentTimestamp()) > $row['sessionTime']) redirect('../user/logout');
+	$sessionTimer = $row['sessionTime'];
+	$cd = $row['cooldownTimer'];
+	$bookingTimeBuffer = $row['bookingTimeBuffer'];
+} else {
+	echo $conn->error;
+	showWarning("Konfigurierungsdaten konnten nicht ausgelesen werden");
+	$sessionTimer = 4;
+	$bookingTimeBuffer = 5;
+	$cd = 2;
 }
 $result = $conn->query("SELECT id, CONCAT(firstname,' ', lastname) AS name FROM UserData")->fetch_all(MYSQLI_ASSOC);
 $userID_toName = array_combine( array_column($result, 'id'), array_column($result, 'name'));
@@ -792,14 +802,8 @@ if ($_SESSION['color'] == 'light') {
 <!-- /feedback modal -->
 <?php
 if(!isset($ckIn_disabled)) $ckIn_disabled = '';
-$showProjectBookingLink = $cd = $diff = 0;
-$result = mysqli_query($conn, "SELECT * FROM $configTable");
-if ($result && ($row = $result->fetch_assoc())) {
-    $cd = $row['cooldownTimer'];
-    $bookingTimeBuffer = $row['bookingTimeBuffer'];
-} else {
-    $bookingTimeBuffer = 5;
-}
+$showProjectBookingLink = $diff = 0;
+
 //display checkin or checkout + disabled
 $result = mysqli_query($conn,  "SELECT `time`, indexIM FROM logs WHERE timeEnd = '0000-00-00 00:00:00' AND userID = $userID");
 if($result && ($row = $result->fetch_assoc())) { //checkout
@@ -923,9 +927,12 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                       <li><a <?php if ($this_page == 'userProjecting.php') {echo $setActiveLink;}?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
                   <?php endif;?>
                   <?php
-                  $result = $conn->query("SELECT d.projectid FROM dynamicprojects d LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
-                      LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN relationship_team_user ON relationship_team_user.teamID = dynamicprojectsteams.teamid
-                      WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") AND d.projectstatus = 'ACTIVE' AND (dynamicprojectsemployees.userid = $userID OR relationship_team_user.userID = $userID)");
+                  $result = $conn->query("SELECT DISTINCT d.projectid FROM dynamicprojects d
+					  LEFT JOIN dynamicprojectsemployees de ON de.projectid = d.projectid AND de.userid = $userID
+                      LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid
+					  LEFT JOIN relationship_team_user rtu ON rtu.teamID = dynamicprojectsteams.teamid AND rtu.userID = $userID
+                      WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).")
+					  AND d.projectstatus = 'ACTIVE' AND (d.projectleader = $userID OR de.userid IS NOT NULL OR rtu.userID IS NOT NULL)");
                       echo $conn->error;
                       if (($result && $result->num_rows > 0) || $userHasSurveys || $isDynamicProjectsAdmin || $canCreateTasks): ?>
                       <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view">

@@ -206,7 +206,8 @@ function create_tables($conn) {
         enableReadyCheck ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
         enableReg ENUM('TRUE', 'FALSE') DEFAULT 'TRUE',
         activeEncryption ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        firstTimeWizard ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL
+        firstTimeWizard ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+		sessionTime DECIMAL(4,2) DEFAULT 4.0 NOT NULL
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -1309,50 +1310,18 @@ function create_tables($conn) {
         ON DELETE CASCADE
     )");
 
-    $sql = "CREATE TABLE sharedfiles (
-        id int(11) NOT NULL AUTO_INCREMENT,
-        name varchar(60) NOT NULL COMMENT 'ursprünglicher Name der Datei',
-        type varchar(10) NOT NULL COMMENT 'Dateiendung',
-        owner int(11) NOT NULL COMMENT 'User der die Datei hochgeladen hat',
-        sharegroup INT(11) NOT NULL COMMENT 'in welcher Gruppe sie hinterlegt ist (groupID)',
-        hashkey VARCHAR(32) NOT NULL COMMENT 'der eindeutige, sichere Key für den Link',
-        filesize BIGINT(20) NOT NULL,
-        uploaddate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (id),
-        UNIQUE KEY hashkey (hashkey),
-        KEY owner (owner)
-    )";
-    if (!$conn->query($sql)) {
-        echo mysqli_error($conn);
-    }
-
     $sql = "CREATE TABLE sharedgroups (
-        id int(11) NOT NULL AUTO_INCREMENT COMMENT 'PK',
-        name varchar(50) NOT NULL COMMENT 'Name der SharedGruppe',
-        dateOfBirth timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Tag der Erstellung',
-        ttl int(10) NOT NULL COMMENT 'Tage bis der Link ungültig ist',
-        uri varchar(128) NOT NULL COMMENT 'URL zu den Objekten',
-        owner int(11) NOT NULL COMMENT 'Besitzer der Gruppe',
-        files varchar(200) DEFAULT NULL,
-        company int(11) NOT NULL COMMENT 'Mandant',
-        PRIMARY KEY (id),
-        KEY owner (owner)
-    )";
-    if (!$conn->query($sql)) {
-        echo mysqli_error($conn);
-    }
-
-    $sql = "CREATE TABLE uploadedfiles (
-        id INT(10) NOT NULL AUTO_INCREMENT ,
-        uploadername VARCHAR(50) NOT NULL ,
-        filename VARCHAR(20) NOT NULL ,
-        filetype VARCHAR(10) NOT NULL ,
-        hashkey VARCHAR(32) NOT NULL ,
-        filesize BIGINT(20) NOT NULL ,
-        uploaddate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-        notes TEXT NULL ,
-        PRIMARY KEY (id),
-        UNIQUE hashkey (hashkey)
+        id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        name varchar(50) NOT NULL,
+		companyID INT(6) UNSIGNED,
+        dateOfBirth timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        ttl int(10) NOT NULL,
+        uri varchar(128) NOT NULL,
+        owner int(11) NOT NULL,
+        KEY owner (owner),
+		FOREIGN KEY (companyID) REFERENCES companyData(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -1526,44 +1495,6 @@ function create_tables($conn) {
         FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
     )";
 	if(!$conn->query($sql)){
-        echo $conn->error;
-    }
-
-    $sql = "CREATE TABLE archive_folders (
-        folderid INT(6) NOT NULL,
-        userid INT(6) NOT NULL,
-        name VARCHAR(30) NOT NULL,
-        parent_folder INT(6) NOT NULL,
-        PRIMARY KEY (userid, folderid),
-        INDEX (parent_folder))";
-    if(!$conn->query($sql)){
-        echo $conn->error;
-    }else{
-		$conn->query("INSERT INTO archive_folders (folderid,userid,name,parent_folder) SELECT 0, id, 'ROOT', -1 FROM UserData");
-    }
-    $sql = "CREATE TABLE archive_editfiles (
-        hashid VARCHAR(32) NOT NULL,
-        body TEXT NOT NULL,
-        version INT(6) NOT NULL DEFAULT 1,
-        PRIMARY KEY (hashid,version))";
-    if(!$conn->query($sql)){
-        echo $conn->error;
-    }
-
-    $sql = "CREATE TABLE archive_savedfiles (
-        id INT(12) NOT NULL AUTO_INCREMENT,
-        name VARCHAR(100) NOT NULL,
-        type VARCHAR(10) NOT NULL,
-        folderid INT(6) NOT NULL,
-        userid INT(6) NOT NULL,
-        hashkey VARCHAR(32) NOT NULL,
-        filesize BIGINT(20) NOT NULL,
-        uploaddate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        isS3 ENUM('TRUE','FALSE') DEFAULT 'TRUE' NOT NULL,
-        PRIMARY KEY (id),
-        UNIQUE (hashkey))";
-
-    if(!$conn->query($sql)){
         echo $conn->error;
     }
 

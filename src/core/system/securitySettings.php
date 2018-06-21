@@ -127,7 +127,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $stmt->close();
         }
     }
-
+	if(!empty($_POST['session_timer'])){
+		$sessionTimer = round($_POST['session_timer'], 2);
+		$conn->query("UPDATE configurationData SET sessionTime = $sessionTimer");
+	}
     if(isset($_POST['saveSecurity'])){
         if(isset($_POST['activate_encryption']) && $config_row['activeEncryption'] == 'FALSE'){
             $key_downloads = array();
@@ -393,7 +396,7 @@ if(!empty($key_downloads)){
         <button type="submit" class="btn btn-default" title="<?php echo $lang['SAVE']; ?>" name="saveSecurity"><i class="fa fa-floppy-o"></i></button>
     </div></h3></div>
 
-    <h4>Verschlüsselung <a role="button" data-toggle="collapse" href="#password_info_encryption"> <i class="fa fa-info-circle"> </i> </a></h4><br>
+    <h4>Verschlüsselung <a role="button" data-toggle="collapse" href="#password_info_encryption"> <i class="fa fa-info-circle"></i></a></h4><br>
     <div class="collapse" id="password_info_encryption"><div class="well"><?php echo $lang['INFO_ENCRYPTION']; ?></div></div>
 
     <div class="row">
@@ -409,6 +412,15 @@ if(!empty($key_downloads)){
         }
         ?>
     </div>
+	<hr>
+	<h4>Session Time <a href="#session_time_info" data-toggle="collapse"> <i class="fa fa-info-circle"></i></a></h4><br>
+	<div class="collapse" id="session_time_info">
+		<div class="well">Der Session timer definiert die maximale Zeit, die ein Benutzer ohne Unterbrechung eingeloggt bleiben darf. Wird in Stunden angegeben.</div>
+	</div>
+	<div class="row">
+        <div class="col-sm-4"><input type="number" step="0.5" name="session_timer" value="<?php echo $sessionTimer; ?>" class="form-control" /></div>
+    </div>
+
 </form>
 
 <br><hr>
