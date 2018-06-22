@@ -24,7 +24,7 @@ function carryOverAdder_Hours($a, $b) {
 		$hours = round($b);
         $date->add(new DateInterval("PT" . $hours . "H"));
 		$minutes = round(($b - $hours) * 60);
-		$date->add(new DateInterval("PT" . $b . "M"));
+		$date->add(new DateInterval("PT" . $minutes . "M"));
     }
     return $date->format('Y-m-d H:i:s');
 }
