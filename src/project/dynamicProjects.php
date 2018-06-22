@@ -618,7 +618,6 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                     if(taskID.length == 0) {
                         return;
                     }
-
                     $.ajax({
                         url: "ajaxQuery/ajax_post_get_messages.php",
                         data: {
@@ -652,7 +651,6 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                     if(taskID.length == 0 || message.length == 0){
                         return;
                     }
-
                     $.ajax({
                         url: "ajaxQuery/ajax_post_send_message.php",
                         data: {
@@ -662,7 +660,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                         },
                         type: "GET",
                         success: function (response) {
-                            getMessages("'.$x.'", target, true, messageLimit'.$x.');
+                            getMessages("'.$x.'", target, true, limit);
                         },
                     })
                 }
@@ -678,10 +676,10 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             // styling
             $modals .= '<script>
                 // immediately get the messages, so theres no delay
+                messageLimit'.$x.' = 10;
                 $(document).on("show.bs.modal", "#messages-'.$x.'", function (e) {
                     getMessages("'.$x.'", "#messages-div-'.$x.'", true, 10);
 
-                    messageLimit'.$x.' = 10;
                     buttonIntervalID'.$x.' = setInterval(function() {
                         getMessages("'.$x.'", "#messages-div-'.$x.'", true, messageLimit'.$x.');
                     }, 1000);
@@ -690,6 +688,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 // always scroll down (when the modal gets reopened)
                 $(document).on("shown.bs.modal", "#messages-'.$x.'", function (e) {
                     $("#messages-div-'.$x.'").scrollTop($("#messages-div-'.$x.'")[0].scrollHeight)
+                    checkMessageBadges();
                 });
 
                 // clear the interval
@@ -1276,9 +1275,9 @@ $(document).ready(function() {
         $('.table').trigger('column-reorder.dt');
     }, 500);
     checkMessageBadges();
-    setTimeout(function(){
+    setInterval(function(){
         checkMessageBadges();
-    }, 10000)
+    }, 20000)
 });
 
 function checkMessageBadges(){
@@ -1295,8 +1294,16 @@ function checkMessageBadges(){
         processData: true,
         contentType: "application/json",
         success: function(response){
-            for(chat in response){
-                $("[data-chat-id=" + chat + "]").html('<i class="fa fa-commenting-o"></i>' + response[chat])
+            try{
+                for(chat in response){
+                    if(response[chat]){
+                        $("[data-chat-id=" + chat + "]").html('<i class="fa fa-commenting-o"></i><span class="badge">' + response[chat]+'</span>')
+                    }else{
+                        $("[data-chat-id=" + chat + "]").html('<i class="fa fa-commenting-o"></i>')
+                    }
+                }
+            }catch(error){
+                console.error(error)
             }
         },
         error: function(error){

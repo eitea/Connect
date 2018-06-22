@@ -11,7 +11,6 @@ $userID = $_SESSION["userid"];
 $messageID = intval($_REQUEST["messageID"]);
 $result = $conn->query("SELECT groupmessages.sender, groupmessages.sent, groupmessages_user.userID receiver, groupmessages_user.seen, firstname, lastname FROM groupmessages INNER JOIN groupmessages_user ON groupmessages.id = groupmessages_user.messageID INNER JOIN UserData ON UserData.id = groupmessages_user.userID WHERE groupmessages.id = $messageID");
 showError($conn->error);
-showInfo($result->num_rows . "rows");
 ?>
 <form method="POST">
     <div class="modal fade">

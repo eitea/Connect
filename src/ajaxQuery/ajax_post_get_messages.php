@@ -62,12 +62,14 @@ if (isset($_GET["partner"], $_GET["subject"]) && !empty($_SESSION["userid"])) {
     $taskView = true;
     $taskID = test_input($_GET["taskID"]);
 
-    if (isset($_GET["taskName"])) {
-        $taskName = test_input($_GET["taskName"]);
-        $result = $conn->query("SELECT * FROM (SELECT * FROM taskmessages INNER JOIN UserData ON UserData.id = taskmessages.userID WHERE ( taskID = '$taskID' and taskName = '$taskName' ) ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC");
-    } else {
-        $result = $conn->query("SELECT * FROM (SELECT * FROM taskmessages INNER JOIN UserData ON UserData.id = taskmessages.userID WHERE ( taskID = '$taskID') ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC");
-    }
+    // if (isset($_GET["taskName"])) {
+    //     $taskName = test_input($_GET["taskName"]);
+    //     $result = $conn->query("SELECT * FROM (SELECT * FROM taskmessages INNER JOIN UserData ON UserData.id = taskmessages.userID WHERE ( taskID = '$taskID' and taskName = '$taskName' ) ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC");
+    // } else {
+    $result = $conn->query("SELECT * FROM (SELECT taskmessages.*, firstname, lastname FROM taskmessages INNER JOIN UserData ON UserData.id = taskmessages.userID WHERE ( taskID = '$taskID') ORDER BY sent DESC LIMIT $limit) AS temptable ORDER BY sent ASC");
+    $conn->query("INSERT INTO taskmessages_user (userID, messageID, seen) SELECT $userID, id, CURRENT_TIMESTAMP FROM taskmessages WHERE taskID = '$taskID' ON DUPLICATE KEY UPDATE seen = CURRENT_TIMESTAMP");    
+    showError($conn->error);
+    // }
 } elseif (isset($_REQUEST["group"])) {
     $taskView = true;
     $groupID = intval($_REQUEST["group"]);
