@@ -101,11 +101,11 @@ while($result && $row = $result->fetch_assoc()){
 				$conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) SELECT '$projectid', teamid FROM dynamicprojectsteams WHERE projectid = '{$rule['templateID']}'");
 				echo $conn->error;
 				$move_sequence[] = $mail_number;
-				//imap_delete($imap, $mail_number);
+				imap_delete($imap, $mail_number);
 			}
 
         } //end foreach mail
-		//if(!imap_mail_move($imap, implode(',', $move_sequence), $archive)) imap_expunge($imap);
+		if(!imap_mail_move($imap, implode(',', $move_sequence), $archive)) imap_expunge($imap);
     }
 	imap_close($imap);
 }
