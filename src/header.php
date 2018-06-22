@@ -882,19 +882,23 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 
                   <li>
                     <a <?php if ($this_page == 'post.php') {echo $setActiveLink;}?> href="../social/post">
-                        <span id="globalMessagingBadge" class="badge pull-right" style="display: none"></span>
+                        <span title="Unread messages" id="globalMessagingBadge" class="badge pull-right" style="display: none"></span>
                         <i class="fa fa-commenting-o"></i><?php echo $lang['MESSAGING']; ?>
                     </a>
 
                     <script>
                     $( document ).ready(function() {
-                        setInterval(function(){udpateBadge("#globalMessagingBadge")}, 10000); //10 seconds
+                        setInterval(function(){udpateHeaderBadge("#globalMessagingBadge", {})}, 10000); //10 seconds
+                        setInterval(function(){udpateHeaderBadge("#projectMessagingBadge", {allProjects: true})}, 10000); //10 seconds
+                        udpateHeaderBadge("#globalMessagingBadge", {}); // initial page render
+                        udpateHeaderBadge("#projectMessagingBadge", {allProjects: true}); // initial page render
                     });
 
-                    function udpateBadge(target) {
+                    function udpateHeaderBadge(target, data) {
                         $.ajax({
                             url: 'ajaxQuery/ajax_post_get_alerts.php',
                             type: 'GET',
+                            data: data,
                             success: function (response) {
                                 if(response != "0"){
                                     $(target).html(response)
@@ -905,7 +909,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             },
                         });
                     }
-                    udpateBadge("#globalMessagingBadge"); // initial page render
+                    
                     </script>
                   </li>
 				  <?php
@@ -931,6 +935,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                       <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view">
 						  <?php if($result->num_rows > 0) echo '<span class="pull-right"><small>'.$result->num_rows.'</small></span>'; ?>
                           <i class="fa fa-tasks"></i><?php echo $lang['DYNAMIC_PROJECTS']; ?>
+                          <span title="Unread messages" id="projectMessagingBadge" class="badge pull-right" style="display: none; margin-right: 15px;"></span> <!-- separate badge for unread messages -->
                       </a></li>
                   <?php endif; ?>
               <?php endif; //endif(canStamp) ?>

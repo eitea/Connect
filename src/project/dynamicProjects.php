@@ -576,7 +576,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             if($filterings['tasks'] == 'ACTIVE_PLANNED') echo '<label><input type="checkbox" name="icalID[]" value="'.$x.'" checked /> .ical</label>';
 
             // always show the messages button (5ac63505c0ecd)
-            echo "<button type='button' class='btn btn-default' title='Nachrichten' data-toggle='modal' data-target='#messages-$x'><i class='fa fa-commenting-o'></i></button>";
+            echo "<button type='button' class='btn btn-default' title='Nachrichten' data-toggle='modal' data-chat-id='$x' data-target='#messages-$x'><i class='fa fa-commenting-o'></i></button>";
 
             echo '</td>';
             echo '</tr>';
@@ -627,7 +627,6 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                     if(taskID.length == 0) {
                         return;
                     }
-
                     $.ajax({
                         url: "ajaxQuery/ajax_post_get_messages.php",
                         data: {
@@ -639,11 +638,13 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                             if(response != "no messages") {
                                 $("#subject_bar'.$x.'").show();
                                 $("#messages-div-'.$x.'").show();
-
-                                $(target).html(response);
-
+                                if (window.lastMessageResponse != response)
+                                    $(target).html(response);
+                                
                                 //Scroll down
-                                if (scroll) $(target).scrollTop($(target)[0].scrollHeight)
+                                // if (scroll) $(target).scrollTop($(target)[0].scrollHeight)
+                                if (window.lastMessageResponse != response && scroll) $(target).scrollTop($(target)[0].scrollHeight)
+                                window.lastMessageResponse = response;
                             }else{
                                 // hide the messages div and subject bar, when no messages available
                                 $("#subject_bar'.$x.'").hide();
@@ -660,7 +661,6 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                     if(taskID.length == 0 || message.length == 0){
                         return;
                     }
-
                     $.ajax({
                         url: "ajaxQuery/ajax_post_send_message.php",
                         data: {
@@ -670,7 +670,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                         },
                         type: "GET",
                         success: function (response) {
-                            getMessages("'.$x.'", target, true, messageLimit'.$x.');
+                            getMessages(taskID, target, true, limit);
                         },
                     })
                 }
@@ -686,18 +686,19 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             // styling
             $modals .= '<script>
                 // immediately get the messages, so theres no delay
+                messageLimit'.$x.' = 10;
                 $(document).on("show.bs.modal", "#messages-'.$x.'", function (e) {
                     getMessages("'.$x.'", "#messages-div-'.$x.'", true, 10);
 
-                    messageLimit'.$x.' = 10;
                     buttonIntervalID'.$x.' = setInterval(function() {
-                        getMessages("'.$x.'", "#messages-div-'.$x.'", false, messageLimit'.$x.');
+                        getMessages("'.$x.'", "#messages-div-'.$x.'", true, messageLimit'.$x.');
                     }, 1000);
                 });
 
                 // always scroll down (when the modal gets reopened)
                 $(document).on("shown.bs.modal", "#messages-'.$x.'", function (e) {
                     $("#messages-div-'.$x.'").scrollTop($("#messages-div-'.$x.'")[0].scrollHeight)
+                    checkMessageBadges();
                 });
 
                 // clear the interval
@@ -1215,7 +1216,43 @@ $(document).ready(function() {
         window.dispatchEvent(new Event('resize'));
         $('.table').trigger('column-reorder.dt');
     }, 500);
+    checkMessageBadges();
+    setInterval(function(){
+        checkMessageBadges();
+    }, 20000)
 });
+
+function checkMessageBadges(){
+    $chats = $("[data-chat-id]")
+    chats = $chats.map(function(){
+        return $(this).data("chat-id");
+    }).get() // get all chat ids as array
+    $.ajax({
+        url: 'ajaxQuery/ajax_post_get_alerts.php',
+        dataType: 'json',
+        data: { projects: chats },
+        cache: false,
+        type: 'GET',
+        processData: true,
+        contentType: "application/json",
+        success: function(response){
+            try{
+                for(chat in response){
+                    if(response[chat]){
+                        $("[data-chat-id=" + chat + "]").html('<i class="fa fa-commenting-o"></i><span class="badge">' + response[chat]+'</span>')
+                    }else{
+                        $("[data-chat-id=" + chat + "]").html('<i class="fa fa-commenting-o"></i>')
+                    }
+                }
+            }catch(error){
+                console.error(error)
+            }
+        },
+        error: function(error){
+            console.error(error)
+        }
+    })
+}
 </script>
 </div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>
