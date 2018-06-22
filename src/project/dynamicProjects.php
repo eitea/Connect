@@ -638,11 +638,12 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                             if(response != "no messages") {
                                 $("#subject_bar'.$x.'").show();
                                 $("#messages-div-'.$x.'").show();
-                                if (window.lastMessageResponse != response) $(target).html(response);
+                                if (window.lastMessageResponse != response)
+                                    $(target).html(response);
                                 
                                 //Scroll down
                                 // if (scroll) $(target).scrollTop($(target)[0].scrollHeight)
-                                // if (window.lastMessageResponse != response && scroll) $(target).scrollTop($(target)[0].scrollHeight)
+                                if (window.lastMessageResponse != response && scroll) $(target).scrollTop($(target)[0].scrollHeight)
                                 window.lastMessageResponse = response;
                             }else{
                                 // hide the messages div and subject bar, when no messages available
@@ -669,7 +670,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                         },
                         type: "GET",
                         success: function (response) {
-                            getMessages("'.$x.'", target, true, limit);
+                            getMessages(taskID, target, true, limit);
                         },
                     })
                 }
