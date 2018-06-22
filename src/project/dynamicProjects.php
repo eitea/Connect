@@ -575,162 +575,162 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             //########################################
             //      messages modal (5ac63505c0ecd)
             //########################################
-            $modals .= '<div id="messages-'.$x.'" class="modal fade" style="z-index:1500;">
-                <div class="modal-dialog modal-content modal-md"><form method="POST" autocomplete="off">
-
-                <div class="modal-header h4">'.$lang["MESSAGES"].'</div>
-
-                <div class="modal-body">';
-
-            // AJAX scripts must be here or a reference error will be shown
-            $modals .= '
-                <script>
-                // AJAX Scripts
-                function getMessages(taskID, target, scroll = false, limit = 50) {
-                    if(taskID.length == 0) {
-                        return;
-                    }
-                    $.ajax({
-                        url: "ajaxQuery/ajax_post_get_messages.php",
-                        data: {
-                            taskID: taskID,
-                            limit: limit,
-                        },
-                        type: "GET",
-                        success: function (response) {
-                            if(response != "no messages") {
-                                $("#subject_bar'.$x.'").show();
-                                $("#messages-div-'.$x.'").show();
-                                if (window.lastMessageResponse != response)
-                                    $(target).html(response);
-                                
-                                //Scroll down
-                                // if (scroll) $(target).scrollTop($(target)[0].scrollHeight)
-                                if (window.lastMessageResponse != response && scroll) $(target).scrollTop($(target)[0].scrollHeight)
-                                window.lastMessageResponse = response;
-                            }else{
-                                // hide the messages div and subject bar, when no messages available
-                                $("#subject_bar'.$x.'").hide();
-                                $("#messages-div-'.$x.'").hide();
-                            }
-                        },
-                        error: function (response) {
-                            $(target).html(response);
-                        },
-                    });
-                }
-
-                function sendMessage(taskID, taskName, message, target, limit = 50) {
-                    if(taskID.length == 0 || message.length == 0){
-                        return;
-                    }
-                    $.ajax({
-                        url: "ajaxQuery/ajax_post_send_message.php",
-                        data: {
-                            taskID: taskID,
-                            taskName: taskName,
-                            message: message,
-                        },
-                        type: "GET",
-                        success: function (response) {
-                            getMessages(taskID, target, true, limit);
-                        },
-                    })
-                }
-                </script>
-                ';
-
-            // subject bar, message div and textinput field
-            $modals .= '
-                <div id="subject_bar'.$x.'" style="background-color: whitesmoke; border: 1px gainsboro solid; border-bottom: none; max-height: 10vh; padding: 10px;">'.$projectName.' - ' .$x.'</div>
-                <div id="messages-div-'.$x.'" class="pre-scrollable" style="background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh; padding-top: 5px"></div>
-                <input id="message-'.$x.'" type="text" required class="form-control" name="message" placeholder="'.$lang["TYPE_A_MESSAGE"].'"/><br>';
-
-            // styling
-            $modals .= '<script>
-                // immediately get the messages, so theres no delay
-                messageLimit'.$x.' = 10;
-                $(document).on("show.bs.modal", "#messages-'.$x.'", function (e) {
-                    getMessages("'.$x.'", "#messages-div-'.$x.'", true, 10);
-
-                    buttonIntervalID'.$x.' = setInterval(function() {
-                        getMessages("'.$x.'", "#messages-div-'.$x.'", true, messageLimit'.$x.');
-                    }, 1000);
-                });
-
-                // always scroll down (when the modal gets reopened)
-                $(document).on("shown.bs.modal", "#messages-'.$x.'", function (e) {
-                    $("#messages-div-'.$x.'").scrollTop($("#messages-div-'.$x.'")[0].scrollHeight)
-                    checkMessageBadges();
-                });
-
-                // clear the interval
-                $(document).on("hidden.bs.modal", "#messages-'.$x.'", function (e) {
-                    clearInterval(buttonIntervalID'.$x.');
-                    window.onbeforeunload = null;
-                });
-
-                //scroll
-                $("#messages-div-'.$x.'").scroll(function(){
-                    if($(this).scrollTop() == 0){
-                        $(this).scrollTop(1);
-                        messageLimit'.$x.' += 1
-                        getMessages("'.$x.'", "#messages-div-'.$x.'", false, messageLimit'.$x.');
-                    }
-                });
-
-                //submit
-                $( "#messages-'.$x.'" ).submit(function( event ) {
-                    event.preventDefault();
-                    messageLimit'.$x.'++;
-                    sendMessage("'.$x.'", "'.$projectName.'", $("#message-'.$x.'").val(), "#messages-div-'.$x.'", messageLimit'.$x.');
-                    $("#message-'.$x.'").val("");
-                  });
-
-                 $(document).ready(function(){ $("#messagePictureUpload-'.$x.'").change(function(e){
-                    e.stopPropagation()
-                    e.preventDefault()
-                    file = e.target.files[0]
-                    var data = new FormData()
-                    if(!file.type.match("image.*")){
-                        alert("Not an image")
-                    }else if (file.size > 1048576){
-                        alert("File too large")
-                    }else{
-                        var limit = messageLimit'.$x.';
-                        var target = "#messages-div-'.$x.'";
-                        var taskID = "'.$x.'";
-                        var taskName = "'.$projectName.'";
-                        data.append("picture", file)
-                        data.append("taskID", taskID)
-                        data.append("taskName", taskName)
-                        const finishedFunction = function (response){
-                            console.log(response);
-                            showInfo(response.responseText || response.statusText || response, 1000);
-                            getMessages(taskID, target, true, limit)
-                        }
-                        $.ajax({
-                            url: "ajaxQuery/ajax_post_send_message.php",
-                            dataType: "json",
-                            data: data,
-                            cache: false,
-                            type: "POST",
-                            processData: false,
-                            contentType: false,
-                            success: finishedFunction,
-                            error: finishedFunction
-                        })
-                    }
-                }) })
-                </script>';
-            //footer
-            $modals .= '</div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button class="btn btn-warning" type="submit" title="'.$lang["SEND"].'" name="task-plan" value="'.$x.'">'.$lang["SEND"].'</button>
-                <label class="btn btn-default" title="Bild senden">
-                    <i class="fa fa-upload" aria-hidden="true"></i>
-                        <input type="file" id="messagePictureUpload-'.$x.'" name="picture" style="display:none">
-                </label>
-                </div></form></div></div>';
+            // $modals .= '<div id="messages-'.$x.'" class="modal fade" style="z-index:1500;">
+            //     <div class="modal-dialog modal-content modal-md"><form method="POST" autocomplete="off">
+			//
+            //     <div class="modal-header h4">'.$lang["MESSAGES"].'</div>
+			//
+            //     <div class="modal-body">';
+			//
+            // // AJAX scripts must be here or a reference error will be shown
+            // $modals .= '
+            //     <script>
+            //     // AJAX Scripts
+            //     function getMessages(taskID, target, scroll = false, limit = 50) {
+            //         if(taskID.length == 0) {
+            //             return;
+            //         }
+            //         $.ajax({
+            //             url: "ajaxQuery/ajax_post_get_messages.php",
+            //             data: {
+            //                 taskID: taskID,
+            //                 limit: limit,
+            //             },
+            //             type: "GET",
+            //             success: function (response) {
+            //                 if(response != "no messages") {
+            //                     $("#subject_bar'.$x.'").show();
+            //                     $("#messages-div-'.$x.'").show();
+            //                     if (window.lastMessageResponse != response)
+            //                         $(target).html(response);
+			//
+            //                     //Scroll down
+            //                     // if (scroll) $(target).scrollTop($(target)[0].scrollHeight)
+            //                     if (window.lastMessageResponse != response && scroll) $(target).scrollTop($(target)[0].scrollHeight)
+            //                     window.lastMessageResponse = response;
+            //                 }else{
+            //                     // hide the messages div and subject bar, when no messages available
+            //                     $("#subject_bar'.$x.'").hide();
+            //                     $("#messages-div-'.$x.'").hide();
+            //                 }
+            //             },
+            //             error: function (response) {
+            //                 $(target).html(response);
+            //             },
+            //         });
+            //     }
+			//
+            //     function sendMessage(taskID, taskName, message, target, limit = 50) {
+            //         if(taskID.length == 0 || message.length == 0){
+            //             return;
+            //         }
+            //         $.ajax({
+            //             url: "ajaxQuery/ajax_post_send_message.php",
+            //             data: {
+            //                 taskID: taskID,
+            //                 taskName: taskName,
+            //                 message: message,
+            //             },
+            //             type: "GET",
+            //             success: function (response) {
+            //                 getMessages(taskID, target, true, limit);
+            //             },
+            //         })
+            //     }
+            //     </script>
+            //     ';
+			//
+            // // subject bar, message div and textinput field
+            // $modals .= '
+            //     <div id="subject_bar'.$x.'" style="background-color: whitesmoke; border: 1px gainsboro solid; border-bottom: none; max-height: 10vh; padding: 10px;">'.$projectName.' - ' .$x.'</div>
+            //     <div id="messages-div-'.$x.'" class="pre-scrollable" style="background-color: white; overflow: auto; overflow-x: hidden; border: 1px solid gainsboro; max-height: 55vh; padding-top: 5px"></div>
+            //     <input id="message-'.$x.'" type="text" required class="form-control" name="message" placeholder="'.$lang["TYPE_A_MESSAGE"].'"/><br>';
+			//
+            // // styling
+            // $modals .= '<script>
+            //     // immediately get the messages, so theres no delay
+            //     messageLimit'.$x.' = 10;
+            //     $(document).on("show.bs.modal", "#messages-'.$x.'", function (e) {
+            //         getMessages("'.$x.'", "#messages-div-'.$x.'", true, 10);
+			//
+            //         buttonIntervalID'.$x.' = setInterval(function() {
+            //             getMessages("'.$x.'", "#messages-div-'.$x.'", true, messageLimit'.$x.');
+            //         }, 1000);
+            //     });
+			//
+            //     // always scroll down (when the modal gets reopened)
+            //     $(document).on("shown.bs.modal", "#messages-'.$x.'", function (e) {
+            //         $("#messages-div-'.$x.'").scrollTop($("#messages-div-'.$x.'")[0].scrollHeight)
+            //         checkMessageBadges();
+            //     });
+			//
+            //     // clear the interval
+            //     $(document).on("hidden.bs.modal", "#messages-'.$x.'", function (e) {
+            //         clearInterval(buttonIntervalID'.$x.');
+            //         window.onbeforeunload = null;
+            //     });
+			//
+            //     //scroll
+            //     $("#messages-div-'.$x.'").scroll(function(){
+            //         if($(this).scrollTop() == 0){
+            //             $(this).scrollTop(1);
+            //             messageLimit'.$x.' += 1
+            //             getMessages("'.$x.'", "#messages-div-'.$x.'", false, messageLimit'.$x.');
+            //         }
+            //     });
+			//
+            //     //submit
+            //     $( "#messages-'.$x.'" ).submit(function( event ) {
+            //         event.preventDefault();
+            //         messageLimit'.$x.'++;
+            //         sendMessage("'.$x.'", "'.$projectName.'", $("#message-'.$x.'").val(), "#messages-div-'.$x.'", messageLimit'.$x.');
+            //         $("#message-'.$x.'").val("");
+            //       });
+			//
+            //      $(document).ready(function(){ $("#messagePictureUpload-'.$x.'").change(function(e){
+            //         e.stopPropagation()
+            //         e.preventDefault()
+            //         file = e.target.files[0]
+            //         var data = new FormData()
+            //         if(!file.type.match("image.*")){
+            //             alert("Not an image")
+            //         }else if (file.size > 1048576){
+            //             alert("File too large")
+            //         }else{
+            //             var limit = messageLimit'.$x.';
+            //             var target = "#messages-div-'.$x.'";
+            //             var taskID = "'.$x.'";
+            //             var taskName = "'.$projectName.'";
+            //             data.append("picture", file)
+            //             data.append("taskID", taskID)
+            //             data.append("taskName", taskName)
+            //             const finishedFunction = function (response){
+            //                 console.log(response);
+            //                 showInfo(response.responseText || response.statusText || response, 1000);
+            //                 getMessages(taskID, target, true, limit)
+            //             }
+            //             $.ajax({
+            //                 url: "ajaxQuery/ajax_post_send_message.php",
+            //                 dataType: "json",
+            //                 data: data,
+            //                 cache: false,
+            //                 type: "POST",
+            //                 processData: false,
+            //                 contentType: false,
+            //                 success: finishedFunction,
+            //                 error: finishedFunction
+            //             })
+            //         }
+            //     }) })
+            //     </script>';
+            // //footer
+            // $modals .= '</div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            //     <button class="btn btn-warning" type="submit" title="'.$lang["SEND"].'" name="task-plan" value="'.$x.'">'.$lang["SEND"].'</button>
+            //     <label class="btn btn-default" title="Bild senden">
+            //         <i class="fa fa-upload" aria-hidden="true"></i>
+            //             <input type="file" id="messagePictureUpload-'.$x.'" name="picture" style="display:none">
+            //     </label>
+            //     </div></form></div></div>';
 
         }
         ?>
@@ -1179,43 +1179,43 @@ $(document).ready(function() {
         window.dispatchEvent(new Event('resize'));
         $('.table').trigger('column-reorder.dt');
     }, 500);
-    checkMessageBadges();
-    setInterval(function(){
-        checkMessageBadges();
-    }, 20000)
+    // checkMessageBadges();
+    // setInterval(function(){
+    //     checkMessageBadges();
+    // }, 20000)
 });
 
-function checkMessageBadges(){
-    $chats = $("[data-chat-id]")
-    chats = $chats.map(function(){
-        return $(this).data("chat-id");
-    }).get() // get all chat ids as array
-    $.ajax({
-        url: 'ajaxQuery/ajax_post_get_alerts.php',
-        dataType: 'json',
-        data: { projects: chats },
-        cache: false,
-        type: 'GET',
-        processData: true,
-        contentType: "application/json",
-        success: function(response){
-            try{
-                for(chat in response){
-                    if(response[chat]){
-                        $("[data-chat-id=" + chat + "]").html('<i class="fa fa-commenting-o"></i><span class="badge">' + response[chat]+'</span>')
-                    }else{
-                        $("[data-chat-id=" + chat + "]").html('<i class="fa fa-commenting-o"></i>')
-                    }
-                }
-            }catch(error){
-                console.error(error)
-            }
-        },
-        error: function(error){
-            console.error(error)
-        }
-    })
-}
+// function checkMessageBadges(){
+//     $chats = $("[data-chat-id]")
+//     chats = $chats.map(function(){
+//         return $(this).data("chat-id");
+//     }).get() // get all chat ids as array
+//     $.ajax({
+//         url: 'ajaxQuery/ajax_post_get_alerts.php',
+//         dataType: 'json',
+//         data: { projects: chats },
+//         cache: false,
+//         type: 'GET',
+//         processData: true,
+//         contentType: "application/json",
+//         success: function(response){
+//             try{
+//                 for(chat in response){
+//                     if(response[chat]){
+//                         $("[data-chat-id=" + chat + "]").html('<i class="fa fa-commenting-o"></i><span class="badge">' + response[chat]+'</span>')
+//                     }else{
+//                         $("[data-chat-id=" + chat + "]").html('<i class="fa fa-commenting-o"></i>')
+//                     }
+//                 }
+//             }catch(error){
+//                 console.error(error)
+//             }
+//         },
+//         error: function(error){
+//             console.error(error)
+//         }
+//     })
+// }
 </script>
 </div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

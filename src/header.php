@@ -890,7 +890,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                         <i class="fa fa-commenting-o"></i><?php echo $lang['MESSAGING']; ?>
                     </a>
 
-                    <script>
+                    <!--script> This is WAY too request heavy... 
                     $( document ).ready(function() {
                         setInterval(function(){udpateHeaderBadge("#globalMessagingBadge", {})}, 10000); //10 seconds
                         setInterval(function(){udpateHeaderBadge("#projectMessagingBadge", {allProjects: true})}, 10000); //10 seconds
@@ -913,8 +913,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             },
                         });
                     }
-                    
-                    </script>
+				</script-->
                   </li>
 				  <?php
 				  $result = $conn->query("SELECT projectID FROM relationship_project_user WHERE userID = $userID AND (expirationDate = '0000-00-00' OR DATE(expirationDate) > CURRENT_TIMESTAMP )");
