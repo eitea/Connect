@@ -4,16 +4,21 @@
 $teamID = 0;
 if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
     $name = test_input($_POST['createTeam_name']);
+	$email = test_input($_POST['createTeam_email']);
     $leader = intval($_POST['leader']);
     $replacement = intval($_POST['replacement']);
     $isDepartment = empty($_POST['create_department']) ? 'FALSE' : 'TRUE';
-    $conn->query("INSERT INTO teamData (name, leader, leaderreplacement, isDepartment) VALUES('$name', '$leader', '$replacement', '$isDepartment')");
+    $conn->query("INSERT INTO teamData (name, leader, leaderreplacement, isDepartment, email) VALUES('$name', '$leader', '$replacement', '$isDepartment', '$email')");
     $teamID = mysqli_insert_id($conn);
-    foreach($_POST['createTeam_members'] AS $user){
-        $user = intval($user);
-        $skill = intval($_POST['createTeam_skill_'.$user]);
-        $conn->query("INSERT INTO relationship_team_user(teamID, userID, skill) VALUES($teamID, $user, $skill)");
-    }
+	if(isset($_POST['createTeam_members'])){
+		foreach($_POST['createTeam_members'] AS $user){
+			$user = intval($user);
+			$skill = intval($_POST['createTeam_skill_'.$user]);
+			$conn->query("INSERT INTO relationship_team_user(teamID, userID, skill) VALUES($teamID, $user, $skill)");
+		}
+	} else {
+		showWarning("Es wurden keine Teammitglieder ausgewählt");
+	}
     if(!$conn->error){
         echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_CREATE'].'</div>';
     }
@@ -54,7 +59,8 @@ if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
 } elseif(isset($_POST['changeTeamName']) && !empty($_POST['teamName'])){
     $teamID = intval($_POST['changeTeamName']);
     $name = test_input($_POST['teamName']);
-    $conn->query("UPDATE teamData SET name = '$name' WHERE id = $teamID");
+	$email = test_input($_POST['teamMail']); //5b28952ad8a9a
+    $conn->query("UPDATE teamData SET name = '$name', email='$email' WHERE id = $teamID");
     if(!$conn->error){
         echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
     }
@@ -96,30 +102,31 @@ for($i = 0; $i < 11; $i++){
 
 <div class="container-fluid">
     <?php
-    $result = $conn->query("SELECT * FROM teamData");
+    $result = $conn->query("SELECT id, name, isDepartment, email FROM teamData");
     while($result && ($row = $result->fetch_assoc())):
         $teamID = $row['id'];
         ?>
         <form method="POST">
             <input type="hidden" name="teamID" value="<?php echo $teamID; ?>">
             <div class="panel panel-default">
-                <div class="panel-heading container-fluid">
-                    <div class="col-xs-6"><a data-toggle="collapse" href="#teamCollapse-<?php echo $teamID; ?>"><?php echo $row['name']; ?></a></div>
-                    <div class="col-xs-6 text-right">
-                        <?php $taskResult = $conn->query("SELECT projectid FROM dynamicprojectsteams WHERE teamid = $teamID");
-                        if($taskResult->num_rows < 1): ?>
-                            <button type="submit" class="btn-empty" style="color:red;" title="Löschen" name="removeTeam" value="<?php echo $teamID; ?>"><i class="fa fa-trash-o"></i></button>
-                        <?php else: ?>
-                            <button type="button" class="btn-empty" style="color:brown;" title="Bearbeiten" data-toggle="modal" data-target="#rename-team-<?php echo $teamID; ?>" ><i class="fa fa-pencil"></i></button>
-                        <?php endif; ?>
-                        <button type="submit" class="btn-empty" style="color:#0078e7;" title="Speichern" name="saveTeam" value="<?php echo $teamID; ?>"><i class="fa fa-floppy-o"></i></button>
-                        <?php if($row['isDepartment'] == 'TRUE'): ?>
-                            <button type="submit" class="btn-empty" style="color:#00d608;" title="Abteilung entfernen" name="department_unflag" value="<?php echo $teamID; ?>"><i class="fa fa-share-alt"></i></button>
-                        <?php else: ?>
-                            <button type="submit" class="btn-empty" style="color:#a0a0a0;" title="Als Abteilung markieren" name="department_flag" value="<?php echo $teamID; ?>"><i class="fa fa-share-alt"></i></button>
-                        <?php endif; ?>
-                    </div>
-                </div>
+				<div class="panel-heading container-fluid">
+					<div class="col-xs-6"><a data-toggle="collapse" href="#teamCollapse-<?php echo $teamID; ?>"><?php echo $row['name']; ?></a>
+						<small style="padding-left:35px;"><?php echo $row['email']; //5b28952ad8a9a ?></small>
+					</div>
+					<div class="col-xs-6 text-right">
+						<?php $taskResult = $conn->query("SELECT projectid FROM dynamicprojectsteams WHERE teamid = $teamID");
+						if($taskResult->num_rows < 1): ?>
+						<button type="submit" class="btn-empty" style="color:red;" title="Löschen" name="removeTeam" value="<?php echo $teamID; ?>"><i class="fa fa-trash-o"></i></button>
+						<?php endif; ?>
+						<button type="button" class="btn-empty" style="color:brown;" title="Bearbeiten" data-toggle="modal" data-target="#rename-team-<?php echo $teamID; ?>" ><i class="fa fa-pencil"></i></button>
+						<button type="submit" class="btn-empty" style="color:#0078e7;" title="Speichern" name="saveTeam" value="<?php echo $teamID; ?>"><i class="fa fa-floppy-o"></i></button>
+						<?php if($row['isDepartment'] == 'TRUE'): ?>
+							<button type="submit" class="btn-empty" style="color:#00d608;" title="Abteilung entfernen" name="department_unflag" value="<?php echo $teamID; ?>"><i class="fa fa-share-alt"></i></button>
+						<?php else: ?>
+							<button type="submit" class="btn-empty" style="color:#a0a0a0;" title="Als Abteilung markieren" name="department_flag" value="<?php echo $teamID; ?>"><i class="fa fa-share-alt"></i></button>
+						<?php endif; ?>
+					</div>
+				</div>
                 <div class="collapse <?php if($teamID == $activeTab) echo 'in'; ?>" id="teamCollapse-<?php echo $teamID; ?>">
                     <div class="panel-body container-fluid">
                         <?php
@@ -183,10 +190,13 @@ for($i = 0; $i < 11; $i++){
         <div id="rename-team-<?php echo $teamID; ?>" class="modal fade">
             <div class="modal-dialog modal-content modal-md">
                 <form method="POST">
-                    <div class="modal-header h4"></div>
+                    <div class="modal-header h4"><?php echo $row['name']; ?> Editieren</div>
                     <div class="modal-body">
                         <label>Name</label>
                         <input type="text" name="teamName" value="<?php echo $row['name']; ?>" class="form-control">
+						<br>
+						<label>Email</label>
+                        <input type="text" name="teamMail" value="<?php echo $row['email']; ?>" class="form-control">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -205,9 +215,13 @@ for($i = 0; $i < 11; $i++){
                 <h4 class="modal-title">New Team</h4>
             </div>
             <div class="modal-body">
-                <div class="col-md-12">
+                <div class="col-md-6">
                     <label>Name</label>
                     <input type="text" class="form-control" name="createTeam_name" placeholder="Name" /><br>
+                </div>
+				<div class="col-md-6">
+                    <label>Name</label>
+                    <input type="email" class="form-control" name="createTeam_email" placeholder="E-Mail" /><br>
                 </div>
                 <div class="row">
                     <div class="col-md-6">

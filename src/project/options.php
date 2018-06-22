@@ -43,10 +43,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 		$workflowID = intval($_POST['add_rule']);
 		$subject = test_input($_POST['rule_subject']);
 		$senders = test_input($_POST['rule_senders']);
-		$receiver = '';
-		if(!empty($_POST['add_rule_template'])){
-			$templateID = test_input($_POST['add_rule_template']);
-		} elseif(!empty($_POST['name']) && !empty($_POST['owner']) && test_Date($_POST['start'], 'Y-m-d') && !empty($_POST['employees'])) {
+		$receiver = test_input($_POST['rule_receiver']);
+		$response = trim(test_input($_POST['rule_autoResponse'])); //5b20ad39615f9
+		if(!empty($_POST['rule_template'])){
+			$templateID = test_input($_POST['rule_template']);
+		} elseif(!empty($_POST['name']) && !empty($_POST['owner']) && !empty($_POST['employees'])) {
 			$templateID = uniqid();
 			$name = asymmetric_encryption('TASK', test_input($_POST["name"]), $userID, $privateKey);
 			$v2Key = ($name == test_input($_POST["name"])) ? '' : $publicKey;
@@ -107,16 +108,24 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 			}
 		}
 		if($templateID){
-			$conn->query("INSERT INTO workflowRules(workflowID, templateID, subject, fromAddress, toAddress) VALUES ($workflowID, '$templateID', '$subject', '$senders', '$receiver')");
+			if(empty($_POST['edit_rule'])){
+				$conn->query("INSERT INTO workflowRules(workflowID, templateID, subject, fromAddress, toAddress, autoResponse)
+					VALUES ($workflowID, '$templateID', '$subject', '$senders', '$receiver', '$response')");
+			} else {
+				$val = intval($_POST['edit_rule']);
+				$conn->query("UPDATE workflowRules SET templateID = '$templateID', subject = '$subject', fromAddress = '$senders', toAddress = '$receiver',
+					autoResponse = '$response' WHERE id = $val");
+			}
 			if($conn->error){
 				showError($conn->error);
 			} else {
-				showSuccess($lang['OK_CREATE']);
+				showSuccess($lang['OK_SAVE']);
 			}
 		} else {
 			showError("Kein Template");
 		}
 	} elseif(!empty($_POST['positions'])){
+		//$positions = array();
 		foreach($_POST['positions'] as $val){
 			$arr = explode('_', $val);
 			$conn->query("UPDATE workflowRules SET position = '".$arr[1]."' WHERE id =".$arr[0]);
@@ -127,8 +136,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <div class="page-header"><h3>Workflow
 	<div class="page-header-button-group">
 		<a data-toggle="modal" href="#new-account" class="btn btn-default" title="New..."><i class="fa fa-plus"></i></a>
+		<button type="button" class="btn btn-default" data-toggle="modal" data-target="#taskTemplateEditor-modal">Task Templates</button>
 	</div>
 </h3></div>
+<?php include __DIR__.'/taskTemplateEditor.php'; ?>
 
 <div class="row bold">
 	<div class="col-xs-2">Server</div>
@@ -140,8 +151,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 	<div class="col-xs-4"></div>
 </div>
 <?php
-$stmt = $conn->prepare("SELECT id, subject, fromAddress, toAddress, projectname, v2 FROM workflowRules w LEFT JOIN dynamicprojects d ON d.projectid = w.templateID WHERE workflowID = ? ORDER BY position ASC");
- echo $conn->error;
+$stmt = $conn->prepare("SELECT id, subject, fromAddress, toAddress, projectname, v2, templateID, autoResponse
+	FROM workflowRules w LEFT JOIN dynamicprojects d ON d.projectid = w.templateID WHERE workflowID = ? ORDER BY w.position ASC");
+echo $conn->error;
 $stmt->bind_param('i', $id);
 $result = $conn->query("SELECT id, server, port, service, smtpSecure, username, password, logEnabled FROM emailprojects");
 while ($row = $result->fetch_assoc()) {
@@ -170,11 +182,11 @@ while ($row = $result->fetch_assoc()) {
 		echo '<div style="margin-left:150px">';
 		echo '<div class="row bold">
 			<div class="col-xs-2">Betreff</div>
-			<div class="col-xs-2">Absender</div>
-			<div class="col-xs-2">Empfänger</div>
+			<div class="col-xs-3">Adressen</div>
+			<div class="col-xs-2">Response</div>
 			<div class="col-xs-2">Template</div>
 			<div class="col-xs-1">Position</div>
-			<div class="col-xs-2"></div>
+			<div class="col-xs-1"></div>
 		</div>';
 		$options = '';
 
@@ -182,22 +194,30 @@ while ($row = $result->fetch_assoc()) {
 		while($rule = $res->fetch_assoc()){
 			echo '<div class="row" style="border-top:1px solid lightgrey">';
 			echo '<div class="col-xs-2">' . $rule['subject'].'</div>';
-			echo '<div class="col-xs-2">' . $rule['fromAddress'] . '</div>';
-			echo '<div class="col-xs-2">' . $rule['toAddress'] . '</div>';
+			echo '<div class="col-xs-3">';
+			if($rule['fromAddress']) echo '<b>Absender: </b>', $rule['fromAddress'];
+			if($rule['toAddress']) echo '<b>Empfänger: </b>', $rule['toAddress'];
+			echo '</div>';
+			echo '<div class="col-xs-2">';
+			if($rule['autoResponse']) echo substr($rule['autoResponse'], 0, 20), '...'; //5b20ad39615f9
+			echo '</div>';
 			echo '<div class="col-xs-2">' . asymmetric_encryption('TASK', $rule['projectname'], $userID, $privateKey, $rule['v2']) . '</div>';
-			echo '<div class="col-xs-1"><select name="position[]" class="form-control">';
+			echo '<div class="col-xs-1"><select name="positions[]" class="form-control">';
 			for($i=1;$i<=$res->num_rows;$i++){
-				$selected = (++$j == $i) ? 'selected' : '';
+				$selected = ($j == $i) ? 'selected' : '';
 				echo "<option $selected value='{$rule['id']}_$i'>$i</option>";
 			}
 			echo '</select></div>';
-			echo '<div class="col-xs-2"><button type="submit" name="deleteRule" value="'.$rule['id'].'" class="btn btn-default"><i class="fa fa-trash-o"></i></button></div>';
+			echo '<div class="col-xs-2"><button type="submit" name="deleteRule" value="'.$rule['id'].'" class="btn btn-default"><i class="fa fa-trash-o"></i></button>
+			<a data-toggle="modal" data-resp="'.$rule['autoResponse'].'" data-subject="'.$rule['subject'].'" data-from="'.$rule['fromAddress'].'" data-to="'.$rule['toAddress'].'"
+			data-valid="'.$row['id'].'" data-workid="'.$rule['id'].'" data-templateid="'.$rule['templateID'].'" class="btn btn-default" href="#add-rule"><i class="fa fa-pencil"></i></a></div>';
 			echo '</div>';
+			$j++;
 		}
 		echo '</div>';
 	}
 
-	//TODO: tasks editieren, rules editieren, resonse hinzufügen
+	//TODO: templates editieren
 	echo '</form>';
 }
 ?>
@@ -259,30 +279,31 @@ while ($row = $result->fetch_assoc()) {
 				<ul class="nav nav-tabs">
                     <li class="active"><a data-toggle="tab" href="#add-rule-basic">Task und Filter</a></li>
                     <li><a data-toggle="tab" href="#add-rule-new-template">Neues Template</a></li>
+					<li><a data-toggle="tab" href="#add-rule-response">Auto Response </a></li>
 				</ul>
 				<div class="tab-content">
                     <div id="add-rule-basic" class="tab-pane fade in active"><br>
 						<div class="row">
 							<div class="col-sm-12"> <label>Betreff</label>
-								<input type="text" name="rule_subject" class="form-control" placeholder="Genaues Suchwort"/>
+								<input type="text" name="rule_subject" id="rule_subject" class="form-control" placeholder="Genaues Suchwort"/>
 								<small>Ist dieser Begriff im Betreff enthalten, wird das Suchwort aus dem Betreff herausgeschnitten
 									 und der Rest des Betreffs wird zum Titel des Tasks. Achten Sie auf Groß- und Kleinschreibung.</small><br>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-sm-12"> <label>Absender</label>
-								<input type="text" name="rule_senders" class="form-control" maxlength="100">
+								<input type="text" name="rule_senders" id="rule_senders" class="form-control" maxlength="100">
 								<small>Es können mehrere Absender angegeben werden. Trennung durch Leerzeichen.</small>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-sm-12"> <label>Emfpänger</label>
-								<input type="email" name="rule_receiver" class="form-control" maxlength="100"/>
+								<input type="email" name="rule_receiver" id="rule_receiver" class="form-control" maxlength="100"/>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-md-12"> <label>Task Template</label>
-								<select class="js-example-basic-single" name="add_rule_template">
+								<select class="js-example-basic-single" name="rule_template" id="rule_template">
 									<option value=""> Kein Template </option>
 									<?php
 									$result = $conn->query("SELECT projectid, projectname, v2 FROM dynamicprojects
@@ -305,9 +326,41 @@ while ($row = $result->fetch_assoc()) {
 						include dirname(__DIR__).'/misc/dynamicproject_gen.php';
 						?>
 					</div>
+					<div id="add-rule-response" class="tab-pane fade"><br>
+						<div class="col-md-12">
+							<label>Automatische Antwort</label><br>
+							Beim erstellen eines Tasks kann automatisch eine Antwort zurück gesendet werden
+							<textarea id="rule_autoResponse" name="rule_autoResponse" rows="8" class="form-control">
+								Herzlichen Dank für Ihre Nachricht!
+
+Ihr Anliegen werden wir so schnell wie möglich beantworten.
+
+Im Betreff finden sie auch gleich die zugewiesene Ticket Nummer.
+
+
+%Mandatennamen%
+Höchste Qualität. Garantiert.
+---------------------------
+---------------------------
+
+Thank you very much for your message!
+
+We will answer your request as soon as possible.
+
+In the subject you will also find the assigned ticket number.
+
+
+%Mandatennamen%
+Highest Quality. Guaranteed.
+---------------------------
+---------------------------
+							</textarea>
+						</div>
+					</div>
 				</div>
             </div><!-- /modal-body -->
             <div class="modal-footer">
+				<input type="hidden" id="edit_rule" name="edit_rule" value="">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
 				<button type="submit" class="btn btn-warning" name="add_rule" id="add_rule"><?php echo $lang['ADD']; ?></button>
             </div>
@@ -332,6 +385,12 @@ $('#new-account').on('show.bs.modal', function (event) {
 $('#add-rule').on('show.bs.modal', function (event) {
 	var button = $(event.relatedTarget);
 	$('#add_rule').val(button.data('valid'));
+	$('#edit_rule').val(button.data('workid'));
+	$('#rule_template').val(button.data('templateid')).trigger('change');
+	$('#rule_receiver').val(button.data('to'));
+	$('#rule_senders').val(button.data('from'));
+	$('#rule_subject').val(button.data('subject'));
+	$('#rule_autoResponse').val(button.data('resp')); //5b20ad39615f9
 });
 function checkEmail(){
 	$.post("ajaxQuery/AJAX_checkEmailAvailability.php",{

@@ -1,4 +1,5 @@
 <?php
+//requires $isTempalte, $x
 if($x){
     $result = $conn->query("SELECT * FROM dynamicprojects WHERE projectid = '$x'"); echo $conn->error;
     $dynrow = $result->fetch_assoc();
@@ -23,6 +24,10 @@ if($x){
     $dynrow['clientid'] = $_SESSION['filterings']['client'] ?? 0;
     $dynrow['clientprojectid'] = $_SESSION['filterings']['project'] ?? 0;
     $dynrow['level'] = 0;
+	if($isTempalte){
+		$dynrow['projectstart'] = '0000-00-00';
+		$dynrow['isTemplate'] = 'TRUE';
+	}
 }
 ?>
 <ul class="nav nav-tabs">
@@ -32,7 +37,10 @@ if($x){
 <div class="tab-content">
 	<div id="projectBasics<?php echo $x; ?>" class="tab-pane fade in active"><br>
 		<div class="row">
-			<?php include dirname(__DIR__).'/misc/select_project.php'; ?>
+			<?php
+			$filterings = array('company' => $dynrow['companyid'], 'client' => $dynrow['clientid'], 'project' => $dynrow['clientprojectid']); //5b28e37956a11
+			include dirname(__DIR__).'/misc/select_project.php';
+			?>
 		</div>
 
 		<div class="col-md-12"><small>*Auswahl ist Optional. Falls leer, entscheidet der Benutzer.</small><br><br></div>
@@ -155,7 +163,7 @@ if($x){
 				?>
 			</div>
 		<?php else: ?>
-			<input type="hidden" name="isTemplate" value="true" />
+			<input type="hidden" id="isTemplate-<?php echo $x; ?>" name="isTemplate" value="true" />
 		<?php endif; ?>
 	</div>
 	<div id="projectAdvanced<?php echo $x; ?>" class="tab-pane fade"><br>

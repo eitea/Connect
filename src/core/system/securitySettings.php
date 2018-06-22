@@ -546,7 +546,7 @@ if(!empty($key_downloads)){
                                 </label>
                             </div>
                         </div>
-                        <br>
+						<br>
                         <div class="row">
                             <div class="col-sm-2 col-sm-offset-10 text-right">
                                 <button type="submit" name="saveRoles" value="<?php echo $x; ?>" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>

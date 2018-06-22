@@ -2973,6 +2973,7 @@ if($row['version'] < 160){
 		echo '<br>Benutzer: Admin entfernt';
 	}
 	$conn->query("UPDATE dynamicprojects SET projectleader = 1 WHERE projectleader = 2");
+	$conn->query("UPDATE dynamicprojects SET projectowner = 1 WHERE projectowner = 2");
 	$conn->query("UPDATE archive SET uploadUser = 1 WHERE uploadUser = 2");
 
 	//5b1f67f86c983
@@ -3011,7 +3012,6 @@ if($row['version'] < 160){
    }
 
 	$conn->query("DROP TABLE taskemailrules");
-
 	$conn->query("DROP TABLE dynamicprojectsnotes");
 	$conn->query("DROP TABLE dynamicprojectspictures");
 
@@ -3024,7 +3024,33 @@ if($row['version'] < 160){
 }
 
 if($row['version'] < 161){
-    
+	//5b20ad39615f9
+	$conn->query("ALTER TABLE workflowRules ADD COLUMN autoResponse TEXT");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Workflow: Auto Response';
+	}
+	//5b28952ad8a9a
+	$conn->query("ALTER TABLE teamData ADD COLUMN email VARCHAR(100)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Teams: E-Mail Adresse';
+	}
+}
+
+if($row['version'] < 162){
+	//5b2931a15ad87
+	$conn->query("ALTER TABLE UserData ADD COLUMN canLogin ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'TRUE'");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Benutzer: Login-Sperre';
+	}
+}
+
+if($row['version'] < 163){
     $conn->query("ALTER TABLE taskmessages ADD COLUMN id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY");
 	if($conn->error){
 		echo $conn->error;
@@ -3047,9 +3073,13 @@ if($row['version'] < 161){
 		echo '<br>Taskmessages: User seen';
 	}
 }
-// if($row['version'] < 162){}
-// if($row['version'] < 163){}
+
 // if($row['version'] < 164){}
+// if($row['version'] < 165){}
+// if($row['version'] < 166){}
+// if($row['version'] < 167){}
+// if($row['version'] < 168){}
+// if($row['version'] < 169){}
 
 //cleanups for maintainable db sizes
 $conn->query("DELETE FROM `checkinLogs` WHERE id <= ( SELECT id FROM ( SELECT id FROM `checkinLogs` ORDER BY id DESC LIMIT 1 OFFSET 100 ) foo )");echo $conn->error;

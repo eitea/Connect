@@ -147,12 +147,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       }
       if (!empty($_POST['gender'])) {
           $val = test_input($_POST['gender']);
-          $conn->query("UPDATE UserData SET gender= '$val' WHERE id = '$x';");
-      }
-      if(!empty($_POST['main_company'])){
-          $val = intval($_POST['main_company']);
-          $conn->query("UPDATE UserData SET companyID = $val WHERE id = '$x'");
-      }
+		  $conn->query("UPDATE UserData SET gender= '$val' WHERE id = '$x';");
+	  }
+	  if(!empty($_POST['main_company'])){
+		  $val = intval($_POST['main_company']);
+		  $conn->query("UPDATE UserData SET companyID = $val WHERE id = '$x'");
+	  }
+	  if(!empty($_POST['canLogin'])){ //5b2931a15ad87
+		  $conn->query("UPDATE UserData SET canLogin = 'TRUE' WHERE id = $x");
+	  } else {
+		  $conn->query("UPDATE UserData SET canLogin = 'FALSE' WHERE id = $x");
+	  }
       if (!empty($_POST['password']) && !empty($_POST['passwordConfirm'])) {
 
           if (strcmp($_POST['password'], $_POST['passwordConfirm']) == 0  && match_passwordpolicy($_POST['password'])) {
@@ -381,6 +386,11 @@ $stmt_company_relationship->bind_param('i', $x);
                       <?php if($row['lastLogin']) echo date('d.m.Y H:i', strtotime($row['lastLogin']) + $timeToUTC * 3600); //5ac7126421a8b ?>
                   </div>
               </div>
+			  <div class="row checkbox"> <div class="col-md-2"> Login Berechtigung: </div>
+				  <div class="col-md-3">
+					  <label> <input type="checkbox" name="canLogin" <?php if($row['canLogin'] == 'TRUE'){echo 'checked';} ?> /> <?php echo $lang['CAN_LOGIN'];?> </label>
+				  </div>
+			  </div>
               <div class="row">
                 <div class="col-md-5">
                   <?php echo $lang['ENTRANCE_DATE'] .'<p class="form-control" style="background-color:#ececec">'. substr($row['beginningDate'],0,10); ?></p>
