@@ -6,9 +6,13 @@ if(isset($_GET['proc'])){
 }
 
 session_start();
-
+$userID = $_SESSION['userid'];
+$privateKey = $_SESSION['privateKey'];
 
 require dirname(dirname(__DIR__))."/plugins/fpdf/fpdf.php";
+require dirname(__DIR__) . "/connection.php";
+require dirname(__DIR__) . "/language.php";
+require dirname(__DIR__) . "/utilities.php";
 
 class PDF extends FPDF {
   public $glob = array();
@@ -41,14 +45,11 @@ class PDF extends FPDF {
   }
 }
 
-require dirname(__DIR__) . "/connection.php";
-require dirname(__DIR__) . "/language.php";
-require dirname(__DIR__) . "/utilities.php";
-
-$result = $conn->query("SELECT processHistory.*, proposals.*, companyData.*, clientData.*, proposals.id AS proposalID, processHistory.id AS historyID, clientData.name AS clientName, companyData.name AS companyName,
+$result = $conn->query("SELECT processHistory.*, proposals.*, companyData.*, clientData.*,
+  proposals.id AS proposalID, processHistory.id AS historyID, clientData.name AS clientName, companyData.name AS companyName,
   clientInfoData.title, clientInfoData.firstname, clientInfoData.vatnumber, clientInfoData.name AS lastname, clientInfoData.nameAddition, clientInfoData.address_Street,
   clientInfoData.address_Country, clientInfoData.address_Country_Postal, clientInfoData.address_Country_City, clientInfoData.address_Addition,
-  erp_settings.yourSign, erp_settings.yourOrder, erp_settings.ourSign, erp_settings.ourMessage
+  erp_settings.yourSign, erp_settings.yourOrder, erp_settings.ourSign, erp_settings.ourMessage, erp_settings.euDelivery, erp_settings.euService
   FROM processHistory
   INNER JOIN proposals ON processHistory.processID = proposals.id
   INNER JOIN clientData ON proposals.clientID = clientData.id
@@ -183,8 +184,8 @@ if($prod_res && $prod_res->num_rows > 0){
   $pdf->Cell($w[5],7,$lang['TOTAL_PRICE'], '', 1, 'R', 1);
 
   while($prod_row = $prod_res->fetch_assoc()){
-    $prod_row["name"] = $prod_row["name"];
-    $prod_row["description"] = $prod_row["description"];
+    $prod_row["name"] = secure_data('ERP', $prod_row['name'], 'decrypt', $userID, $privateKey);
+    $prod_row["description"] = secure_data('ERP', $prod_row['description'], 'decrypt', $userID, $privateKey);
     if($prod_row['name'] == 'NEW_PAGE'){
       $pdf->AddPage();
     } elseif($prod_row['name'] == 'PARTIAL_SUM'){
@@ -227,14 +228,20 @@ if($prod_res && $prod_res->num_rows > 0){
       //Price
       $pdf->Cell($w[3],6,number_format($prod_row['price'],2,',','.'). ' EUR',0,0,'R');
       //Taxes
-      if($prod_row['cash'] == 'TRUE'){
-        $pdf->Cell($w[4],6,'BAR','',0,'R');
-        $cash_value += $prod_row['total'];
-      } else {
-        $pdf->Cell($w[4],6,intval($prod_row['taxPercentage']). '%',0,0,'R');
-        $vat_value += $prod_row['total'] * $prod_row['taxPercentage'] / 100;
-        $netto_value += $prod_row['total'];
-      }
+	  if($prod_row['cash'] == 'TRUE'){
+		$pdf->Cell($w[4],6,'BAR','',0,'R');
+		$cash_value += $prod_row['total'];
+	  } else {
+		  if($row['foreignOpt'] != 1 && $row['foreignOpt'] != 2){ //5b17d623ddace
+			  $pdf->Cell($w[4],6,intval($prod_row['taxPercentage']). '%',0,0,'R');
+			  $vat_value += $prod_row['total'] * $prod_row['taxPercentage'] / 100;
+		  } else {
+			  $pdf->Cell($w[4],6,'0%',0,0,'R');
+		  }
+		$netto_value += $prod_row['total'];
+	  }
+
+
       $pdf->Cell($w[5],6,number_format($prod_row['total'],2,',','.'). ' EUR',0,1,'R');
       $pdf->Line(10, $pdf->GetY(), 210-10, $pdf->GetY());
       $i++;
@@ -319,6 +326,13 @@ if($payment_name) $pdf->Cell(0, 4, iconv('UTF-8', 'windows-1252', $payment_name)
 if($payment_1) $pdf->Cell(0, 5, $payment_1.' EUR' , 0, 1);
 if($payment_2) $pdf->Cell(0, 5, $payment_2.' EUR', 0, 1);
 if($payment_3) $pdf->Cell(0, 5, $payment_3.' EUR', 0, 1);
+
+
+if($row['foreignOpt'] != 3){
+	$pdf->Ln(5);
+	if($row['foreignOpt'] == 1){ $pdf->MultiCell(0, 5, iconv('UTF-8', 'windows-1252', $row['euDelivery']), 0, 1); }
+	if($row['foreignOpt'] == 2){ $pdf->MultiCell(0, 5, iconv('UTF-8', 'windows-1252', $row['euService']), 0, 1); }
+}
 
 /*
 A4 = 210 x 297

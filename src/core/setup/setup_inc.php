@@ -683,6 +683,7 @@ function create_tables($conn) {
         portoRate INT(3),
         header VARCHAR(400),
         referenceNumrow VARCHAR(10),
+		foreignOpt INT(2) NOT NULL DEFAULT 0,
         FOREIGN KEY (clientID) REFERENCES clientData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE

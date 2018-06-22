@@ -3047,6 +3047,7 @@ if($row['version'] < 162){
 
 	//5af9b976aa8a6
 	$conn->query("ALTER TABLE dsgvo_vv_logs ADD COLUMN vvID VARCHAR(10)");
+	$conn->query("ALTER TABLE proposals ADD COLUMN foreignOpt INT(2) NOT NULL DEFAULT 0");
 }
 
 // if($row['version'] < 163){}
