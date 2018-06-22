@@ -49,13 +49,14 @@ if (isset($_REQUEST["partner"], $_REQUEST["subject"]) && $mode == "single") { //
         ON tbl5.dynamicID = d.projectid
     LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
     LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN relationship_team_user ON relationship_team_user.teamID = dynamicprojectsteams.teamid
-    WHERE d.isTemplate = 'FALSE' AND (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (relationship_team_user.userID = $userID AND relationship_team_user.skill >= d.level))
-    ORDER BY projectpriority DESC, projectstatus, projectstart ASC"); // select all relevant projects
+    WHERE d.isTemplate = 'FALSE' AND (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (relationship_team_user.userID = $userID AND relationship_team_user.skill >= d.level))"); // select all relevant projects
     echo $conn->error;
     $results = $result->fetch_all();
     $projects = array();
     foreach ($results as $value) {
-        $projects[] = "'" . $value[0] . "'";
+        $project = "'" . $value[0] . "'";
+        if (in_array($project, $projects)) continue;
+        $projects[] = $project;
     }
     // var_dump($projects);
     $result = $conn->query("SELECT count(*) count FROM taskmessages WHERE userID != $userID AND taskID IN (" . join(",", $projects) . ") AND NOT EXISTS (SELECT seen FROM taskmessages_user WHERE taskmessages_user.messageID = id AND seen IS NOT NULL AND userID = $userID )");
