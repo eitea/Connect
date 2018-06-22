@@ -3048,25 +3048,23 @@ if($row['version'] < 162){
 	//5af9b976aa8a6
 	$conn->query("ALTER TABLE dsgvo_vv_logs ADD COLUMN vvID VARCHAR(10)");
 	$conn->query("ALTER TABLE proposals ADD COLUMN foreignOpt INT(2) NOT NULL DEFAULT 0");
-}
 
-if($row['version'] < 163){
-    $conn->query("ALTER TABLE taskmessages ADD COLUMN id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY");
+	$conn->query("ALTER TABLE taskmessages ADD COLUMN id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY");
 	if($conn->error){
 		echo $conn->error;
 	} else {
 		echo '<br>Taskmessages: ID';
-    }	
-    
-    $conn->query("CREATE TABLE taskmessages_user (
-        userID INT(6) UNSIGNED,
-        messageID INT(6) UNSIGNED,
-        deleted ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        seen DATETIME DEFAULT NULL,
-        PRIMARY KEY (userID, messageID),
-        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE,
-        FOREIGN KEY (messageID) REFERENCES taskmessages(id) ON UPDATE CASCADE ON DELETE CASCADE
-    )");
+	}
+
+	$conn->query("CREATE TABLE taskmessages_user (
+		userID INT(6) UNSIGNED,
+		messageID INT(6) UNSIGNED,
+		deleted ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+		seen DATETIME DEFAULT NULL,
+		PRIMARY KEY (userID, messageID),
+		FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE,
+		FOREIGN KEY (messageID) REFERENCES taskmessages(id) ON UPDATE CASCADE ON DELETE CASCADE
+	)");
 	if($conn->error){
 		echo $conn->error;
 	} else {
@@ -3074,6 +3072,7 @@ if($row['version'] < 163){
 	}
 }
 
+// if($row['version'] < 163){}
 // if($row['version'] < 164){}
 // if($row['version'] < 165){}
 // if($row['version'] < 166){}
