@@ -1677,6 +1677,7 @@ function create_tables($conn) {
 
 	    // 5ac63505c0ecd
     $sql = "CREATE TABLE taskmessages(
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         userID INT(6) UNSIGNED,
         taskID varchar(100),
         taskName varchar(100),
@@ -1686,6 +1687,19 @@ function create_tables($conn) {
     )";
     if (!$conn->query($sql)) {
         echo $conn->error;
+    }
+
+    $sql = "CREATE TABLE taskmessages_user (
+        userID INT(6) UNSIGNED,
+        messageID INT(6) UNSIGNED,
+        deleted ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+        seen DATETIME DEFAULT NULL,
+        PRIMARY KEY (userID, messageID),
+        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (messageID) REFERENCES taskmessages(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
     }
 
     $sql = "CREATE TABLE messagegroups (

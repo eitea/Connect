@@ -180,9 +180,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <?php echo $lang['POST_TO']; ?> </label>
                         <select required class="js-example-basic-single" name="to_userid[]" multiple="multiple">
                             <?php //5abdd31716137
-                            foreach ($available_users as $x) {
+                            foreach ($userID_toName as $x => $name) {
                                 if ($x == -1 || $x == $userID) continue;
-                                echo '<option value="' . $x . '">' . $userID_toName[$x] . '</option>';
+                                echo '<option value="' . $x . '">' . $name . '</option>';
                             }
                             ?>
                         </select>
@@ -259,7 +259,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     } else {
                         $subject = $row['subject'];
                         $groupID = $row['groupID'];
-                        $receiver = 0;
+                        $receiver = $groupID;
                         $sender = $userID;
                     }
 
@@ -330,7 +330,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <script>
                         // interval for the notification badge
                         setInterval(function () { //todo:
-                            udpateBadge("#badge<?php echo $i; ?>", "#menu<?php echo $i; ?>", <?php echo $receiver; ?>, "<?php echo $subject; ?>")
+                            udpateBadge("#badge<?php echo $i; ?>", "#menu<?php echo $i; ?>", <?php echo $receiver; ?>, "<?php echo $subject; ?>", "<?= $j ?>")
                         }, 1000);
     
                         //on hover (for dynamic html elements) //todo:
@@ -602,7 +602,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             data.append('picture', file)
             
             const finishedFunction = function (response) {
-                console.log(response);
                 showInfo(response.responseText || response.statusText || response, 1000);
                 getMessages(true)
             }
@@ -649,7 +648,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         })
     }
 
-    function udpateBadge(target, menu, partner, subject) {
+    function udpateBadge(target, menu, partner, subject, mode) {
         if (partner == -1) {
             return;
         }
@@ -659,14 +658,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             type: 'GET',
             data: {
                 partner: partner,
-                subject: subject
+                subject: subject,
+                mode: mode
             },
             success: function (response) {
 
                 // dont show a badge, when the chat is already opened or the response is 0
-                if (response == "0" || selectedPartner == partner || subject == selectedSubject) {
+                if (response == "0" || (selectedPartner == partner && subject == selectedSubject)) {
                     $(menu).show();
                     $(target).hide();
+                    udpateHeaderBadge("#globalMessagingBadge");
                 } else {
                     $(target).show();
                     $(menu).hide();
@@ -675,6 +676,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             },
         })
+    }
+
+    function showGroupMessageInfo(messageID){
+        setCurrentModal({messageID: messageID},"get","ajaxQuery/ajax_post_get_message_information.php")
     }
 
     function onModalLoad() {
