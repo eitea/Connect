@@ -450,6 +450,11 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 			$nonAdminQuery = "AND (d.projectowner = $userID OR d.projectleader = $userID OR conemployees LIKE '% $userID %' $nonAdminQuery)";
         }
 
+		// FIXME:
+		// LEFT JOIN ( SELECT activity, projectid, userID FROM dynamicprojectslogs
+		// 	WHERE (activity = 'VIEWED' AND userID = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID)
+		// 	ORDER BY id DESC
+		// ) tbl4 ON tbl4.projectid = d.projectid AND ((activity = 'VIEWED' AND userID = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID))
 		$result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,
 			projectpriority, projectowner, projectleader, projectpercentage, projecttags, v2, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
 			clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours,
@@ -463,12 +468,8 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 				FROM projectBookingData p GROUP BY dynamicID) tbl3 ON tbl3.dynamicID = d.projectid
 			LEFT JOIN ( SELECT userID, dynamicID, p.id, p.start FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00') tbl5
 				ON tbl5.dynamicID = d.projectid
-			LEFT JOIN ( SELECT activity, projectid FROM dynamicprojectslogs
-				WHERE ((activity = 'VIEWED' AND userID = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID))
-				AND id IN ( SELECT MAX(id) FROM dynamicprojectslogs GROUP BY projectid)) tbl4 ON tbl4.projectid = d.projectid
 			WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") $nonAdminQuery $query_filter
 			ORDER BY workingUser DESC, projectpriority DESC, projectstatus, projectstart");
-
 
         echo $conn->error;
         while($result && ($row = $result->fetch_assoc())){
