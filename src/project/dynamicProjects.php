@@ -447,7 +447,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 
 	    $nonAdminQuery = '';
         if($isDynamicProjectsAdmin == 'FALSE'){
-			//foreach($available_teams as $val) $nonAdminQuery .= " OR conteamsids LIKE '% $val %' ";
+			foreach($available_teams as $val) $nonAdminQuery .= " OR conteamsids LIKE '% $val %' ";
 			$nonAdminQuery = "AND (d.projectowner = $userID OR d.projectleader = $userID OR conemployees LIKE '% $userID %' $nonAdminQuery)";
         }
 		$sql = ("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,
