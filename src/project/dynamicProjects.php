@@ -413,7 +413,6 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
     <tbody>
         <?php
         $modals = $occupation = $query_filter = '';
-        $filter_emps = $filter_team = '0';
         $priority_color = ['', '#2a5da1', '#0c95d9', '#9d9c9c', '#ff7600', '#ff0000'];
         if($filterings['company']){ $query_filter .= "AND d.companyid = ".intval($filterings['company']); }
         if($filterings['client']){ $query_filter .= " AND d.clientid = ".intval($filterings['client']); }
@@ -433,49 +432,48 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             }
         }
         if($filterings['priority'] > 0){ $query_filter .= " AND d.projectpriority = ".$filterings['priority']; }
+
+		$filter_emps = $filter_team = '0';
         foreach($filterings['employees'] as $val){
             $arr = explode(';', $val);
-            if($arr[0] == 'user') $filter_emps .= " OR conemployees LIKE '%{$arr[1]}%'";
-            if($arr[0] == 'team') $filter_team .= " OR conteamsids LIKE '%{$arr[1]}%'";
+            if($arr[0] == 'user') $filter_emps .= " OR conemployees LIKE '% {$arr[1]} %' OR d.projectowner = {$arr[1]} OR d.projectleader = {$arr[1]}";
+            if($arr[0] == 'team') $filter_team .= " OR conteamsids LIKE '% {$arr[1]} %'";
         }
 
-        if($filter_emps || $filter_team) $query_filter .= " AND (d.projectleader = $userID OR d.projectowner = $userID OR $filter_emps OR $filter_team)";
+        if($filter_emps || $filter_team) $query_filter .= " AND ($filter_emps OR $filter_team)";
 
         $result = $conn->query("SELECT id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND logs.userID = $userID AND `end` = '0000-00-00 00:00:00' LIMIT 1");
         $hasActiveBooking = $result->num_rows;
 
 	    $nonAdminQuery = '';
         if($isDynamicProjectsAdmin == 'FALSE'){
-			foreach($available_teams as $val) $nonAdminQuery .= " OR conteamsids LIKE '%$val%' ";
+			//foreach($available_teams as $val) $nonAdminQuery .= " OR conteamsids LIKE '% $val %' ";
 			$nonAdminQuery = "AND (d.projectowner = $userID OR d.projectleader = $userID OR conemployees LIKE '% $userID %' $nonAdminQuery)";
         }
-
-		// FIXME:
-		// LEFT JOIN ( SELECT activity, projectid, userID FROM dynamicprojectslogs
-		// 	WHERE (activity = 'VIEWED' AND userID = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID)
-		// 	ORDER BY id DESC
-		// ) tbl4 ON tbl4.projectid = d.projectid AND ((activity = 'VIEWED' AND userID = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID))
-		$result = $conn->query("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,
+		$sql = ("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,
 			projectpriority, projectowner, projectleader, projectpercentage, projecttags, v2, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
 			clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours,
-			tbl5.userID AS workingUser, tbl5.start AS workStart, tbl5.id AS workingID
+			tbl5.userID AS workingUser, tbl5.start AS workStart, tbl5.id AS workingID, dpl.activity
 			FROM dynamicprojects d
-			LEFT JOIN ( SELECT projectid, GROUP_CONCAT(userid SEPARATOR ' ') AS conemployees FROM dynamicprojectsemployees GROUP BY projectid ) tbl ON tbl.projectid = d.projectid
+			LEFT JOIN ( SELECT projectid, CONCAT(' ',GROUP_CONCAT(userid SEPARATOR ' '),' ') AS conemployees FROM dynamicprojectsemployees GROUP BY projectid ) tbl ON tbl.projectid = d.projectid
 			LEFT JOIN companyData ON companyData.id = d.companyid LEFT JOIN clientData ON clientData.id = clientid LEFT JOIN projectData ON projectData.id = clientprojectid
-			LEFT JOIN ( SELECT t.projectid, GROUP_CONCAT(teamData.name SEPARATOR ',<br>') AS conteams, GROUP_CONCAT(teamData.id SEPARATOR ' ') AS conteamsids FROM dynamicprojectsteams t
+			LEFT JOIN ( SELECT t.projectid, GROUP_CONCAT(teamData.name SEPARATOR ',<br>') AS conteams, CONCAT(' ', GROUP_CONCAT(teamData.id SEPARATOR ' '), ' ') AS conteamsids FROM dynamicprojectsteams t
 				LEFT JOIN teamData ON teamData.id = t.teamid GROUP BY t.projectid ) tbl2 ON tbl2.projectid = d.projectid
 			LEFT JOIN ( SELECT p.dynamicID, SUM(IFNULL(TIMESTAMPDIFF(SECOND, p.start, p.end)/3600,TIMESTAMPDIFF(SECOND, p.start, UTC_TIMESTAMP)/3600)) AS currentHours
 				FROM projectBookingData p GROUP BY dynamicID) tbl3 ON tbl3.dynamicID = d.projectid
 			LEFT JOIN ( SELECT userID, dynamicID, p.id, p.start FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND `end` = '0000-00-00 00:00:00') tbl5
 				ON tbl5.dynamicID = d.projectid
+			LEFT JOIN dynamicprojectslogs dpl ON dpl.id = ( SELECT id FROM dynamicprojectslogs dpl2
+				WHERE dpl2.projectid = d.projectid AND ((activity = 'VIEWED' AND userID = $userID) OR ((activity = 'CREATED' OR activity = 'EDITED') AND userID != $userID))
+				ORDER BY id DESC LIMIT 1)
 			WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") $nonAdminQuery $query_filter
 			ORDER BY workingUser DESC, projectpriority DESC, projectstatus, projectstart");
-
+		$result = $conn->query($sql);
+		//echo $sql;
         echo $conn->error;
         while($result && ($row = $result->fetch_assoc())){
             $x = $row['projectid'];
             $projectName = $row['projectname'];
-
             $rowStyle = (isset($row['activity']) && $row['activity'] != 'VIEWED') ? 'style="color:#1689e7; font-weight:bold;"' : '';
             echo "<tr $rowStyle>";
             echo '<td>';
@@ -506,7 +504,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 echo '<b title="Besitzer">'. $userID_toName[$row['projectowner']].'</b>,<br>';
                 if($row['projectleader']) echo '<u title="Verantwortlicher Mitarbeiter">'.$userID_toName[$row['projectleader']].'</u>,<br>';
             }
-            echo implode(',<br>', array_map(function($val){ global $userID_toName; if(isset($userID_toName[$val])) return $userID_toName[$val]; }, explode(' ',$row['conemployees'])));
+            echo implode(',<br>', array_map(function($val){ global $userID_toName; if(isset($userID_toName[$val])) return $userID_toName[$val]; }, explode(' ', trim($row['conemployees']))));
             //foreach(explode(' ',$row['conemployees']) as $val){ if(isset($userID_toName[$val])) echo $userID_toName[$val].',<br>'; };
             if($row['conemployees'] && $row['conteams']) echo ',<br>';
             echo $row['conteams'];

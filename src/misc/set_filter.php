@@ -307,7 +307,11 @@ if($scale > 2){ //3 columns
                   }
                   echo $result;
                   $selected = '';
-                  $result = $conn->query("SELECT id, name FROM $teamTable");
+				  if(!empty($available_teams) && $isDynamicProjectsAdmin == 'FALSE'){
+					  $result = $conn->query("SELECT id, name FROM teamData WHERE id IN (".implode(', ', $available_teams).") ");
+				  } else {
+					  $result = $conn->query("SELECT id, name FROM teamData");
+				  }
                   while ($row = $result->fetch_assoc()) {
                       $selected .= '<option value="team;'.$row['id'].'" data-icon="group" >'.$row['name'].'</option>';
                   }

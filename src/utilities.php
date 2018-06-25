@@ -16,12 +16,12 @@ function carryOverAdder_Hours($a, $b) {
     $date = new DateTime($a);
     if ($b < 0) {
         $b *= -1;
-		$hours = round($b);
+		$hours = floor($b);
         $date->sub(new DateInterval("PT" . $hours . "H"));
 		$minutes = round(($b - $hours) * 60);
 		$date->sub(new DateInterval("PT" . $minutes . "M"));
     } else {
-		$hours = round($b);
+		$hours = floor($b);
         $date->add(new DateInterval("PT" . $hours . "H"));
 		$minutes = round(($b - $hours) * 60);
 		$date->add(new DateInterval("PT" . $minutes . "M"));
