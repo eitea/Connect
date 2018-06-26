@@ -242,9 +242,9 @@ FROM contactPersons LEFT JOIN position ON position.id = position LEFT JOIN exter
                                     <tbody>
                                         <?php
                                         $position_select = '<select type="text" name="edit_contacts_position" placeholder="Position" class="js-example-basic-single">';
-                                        $result = $conn->query("SELECT * FROM position ORDER BY name");
-                                        while ($row = $result->fetch_assoc()) {
-                                            $position_select .= '<option value="' . $row['id'] . '" >' . $row['name'] . '</option>';
+                                        $resultc = $conn->query("SELECT * FROM position ORDER BY name");
+                                        while ($rowc = $resultc->fetch_assoc()) {
+                                            $position_select .= '<option value="' . $rowc['id'] . '" >' . $rowc['name'] . '</option>';
                                         }
 
                                         $position_select .= '</select>';

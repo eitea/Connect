@@ -48,7 +48,7 @@ class PDF extends FPDF {
 $result = $conn->query("SELECT processHistory.*, proposals.*, companyData.*, clientData.*,
   proposals.id AS proposalID, processHistory.id AS historyID, clientData.name AS clientName, companyData.name AS companyName,
   clientInfoData.title, clientInfoData.firstname, clientInfoData.vatnumber, clientInfoData.name AS lastname, clientInfoData.nameAddition, clientInfoData.address_Street,
-  clientInfoData.address_Country, clientInfoData.address_Country_Postal, clientInfoData.address_Country_City, clientInfoData.address_Addition,
+  travelCountryData.countryName, clientInfoData.address_Country_Postal, clientInfoData.address_Country_City, clientInfoData.address_Addition,
   erp_settings.yourSign, erp_settings.yourOrder, erp_settings.ourSign, erp_settings.ourMessage, erp_settings.euDelivery, erp_settings.euService
   FROM processHistory
   INNER JOIN proposals ON processHistory.processID = proposals.id
@@ -56,6 +56,7 @@ $result = $conn->query("SELECT processHistory.*, proposals.*, companyData.*, cli
   INNER JOIN clientInfoData ON clientInfoData.clientID = clientData.id
   INNER JOIN companyData ON clientData.companyID = companyData.id
   INNER JOIN erp_settings ON erp_settings.companyID = companyData.id
+  LEFT JOIN travelCountryData ON clientInfoData.address_Country = travelCountryData.id
   WHERE processHistory.id = $processID");
 if(mysqli_error($conn)){
   echo mysqli_error($conn);
@@ -113,8 +114,8 @@ if($row['address_Street']){
 if($row['address_Country_Postal'] || $row['address_Country_City']){
   $pdf->Cell(0, 5, iconv('UTF-8', 'windows-1252', trim($row['address_Country_Postal'].' '.$row['address_Country_City'])), 0, 2 );
 }
-if($row['address_Country']){
-  $pdf->Cell(0, 5, iconv('UTF-8', 'windows-1252', trim($row['address_Country'])), 0, 2 );
+if($row['countryName']){
+  $pdf->Cell(0, 5, iconv('UTF-8', 'windows-1252', trim($row['countryName'])), 0, 2 );
 }
 if($row['address_Street'] && $row['address_Country_Postal'] && $row['address_Country_City'] &&  $row['address_Addition']){
   $pdf->Cell(0, 5, iconv('UTF-8', 'windows-1252', trim($row['address_Addition'])), 0, 2 );

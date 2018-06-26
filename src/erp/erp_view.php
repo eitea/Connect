@@ -27,7 +27,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 		SELECT clientID, deliveryDate, paymentMethod, shipmentType, representative, porto, portoRate, header, referenceNumrow FROM proposals WHERE id = $processID"); echo $conn->error;
 		//insert history
 		$processID = $conn->insert_id;
-		$conn->query("INSERT INTO processHistory(id_number, processID) VALUES('".$row['id_number']."', $processID)"); echo $conn->error;
+		$conn->query("INSERT INTO processHistory(id_number, processID, status) VALUES('".$row['id_number']."', $processID, 0)"); echo $conn->error;
 		//insert products
 		$historyID = $conn->insert_id;
 		$origin = randomPassword(16);
@@ -66,7 +66,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 		$conn->query("INSERT INTO proposals (clientID, curDate, deliveryDate, paymentMethod, shipmentType, representative)
 		VALUES ($val, '$date', '$date', '$meta_paymentMethod', '$meta_shipmentType', '$meta_representative')");
 		$val = $conn->insert_id;
-		$conn->query("INSERT INTO processHistory (id_number, processID) VALUES('$num', $val)");
+		$conn->query("INSERT INTO processHistory (id_number, processID, status) VALUES('$num', $val, 0)");
 		$val = $conn->insert_id;
 		if(!$conn->error){
 			redirect("edit?val=$val");
