@@ -5,10 +5,10 @@
 	$filterClient = empty($filterings['client']) ? 0 : $filterings['client'];
 	$filterPerson = empty($filterings['contact']) ? 0 : $filterings['contact'];
 
-	if(!$cmpID){
+	if(empty($cmpID)){
 		$result_fc = mysqli_query($conn, "SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
 		if($result_fc && $result_fc->num_rows > 1){
-			echo '<div class="col-sm-6"><label>'.$lang['COMPANY'].'</label><select class="js-example-basic-single" name="filterCompany"
+			echo '<div class="col-sm-4"><label>'.$lang['COMPANY'].'</label><select class="js-example-basic-single" name="filterCompany"
 			onchange="select_client[\''.$val.'\'].showClients(this.value, '.$filterClient.');" >';
 			echo '<option value="0">...</option>';
 			while($result && ($row_fc = $result_fc->fetch_assoc())){
@@ -26,7 +26,7 @@
 		$filterCompany = $cmpID;
 	}
 	?>
-	<div class="col-md-6">
+	<div class="col-md-4">
 		<label><?php echo $lang['CLIENT']; ?></label>
 		<select id="clientHint-<?php echo $val; ?>" name="filterClient" class="js-example-basic-single" onchange="select_client['<?php echo $val; ?>'].showContacts(this.value, <?php echo $filterClient; ?>);">
 			<?php
@@ -41,7 +41,7 @@
 			?>
 		</select>
 	</div>
-	<div class="col-md-6">
+	<div class="col-md-4">
 		<label>Kontaktperson</label>
 		<select id="contactHint-<?php echo $val; ?>" class="js-example-basic-single" name="filterContact">
 			<?php

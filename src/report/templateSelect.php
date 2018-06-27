@@ -138,7 +138,7 @@ while($result && ($row = $result->fetch_assoc())):  //create a modal for every t
             <div class="container-fluid checkbox">
               <?php
               $users = explode(",", $row['userIDs']);
-              $resultUser = $conn->query("SELECT id, firstname, lastname FROM $userTable");
+              $resultUser = $conn->query("SELECT id, firstname, lastname FROM UserData");
               while($resultUser && ($rowUser = $resultUser->fetch_assoc())){
                 if(in_array($rowUser['id'], $users)){
                   $selected = 'checked';

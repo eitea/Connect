@@ -850,39 +850,6 @@ function create_tables($conn) {
         echo mysqli_error($conn);
     }
 
-    $sql = "CREATE TABLE socialmessages(
-        userID INT(6) UNSIGNED,
-        partner INT(6) UNSIGNED,
-        message TEXT,
-        picture MEDIUMBLOB,
-        sent DATETIME DEFAULT CURRENT_TIMESTAMP,
-        seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL
-    )";
-    if (!$conn->query($sql)) {
-        echo mysqli_error($conn);
-    }
-
-    $sql = "CREATE TABLE socialgroups(
-        groupID INT(6) UNSIGNED,
-        userID INT(6) UNSIGNED,
-        name VARCHAR(30),
-        admin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
-    )";
-    if (!$conn->query($sql)) {
-        echo mysqli_error($conn);
-    }
-
-    $sql = "CREATE TABLE socialgroupmessages(
-        userID INT(6) UNSIGNED,
-        groupID INT(6) UNSIGNED,
-        message TEXT,
-        picture MEDIUMBLOB,
-        sent DATETIME DEFAULT CURRENT_TIMESTAMP,
-        seen TEXT
-    )";
-    if (!$conn->query($sql)) {
-        echo mysqli_error($conn);
-    }
     if (!$conn->query("CREATE TABLE resticconfiguration(
         path VARCHAR(255),
         password VARCHAR(255),
@@ -1659,96 +1626,6 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
-    $sql = "CREATE TABLE messages(
-        messageID INT(6) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        userID INT(6) UNSIGNED NOT NULL,
-        partnerID INT(6) UNSIGNED NOT NULL,
-        subject varchar(250),
-        message TEXT,
-        picture MEDIUMBLOB,
-        sent DATETIME DEFAULT CURRENT_TIMESTAMP,
-        seen ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        user_deleted ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
-        partner_deleted ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
-    )";
-    if (!$conn->query($sql)) {
-        echo $conn->error;
-    }
-
-	    // 5ac63505c0ecd
-    $sql = "CREATE TABLE taskmessages(
-        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        userID INT(6) UNSIGNED,
-        taskID varchar(100),
-        taskName varchar(100),
-        message TEXT,
-        picture MEDIUMBLOB,
-        sent DATETIME DEFAULT CURRENT_TIMESTAMP
-    )";
-    if (!$conn->query($sql)) {
-        echo $conn->error;
-    }
-
-    $sql = "CREATE TABLE taskmessages_user (
-        userID INT(6) UNSIGNED,
-        messageID INT(6) UNSIGNED,
-        deleted ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        seen DATETIME DEFAULT NULL,
-        PRIMARY KEY (userID, messageID),
-        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE,
-        FOREIGN KEY (messageID) REFERENCES taskmessages(id) ON UPDATE CASCADE ON DELETE CASCADE
-    )";
-    if (!$conn->query($sql)) {
-        echo mysqli_error($conn);
-    }
-
-    $sql = "CREATE TABLE messagegroups (
-        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        subject VARCHAR(60)
-    )";
-    if (!$conn->query($sql)) {
-        echo mysqli_error($conn);
-    }
-
-    $sql = "CREATE TABLE messagegroups_user (
-        userID INT(6) UNSIGNED,
-        groupID INT(6) UNSIGNED,
-        admin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE,
-        FOREIGN KEY (groupID) REFERENCES messagegroups(id) ON UPDATE CASCADE ON DELETE CASCADE,
-        PRIMARY KEY (userID, groupID)
-    )";
-    if (!$conn->query($sql)) {
-        echo mysqli_error($conn);
-    }
-
-    $sql = "CREATE TABLE groupmessages(
-        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-        groupID INT(6) UNSIGNED,
-        sender INT(6) UNSIGNED,
-        message TEXT,
-        picture MEDIUMBLOB,
-        sent DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (sender) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE,
-        FOREIGN KEY (groupID) REFERENCES messagegroups(id) ON UPDATE CASCADE ON DELETE CASCADE
-    )";
-    if (!$conn->query($sql)) {
-        echo $conn->error;
-    }
-
-    $sql = "CREATE TABLE groupmessages_user (
-        userID INT(6) UNSIGNED,
-        messageID INT(6) UNSIGNED,
-        deleted ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        seen DATETIME DEFAULT NULL,
-        PRIMARY KEY (userID, messageID),
-        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE,
-        FOREIGN KEY (messageID) REFERENCES groupmessages(id) ON UPDATE CASCADE ON DELETE CASCADE
-    )";
-    if (!$conn->query($sql)) {
-        echo mysqli_error($conn);
-    }
-
 	$sql = "CREATE TABLE folder_default_sturctures(
 		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 		category VARCHAR(20) NOT NULL,
@@ -1800,6 +1677,47 @@ function create_tables($conn) {
 	$conn->query("CREATE TABLE dsgvo_categories(
 		id INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 		name VARCHAR(250) NOT NULL
+	)");
+	if($conn->error){
+		echo $conn->error;
+	}
+
+	$conn->query("CREATE TABLE messenger_conversations(
+		id INT(6) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		subject VARCHAR(550) NOT NULL,
+		category VARCHAR(25),
+		categoryID VARCHAR(10)
+	)");
+	if($conn->error){
+		echo $conn->error;
+	}
+
+	$conn->query("CREATE TABLE relationship_conversation_participant(
+		id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		conversationID INT(6) UNSIGNED,
+		partType VARCHAR(25) NOT NULL,
+		partID VARCHAR(50) NOT NULL,
+		status VARCHAR(25),
+		lastCheck DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		FOREIGN KEY (conversationID) REFERENCES messenger_conversations(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+		UNIQUE KEY relationship (conversationID, partType, partID)
+	)");
+	if($conn->error){
+		echo $conn->error;
+	}
+
+	$conn->query("CREATE TABLE messenger_messages(
+		id INT(15) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		message MEDIUMTEXT,
+		participantID INT(10) UNSIGNED,
+		sentTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		type VARCHAR(15) NOT NULL DEFAULT 'text',
+		vKey VARCHAR(150),
+		FOREIGN KEY (participantID) REFERENCES relationship_conversation_participant(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
 	)");
 	if($conn->error){
 		echo $conn->error;

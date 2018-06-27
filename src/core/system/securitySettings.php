@@ -127,6 +127,52 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $stmt->close();
         }
     }
+
+	function grantAccess($module, $user){
+		global $conn;
+		global $grantable_modules;
+		global $encrypted_modules;
+		global $privateKey;
+		$result = $conn->query("SELECT u.publicKey, module FROM security_users u LEFT JOIN security_access a ON a.userID = u.userID
+			AND module = '$module' AND a.outDated = 'FALSE' WHERE u.userID = $user AND u.outDated = 'FALSE'");
+		if($result && ($row = $result->fetch_assoc()) && !$row['module']){
+			$user_public = base64_decode($row['publicKey']);
+			//grant which can be granted
+			if(array_key_exists($module, $grantable_modules) && array_key_exists($module, $encrypted_modules)){
+				$cipher_private_module = base64_decode($grantable_modules[$module]['private']);
+				try{
+					$nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
+					$cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
+					$private = sodium_crypto_box_open($cipher_private_module, $nonce, base64_decode($privateKey).base64_decode($grantable_modules[$module]['public']));
+					$nonce = random_bytes(24);
+					$access_private_encrypted = base64_encode($nonce . sodium_crypto_box($private, $nonce, $private.$user_public));
+				} catch (Exception $e){
+					echo $e;
+					//echo '<br>length:',strlen(base64_decode($privateKey).base64_decode($grantable_modules[$module]['public']));
+					return 'FALSE';
+				}
+
+				$conn->query("INSERT INTO security_access(userID, module, privateKey) VALUES($user, '$module', '$access_private_encrypted')");
+				if($conn->error){
+					showError($conn->error.__LINE__);
+					return 'FALSE';
+				} else {
+					showSuccess("$module Schlüssel wurde hinzugefügt");
+				}
+			} elseif(!array_key_exists($module, $grantable_modules)) {
+				showInfo("Fehlende $module Verschlüsselung: Sie können keinen Modulzugriff gewähren, zudem Sie selbst keinen Zugriff besitzen.");
+				return 'FALSE';
+			}
+		} else {
+			if($conn->error){
+				showError($conn->error.__LINE__);
+			} elseif($result->num_rows < 1) {
+				showError("Nicht registrierter Benutzer: Dieser Benutzer muss sich zuerst einloggen");
+				return 'FALSE';
+			}
+		}
+		return 'TRUE';
+	}
 	if(!empty($_POST['session_timer'])){
 		$sessionTimer = round($_POST['session_timer'], 2);
 		$conn->query("UPDATE configurationData SET sessionTime = $sessionTimer");
@@ -286,75 +332,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 		}
 
 		if(isset($_POST['isDSGVOAdmin'])){
-			$isDSGVOAdmin = 'TRUE';
-			$result = $conn->query("SELECT u.publicKey, module FROM security_users u LEFT JOIN security_access a ON a.userID = u.userID
-				AND module = 'DSGVO' AND a.outDated = 'FALSE' WHERE u.userID = $x AND u.outDated = 'FALSE'");
-			if($result && ($row = $result->fetch_assoc()) && !$row['module']){
-				$user_public = base64_decode($row['publicKey']);
-				//grant which can be granted
-				if(array_key_exists('DSGVO', $grantable_modules) && array_key_exists('DSGVO', $encrypted_modules)){
-					$cipher_private_module = base64_decode($grantable_modules['DSGVO']['private']);
-					$nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
-        			$cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
-					$private = sodium_crypto_box_open($cipher_private_module, $nonce, base64_decode($privateKey).base64_decode($grantable_modules['DSGVO']['public']));
-
-		            $nonce = random_bytes(24);
-		            $access_private_encrypted = base64_encode($nonce . sodium_crypto_box($private, $nonce, $private.$user_public));
-
-					$conn->query("INSERT INTO security_access(userID, module, privateKey) VALUES($x, 'DSGVO', '$access_private_encrypted')");
-					if($conn->error){
-						showError($conn->error);
-					} else {
-						showSuccess("DSGVO Schlüssel wurde hinzugefügt");
-					}
-				} elseif(!array_key_exists('DSGVO', $grantable_modules)) {
-					$isDSGVOAdmin = 'FALSE';
-					showInfo("Fehlende DSGVO Verschlüsselung: Sie können keinen Modulzugriff gewähren, zudem Sie selbst keinen Zugriff besitzen.");
-				}
-			} else {
-				if($conn->error){
-					showError($conn->error);
-				} elseif($result->num_rows < 1) {
-					$isDSGVOAdmin = 'FALSE';
-					showError("Nicht registrierter Benutzer: Dieser Benutzer muss sich zuerst einloggen");
-				}
-			}
+			$isDSGVOAdmin = grantAccess('DSGVO', $x);
 		} else {
 			$conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'DSGVO' AND userID = $x");
 		}
-
 		if(isset($_POST['isERPAdmin'])){
-			$isERPAdmin = 'TRUE';
-			$result = $conn->query("SELECT u.publicKey, module FROM security_users u LEFT JOIN security_access a ON a.userID = u.userID
-				AND module = 'ERP' AND a.outDated = 'FALSE' WHERE u.userID = $x AND u.outDated = 'FALSE'");
-			if($result && ($row = $result->fetch_assoc()) && !$row['module']){
-				$user_public = base64_decode($row['publicKey']);
-				//grant which can be granted
-				$result = $conn->query("SELECT s.privateKey, m.publicKey FROM security_access s, security_modules m
-					WHERE m.outDated = 'FALSE' AND m.module = 'ERP'
-					AND s.userID = $userID AND s.outDated = 'FALSE' AND s.module = 'ERP' LIMIT 1");
-				if($result && ($row = $result->fetch_assoc()) && array_key_exists('ERP', $encrypted_modules)){
-
-					$cipher_private_module = base64_decode($row['privateKey']);
-					$nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
-        			$cipher_private_module = mb_substr($cipher_private_module, 24, null, '8bit');
-					$private = sodium_crypto_box_open($cipher_private_module, $nonce, base64_decode($privateKey).base64_decode($row['publicKey']));
-
-		            $nonce = random_bytes(24);
-		            $access_private_encrypted = base64_encode($nonce . sodium_crypto_box($private, $nonce, $private.$user_public));
-
-					$conn->query("INSERT INTO security_access(userID, module, privateKey) VALUES($x, 'ERP', '$access_private_encrypted')");
-					if($conn->error){
-						showError($conn->error);
-					} else {
-						showSuccess("ERP Schlüssel wurde hinzugefügt");
-					}
-				} else {
-					showError($conn->error);
-				}
-			} else {
-				showError($conn->error);
-			}
+			$isERPAdmin = grantAccess('ERP', $x);
 		} else {
 			$conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'ERP' AND userID = $x");
 		}
@@ -363,6 +346,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         isProjectAdmin = '$isProjectAdmin', isReportAdmin = '$isReportAdmin', isERPAdmin = '$isERPAdmin', isFinanceAdmin = '$isFinanceAdmin', canStamp = '$canStamp', canBook = '$canBook',
         canEditTemplates = '$canEditTemplates', canUseSocialMedia = '$canUseSocialMedia', canCreateTasks = '$canCreateTasks', canUseArchive = '$canUseArchive', canUseClients = '$canUseClients',
         canUseSuppliers = '$canUseSuppliers', canEditClients = '$canEditClients', canEditSuppliers = '$canEditSuppliers', canUseWorkflow = '$canUseWorkflow' WHERE userID = '$x'");
+
+		if(isset($_POST['hasTaskAccess'])){
+			//TODO: see if user has access already, and if not, and you can grant it, grant it.
+		} else {
+			$conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'TASK' AND userID = $x");
+		}
+		if(isset($_POST['hasChatAccess'])){
+
+		} else {
+			$conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'CHAT' AND userID = $x");
+		}
 
         if($conn->error){
             showError($conn->error);
@@ -431,6 +425,8 @@ if(!empty($key_downloads)){
     $result = $conn->query("SELECT * FROM roles");
     while ($result && ($row = $result->fetch_assoc())):
         $x = $row['userID'];
+		$res_access = $conn->query("SELECT module FROM security_access WHERE userID = $x AND outDated = 'FALSE'")->fetch_all();
+		$hasAccessTo = array_column($res_access, 0);
         ?>
         <div class="panel panel-default">
             <div class="panel-heading" role="tab" id="heading<?php echo $x; ?>">
@@ -558,6 +554,19 @@ if(!empty($key_downloads)){
                                 </label>
                             </div>
                         </div>
+						<br><h4>Keys</h4>
+                        <div class="row checkbox">
+                            <div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="hasTaskAccess" <?php if(in_array('TASK', $hasAccessTo)){echo 'checked';} //TODO: optimize performance ?>>Tasks
+                                </label><br>
+                            </div>
+							<div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="hasChatAccess" <?php if(in_array('CHAT', $hasAccessTo)){echo 'checked';} ?>>Messenger
+                                </label><br>
+                            </div>
+						</div>
 						<br>
                         <div class="row">
                             <div class="col-sm-2 col-sm-offset-10 text-right">

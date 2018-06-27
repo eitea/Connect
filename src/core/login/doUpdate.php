@@ -3072,7 +3072,83 @@ if($row['version'] < 162){
 	}
 }
 
-// if($row['version'] < 163){}
+if($row['version'] < 163){
+	//messenger update. ONE performant messenger, throghout the entire system
+	$conn->query("DROP TABLE messages"); echo $conn->error;
+	$conn->query("DROP TABLE taskmessages");
+	$conn->query("DROP TABLE taskmessages_user");
+	$conn->query("DROP TABLE messagegroups");
+	$conn->query("DROP TABLE messagegroups_user"); echo $conn->error;
+	$conn->query("DROP TABLE groupmessages");
+	$conn->query("DROP TABLE groupmessages_user");
+	$conn->query("DROP TABLE socialgroupmessages");
+	$conn->query("DROP TABLE socialmessages"); echo $conn->error;
+	$conn->query("DROP TABLE socialgroups"); echo $conn->error;
+
+	$conn->query("CREATE TABLE messenger_conversations(
+		id INT(6) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		subject VARCHAR(550) NOT NULL,
+		category VARCHAR(25),
+		categoryID VARCHAR(10)
+	)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Messenger: Conversations';
+	}
+	$conn->query("CREATE TABLE relationship_conversation_participant(
+		id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		conversationID INT(6) UNSIGNED,
+		partType VARCHAR(25) NOT NULL,
+		partID VARCHAR(50) NOT NULL,
+		status VARCHAR(25),
+		lastCheck DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		FOREIGN KEY (conversationID) REFERENCES messenger_conversations(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+		UNIQUE KEY relationship (conversationID, partType, partID)
+	)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Messenger: Participants';
+	}
+
+	//try not to flood this
+	$conn->query("CREATE TABLE messenger_messages(
+		id INT(15) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		message MEDIUMTEXT,
+		participantID INT(10) UNSIGNED,
+		sentTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		type VARCHAR(15) NOT NULL DEFAULT 'text',
+		vKey VARCHAR(150),
+		FOREIGN KEY (participantID) REFERENCES relationship_conversation_participant(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+	)");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>Messenger: Messages';
+	}
+
+	$keypair = sodium_crypto_box_keypair();
+	$private = sodium_crypto_box_secretkey($keypair);
+	$public = sodium_crypto_box_publickey($keypair);
+	$nonce = random_bytes(24);
+	$conn->query("INSERT INTO security_modules (module, symmetricKey, publicKey, outDated, checkSum) VALUES('CHAT', '', '".base64_encode($public)."', 'FALSE', '')");
+
+	echo $conn->error;
+	$result = $conn->query("SELECT userID, publicKey FROM security_users WHERE outDated = 'FALSE'");
+	while($row = $result->fetch_assoc()){
+		$user_public = base64_decode($row['publicKey']);
+		$nonce = random_bytes(24);
+		$encrypted = base64_encode($nonce . sodium_crypto_box($private, $nonce, $private.$user_public));
+		$conn->query("INSERT INTO security_access(userID, module, privateKey, outDated) VALUES(".$row['userID'].", 'CHAT', '$encrypted', 'FALSE')");
+	}
+	echo $conn->error;
+}
+
 // if($row['version'] < 164){}
 // if($row['version'] < 165){}
 // if($row['version'] < 166){}
@@ -3082,7 +3158,8 @@ if($row['version'] < 162){
 
 //cleanups for maintainable db sizes
 $conn->query("DELETE FROM `checkinLogs` WHERE id <= ( SELECT id FROM ( SELECT id FROM `checkinLogs` ORDER BY id DESC LIMIT 1 OFFSET 100 ) foo )");echo $conn->error;
-$conn->query("DELETE FROM `dsgvo_vv_logs` WHERE id <= ( SELECT id FROM ( SELECT id FROM `dsgvo_vv_logs` ORDER BY id DESC LIMIT 1 OFFSET 400 ) foo )");echo $conn->error;
+$conn->query("DELETE FROM `dsgvo_vv_logs` WHERE id <= ( SELECT id FROM ( SELECT id FROM `dsgvo_vv_logs` ORDER BY id DESC LIMIT 1 OFFSET 200 ) foo )");echo $conn->error;
+$conn->query("DELETE FROM `emailprojectlogs` WHERE id <= ( SELECT id FROM ( SELECT id FROM `emailprojectlogs` ORDER BY id DESC LIMIT 1 OFFSET 100 ) foo )");echo $conn->error; //5b331ae15c641
 // ------------------------------------------------------------------------------
 require dirname(dirname(__DIR__)) . '/version_number.php';
 $conn->query("UPDATE configurationData SET version=$VERSION_NUMBER");

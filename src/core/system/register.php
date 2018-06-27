@@ -104,12 +104,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $conn->query("INSERT INTO archive_folders VALUES(0,$curID,'ROOT',-1)");
 		  echo mysqli_error($conn);
           //create interval
-          $sql = "INSERT INTO $intervalTable (mon, tue, wed, thu, fri, sat, sun, userID, vacPerYear, overTimeLump, pauseAfterHours, hoursOfrest, startDate)
+          $sql = "INSERT INTO intervalData (mon, tue, wed, thu, fri, sat, sun, userID, vacPerYear, overTimeLump, pauseAfterHours, hoursOfrest, startDate)
           VALUES ($mon, $tue, $wed, $thu, $fri, $sat, $sun, $curID, '$vacDaysPerYear', '$overTimeLump','$pauseAfter', '$hoursOfRest', '$begin');";
           $conn->query($sql);
           echo mysqli_error($conn);
           //create roletable
-          $sql = "INSERT INTO $roleTable (userID, canStamp, canUseSocialMedia) VALUES($curID, 'TRUE', 'TRUE');";
+          $sql = "INSERT INTO roles (userID, canStamp, canUseSocialMedia) VALUES($curID, 'TRUE', 'TRUE');";
           $conn->query($sql);
           echo mysqli_error($conn);
           //create socialprofile

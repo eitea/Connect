@@ -201,18 +201,22 @@ function asymmetric_encryption($module, $message, $userID, $privateKey, $mode = 
 				$cipher_private_module = base64_decode($row['privateKey']);
 				$nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
 				$encrypted = mb_substr($cipher_private_module, 24, null, '8bit');
-				// echo '<br> public module: '.$public_module;
-				// echo '<br> key:'.$privateKey;
-				$private_module = sodium_crypto_box_open($encrypted, $nonce, $privateKey.$public_module);
-				//echo '<br> private module: '.$private_module;
-				if(strlen($private_module.$mode) != 64){
-					$err = 'module keys do not have the right size: '.strlen($private_module.$mode);
-					return $message;
+				try{
+					$private_module = sodium_crypto_box_open($encrypted, $nonce, $privateKey.$public_module);
+
+					if(strlen($private_module.$mode) != 64){
+						$err = 'module keys do not have the right size: '.strlen($private_module.$mode);
+						return $message;
+					}
+					$message_crypt = base64_decode($message);
+					$nonce = mb_substr($message_crypt, 0, 24, '8bit');
+					$encrypted = mb_substr($message_crypt, 24, null, '8bit');
+					return sodium_crypto_box_open($encrypted, $nonce, $private_module.$mode);
+				} catch(Exception $e){
+					// echo '<br> public module: '.$public_module;
+					// echo '<br> key:'.$privateKey;
+					// echo '<br> private module: '.$private_module;
 				}
-				$message = base64_decode($message);
-				$nonce = mb_substr($message, 0, 24, '8bit');
-				$encrypted = mb_substr($message, 24, null, '8bit');
-				return sodium_crypto_box_open($encrypted, $nonce, $private_module.$mode);
 			}
 		} else { //encrypt - privateUser, publicModule
 			$nonce = random_bytes(24);
@@ -458,15 +462,12 @@ function getFilledOutTemplate($templateID, $bookingQuery = "") {
 }
 
 function uploadImage($file_field, $crop_square = false, $resize = true) {
-    //bytes
     $max_size = 5000000; //5mb
-    //whitelist
     $whitelist_ext = array('jpeg', 'jpg', 'png', 'gif');
     $whitelist_type = array('image/jpeg', 'image/jpg', 'image/png');
 
     //Validation
     $out = array('error' => array());
-
     //Make sure that there is a file
     if ((!empty($_FILES[$file_field])) && ($_FILES[$file_field]['error'] == 0)) {
         // Get filename
@@ -477,40 +478,31 @@ function uploadImage($file_field, $crop_square = false, $resize = true) {
         if (!in_array($ext, $whitelist_ext)) {
             $out['error'][] = "Invalid file Extension";
         }
-
         //Check that the file is of the right type
         if (!in_array($_FILES[$file_field]["type"], $whitelist_type)) {
             $out['error'][] = "Invalid file Type";
         }
-
         //Check that the file is not too big
         if ($_FILES[$file_field]["size"] > $max_size) {
             $out['error'][] = "File is too big";
         }
-
         if (!getimagesize($_FILES[$file_field]['tmp_name'])) {
             $out['error'][] = "Uploaded file is not a valid image";
         }
-
         if (count($out['error']) > 0) {
             return $out;
         }
-
         //remove interlacing bit
         $im = file_get_contents($_FILES[$file_field]['tmp_name']);
         $im = @imagecreatefromstring($im); //suppress the warning, since im handling it anyways
         if (!$im) {
             return file_get_contents($_FILES[$file_field]['tmp_name']);
         }
-
         $corx = imagesx($im);
         $cory = imagesy($im);
-
         if ($crop_square && $corx != $cory) {
             $size = min($corx, $cory);
-            $middlex = $corx / 2;
-            $middley = $cory / 2;
-            $im = imagecrop($im, ['x' => floor($middlex - ($size / 2)), 'y' => floor($middley - ($size / 2)), 'width' => $size, 'height' => $size]);
+            $im = imagecrop($im, ['x' => 0, 'y' => 0, 'width' => $size, 'height' => $size]);
         }
         if ($resize && ($corx > 350 || $cory > 200)) {
             $aspect_ratio = $corx / $cory;
@@ -689,7 +681,6 @@ function getS3Object($bucket = ''){
 	}
 	return $s3;
 }
-
 
 use PHPMailer\PHPMailer\PHPMailer;
 function send_standard_email($recipient, $content, $subject=''){

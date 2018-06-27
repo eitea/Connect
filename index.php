@@ -8,7 +8,8 @@ $routes = array(
 	'user/home' => 'core/user/home.php',                              'user/time' => 'core/user/timeCalcTable.php',                'user/book' => 'core/user/userProjecting.php',
 	'user/logout' => 'core/user/logout.php',                          'user/request' => 'core/user/makeRequest.php',               'user/ready' => 'core/user/readyPlan.php',
 
-	'social/post' => 'core/system/social_messages.php',               'social/home' => 'core/system/socialMedia.php',
+	'social/post' => 'social/social_messages.php',               	  'social/profile' => 'social/user_profile.php',
+
 	'setup/run' => 'core/setup/setup.php',                            'setup/wizard' => 'core/setup/install_wizard.php',           'setup/keys' => 'core/setup/download_keys.php',
 
 	'system/users' => 'core/system/editUsers.php',                    'system/saldo' => 'core/system/admin_saldoview.php',         'system/register' => 'core/system/register.php',
@@ -17,7 +18,7 @@ $routes = array(
 	'system/password' => 'core/system/options_password.php',          'system/email' => 'core/system/options_report.php',          'system/tasks' => 'core/system/taskScheduler.php',
 	'system/backup' => 'core/system/system_backup.php',               'system/restore' => 'core/system/system_restore.php',        'system/clients' => 'core/system/editCustomers.php',
 	'system/archive' => 'core/system/options_archive.php',            'system/security' => 'core/system/securitySettings.php',     'system/restic' => 'core/system/resticBackup.php',
-	'system/downloadSql' => 'core/system/backup_download.php',        'system/cryptlog'=> 'core/system/viewCryptLog.php',          
+	'system/downloadSql' => 'core/system/backup_download.php',        'system/cryptlog'=> 'core/system/viewCryptLog.php',
 	'system/checkinLogs' => 'core/system/checkinLogs.php',
 
 	'time/view' => 'time/time_projects.php',                          'time/corrections' => 'time/time_adjusts.php',               'time/travels' => 'time/time_travel.php',
@@ -47,6 +48,7 @@ $routes = array(
 	'dsgvo/data-matrix' => 'dsgvo/dsgvo_data_matrix.php',             'dsgvo/pdfDownload' => 'dsgvo/dsgvo_vv_pdfDownload.php',
 
 	'archive/share' => 'archive/archive_share.php',                   'archive/files' => 'archive/archive_files.php',			   'archive/private'  => 'archive/private_view.php',
+
 	'extern/login' => 'external/login.php',                           'extern/home' => 'external/home.php'
 );
 

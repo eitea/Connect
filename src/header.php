@@ -65,12 +65,9 @@ if ($userID == 1) { //superuser
 if($isERPAdmin == 'TRUE'){
     $canEditClients = $canEditSuppliers = 'TRUE';
 }
-$result = $conn->query("SELECT psw, lastPswChange, forcedPwdChange, birthday, displayBirthday FROM UserData WHERE id = $userID");
-if($result && ($userdata = $result->fetch_assoc())) {
-    $userPasswordHash = $userdata['psw'];
-} else {
-    echo $conn->error;
-}
+$result = $conn->query("SELECT psw, lastPswChange, forcedPwdChange, birthday, displayBirthday, real_email FROM UserData WHERE id = $userID");
+$userdata = $result->fetch_assoc();
+
 $result = $conn->query("SELECT firstTimeWizard, bookingTimeBuffer, cooldownTimer, sessionTime FROM configurationData");
 if ($result && ($row = $result->fetch_assoc())) {
     if($row['firstTimeWizard'] == 'FALSE') redirect('../setup/wizard');
@@ -88,11 +85,6 @@ if ($result && ($row = $result->fetch_assoc())) {
 $result = $conn->query("SELECT id, CONCAT(firstname,' ', lastname) AS name FROM UserData")->fetch_all(MYSQLI_ASSOC);
 $userID_toName = array_combine( array_column($result, 'id'), array_column($result, 'name'));
 
-$numberOfSocialAlerts = 0;
-$result = $conn->query("SELECT userID FROM socialmessages WHERE seen = 'FALSE' AND partner = $userID "); echo $conn->error;
-if($result) $numberOfSocialAlerts += $result->num_rows;
-$result = $conn->query("SELECT seen FROM socialgroupmessages INNER JOIN socialgroups ON socialgroups.groupID = socialgroupmessages.groupID WHERE socialgroups.userID = '$userID' AND NOT ( seen LIKE '%,$userID,%' OR seen LIKE '$userID,%' OR seen LIKE '%,$userID' OR seen = '$userID')"); echo $conn->error;
-if($result) $numberOfSocialAlerts += $result->num_rows;
 if ($isTimeAdmin) {
     $numberOfAlerts = 0;
     //requests
@@ -280,13 +272,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_POST = array();
     }
     $_SESSION['posttimer'] = time();
-    if(isset($_POST['savePAS']) && !empty($_POST['passwordCurrent']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm']) && crypt($_POST['passwordCurrent'], $userPasswordHash) == $userPasswordHash){
+    if(isset($_POST['savePAS']) && !empty($_POST['passwordCurrent']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm']) && crypt($_POST['passwordCurrent'], $userdata['psw']) == $userdata['psw']){
         $password = $_POST['password'];
         $output = '';
         if(strcmp($password, $_POST['passwordConfirm']) == 0 && match_passwordpolicy($password, $output)){
-            $userPasswordHash = password_hash($password, PASSWORD_BCRYPT);
+            $userdata['psw'] = password_hash($password, PASSWORD_BCRYPT);
             $private_encrypted = simple_encryption($privateKey, $password);
-            $conn->query("UPDATE UserData SET psw = '$userPasswordHash', lastPswChange = UTC_TIMESTAMP, forcedPwdChange = 0 WHERE id = '$userID';");
+            $conn->query("UPDATE UserData SET psw = '{$userdata['psw']}', lastPswChange = UTC_TIMESTAMP, forcedPwdChange = 0 WHERE id = '$userID';");
 			$conn->query("UPDATE security_users SET privateKey = '$private_encrypted' WHERE outDated = 'FALSE' AND userID = $userID");
             if(!$conn->error){
                 $validation_output = showSuccess('Password successfully changed.', 1);
@@ -317,56 +309,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['color'] = $txt = test_input($_POST['set_skin']);
         $conn->query("UPDATE UserData SET color = '$txt' WHERE id = $userID");
     }
-    if (isset($_POST['saveSocial'])) {
-        // picture upload
-        if (isset($_FILES['profilePictureUpload']) && !empty($_FILES['profilePictureUpload']['name'])) {
-            $pp = uploadImage("profilePictureUpload", 1, 1);
-            if (!is_array($pp)) {
-                $stmt = $conn->prepare("UPDATE socialprofile SET picture = ? WHERE userID = $userID");
-                $validation_output = $conn->error;
-                $null = NULL;
-                $stmt->bind_param("b", $null);
-                $stmt->send_long_data(0, $pp);
-                $stmt->execute();
-                if ($stmt->errno) {
-                    $validation_output =  $stmt->error; //displayError($stmt->error);
-                } else {
-                    //displaySuccess($lang['SOCIAL_SUCCESS_IMAGE_UPLOAD']);
-                }
-                $stmt->close();
-            } else {
-                $validation_output = print_r($filename, 1);
-            }
-        }
-        // other settings
-        if (isset($_POST['social_status'])) {
-            $status = test_input($_POST['social_status']);
-            $conn->query("UPDATE socialprofile SET status = '$status' WHERE userID = $userID");
-        }
-        if (isset($_POST['social_isAvailable'])) {
-            $sql = "UPDATE socialprofile SET isAvailable = 'TRUE' WHERE userID = '$userID'";
-        } else {
-            $sql = "UPDATE socialprofile SET isAvailable = 'FALSE' WHERE userID = '$userID'";
-        }
-        $conn->query($sql);
-        if (isset($_POST['social_newMessageEmail'])) {
-            $sql = "UPDATE socialprofile SET new_message_email = 'TRUE' WHERE userID = '$userID'";
-        } else {
-            $sql = "UPDATE socialprofile SET new_message_email = 'FALSE' WHERE userID = '$userID'";
-        }
-        $conn->query($sql);
-    }
-    //5ab7bd3310438
-    if(!empty($_POST['social_birthday']) && test_Date($_POST['social_birthday'], 'Y-m-d')){
-        $userdata['displayBirthday'] = isset($_POST['social_display_birthday']) ? 'TRUE' : 'FALSE';
-        $userdata['birthday'] = test_input($_POST['social_birthday']);
-        $conn->query("UPDATE UserData SET birthday = '".$userdata['birthday']."', displayBirthday = '".$userdata['displayBirthday']."' WHERE id = $userID");
-        if($conn->error){
-            $validation_output = showError($conn->error, 1);
-        } else {
-            $validation_output = showSuccess($lang['OK_SAVE'], 1);
-        }
-    }
+
+
 } //endif POST
 
 if ($_SESSION['color'] == 'light') {
@@ -450,30 +394,15 @@ if ($_SESSION['color'] == 'light') {
             </div>
             <div class="navbar-right" style="margin-right:10px;">
                 <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>
-                <?php
-                $result = $conn->query("SELECT status, isAvailable, picture, new_message_email FROM socialprofile WHERE userID = $userID"); echo $conn->error;
-                if($result){
-                    $row = $result->fetch_assoc();
-                    $social_status = $row["status"];
-                    $social_isAvailable = $row["isAvailable"];
-                    $social_newMessageEmail = $row["new_message_email"];
-                    $defaultGroupPicture = "images/group.png";
-                    $defaultPicture = "images/defaultProfilePicture.png";
-                    $profilePicture = $row['picture'] ? "data:image/jpeg;base64," . base64_encode($row['picture']) : $defaultPicture;
-                }
-                ?>
                 <?php if ($canUseSocialMedia == 'TRUE'): ?>
-                    <a href="" class="hidden-xs" data-toggle="modal" data-target="#socialSettings"><img src='<?php echo $profilePicture; ?>' class='img-circle' style='width:35px;display:inline-block;vertical-align:middle;'></a>
-                    <span class="navbar-text hidden-xs" data-toggle="modal" data-target="#socialSettings"><?php echo $_SESSION['firstname']; ?></span>
-                    <a class="btn navbar-btn navbar-link"  href="../social/home" title="<?php echo $lang['SOCIAL_MENU_ITEM']; ?>">
-                        <i class="fa fa-commenting"></i>
-                        <?php if($numberOfSocialAlerts > 0): ?>
-                            <span class="badge pull-right alert-badge" style="position:absolute;top:5px;right:270px;" id="numberOfSocialAlerts"><?php echo $numberOfSocialAlerts; ?></span>
-                        <?php endif; ?>
-                    </a>
-                <?php else: ?>
+					<a href="../social/profile" class="hidden-xs">
+						<?php $result = $conn->query("SELECT picture FROM socialprofile WHERE userID = $userID"); echo $conn->error;
+						if($result && ($row = $result->fetch_assoc())): ?>
+							<img src='<?php echo $row['picture'] ? 'data:image/jpeg;base64,'.base64_encode($row['picture']) : 'images/defaultProfilePicture.png'; ?>' class='img-circle' style='width:35px;display:inline-block;vertical-align:middle;'>
+						<?php endif; ?>
+					</a>
+				<?php endif; ?>
                     <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
-                <?php endif; ?>
                 <?php if ($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?>
                     <a href="../time/check" class="btn navbar-btn navbar-link hidden-xs" title="Your Database is in an invalid state, please fix these Errors after clicking this button.">
                         <i class="fa fa-bell"></i><span class="badge alert-badge" style="position:absolute;top:5px;right:220px;"> <?php echo $numberOfAlerts; ?></span>
@@ -583,7 +512,7 @@ if ($_SESSION['color'] == 'light') {
                               <br><?php echo $publicKey; ?><br><br>
                           </div>
                           <div class="col-md-12">
-                              <?php if(!empty($_POST['unlockKeyDownload']) && crypt($_POST['unlockKeyDownload'], $userPasswordHash) == $userPasswordHash): ?>
+                              <?php if(!empty($_POST['unlockKeyDownload']) && crypt($_POST['unlockKeyDownload'], $userdata['psw']) == $userdata['psw']): ?>
                                   <label>Keypair download</label>
                                   <input type="hidden" name="personal" value="<?php echo $privateKey."\n".$publicKey; ?>" /><br>
                                   <button type="submit" class="btn btn-warning" formaction="../setup/keys" formtarget="_blank" name="">Download</button>
@@ -642,7 +571,7 @@ if ($_SESSION['color'] == 'light') {
 							  ?>
 						  </div>
 					  <?php
-					  $result = $conn->query("SELECT module, checkSum, id FROM security_modules WHERE module != 'TASK' AND outDated = 'FALSE'"); //nothing works with tasks
+					  $result = $conn->query("SELECT module, checkSum, id FROM security_modules WHERE symmetricKey != '' AND outDated = 'FALSE'"); //nothing works with tasks
 					  echo $conn->error;
 					  while($result && ($row = $result->fetch_assoc())){
 						  $err = '';
@@ -676,70 +605,6 @@ if ($_SESSION['color'] == 'light') {
 
   <?php if(isset($_POST['unlockKeyDownload'])) echo '<script>$(document).ready(function(){$("#header-gears").click();$("#header_keystab").click();});</script>'; ?>
 
-  <!-- /modal -->
-  <?php if ($canUseSocialMedia == 'TRUE'): ?>
-    <!-- social settings modal -->
-    <form method="post" enctype="multipart/form-data">
-      <div class="modal fade" id="socialSettings" tabindex="-1" role="dialog">
-          <div class="modal-dialog" role="form">
-              <div class="modal-content">
-                  <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-                      <h4 class="modal-title" id="socialSettingsLabel"><?php echo $lang['SOCIAL_PROFILE_SETTINGS']; ?></h4>
-                  </div>
-                  <br>
-                  <div class="modal-body">
-                      <img src='<?php echo $profilePicture; ?>' style='width:30%;height:30%;' class='img-circle center-block' alt='Profile Picture'>
-                      <br>
-                      <div class="text-center">
-                          <label class="btn btn-default">
-                              <?php echo $lang['SOCIAL_UPLOAD_PICTURE']; ?>
-                              <input type="file" name="profilePictureUpload" style="display:none">
-                          </label>
-                      </div>
-                      <div class="row">
-                          <div class="col-md-6">
-                              <label><?php echo $lang['BIRTHDAY']; ?></label>
-                              <input type="text" class="form-control datepicker" name="social_birthday" placeholder="1990-01-30" value="<?php echo $userdata['birthday']; ?>" >
-                          </div>
-                          <div class="col-md-6 checkbox">
-                              <label><br>
-                                  <input type="checkbox" name="social_display_birthday" <?php if($userdata['displayBirthday'] == 'TRUE') echo 'checked'; ?> /> Im Kalender Anzeigen
-                              </label>
-                          </div>
-                      </div>
-                      <div class="row">
-                          <div class="col-md-8">
-                              <label><?php echo $lang['SOCIAL_STATUS'] ?></label>
-                              <input type="text" class="form-control" name="social_status" placeholder="<?php echo $lang['SOCIAL_STATUS_EXAMPLE'] ?>" value="<?php echo $social_status; ?>">
-                          </div>
-                          <div class="col-md-4 checkbox">
-                              <label><br>
-                                  <input type="checkbox" name="social_isAvailable" <?php if($social_isAvailable == 'TRUE') {echo 'checked';} ?> ><?php echo $lang['SOCIAL_AVAILABLE']; ?>
-                              </label>
-                          </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-md-12">
-                            <label>Benachrichtigungen</label>
-                        </div>
-                        <div class="col-md-12 checkbox">
-                              <label><br>
-                                  <input type="checkbox" name="social_newMessageEmail" <?php if($social_newMessageEmail == 'TRUE') {echo 'checked';} ?> > Bei neuer Nachricht per E-Mail informieren
-                              </label>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="modal-footer">
-                      <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
-                      <button type="submit" class="btn btn-warning" name="saveSocial"><?php echo $lang['SAVE']; ?></button>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </form>
-  <!-- /social settings modal -->
-  <?php endif;?>
     <!-- feedback modal -->
 
 <div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog">
@@ -798,7 +663,6 @@ if ($_SESSION['color'] == 'light') {
         </div>
     </form>
 </div>
-
 <!-- /feedback modal -->
 <?php
 if(!isset($ckIn_disabled)) $ckIn_disabled = '';
@@ -883,14 +747,13 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   <li><a <?php if ($this_page == 'home.php') {echo $setActiveLink;}?> href="../user/home"><i class="fa fa-home"></i> <span><?php echo $lang['OVERVIEW']; ?></span></a></li>
                   <li><a <?php if ($this_page == 'timeCalcTable.php') {echo $setActiveLink;}?> href="../user/time"><i class="fa fa-clock-o"></i> <span><?php echo $lang['VIEW_TIMESTAMPS']; ?></span></a></li>
                   <li><a <?php if ($this_page == 'makeRequest.php') {echo $setActiveLink;}?> href="../user/request"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['REQUESTS']; ?></span></a></li>
-
                   <li>
                     <a <?php if ($this_page == 'post.php') {echo $setActiveLink;}?> href="../social/post">
                         <span title="Unread messages" id="globalMessagingBadge" class="badge pull-right" style="display: none"></span>
                         <i class="fa fa-commenting-o"></i><?php echo $lang['MESSAGING']; ?>
                     </a>
 
-                    <!--script> This is WAY too request heavy... 
+                    <!--script> This is WAY too request heavy...
                     $( document ).ready(function() {
                         setInterval(function(){udpateHeaderBadge("#globalMessagingBadge", {})}, 10000); //10 seconds
                         setInterval(function(){udpateHeaderBadge("#projectMessagingBadge", {allProjects: true})}, 10000); //10 seconds
