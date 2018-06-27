@@ -186,7 +186,7 @@ if($result && ($row = $result->fetch_assoc())){ $showBalance = $row['erpOption']
 						<div class="modal-header"><h4 class="modal-title">'.$row['id_number'].'</h4></div>
 						<div class="modal-body">Wollen Sie diese Rechnung abschließen?</div>
 						<div class="modal-footer">
-						<a href="download?proc=$historyID" class="btn btn-default" target="_blank" onclick="$(\'.ask-complete-'.$historyID.'\').modal(\'hide\');">'.$lang['CONFIRM_CANCEL'].'</a>
+						<a href="download?proc='.$historyID.'" class="btn btn-default" target="_blank" onclick="$(\'.ask-complete-'.$historyID.'\').modal(\'hide\');">'.$lang['CONFIRM_CANCEL'].'</a>
 						<button type="submit" name="setComplete" class="btn btn-warning" value="'.$historyID.'">'.$lang['CONFIRM'].'</button>
 						</div> </div> </div> </form>';
 					} else {
