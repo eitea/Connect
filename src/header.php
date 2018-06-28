@@ -748,35 +748,38 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   <li><a <?php if ($this_page == 'timeCalcTable.php') {echo $setActiveLink;}?> href="../user/time"><i class="fa fa-clock-o"></i> <span><?php echo $lang['VIEW_TIMESTAMPS']; ?></span></a></li>
                   <li><a <?php if ($this_page == 'makeRequest.php') {echo $setActiveLink;}?> href="../user/request"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['REQUESTS']; ?></span></a></li>
                   <li>
-                    <a <?php if ($this_page == 'post.php') {echo $setActiveLink;}?> href="../social/post">
-                        <span title="Unread messages" id="globalMessagingBadge" class="badge pull-right" style="display: none"></span>
-                        <i class="fa fa-commenting-o"></i><?php echo $lang['MESSAGING']; ?>
-                    </a>
+					  <a <?php if ($this_page == 'post.php') {echo $setActiveLink;}?> href="../social/post">
+						  <?php
+						  $result = $conn->query("SELECT COUNT(*) AS unreadMessages FROM messenger_messages m
+						  INNER JOIN relationship_conversation_participant rcp ON (rcp.id = m.participantID AND (partType != 'USER' OR partID != '$userID'))
+						  WHERE m.sentTime >= (SELECT lastCheck FROM relationship_conversation_participant rcp2 WHERE rcp2.conversationID = rcp.conversationID
+						  AND rcp2.status != 'exited' AND rcp2.partType = 'USER' AND rcp2.partID = '$userID')"); echo $conn->error;
+						  if($result && ($row = $result->fetch_assoc())){
+							  if($row['unreadMessages'] < 1) $row['unreadMessages'] = '';
+							  echo '<span class="pull-right"><small id="chat_unread_message">',$row['unreadMessages'],'</small></span>';
+						  }
+						  ?>
+						  <i class="fa fa-commenting-o"></i><?php echo $lang['MESSAGING']; ?>
+					  </a>
 
-                    <!--script> This is WAY too request heavy...
-                    $( document ).ready(function() {
-                        setInterval(function(){udpateHeaderBadge("#globalMessagingBadge", {})}, 10000); //10 seconds
-                        setInterval(function(){udpateHeaderBadge("#projectMessagingBadge", {allProjects: true})}, 10000); //10 seconds
-                        udpateHeaderBadge("#globalMessagingBadge", {}); // initial page render
-                        udpateHeaderBadge("#projectMessagingBadge", {allProjects: true}); // initial page render
-                    });
-
-                    function udpateHeaderBadge(target, data) {
-                        $.ajax({
-                            url: 'ajaxQuery/ajax_post_get_alerts.php',
-                            type: 'GET',
-                            data: data,
-                            success: function (response) {
-                                if(response != "0"){
-                                    $(target).html(response)
-                                    $(target).show()
-                                }else {
-                                    $(target).hide();
-                                }
-                            },
-                        });
-                    }
-				</script-->
+					  <script>
+					  setInterval(function(){
+						  $.ajax({
+							  url: 'ajaxQuery/AJAX_db_utility.php',
+							  type: 'POST',
+							  data: {function: 'getUnreadMessages', userid: <?php echo $userID; ?> },
+							  success: function (response) {
+								  $('#chat_unread_message').html(response);
+								  if(response){ //annoy
+									  showInfo('Sie haben eine neue Nachricht erhalten. Sie finden Sie in Ihrer Post.');
+									  var audioElement = document.createElement('audio');
+									  audioElement.setAttribute('src', 'http://www.soundjay.com/misc/sounds/bell-ringing-04.mp3');
+									  audioElement.play();
+								  }
+							  }
+						  });
+					  }, 120000); //120 seconds, should not cause request overflow
+					  </script>
                   </li>
 				  <?php
 				  $result = $conn->query("SELECT projectID FROM relationship_project_user WHERE userID = $userID AND (expirationDate = '0000-00-00' OR DATE(expirationDate) > CURRENT_TIMESTAMP )");

@@ -10,11 +10,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		if(!empty($_POST['chat_message'])){
 			$message = asymmetric_encryption('CHAT', test_input($_POST['chat_message']), $userID, $privateKey);
 			if($message == test_input($_POST['chat_message'])) $v2Key = $publicKey;
+			//TODO: configurable from settings
 			$conn->query("INSERT INTO messenger_messages(message, participantID, vKey)
 			SELECT '$message', id, '$v2Key' FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$sendingUser' AND conversationID = $openChatID");
 			if($conn->error) showError($conn->error.__LINE__);
 		}
-		if(isset($_FILES['chat_newfile'])){
+		if(file_exists($_FILES['chat_newfile']['tmp_name']) && is_uploaded_file($_FILES['chat_newfile']['tmp_name'])){
 			$s3 = getS3Object($bucket);
 			$file_info = pathinfo($_FILES['chat_newfile']['name']);
 			$ext = strtolower($file_info['extension']);
@@ -52,6 +53,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	if(!empty($_POST['leave_conversation'])){
 		$conversationID = intval($_POST['leave_conversation']);
 		$conn->query("UPDATE relationship_conversation_participant SET status = 'exited' WHERE partType='USER' AND partID = $userID AND conversationID = $conversationID");
+		if($conn->error) showError($conn->error.__LINE__);
+		//delete conversations which have no participants
+		$conn->query("DELETE FROM messenger_conversations WHERE NOT EXISTS(SELECT id FROM relationship_conversation_participant WHERE conversationID = messenger_conversations.id)");
 		if($conn->error){
 			showError($conn->error);
 		} else {
@@ -100,23 +104,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			</thead>
 			<tbody>
 				<?php
+				//TODO: inclue this in main query
+				$stmt_unread = $conn->prepare("SELECT COUNT(m.id) AS unreadMessages FROM messenger_messages m
+				INNER JOIN relationship_conversation_participant rcp ON (rcp.id = m.participantID AND (partType != 'USER' OR partID != '$userID'))
+				WHERE m.sentTime >= ? AND rcp.conversationID = ?");
+				$stmt_unread->bind_param('si', $lastCheck, $conversationID);
+
 				$stmt = $conn->prepare("SELECT partType, partID FROM relationship_conversation_participant WHERE conversationID = ?"); echo $conn->error;
-				$stmt->bind_param('i', $x);
-				$result = $conn->query("SELECT c.id, subject, rcp.id AS participantID, tbl.unreadMessages FROM messenger_conversations c
+				$stmt->bind_param('i', $conversationID);
+				$result = $conn->query("SELECT c.id, subject, rcp.lastCheck, rcp.id AS participantID FROM messenger_conversations c
 					INNER JOIN relationship_conversation_participant rcp
-					ON (rcp.status != 'exited' AND rcp.conversationID = c.id AND rcp.partType = 'USER' AND rcp.partID = '$userID')
-					LEFT JOIN (SELECT COUNT(m.id) AS unreadMessages, rcp2.conversationID FROM messenger_messages m
-						INNER JOIN relationship_conversation_participant rcp2
-						ON (rcp2.id = m.participantID) WHERE m.sentTime <= rcp2.lastCheck AND (rcp2.partType != 'USER' OR rcp2.partID != $userID)
-						GROUP BY conversationID ) tbl
-					ON tbl.conversationID = c.id ");
+					ON (rcp.status != 'exited' AND rcp.conversationID = c.id AND rcp.partType = 'USER' AND rcp.partID = '$userID')");
+
 				echo $conn->error;
 				while($result && ($row = $result->fetch_assoc())){
+					$conversationID = $row['id'];
 					echo '<tr>';
 					echo '<td>', $row['subject'], '</td>';
-					echo '<td>', $row['unreadMessages'] ? '<span class="badge" title="Ungelesene Nachrichten">'.$row['unreadMessages'] .'</span>' : '', '</td>';
+					$lastCheck = $row['lastCheck'];
+					$stmt_unread->execute();
+					$partres = $stmt_unread->get_result();
+					$partrow = $partres->fetch_assoc();
+					echo '<td>', $partrow['unreadMessages'] ? '<span class="badge" title="Ungelesene Nachrichten">'.$partrow['unreadMessages'] .'</span>' : '', '</td>';
 					echo '<td>';
-					$x = $row['id'];
 					$participantID = $row['participantID'];
 					$stmt->execute();
 					$partres = $stmt->get_result();
@@ -133,7 +143,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 					echo '</td>';
 					echo '<td><div class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown"> <i class="fa fa-ellipsis-v"></i></a>
 					<ul class="dropdown-menu">
-					<button type="submit" name="leave_conversation" class="btn btn-link" value="', $row['id'], '">Konversation Verlassen</button>
+					<form method="POST"><button type="submit" name="leave_conversation" class="btn btn-link" value="', $row['id'], '">Konversation Verlassen</button></form>
 					</ul></div> </td>';
 					echo '<td><form method="POST"><button type="submit" name="openChat" value="', $row['id'], '" class="btn btn-default"><i class="fa fa-arrow-right"></i></button></form></td>';
 					echo '</tr>';

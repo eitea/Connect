@@ -346,7 +346,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 							if($s3 && file_exists($_FILES['newTaskFiles']['tmp_name'][$i]) && is_uploaded_file($_FILES['newTaskFiles']['tmp_name'][$i])){
 								$file_info = pathinfo($_FILES['newTaskFiles']['name'][$i]);
 								$ext = test_input(strtolower($file_info['extension']));
-								if (!validate_file($err, $ext, $_FILES['newTaskFiles']['size'])){
+								if (!validate_file($err, $ext, $_FILES['newTaskFiles']['size'][$i])){
 									showError($err);
 								} else {
 									$hashkey = uniqid('', true); //23 chars
@@ -530,7 +530,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             if($filterings['tasks'] == 'ACTIVE_PLANNED') echo '<label><input type="checkbox" name="icalID[]" value="'.$x.'" checked /> .ical</label>';
 
             // always show the messages button (5ac63505c0ecd)
-            echo "<button type='button' class='btn btn-default' title='Nachrichten' data-toggle='modal' data-chat-id='$x' data-target='#messages-$x'><i class='fa fa-commenting-o'></i></button>";
+            echo "<a class='btn btn-default' title='Nachrichten' data-toggle='modal' data-chat-id='$x' href='#new-message-modal'><i class='fa fa-commenting-o'></i></a>";
 
             echo '</td>';
             echo '</tr>';
@@ -598,6 +598,28 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
     </tbody>
 </table>
 </form>
+
+<div id="new-message-modal" class="modal fade" tabindex="-1" role="dialog">
+	<form method="post">
+		<div class="modal-dialog modal-content modal-md">
+			<div class="modal-header h4">Neue Nachricht</div>
+			<div class="modal-body">
+				<div class="col-md-12">
+					<label><?php echo mc_status(); ?> Nachricht</label>
+					<textarea name="new_message_body" rows="8" style="resize:none" class="form-control"></textarea>
+					<hr><h4>Empfänger</h4><hr>
+					<br>Alle Teilnehmer können diese Nachricht lesen. Der Taskbestizer wird direkt benachrichtigt.
+				</div>
+				<br>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button type="submit" class="btn btn-warning" name="send_new_message">Senden</button>
+			</div>
+		</div>
+	</form>
+</div>
+
 <div id="editingModalDiv">
     <?php echo $modals; ?>
     <div class="modal fade" id="template-list-modal">
@@ -1008,43 +1030,8 @@ $(document).ready(function() {
         window.dispatchEvent(new Event('resize'));
         $('.table').trigger('column-reorder.dt');
     }, 500);
-    // checkMessageBadges();
-    // setInterval(function(){
-    //     checkMessageBadges();
-    // }, 20000)
 });
 
-// function checkMessageBadges(){
-//     $chats = $("[data-chat-id]")
-//     chats = $chats.map(function(){
-//         return $(this).data("chat-id");
-//     }).get() // get all chat ids as array
-//     $.ajax({
-//         url: 'ajaxQuery/ajax_post_get_alerts.php',
-//         dataType: 'json',
-//         data: { projects: chats },
-//         cache: false,
-//         type: 'GET',
-//         processData: true,
-//         contentType: "application/json",
-//         success: function(response){
-//             try{
-//                 for(chat in response){
-//                     if(response[chat]){
-//                         $("[data-chat-id=" + chat + "]").html('<i class="fa fa-commenting-o"></i><span class="badge">' + response[chat]+'</span>')
-//                     }else{
-//                         $("[data-chat-id=" + chat + "]").html('<i class="fa fa-commenting-o"></i>')
-//                     }
-//                 }
-//             }catch(error){
-//                 console.error(error)
-//             }
-//         },
-//         error: function(error){
-//             console.error(error)
-//         }
-//     })
-// }
 </script>
 </div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

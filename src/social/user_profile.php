@@ -1,7 +1,7 @@
 <?php require dirname(__DIR__).DIRECTORY_SEPARATOR.'header.php'; enableToSocialMedia($userID); ?>
 <?php
 if (isset($_POST['saveSocial']) && !empty($_POST['social_realemail'])) {
-	$val = test_input($_POST['social_realemail']);
+	$val = $userdata['real_email'] =  test_input($_POST['social_realemail']);
 	$conn->query("UPDATE UserData SET real_email = '$val' WHERE id = $userID");
 
 	if (isset($_FILES['profilePictureUpload']) && !empty($_FILES['profilePictureUpload']['name'])) {

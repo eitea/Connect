@@ -4,7 +4,7 @@
 <script>
 $(".openSurvey").click(function(){
     openSurveyModal()
-})
+});
 function openSurveyModal(){
   $.ajax({
         url:'ajaxQuery/ajax_dsgvo_training_user_generate.php',
@@ -63,7 +63,7 @@ $(".feedback-button").on("click",function(){
             newImg.src = url;
             $("#screenshot").html(newImg);
         });
-        window.feedbackCanvasObject = canvas
+        window.feedbackCanvasObject = canvas;
         $('#feedbackModal').appendTo("body").modal('show');
     });
 });
@@ -135,18 +135,6 @@ function onPageLoad(){
     });
     $(this).datetimepicker('show');
   });
-  /*
-  $('.timepicker').timepicker({
-    todayBtn:  1,
-    autoclose: 1,
-    todayHighlight: 1,
-    startView: 1,
-    minView: 0,
-    maxView: 1,
-    forceParse: 0,
-    format: 'hh:ii'
-  });
-  */
   $('.timepicker').attr('pattern', '^([01][0-9]|2[0-3]):([0-5][0-9])$');
   $('.timepicker').mask("20:50", {
     placeholder: "--:--",
@@ -199,6 +187,7 @@ $(document).ready(function() {
   if (sessionStorage.scrollTop != "undefined") {
     $(window).scrollTop(sessionStorage.scrollTop);
   }
+  $('.scrollDown').each(function(){$(this).scrollTop($(this)[0].scrollHeight) }); //call me god
 });
 </script>
 </body>
