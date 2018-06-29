@@ -10,8 +10,10 @@
 		<div class="panel-body scrollDown" style="height:50vh; overflow-y:auto;">
 			<?php
 			$date = '';
-			$result = $conn->query("SELECT message, vKey, sentTime, type, rcp.partType, rcp.partID, rcp.status, rcp.lastCheck
+			$result = $conn->query("SELECT message, vKey, sentTime, m.type, rcp.partType, rcp.partID, rcp.status, rcp.lastCheck,
+				archive.name AS fileName, archive.type AS fileType, m.id AS messageID
 				FROM messenger_messages m LEFT JOIN relationship_conversation_participant rcp ON rcp.id = m.participantID
+				LEFT JOIN archive ON m.message = archive.uniqID
 				WHERE rcp.conversationID = $openChatID ORDER BY m.sentTime ASC LIMIT 20");
 			echo $conn->error;
 			while($result && ($row = $result->fetch_assoc())){
@@ -29,6 +31,13 @@
 
 				echo '<div class="well" style="width:70%;',$style,'" >';
 				if($row['type'] == 'text') echo asymmetric_encryption('CHAT', $row['message'], $userID, $privateKey, $row['vKey']);
+				if($row['type'] == 'file' && $row['fileName']) {
+					echo '<form method="POST" action="../project/detailDownload" target="_blank">
+					<input type="hidden" name="keyReference" value="CHAT_',$row['messageID'],'" />
+					<button type="submit" class="btn btn-link" name="download-file" value="',$row['message'],'"><i class="fa fa-file-text-o"></i> ',$row['fileName'],'.',$row['fileType'],'</form>';
+				} elseif($row['type'] == 'file'){
+					$conn->query("DELETE FROM messenger_messages WHERE id = ".$row['messageID']); //remove this after the update.
+				}
 				echo '</div>';
 				echo '</div>';
 			}

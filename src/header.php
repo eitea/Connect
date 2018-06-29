@@ -405,7 +405,7 @@ if ($_SESSION['color'] == 'light') {
                     <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
                 <?php if ($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?>
                     <a href="../time/check" class="btn navbar-btn navbar-link hidden-xs" title="Your Database is in an invalid state, please fix these Errors after clicking this button.">
-                        <i class="fa fa-bell"></i><span class="badge alert-badge" style="position:absolute;top:5px;right:220px;"> <?php echo $numberOfAlerts; ?></span>
+                        <i class="fa fa-bell"></i><span class="badge badge-alert" style="position:absolute;top:5px;right:220px;"> <?php echo $numberOfAlerts; ?></span>
                     </a>
                 <?php endif; ?>
                 <a class="btn navbar-btn navbar-link hidden-xs" data-toggle="modal" data-target="#infoDiv_collapse"><i class="fa fa-info"></i></a>
@@ -763,6 +763,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 					  </a>
 
 					  <script>
+					  var firstTime = true;
 					  setInterval(function(){
 						  $.ajax({
 							  url: 'ajaxQuery/AJAX_db_utility.php',
@@ -771,10 +772,19 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 							  success: function (response) {
 								  $('#chat_unread_message').html(response);
 								  if(response){ //annoy
-									  showInfo('Sie haben eine neue Nachricht erhalten. Sie finden Sie in Ihrer Post.');
+									  showInfo('Sie haben eine neue Nachricht erhalten. Sie finden Sie in Ihrer Post.',110000);
 									  var audioElement = document.createElement('audio');
 									  audioElement.setAttribute('src', 'http://www.soundjay.com/misc/sounds/bell-ringing-04.mp3');
 									  audioElement.play();
+								  }
+								  if(response && firstTime){
+									  firstTime = false;
+									  var newTitle = 'Ungelese Nachricht';
+									  setInterval(function(){
+										  var oldTitle = $(document).find('title').text();
+										  document.title = newTitle;
+										  newTitle = oldTitle;
+									  }, 1000);
 								  }
 							  }
 						  });

@@ -52,10 +52,13 @@ if(isset($object)){
 		header( "Content-Type: {$object['ContentType']}" );
 		header( "Content-Disposition: attachment; filename=" . $row['name'] . "." . $row['type'] );
 	}
-	if($module == 'TASK'){
-		$result = $conn->query("SELECT v2 FROM dynamicprojects WHERE projectid = '{$arr[1]}'");
+	if($module == 'TASK' || $module == 'CHAT'){
+		if($module == 'TASK') $result = $conn->query("SELECT v2 FROM dynamicprojects WHERE projectid = '{$arr[1]}'");
+		if($module == 'CHAT') $result = $conn->query("SELECT vKey AS v2 FROM messenger_messages WHERE id = {$arr[1]}");
+		echo $conn->error;
 		$row = $result->fetch_assoc();
-		echo asymmetric_encryption('TASK', $object[ 'Body' ], $userID, $privateKey, $row['v2']);
+		echo asymmetric_encryption($module, $object[ 'Body' ], $userID, $privateKey, $row['v2'], $err);
+		echo $err;
 	} elseif($module == 'PERSONAL'){
 		$body = base64_decode($object['Body']);
 		$nonce = mb_substr($body, 0, 24, '8bit');

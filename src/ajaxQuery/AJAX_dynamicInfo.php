@@ -145,7 +145,7 @@ $archiveResult = $conn->query("SELECT uniqID, name, uploadDate, type FROM archiv
                 <li><a data-toggle="tab" href="#projectInfoBookings<?php echo $x; ?>">Buchungen</a></li>
                 <li><a data-toggle="tab" href="#projectInfoLogs<?php echo $x; ?>">Logs</a></li>
 				<li><a data-toggle="tab" href="#projectInfoData<?php echo $x; ?>">Dateien
-					<?php if($archiveResult && $archiveResult->num_rows > 0) echo '<span class="badge">'.$archiveResult->num_rows.'</span>'; //5b2b907550d12 ?></a>
+					<?php if($archiveResult && $archiveResult->num_rows > 0) echo '<span class="badge badge-alert">'.$archiveResult->num_rows.'</span>'; //5b2b907550d12 ?></a>
 				</li>
                 <?php if(false): ?><li><a data-toggle="tab" href="#projectMessages<?php echo $x; ?>" id="projectMessagesTab<?php echo $x; ?>">Messages</a></li><?php endif; ?>
                 <?php if($showMissingBookings): ?><li><a data-toggle="tab" href="#projectForgottenBooking<?php echo $x; ?>">Zeit nachbuchen</a></li><?php endif; ?>

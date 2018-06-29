@@ -8,7 +8,8 @@ include dirname(__DIR__) . '/header.php';
 require dirname(__DIR__) . "/misc/helpcenter.php";
 require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
 
-function generate_progress_bar($current, $estimate, $referenceTime = 8){ //$referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
+//$referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
+function generate_progress_bar($current, $estimate, $referenceTime = 8){
     $allHours = 0;
     $times = explode(' ', $estimate);
     foreach($times as $t){
@@ -140,7 +141,35 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$x', 'DUTY', $userID)");
             showSuccess($lang['OK_ADD']);
         }
-    }
+    } elseif(!empty($_POST['send_new_message']) && !empty($_POST['new_message_body'])){
+		$dynamicID = test_input($_POST['send_new_message']);
+		$message = asymmetric_encryption('CHAT', test_input($_POST['new_message_body']), $userID, $privateKey);
+		//conversation
+		$result = $conn->query("SELECT id FROM messenger_conversations WHERE category = 'task' AND categoryID = '$dynamicID'");
+		if($result->num_rows > 0 && ($row = $result->fetch_assoc())){
+			$conversationID = $row['id'];
+		} else {
+			$conn->query("INSERT INTO messenger_conversations (subject, category, categoryID) VALUES ('TASK: $dynamicID', 'task', '$dynamicID')"); echo $conn->error;
+			$conversationID = $conn->insert_id;
+			$conn->query("INSERT INTO relationship_conversation_participant (conversationID, partType, partID)
+			SELECT $conversationID, 'USER', projectowner FROM dynamicprojects WHERE projectid = '$dynamicID'");
+		}
+		//participant
+		$result = $conn->query("SELECT id FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' and conversationID = $conversationID");
+		if($result->num_rows >  0 && ($row = $result->fetch_assoc())){
+			$participantID = $row['id'];
+		} else {
+			$conn->query("INSERT INTO relationship_conversation_participant (conversationID, partType, partID) VALUES ($conversationID, 'USER', '$userID')");
+			$participantID = $conn->insert_id;
+		}
+		//message
+		$conn->query("INSERT INTO messenger_messages (message, participantID, type, vKey) VALUES('$message', $participantID, 'text', '$publicKey')");
+		if($conn->error){
+			showError($conn->error);
+		} else {
+			showSuccess($lang['OK_ADD']);
+		}
+	}
     if(!empty($_POST['createForgottenBooking']) && !empty($_POST['description']) && isset($_POST["time-range"])){
         $timeRange =  explode(";",$_POST["time-range"]); //format date;start;end;timeToUTC;indexIM
         $date = $timeRange[0];
@@ -515,7 +544,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 $occupation = array('bookingID' => $row['workingID'], 'dynamicID' => $x, 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage']);
             } elseif(strtotime($A) < time() && $row['projectstatus'] == 'ACTIVE' && !$row['workingUser'] && !$hasActiveBooking){
                 if(!$row['projectleader']){
-                    echo "<button class='btn btn-default' type='button' title='Task starten' data-toggle='modal' data-target='#play-take-$x'><i class='fa fa-play'></i></button>";
+                    echo "<button class='btn btn-default' type='button' title='Task starten' data-toggle='modal' data-target='#play-take-$x'><i class='fa fa-play'></i></button> ";
                 } else {
                     echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button> ";
                 }
@@ -530,7 +559,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             if($filterings['tasks'] == 'ACTIVE_PLANNED') echo '<label><input type="checkbox" name="icalID[]" value="'.$x.'" checked /> .ical</label>';
 
             // always show the messages button (5ac63505c0ecd)
-            echo "<a class='btn btn-default' title='Nachrichten' data-toggle='modal' data-chat-id='$x' href='#new-message-modal'><i class='fa fa-commenting-o'></i></a>";
+            echo "<a class='btn btn-default' title='Nachrichten' data-toggle='modal' data-chatid='$x' href='#new-message-modal'><i class='fa fa-commenting-o'></i></a>";
 
             echo '</td>';
             echo '</tr>';
@@ -607,8 +636,8 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 				<div class="col-md-12">
 					<label><?php echo mc_status(); ?> Nachricht</label>
 					<textarea name="new_message_body" rows="8" style="resize:none" class="form-control"></textarea>
-					<hr><h4>Empfänger</h4><hr>
-					<br>Alle Teilnehmer können diese Nachricht lesen. Der Taskbestizer wird direkt benachrichtigt.
+					<hr><h4>Empfänger</h4>
+					Alle Teilnehmer können diese Nachricht lesen. Der Taskbestizer wird direkt benachrichtigt.
 				</div>
 				<br>
 			</div>
@@ -1026,6 +1055,11 @@ $(document).ready(function() {
         },
         paging: true
     });
+
+$('#new-message-modal').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget);
+  $(this).find('button[name=send_new_message]').val(button.data('chatid'));
+});
     setTimeout(function(){
         window.dispatchEvent(new Event('resize'));
         $('.table').trigger('column-reorder.dt');

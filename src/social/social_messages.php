@@ -11,8 +11,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			$message = asymmetric_encryption('CHAT', test_input($_POST['chat_message']), $userID, $privateKey);
 			if($message == test_input($_POST['chat_message'])) $v2Key = $publicKey;
 			//TODO: configurable from settings
-			$conn->query("INSERT INTO messenger_messages(message, participantID, vKey)
-			SELECT '$message', id, '$v2Key' FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$sendingUser' AND conversationID = $openChatID");
+			$conn->query("INSERT INTO messenger_messages(message, participantID, vKey) SELECT '$message', id, '$v2Key'
+			FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$sendingUser' AND conversationID = $openChatID");
 			if($conn->error) showError($conn->error.__LINE__);
 		}
 		if(file_exists($_FILES['chat_newfile']['tmp_name']) && is_uploaded_file($_FILES['chat_newfile']['tmp_name'])){
@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			} else {
 				try{
 					$hashkey = uniqid('', true); //23 chars
-					$file_encrypt = asymmetric_encryption('TASK', file_get_contents($_FILES['newTaskFiles']['tmp_name'][$i]), $userID, $privateKey);
+					$file_encrypt = asymmetric_encryption('CHAT', file_get_contents($_FILES['chat_newfile']['tmp_name']), $userID, $privateKey);
 					$s3->putObject(array(
 						'Bucket' => $bucket,
 						'Key' => $hashkey,
@@ -35,10 +35,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 					$filename = test_input($file_info['filename']);
 					$conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uniqID, uploadUser)
-					VALUES ('CHAT', '$openChatID', '$filename', '$parent', '$ext', '$hashkey', $userID)");
+					VALUES ('CHAT', '$openChatID', '$filename', 'ROOT', '$ext', '$hashkey', $userID)");
+
 					if($conn->error){ showError($conn->error.__LINE__); }
-					$conn->query("INSERT INTO messenger_messages(message, type, participantID, vKey)
-					SELECT '$message', 'file', id, '$v2Key' FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$sendingUser' AND conversationID = $openChatID");
+					$conn->query("INSERT INTO messenger_messages(message, type, participantID, vKey) SELECT '$hashkey', 'file', id, '$v2Key'
+					FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$sendingUser' AND conversationID = $openChatID");
 
 					if($conn->error){ showError($conn->error.__LINE__); } else { showSuccess($lang['OK_UPLOAD']); }
 				} catch(Exception $e){
@@ -104,32 +105,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			</thead>
 			<tbody>
 				<?php
-				//TODO: inclue this in main query
-				$stmt_unread = $conn->prepare("SELECT COUNT(m.id) AS unreadMessages FROM messenger_messages m
-				INNER JOIN relationship_conversation_participant rcp ON (rcp.id = m.participantID AND (partType != 'USER' OR partID != '$userID'))
-				WHERE m.sentTime >= ? AND rcp.conversationID = ?");
-				$stmt_unread->bind_param('si', $lastCheck, $conversationID);
-
-				$stmt = $conn->prepare("SELECT partType, partID FROM relationship_conversation_participant WHERE conversationID = ?"); echo $conn->error;
+				$stmt = $conn->prepare("SELECT partType, partID FROM relationship_conversation_participant
+					WHERE conversationID = ? AND status != 'exited' AND (partType != 'USER' OR partID != '$userID')"); echo $conn->error;
 				$stmt->bind_param('i', $conversationID);
-				$result = $conn->query("SELECT c.id, subject, rcp.lastCheck, rcp.id AS participantID FROM messenger_conversations c
+				$result = $conn->query("SELECT c.id, subject, rcp.lastCheck, rcp.id AS participantID, tbl.unreadMessages FROM messenger_conversations c
 					INNER JOIN relationship_conversation_participant rcp
-					ON (rcp.status != 'exited' AND rcp.conversationID = c.id AND rcp.partType = 'USER' AND rcp.partID = '$userID')");
-
+					ON (rcp.status != 'exited' AND rcp.conversationID = c.id AND rcp.partType = 'USER' AND rcp.partID = '$userID')
+					LEFT JOIN (SELECT COUNT(*) AS unreadMessages, rcp1.conversationID FROM messenger_messages m
+						INNER JOIN relationship_conversation_participant rcp1 ON (rcp1.id = m.participantID AND (partType != 'USER' OR partID != '$userID'))
+						WHERE m.sentTime >= (SELECT lastCheck FROM relationship_conversation_participant rcp2 WHERE rcp2.conversationID = rcp1.conversationID
+						AND rcp2.status != 'exited' AND rcp2.partType = 'USER' AND rcp2.partID = '$userID')
+						GROUP BY conversationID) tbl
+					ON tbl.conversationID = c.id");
 				echo $conn->error;
 				while($result && ($row = $result->fetch_assoc())){
 					$conversationID = $row['id'];
 					echo '<tr>';
 					echo '<td>', $row['subject'], '</td>';
-					$lastCheck = $row['lastCheck'];
-					$stmt_unread->execute();
-					$partres = $stmt_unread->get_result();
-					$partrow = $partres->fetch_assoc();
-					echo '<td>', $partrow['unreadMessages'] ? '<span class="badge" title="Ungelesene Nachrichten">'.$partrow['unreadMessages'] .'</span>' : '', '</td>';
+					echo '<td>', $row['unreadMessages'] ? '<span class="badge badge-alert" title="Ungelesene Nachrichten">'.$row['unreadMessages'] .'</span>' : '', '</td>';
 					echo '<td>';
 					$participantID = $row['participantID'];
 					$stmt->execute();
 					$partres = $stmt->get_result();
+					if($partres->num_rows < 1) echo '<b style="color:red">- Niemand mehr da -</b>';
 					while($partrow = $partres->fetch_assoc()){
 						if($partrow['partType'] == 'USER'){
 							echo $userID_toName[$partrow['partID']];

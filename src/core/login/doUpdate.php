@@ -3149,6 +3149,7 @@ if($row['version'] < 163){
 	echo $conn->error;
 }
 
+$conn->query("ALTER TABLE messenger_conversations MODIFY COLUMN categoryID VARCHAR(20); ");
 // if($row['version'] < 164){}
 // if($row['version'] < 165){}
 // if($row['version'] < 166){}

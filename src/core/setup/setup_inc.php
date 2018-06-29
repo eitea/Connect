@@ -1686,7 +1686,7 @@ function create_tables($conn) {
 		id INT(6) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 		subject VARCHAR(550) NOT NULL,
 		category VARCHAR(25),
-		categoryID VARCHAR(10)
+		categoryID VARCHAR(20)
 	)");
 	if($conn->error){
 		echo $conn->error;
@@ -1697,7 +1697,7 @@ function create_tables($conn) {
 		conversationID INT(6) UNSIGNED,
 		partType VARCHAR(25) NOT NULL,
 		partID VARCHAR(50) NOT NULL,
-		status VARCHAR(25),
+		status VARCHAR(25) COMMENT 'exited, creator, normal',
 		lastCheck DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY (conversationID) REFERENCES messenger_conversations(id)
 		ON UPDATE CASCADE

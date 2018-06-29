@@ -140,7 +140,7 @@ input[type="radio"]:checked {
 .alert.alert-danger{
   border-color: #e7505a;
 }
-.badge.alert-badge{
+.badge.badge-alert{
   background-color: #33C7D5;
 }
 .page-header{
