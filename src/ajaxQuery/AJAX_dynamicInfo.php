@@ -127,13 +127,13 @@ if ($showMissingBookings) {
     }
 }
 
-// /userProjecting
+// missingBookingsArray now contains all available timestamps where booking data is missing
 echo $conn->error;
 if (sizeof($missingBookingsArray) == 0) {
     $showMissingBookings = false;
 }
-// missingBookingsArray now contains all available timestamps where booking data is missing
 $archiveResult = $conn->query("SELECT uniqID, name, uploadDate, type FROM archive WHERE category = 'TASK' AND categoryID = '$x'");
+$messageResult = $conn->query("SELECT id FROM messenger_conversations WHERE category='task' AND categoryID='$x'");
 ?>
 
 <div id="infoModal-<?php echo $x; ?>" class="modal fade">
@@ -144,11 +144,21 @@ $archiveResult = $conn->query("SELECT uniqID, name, uploadDate, type FROM archiv
                 <li class="active"><a data-toggle="tab" href="#projectDescription<?php echo $x; ?>">Beschreibung</a></li>
                 <li><a data-toggle="tab" href="#projectInfoBookings<?php echo $x; ?>">Buchungen</a></li>
                 <li><a data-toggle="tab" href="#projectInfoLogs<?php echo $x; ?>">Logs</a></li>
-				<li><a data-toggle="tab" href="#projectInfoData<?php echo $x; ?>">Dateien
-					<?php if($archiveResult && $archiveResult->num_rows > 0) echo '<span class="badge badge-alert">'.$archiveResult->num_rows.'</span>'; //5b2b907550d12 ?></a>
-				</li>
+				<?php if($archiveResult && $archiveResult->num_rows > 0): ?>
+					<li><a data-toggle="tab" href="#projectInfoData<?php echo $x; ?>">Dateien
+						<?php echo '<span class="badge badge-alert">'.$archiveResult->num_rows.'</span>'; //5b2b907550d12 ?></a>
+					</li>
+				<?php endif; ?>
                 <?php if(false): ?><li><a data-toggle="tab" href="#projectMessages<?php echo $x; ?>" id="projectMessagesTab<?php echo $x; ?>">Messages</a></li><?php endif; ?>
                 <?php if($showMissingBookings): ?><li><a data-toggle="tab" href="#projectForgottenBooking<?php echo $x; ?>">Zeit nachbuchen</a></li><?php endif; ?>
+				<?php if($messageResult && $messageResult->num_rows > 0):
+					$openChatID = $messageResult->fetch_assoc()['id'];
+					$unreadMessages = getUnreadMessages($openChatID);
+				?>
+					<li><a data-toggle="tab" href="#projectMessagesTab<?php echo $x; ?>">Nachrichten
+						<?php if($unreadMessages) echo '<span class="badge badge-alert">'.$unreadMessages.'</span>'; //5b2b907550d12 ?></a> 
+					</li>
+				<?php endif; ?>
             </ul>
             <div class="tab-content">
 				<div id="projectInfoData<?php echo $x; ?>" class="tab-pane fade"><br>
@@ -409,6 +419,9 @@ $archiveResult = $conn->query("SELECT uniqID, name, uploadDate, type FROM archiv
                     </form>
                 </div>
                 <?php endif; ?>
+				<?php if(!empty($openChatID)): ?>
+					<div id="projectMessagesTab<?php echo $x; ?>" class="tab-pane fade"><br> <?php include dirname(__DIR__).'/social/chatwindow.php'; ?> </div>
+				<?php endif; ?>
             </div>
         </div>
 

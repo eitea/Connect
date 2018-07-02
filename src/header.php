@@ -750,14 +750,8 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   <li>
 					  <a <?php if ($this_page == 'post.php') {echo $setActiveLink;}?> href="../social/post">
 						  <?php
-						  $result = $conn->query("SELECT COUNT(*) AS unreadMessages FROM messenger_messages m
-						  INNER JOIN relationship_conversation_participant rcp ON (rcp.id = m.participantID AND (partType != 'USER' OR partID != '$userID'))
-						  WHERE m.sentTime >= (SELECT lastCheck FROM relationship_conversation_participant rcp2 WHERE rcp2.conversationID = rcp.conversationID
-						  AND rcp2.status != 'exited' AND rcp2.partType = 'USER' AND rcp2.partID = '$userID')"); echo $conn->error;
-						  if($result && ($row = $result->fetch_assoc())){
-							  if($row['unreadMessages'] < 1) $row['unreadMessages'] = '';
-							  echo '<span class="pull-right"><small id="chat_unread_message">',$row['unreadMessages'],'</small></span>';
-						  }
+						  $unreadMessages = getUnreadMessages();
+						  if($unreadMessages) echo '<span class="pull-right"><small id="chat_unread_message">',$unreadMessages,'</small></span>';
 						  ?>
 						  <i class="fa fa-commenting-o"></i><?php echo $lang['MESSAGING']; ?>
 					  </a>

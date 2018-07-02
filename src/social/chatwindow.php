@@ -4,10 +4,14 @@
 		$result = $conn->query("SELECT subject FROM messenger_conversations c WHERE c.id = $openChatID ");
 		$messenger_row = $result->fetch_assoc();
 
-		$conn->query("UPDATE relationship_conversation_participant SET lastCheck = UTC_TIMESTAMP WHERE conversationID = $openChatID AND partType='USER' AND partID = $userID");
+		$participantID = false;
+		$result = $conn->query("SELECT id FROM relationship_conversation_participant WHERE conversationID = $openChatID AND partType='USER' AND partID='$userID'");
+		if($result && $result->num_rows > 0) $participantID = $result->fetch_assoc()['id'];
+
+		if($participantID) $conn->query("UPDATE relationship_conversation_participant SET lastCheck = UTC_TIMESTAMP WHERE id = $participantID");
 		?>
 		<div class="panel-heading"><?php echo $messenger_row['subject']; ?></div>
-		<div class="panel-body scrollDown" style="height:50vh; overflow-y:auto;">
+		<div class="panel-body scrollDown" style="height:40vh; overflow-y:auto;">
 			<?php
 			$date = '';
 			$result = $conn->query("SELECT message, vKey, sentTime, m.type, rcp.partType, rcp.partID, rcp.status, rcp.lastCheck,
@@ -44,17 +48,23 @@
 			?>
 		</div>
 	</div>
+
 	<form method="POST" enctype="multipart/form-data">
 		<input type="hidden" readonly value="<?php echo $openChatID; ?>" name="openChat" />
-		<textarea name="chat_message" rows="3" class="form-control"  placeholder="Deine Nachricht... " style="resize:none"></textarea>
-		<div style="border:1px solid #cccccc;background-color: #eaeaea">
-			<label class="btn btn-empty">
-				<i class="fa fa-paperclip"></i>
-				<input type="file" name="chat_newfile" style="display:none" >
-			</label>
-			<span style="float:right">
-				<button type="submit" class="btn btn-link" value="<?php echo $userID; ?>" name="chat_send">Senden <i class="fa fa-paper-plane-o"></i></button>
-			</span>
-		</div>
+		<?php if($participantID): ?>
+				<textarea name="chat_message" rows="3" class="form-control"  placeholder="Deine Nachricht... " style="resize:none"></textarea>
+				<div style="border:1px solid #cccccc;background-color: #eaeaea">
+					<label class="btn btn-empty">
+						<i class="fa fa-paperclip"></i>
+						<input type="file" name="chat_newfile" style="display:none" >
+					</label>
+					<span style="float:right">
+						<button type="submit" class="btn btn-link" name="chat_send">Senden <i class="fa fa-paper-plane-o"></i></button>
+					</span>
+				</div>
+		<?php else: ?>
+			Sie sind noch kein Teilnehmer dieser Konversation. Wollen Sie an dieser Konversation teilnehmen?
+			<button type="submit" name="chat_join_conversation" class="btn btn-warning">Ja, ich möchte teilnehmen.</button>
+		<?php endif; ?>
 	</form>
 <?php endif; ?>

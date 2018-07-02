@@ -11,20 +11,6 @@ $(document).ready(function() {
         }, 1000);
     }
 });
-function generateKeys($userID){
-    $.ajax({
-        type: "POST",
-        url: "ajaxQuery/AJAX_pgpKeyGen.php",
-        data: { userID: $userID}
-    }).done(function(keys){
-        keys = JSON.parse(keys);
-        document.getElementsByName('privatePGP')[0].value = keys[0];
-        document.getElementsByName('publicPGP')[0].value = keys[1];
-    });
-}
-function clearPGP(){
-    document.getElementsByName('privatePGP')[0].value = '';
-}
 
 function showError(message, hideDelay = 30000){
     if(!message || message.length == 0) return;

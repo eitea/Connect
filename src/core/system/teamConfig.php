@@ -143,7 +143,7 @@ for($i = 0; $i < 11; $i++){
                         }
                         echo mysqli_error($conn);
                         ?>
-                        <div class="col-md-12 text-right"><a class="btn btn-default" data-toggle="modal" data-target=".addTeamMember_<?php echo $teamID; ?>" title="Add Team Member">+</a></div>
+                        <div class="col-md-12 text-right"><br><a class="btn btn-default" data-toggle="modal" data-target=".addTeamMember_<?php echo $teamID; ?>" title="Add Team Member">Mitglied Hinzufügen</a></div>
                     </div>
                 </div>
             </div>

@@ -166,7 +166,7 @@ if($scale > 2){ //3 columns
                   }
                   echo '</select><br><br>';
               } else {
-                  $filterings['company'] == $available_companies[1];
+                  $filterings['company'] == $available_companies[0];
               }
           }
           if(isset($filterings['supplier'])){

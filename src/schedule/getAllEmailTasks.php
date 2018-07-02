@@ -30,7 +30,7 @@ while($result && $row = $result->fetch_assoc()){
 	imap_reopen($imap, $mailbox.'INBOX');
 
     $result = $conn->query("SELECT fromAddress, toAddress, subject, templateID FROM workflowRules WHERE workflowID = ".$row['id']." ORDER BY position ASC"); echo $conn->error;
-    while(($rule = $result->fetch_assoc()) && $rule['templateID']){
+    while(($rule = $result->fetch_assoc())){
 		$move_sequence = array();
         foreach(imap_search($imap, 'ALL') as $mail_number){
             $header = imap_headerinfo($imap, $mail_number);
@@ -84,22 +84,26 @@ while($result && $row = $result->fetch_assoc()){
 					}
 				}
 
-				//dynamicproject
-				$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$projectid', 'CREATED', 1)");
-				$html = asymmetric_encryption('TASK', $html, 0, $secret);
-				$name = asymmetric_encryption('TASK', substr_replace($header->subject, '', $pos, strlen($rule['subject'])), 0, $secret);
-				$conn->query("INSERT INTO dynamicprojects(
-				projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-				projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2, projectmailheader)
-				SELECT '$projectid', '$name', '$html', companyid, clientid, clientprojectid, projectcolor, IF(projectstart='0000-00-00', UTC_TIMESTAMP , projectstart),
-				projectend, projectstatus, projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, 'FALSE',
-				'$v2', '$encrypted_header' FROM dynamicprojects WHERE projectid = '{$rule['templateID']}'");
-				echo $conn->error;
-				if($rule['autoResponse']) send_standard_email($sender, $rule['autoResponse'], "Connect - Ticket Nr. [$projectid]"); //5b20ad39615f9
-				$conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) SELECT '$projectid', userid, position FROM dynamicprojectsemployees WHERE projectid = '{$rule['templateID']}'");
-				echo $conn->error;
-				$conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) SELECT '$projectid', teamid FROM dynamicprojectsteams WHERE projectid = '{$rule['templateID']}'");
-				echo $conn->error;
+				if($rule['templateID']){ //dynamicproject
+					$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$projectid', 'CREATED', 1)");
+					$html = asymmetric_encryption('TASK', $html, 0, $secret);
+					$name = asymmetric_encryption('TASK', substr_replace($header->subject, '', $pos, strlen($rule['subject'])), 0, $secret);
+					$conn->query("INSERT INTO dynamicprojects(
+					projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
+					projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2, projectmailheader)
+					SELECT '$projectid', '$name', '$html', companyid, clientid, clientprojectid, projectcolor, IF(projectstart='0000-00-00', UTC_TIMESTAMP , projectstart),
+					projectend, projectstatus, projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, 'FALSE',
+					'$v2', '$encrypted_header' FROM dynamicprojects WHERE projectid = '{$rule['templateID']}'");
+					echo $conn->error;
+					if($rule['autoResponse']) send_standard_email($sender, $rule['autoResponse'], ['subject' => "Connect - Ticket Nr. [$projectid]"]); //5b20ad39615f9
+					$conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) SELECT '$projectid', userid, position FROM dynamicprojectsemployees WHERE projectid = '{$rule['templateID']}'");
+					echo $conn->error;
+					$conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) SELECT '$projectid', teamid FROM dynamicprojectsteams WHERE projectid = '{$rule['templateID']}'");
+					echo $conn->error;
+				} else { //message
+
+				}
+
 				$move_sequence[] = $mail_number;
 				imap_delete($imap, $mail_number);
 			}
@@ -112,6 +116,7 @@ while($result && $row = $result->fetch_assoc()){
 $stmt_insertarchive->close();
 echo $conn->error;
 
+//http://php.net/manual/en/function.imap-fetchbody.php
 function create_part_array($structure, $prefix="") {
 	//print_r($structure);
 	if (!empty($structure->parts) && sizeof($structure->parts) > 0) {    // There some sub parts

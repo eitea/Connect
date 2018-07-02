@@ -9,7 +9,7 @@ require dirname(__DIR__) . "/misc/helpcenter.php";
 require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
 
 //$referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
-function generate_progress_bar($current, $estimate, $referenceTime = 8){
+function generate_progress_bar($current, $estimate, Array $options = ['referenceTime' => 8]){
     $allHours = 0;
     $times = explode(' ', $estimate);
     foreach($times as $t){
@@ -42,14 +42,20 @@ function generate_progress_bar($current, $estimate, $referenceTime = 8){
     $greenBar *= 100;
     $yellowBar *= 100;
     $redBar *= 100;
-    //TODO: change title
-    $progressLength = min(($timeLeft + $timeOver + $current)/$referenceTime, 1);
+	if(empty($options['referenceTime'])) $options['referenceTime'] = 8;
+    $progressLength = min(($timeLeft + $timeOver + $current)/$options['referenceTime'], 1);
+	$greenID = $yellowID = $redID = '';
+	if(!empty($options['animate']) && $options['animate']){
+		$greenID = 'id="progress-bar-green"';
+		$yellowID = 'id="progress-bar-yellow"';
+		$redID = 'id="progress-bar-red"';
+	}
+	//TODO: change title
     return '<div style="height:5px;margin-bottom:2px;width:'.($progressLength * 100).'%" class="progress">'
-    .'<div data-toggle="tooltip" title="'.round($current, 2).' Stunden" class="progress-bar progress-bar-warning" style="height:10px;width:'.$yellowBar.'%"></div>'
-    .'<div data-toggle="tooltip" title="'.round($timeLeft,2).' Stunden" class="progress-bar progress-bar-success" style="height:10px;width:'.$greenBar.'%"></div>'
-    .'<div data-toggle="tooltip" title="'.round($timeOver,2).' Stunden" class="progress-bar progress-bar-danger" style="height:10px;width:'.$redBar.'%"></div></div>';
+    .'<div '.$yellowID.' data-toggle="tooltip" title="'.round($current, 2).' Stunden" class="progress-bar progress-bar-warning" style="height:10px;width:'.$yellowBar.'%"></div>'
+    .'<div '.$greenID.' data-toggle="tooltip" title="'.round($timeLeft,2).' Stunden" class="progress-bar progress-bar-success" style="height:10px;width:'.$greenBar.'%"></div>'
+    .'<div '.$redID.' data-toggle="tooltip" title="'.round($timeOver,2).' Stunden" class="progress-bar progress-bar-danger" style="height:10px;width:'.$redBar.'%"></div></div>';
 }
-
 $available_teams = array();
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', "priority" => 0, 'employees' => ["user;".$userID]); //set_filter requirement
 $result = $conn->query("SELECT teamID FROM relationship_team_user WHERE userID = $userID");
@@ -86,7 +92,8 @@ $templateResult = $conn->query("SELECT projectname,projectid,v2 FROM dynamicproj
 <div class="page-content-fixed-100">
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    if(!empty($_POST['play']) || !empty($_POST['play-take'])){
+	include dirname(__DIR__).'/social/chatwindow_backend.php';
+	if(!empty($_POST['play']) || !empty($_POST['play-take'])){
         if(!empty($_POST['play'])){
             $x = test_input($_POST['play'], true);
         } else {
@@ -159,7 +166,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 		if($result->num_rows >  0 && ($row = $result->fetch_assoc())){
 			$participantID = $row['id'];
 		} else {
-			$conn->query("INSERT INTO relationship_conversation_participant (conversationID, partType, partID) VALUES ($conversationID, 'USER', '$userID')");
+			$conn->query("INSERT INTO relationship_conversation_participant (conversationID, partType, partID, status) VALUES ($conversationID, 'USER', '$userID', 'open')");
 			$participantID = $conn->insert_id;
 		}
 		//message
@@ -274,6 +281,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 showSuccess($lang['OK_DELETE']);
             }
         }
+
         if(isset($_POST['editDynamicProject'])){ //new projects
 			$setEdit = false;
 			if(isset($available_companies[1]) && !empty($_POST['name']) && !empty($_POST['owner']) && !empty($_POST['employees']) && !empty($_POST['description'])){
@@ -499,7 +507,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             echo "<tr $rowStyle>";
             echo '<td>';
             // echo $row['activity'];
-            if($row['estimatedHours'] || $row['currentHours']) echo generate_progress_bar($row['currentHours'], $row['estimatedHours']);
+            if($row['estimatedHours'] || $row['currentHours']) echo generate_progress_bar($row['currentHours'], $row['estimatedHours'], ['animate' => ($row['workingUser'] == $userID)]);
             echo '<i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.mc_status('TASK', $row['v2'])
 			.asymmetric_encryption('TASK', $row['projectname'],$userID, $privateKey, $row['v2']).' <div>';
             foreach(explode(',', $row['projecttags']) as $tag){
@@ -559,7 +567,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             if($filterings['tasks'] == 'ACTIVE_PLANNED') echo '<label><input type="checkbox" name="icalID[]" value="'.$x.'" checked /> .ical</label>';
 
             // always show the messages button (5ac63505c0ecd)
-            echo "<a class='btn btn-default' title='Nachrichten' data-toggle='modal' data-chatid='$x' href='#new-message-modal'><i class='fa fa-commenting-o'></i></a>";
+			echo "<a class='btn btn-default' title='Nachrichten' data-toggle='modal' data-chatid='$x' href='#new-message-modal'><i class='fa fa-commenting-o'></i></a>";
 
             echo '</td>';
             echo '</tr>';
@@ -627,7 +635,6 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
     </tbody>
 </table>
 </form>
-
 <div id="new-message-modal" class="modal fade" tabindex="-1" role="dialog">
 	<form method="post">
 		<div class="modal-dialog modal-content modal-md">
@@ -855,6 +862,7 @@ function dynamicOnLoad(modID){
                 },
             });
         },
+
         // enable title field in the Image dialog
         image_title: true,
         // enable automatic uploads of images represented by blob or data URIs
@@ -1040,6 +1048,18 @@ setTimeout( function(){
     $('button[name="pauseBtn"]').prop("disabled", false);
 }, 60000 );
 $(document).ready(function() {
+	$('#new-message-modal').on('show.bs.modal', function (event) {
+	  var button = $(event.relatedTarget);
+	  $(this).find('button[name=send_new_message]').val(button.data('chatid'));
+	});
+	// setInterval(function(){
+	// 	if($('#progress-bar-green').width() > 0){
+	// 		$('#progress-bar-green').width($('#progress-bar-green').width()-1);
+	// 		$('#progress-bar-yellow').width($('#progress-bar-yellow').width()+1);
+	// 	} elseif($('#progress-bar-red').width() < 250) {
+	// 		$('#progress-bar-red').width($('#progress-bar-red').width()+1);
+	// 	}
+	// }, 1000);
     dynamicOnLoad();
     $('.table').DataTable({
         ordering:false,
@@ -1055,11 +1075,6 @@ $(document).ready(function() {
         },
         paging: true
     });
-
-$('#new-message-modal').on('show.bs.modal', function (event) {
-  var button = $(event.relatedTarget);
-  $(this).find('button[name=send_new_message]').val(button.data('chatid'));
-});
     setTimeout(function(){
         window.dispatchEvent(new Event('resize'));
         $('.table').trigger('column-reorder.dt');

@@ -382,7 +382,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       <tbody>
         <?php
         $csv = $lang['CLIENT'].';'.$lang['PROJECT'].';Info;'.$lang['DATE'].' - '. $lang['FROM'].';'. $lang['DATE'].' - '. $lang['TO'].';'.
-        $lang['TIMES'].' - '. $lang['FROM'].';'.$lang['TIMES'].' - '. $lang['TO'].';'.$lang['SUM'].' (min)'.';'.$lang['HOURS_CREDIT'].';Person;'.$lang['HOURLY_RATE'].';'.
+        $lang['TIMES'].' - '. $lang['FROM'].';'.$lang['TIMES'].' - '. $lang['TO'].';'.$lang['SUM'].' (min)'.';'.$lang['HOURS_CREDIT'].';Benutzer;'.$lang['HOURLY_RATE'].';'.
         $lang['ADDITIONAL_FIELDS'].';'.$lang['EXPENSES']."\n";
 
         $sum_min = 0;

@@ -421,6 +421,7 @@ function create_tables($conn) {
 
     $sql = "CREATE TABLE clientInfoData(
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		clientID INT(6) UNSIGNED,
         contactType ENUM('person', 'company'),
         gender ENUM('female', 'male'),
         title VARCHAR(30),
@@ -448,11 +449,6 @@ function create_tables($conn) {
         creditLimit DECIMAL(10,2),
         eBill ENUM('true', 'false') DEFAULT 'false',
         lastFaktura DATETIME,
-        daysNetto INT(4),
-        skonto1 DECIMAL(6,2),
-        skonto2 DECIMAL(6,2),
-        skonto1Days INT(4),
-        skonto2Days INT(4),
         warningEnabled ENUM('true', 'false') DEFAULT 'true',
         karenztage INT(4),
         lastWarning DATETIME,
@@ -460,7 +456,10 @@ function create_tables($conn) {
         warning2 DECIMAL(10,2),
         warning3 DECIMAL(10,2),
         calculateInterest ENUM('true', 'false'),
-        clientID INT(6) UNSIGNED,
+		billingMailAddress VARCHAR(100),
+		homepage VARCHAR(100),
+		mail VARCHAR(100),
+		billDelivery VARCHAR(60),
         FOREIGN KEY (clientID) REFERENCES clientData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE

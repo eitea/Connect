@@ -683,10 +683,10 @@ function getS3Object($bucket = ''){
 }
 
 use PHPMailer\PHPMailer\PHPMailer;
-function send_standard_email($recipient, $content, $subject=''){
+
+function send_standard_email($recipient, $content, Array $options = ['subject' => '']){
 	require dirname(__DIR__).'/plugins/phpMailer/autoload.php';
 	global $conn;
-
 	//send mail
 	$mail = new PHPMailer();
 	$mail->CharSet = 'UTF-8';
@@ -704,26 +704,27 @@ function send_standard_email($recipient, $content, $subject=''){
 	} else {
 		$mail->SMTPAuth   = false;
 	}
-
 	if(empty($row['smptSecure'])){
 		$mail->SMTPSecure = $row['smtpSecure'];
 	}
-
 	$mail->Host       = $row['host'];
 	$mail->Port       = $row['port'];
-	$mail->setFrom($row['sender'], $row['senderName']);
-	//$mail->addReplyTo($row['replyEmail']);
+	if(isset($options['sender'])){
+		$mail->setFrom($options['sender'], $options['senderName']);
+	} else {
+		$mail->setFrom($row['sender'], $row['senderName']);
+	}
+	if(isset($options['reply'])) $mail->addReplyTo($row['replyEmail']);
+
 	$mail->addAddress($recipient);
 	$mail->isHTML(true);
-
-	if($subject) {
-		$mail->Subject = $subject;
+	if($options['subject']) {
+		$mail->Subject = $options['subject'];
 	} else {
 		$mail->Subject = 'Connect';
 	}
 	$mail->Body    =  $content;
 	$mail->AltBody = 'Your e-mail provider does not support HTML. Use an Html Viewer to format this email. '. $content;
-
 	if(!$mail->send()) return $mail->ErrorInfo;
 }
 
@@ -770,4 +771,28 @@ function validate_file(&$err, $extension, $filesize, $mime = ''){
 	'application/x-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-outlook'])){ $err = "Invalid filetype $mime"; }
 
 	return empty($err);
+}
+
+function getUnreadMessages($conversationID = 0){
+	global $conn;
+	global $userID;
+	if($conversationID){
+		$result = $conn->query("SELECT COUNT(*) AS unreadMessages FROM messenger_messages m
+		INNER JOIN relationship_conversation_participant rcp ON (rcp.id = m.participantID AND (partType != 'USER' OR partID != '$userID'))
+		WHERE rcp.conversationID = $conversationID
+		AND m.sentTime >= (SELECT lastCheck FROM relationship_conversation_participant rcp2 WHERE rcp2.conversationID = rcp.conversationID
+		AND rcp2.status != 'exited' AND rcp2.partType = 'USER' AND rcp2.partID = '$userID')");
+	} else {
+		$result = $conn->query("SELECT COUNT(*) AS unreadMessages FROM messenger_messages m
+		INNER JOIN relationship_conversation_participant rcp ON (rcp.id = m.participantID AND (partType != 'USER' OR partID != '$userID'))
+		WHERE m.sentTime >= (SELECT lastCheck FROM relationship_conversation_participant rcp2 WHERE rcp2.conversationID = rcp.conversationID
+		AND rcp2.status != 'exited' AND rcp2.partType = 'USER' AND rcp2.partID = '$userID')");
+	}
+
+	if($result && ($row = $result->fetch_assoc())){
+		return $row['unreadMessages'];
+	} else {
+		echo $conn->error;
+	}
+	return '';
 }

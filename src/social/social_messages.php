@@ -3,54 +3,7 @@ require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'header.php';
 $openChatID = 0;
 $bucket = $identifier .'-uploads'; //no uppercase, no underscores, no ending dashes, no adjacent special chars
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-	if(!empty($_POST['openChat'])) $openChatID = intval($_POST['openChat']);
-	if(!empty($_POST['chat_send'])){
-		$sendingUser = intval($_POST['chat_send']);
-		$v2Key = $publicKey;
-		if(!empty($_POST['chat_message'])){
-			$message = asymmetric_encryption('CHAT', test_input($_POST['chat_message']), $userID, $privateKey);
-			if($message == test_input($_POST['chat_message'])) $v2Key = $publicKey;
-			//TODO: configurable from settings
-			$conn->query("INSERT INTO messenger_messages(message, participantID, vKey) SELECT '$message', id, '$v2Key'
-			FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$sendingUser' AND conversationID = $openChatID");
-			if($conn->error) showError($conn->error.__LINE__);
-		}
-		if(file_exists($_FILES['chat_newfile']['tmp_name']) && is_uploaded_file($_FILES['chat_newfile']['tmp_name'])){
-			$s3 = getS3Object($bucket);
-			$file_info = pathinfo($_FILES['chat_newfile']['name']);
-			$ext = strtolower($file_info['extension']);
-			if (!validate_file($err, $ext, $_FILES['chat_newfile']['size'])){
-				showError($err);
-			} elseif (empty($s3)) {
-				showError("Es konnte keine S3 Verbindung hergestellt werden. Stellen Sie sicher, dass unter den Archiv Optionen eine gültige Verbindung gespeichert wurde.");
-			} else {
-				try{
-					$hashkey = uniqid('', true); //23 chars
-					$file_encrypt = asymmetric_encryption('CHAT', file_get_contents($_FILES['chat_newfile']['tmp_name']), $userID, $privateKey);
-					$s3->putObject(array(
-						'Bucket' => $bucket,
-						'Key' => $hashkey,
-						'Body' => $file_encrypt
-					));
-
-					$filename = test_input($file_info['filename']);
-					$conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uniqID, uploadUser)
-					VALUES ('CHAT', '$openChatID', '$filename', 'ROOT', '$ext', '$hashkey', $userID)");
-
-					if($conn->error){ showError($conn->error.__LINE__); }
-					$conn->query("INSERT INTO messenger_messages(message, type, participantID, vKey) SELECT '$hashkey', 'file', id, '$v2Key'
-					FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$sendingUser' AND conversationID = $openChatID");
-
-					if($conn->error){ showError($conn->error.__LINE__); } else { showSuccess($lang['OK_UPLOAD']); }
-				} catch(Exception $e){
-					echo $e->getTraceAsString();
-					echo '<br><hr><br>';
-					echo $e->getMessage();
-				}
-			}
-		}
-
-	}
+	require __DIR__.'/chatwindow_backend.php'; //sets openChatID and takes care of chatwindow.php default operations
 	if(!empty($_POST['leave_conversation'])){
 		$conversationID = intval($_POST['leave_conversation']);
 		$conn->query("UPDATE relationship_conversation_participant SET status = 'exited' WHERE partType='USER' AND partID = $userID AND conversationID = $conversationID");
@@ -105,6 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			</thead>
 			<tbody>
 				<?php
+				//TODO: refactor for partType = 'TEAM' and partID = 'teamID';
 				$stmt = $conn->prepare("SELECT partType, partID FROM relationship_conversation_participant
 					WHERE conversationID = ? AND status != 'exited' AND (partType != 'USER' OR partID != '$userID')"); echo $conn->error;
 				$stmt->bind_param('i', $conversationID);
@@ -160,34 +114,73 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <form method="post">
 	<div id="new-message-modal" class="modal fade" tabindex="-1" role="dialog">
 		<div class="modal-dialog modal-content modal-md">
-			<div class="modal-header h4">Neue Nachricht</div>
 			<div class="modal-body">
-				<div class="col-md-12">
-					<label>Betreff</label>
-					<input type="text" maxlength="50" name="new_message_subject" class="form-control" required>
-					<br>
-					<label><?php echo mc_status(); ?> Nachricht</label>
-					<textarea name="new_message_body" rows="8" style="resize:none" class="form-control"></textarea>
-					<hr><h4>Empfänger</h4><hr>
-					<ul class="nav nav-tabs">
-						<li class="active"><a data-toggle="tab" href="#tab_recipient_user">Benutzer</a></li>
-						<li><a data-toggle="tab" href="#tab_recipient_contact">Adressbuch</a></li>
-					</ul>
-					<div class="tab-content">
-						<div id="tab_recipient_user" class="tab-pane fade in active">
-							<br><label>Benutzer Auswählen</label>
-							<select class="js-example-basic-single" name="new_message_user[]" multiple>
-								<?php
-								foreach($available_users AS $user){
-									if($user > 0) echo '<option value="',$user,'">', $userID_toName[$user], '</option>';
-								}
-								?>
-							</select>
-						</div>
-						<div id="tab_recipient_contact" class="tab-pane fade"><br>Inhalt noch im Aufbau</div>
+				<div class="row">
+					<h4>Absender</h4>
+					<div class="col-sm-6"><label><input type="radio" name="new_message_sender" value="1" checked> Persönlich</label></div>
+					<div class="col-sm-6"><label><input type="radio" name="new_message_sender" value="2" id="sender_team_radio"> Von Team</label></div>
+					<div id="sender_team_box" class="col-sm-12" style="display:none">
+						<select class="js-example-basic-single" name="new_message_sender_team">
+							<?php
+							$result = $conn->query("SELECT teamData.name, teamID FROM relationship_team_user
+								INNER JOIN teamData ON teamData.id = teamID WHERE userID = $userID");
+							while($result && ( $row = $result->fetch_assoc())){
+								echo '<option value="',$row['teamID'],'">', $row['name'], '</option>';
+							}
+							?>
+						</select>
 					</div>
 				</div>
-				<br>
+				<div class="row">
+					<h4>Empfänger</h4>
+					<div class="col-md-6">
+						<br><label>Benutzer</label>
+						<select class="js-example-basic-single" name="new_message_user[]" multiple>
+							<?php
+							foreach($available_users as $val){
+								if($val > 0) echo '<option value="',$val,'">', $userID_toName[$val], '</option>';
+							}
+							?>
+						</select>
+					</div>
+					<div class="col-md-6">
+						<br><label>Kunde</label>
+						<select class="js-example-basic-single" name="new_message_company[]" multiple>
+							<?php
+							$result = $conn->query("SELECT clientID, clientInfoData.mail, clientData.name AS clientName, companyData.name AS companyName
+								FROM clientInfoData INNER JOIN clientData ON clientData.id = clientID INNER JOIN companyData ON companyData.id = companyID
+								WHERE mail IS NOT NULL AND clientData.companyID IN (".implode(', ', $available_companies).")");
+							while($result && ( $row = $result->fetch_assoc())){
+								echo '<option value="',$row['id'],'">', $row['companyName'],' - ',$row ['clientName'], ' (',$row['mail'], ')</option>';
+							}
+							?>
+						</select>
+					</div>
+					<div class="col-md-12">
+						<br><label>Ansprechpartner</label>
+						<select class="js-example-basic-single" name="new_message_contacts[]" multiple>
+							<?php
+							$result = $conn->query("SELECT cp.id, cp.firstname, cp.lastname, cp.email, clientData.name AS clientName, companyData.name AS companyName
+								FROM contactPersons cp INNER JOIN clientData ON clientData.id = clientID INNER JOIN companyData ON companyData.id = companyID
+								WHERE cp.email IS NOT NULL AND clientData.companyID IN (".implode(', ', $available_companies).")");
+							while($result && ( $row = $result->fetch_assoc())){
+								echo '<option value="',$row['id'],'">', $row['companyName'],' - ',$row ['clientName'],' - ',
+								$row['firstname'],' ',$row['lastname'], ' (',$row['email'], ')</option>';
+							}
+							?>
+						</select>
+					</div>
+				</div>
+				<div class="row">
+					<h4>Nachricht</h4>
+					<div class="col-md-12">
+						<label>Betreff</label>
+						<input type="text" maxlength="50" name="new_message_subject" class="form-control" required>
+						<br>
+						<label><?php echo $conn->error; echo mc_status(); ?> Nachricht</label>
+						<textarea name="new_message_body" rows="8" style="resize:none" class="form-control"></textarea>
+					</div>
+				</div>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -196,4 +189,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		</div>
 	</div>
 </form>
+
+<script type="text/javascript">
+	$('input[name="new_message_sender"]').on('click', function(){
+		if($('#sender_team_radio').is(':checked')){
+			$('#sender_team_box').show();
+		} else {
+			$('#sender_team_box').hide();
+		}
+	});
+</script>
 <?php require dirname(__DIR__) . '/footer.php'; ?>

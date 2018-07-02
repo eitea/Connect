@@ -3149,8 +3149,25 @@ if($row['version'] < 163){
 	echo $conn->error;
 }
 
-$conn->query("ALTER TABLE messenger_conversations MODIFY COLUMN categoryID VARCHAR(20); ");
-// if($row['version'] < 164){}
+if($row['version'] < 164){
+	//these were missing. dc if fail
+	$conn->query("ALTER TABLE clientInfoData ADD COLUMN homepage VARCHAR(100)");
+	if (!$conn->error) {
+		echo '<br>Datenstamm: Homepage';
+	}
+	$conn->query("ALTER TABLE clientInfoData ADD COLUMN mail VARCHAR(100)");
+	if (!$conn->error) {
+		echo '<br>Datenstamm: Allgemeine E-Mails';
+	}
+
+	$conn->query("ALTER TABLE clientInfoData ADD COLUMN billDelivery VARCHAR(60)");
+	if (!$conn->error) {
+		echo '<br>Kundendetails: Rechnungsversand';
+	}
+
+	$conn->query("ALTER TABLE messenger_conversations MODIFY COLUMN categoryID VARCHAR(20); ");
+
+}
 // if($row['version'] < 165){}
 // if($row['version'] < 166){}
 // if($row['version'] < 167){}
