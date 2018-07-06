@@ -972,6 +972,9 @@ $lang_ger['OK_REQUEST'] = 'Ihr Antrag wurde erfolgreich erstellt. Bitte warten S
 $lang_eng['OK_SAVE'] = 'Changes were successfully saved.';
 $lang_ger['OK_SAVE'] = 'Änderungen wurden erfolgreich gespeichert.';
 
+$lang_eng['OK_SEND'] = 'Message was successfully sent.';
+$lang_ger['OK_SEND'] = 'Nachricht wurde erfolgreich versendet.';
+
 $lang_eng['OK_ADD'] = 'Entry was added.';
 $lang_ger['OK_ADD'] = 'Eintrag wurde hinzugefügt.';
 

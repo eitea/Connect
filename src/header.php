@@ -54,6 +54,7 @@ if ($result && $result->num_rows > 0) {
     $canUseArchive = $row['canUseArchive'];
     $canUseWorkflow = $row['canUseWorkflow']; //5ab7ae7596e5c
 } else {
+	echo $conn->error;
     $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = false;
     $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = $canCreateTasks  = $canUseSuppliers = $canUseClients = $canEditClients = false;
     $canEditSuppliers = $canUseArchive = $canUseWorkflow = false;
@@ -66,6 +67,12 @@ if($isERPAdmin == 'TRUE'){
     $canEditClients = $canEditSuppliers = 'TRUE';
 }
 $result = $conn->query("SELECT psw, lastPswChange, forcedPwdChange, birthday, displayBirthday, real_email FROM UserData WHERE id = $userID");
+echo $conn->error;
+if(!$result || $result->num_rows < 1){
+	showError("This ID is not registered. Please logout");
+	include 'footer.php';
+	die();
+}
 $userdata = $result->fetch_assoc();
 
 $result = $conn->query("SELECT firstTimeWizard, bookingTimeBuffer, cooldownTimer, sessionTime FROM configurationData");
@@ -82,7 +89,7 @@ if ($result && ($row = $result->fetch_assoc())) {
 	$bookingTimeBuffer = 5;
 	$cd = 2;
 }
-$result = $conn->query("SELECT id, CONCAT(firstname,' ', lastname) AS name FROM UserData")->fetch_all(MYSQLI_ASSOC);
+$result = $conn->query("SELECT id, CONCAT(firstname,' ', lastname) AS name FROM UserData")->fetch_all(MYSQLI_ASSOC); echo $conn->error;
 $userID_toName = array_combine( array_column($result, 'id'), array_column($result, 'name'));
 
 if ($isTimeAdmin) {

@@ -614,6 +614,7 @@ function create_tables($conn) {
         leaderreplacement INT(6),
         isDepartment ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE',
 		email VARCHAR(100),
+		emailName VARCHAR(50),
         FOREIGN KEY (companyID) REFERENCES companyData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -1683,6 +1684,7 @@ function create_tables($conn) {
 
 	$conn->query("CREATE TABLE messenger_conversations(
 		id INT(6) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		identifier VARCHAR(13) UNIQUE NOT NULL,
 		subject VARCHAR(550) NOT NULL,
 		category VARCHAR(25),
 		categoryID VARCHAR(20)
@@ -1696,7 +1698,7 @@ function create_tables($conn) {
 		conversationID INT(6) UNSIGNED,
 		partType VARCHAR(25) NOT NULL,
 		partID VARCHAR(50) NOT NULL,
-		status VARCHAR(25) COMMENT 'exited, creator, normal',
+		status VARCHAR(25) NOT NULL DEFAULT 'normal' COMMENT 'exited, creator, normal, open',
 		lastCheck DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY (conversationID) REFERENCES messenger_conversations(id)
 		ON UPDATE CASCADE

@@ -127,5 +127,15 @@ if($userID != 1 && (!$result || $result->num_rows <= 0)){
   </div>
 </div>
 </div>
+
+<script type="text/javascript">
+$('.table').DataTable({
+ordering: false,
+language: {
+  <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
+},
+autoWidth: false
+});
+</script>
 <!-- /BODY -->
 <?php include dirname(__DIR__) . '/footer.php'; ?>
