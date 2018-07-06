@@ -18,22 +18,75 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	}
 	if(isset($_POST['send_new_message']) && !empty($_POST['new_message_subject']) && !empty($_POST['new_message_body'])){
 		$subject = test_input($_POST['new_message_subject']);
-		$conn->query("INSERT INTO messenger_conversations(subject, category) VALUES('$subject', 'direct')");
+		$identifier = uniqid();
+		$options = ['subject' => "Connect - [CON - $identifier]"];
+		$conn->query("INSERT INTO messenger_conversations(identifier, subject, category) VALUES('$identifier', '$subject', 'direct')");
 		if($conn->error) showError($conn->error.__LINE__);
 		$conversationID = $openChatID = $conn->insert_id;
 
-		$conn->query("INSERT INTO relationship_conversation_participant(conversationID, partType, partID, status) VALUES($conversationID, 'USER', '$userID', 'creator')");
+		$stmt_participant = $conn->prepare("INSERT INTO relationship_conversation_participant(conversationID, partType, partID, status) VALUES (?, ?, ?, ?)");
+		$stmt_participant->bind_param('isss', $conversationID, $partType, $partID, $status);
+		$partType = 'USER';
+		$partID = $userID;
+		$status = 'creator';
+		$stmt_participant->execute();
+
 		if($conn->error) showError($conn->error.__LINE__);
 		$participantID = $conn->insert_id;
 
-		$message = asymmetric_encryption('CHAT', test_input($_POST['new_message_body']), $userID, $privateKey, 'encrypt', $err);
-		$v2Key = $message == test_input($_POST['new_message_body']) ? '' : $publicKey;
-		$conn->query("INSERT INTO messenger_messages(message, participantID, vKey) VALUES('$message', $participantID, '$v2Key')");
+		if($_POST['new_message_sender'] == 2 && !empty($_POST['new_message_sender_team'])){
+			$partType = 'team';
+			$partID = intval($_POST['new_message_sender_team']);
+			$status = 'sender';
+			$stmt_participant->execute();
+			$options['teamid'] = $partID;
+		}
+		$message =  test_input($_POST['new_message_body']);
+		$message_encrypt = asymmetric_encryption('CHAT', $message, $userID, $privateKey, 'encrypt', $err);
+		$v2Key = $message_encrypt == $message ? '' : $publicKey;
+		$conn->query("INSERT INTO messenger_messages(message, participantID, vKey) VALUES('$message_encrypt', $participantID, '$v2Key')");
 		if($conn->error) showError($conn->error.__LINE__);
 
-		foreach($_POST['new_message_user'] as $val){
-			$val = intval($val);
-			$conn->query("INSERT INTO relationship_conversation_participant(conversationID, partType, partID, status) VALUES($conversationID, 'USER', '$val', 'normal')");
+		//participants
+		if(!empty($_POST['new_message_user'])){
+			foreach($_POST['new_message_user'] as $val){
+				$partType = 'USER';
+				$partID = intval($val);
+				$status = 'normal';
+				$stmt_participant->execute();
+			}
+		}
+		if(!empty($_POST['new_message_company'])){
+			foreach($_POST['new_message_company'] as $val){
+				$val = intval($val);
+				$partType = 'client';
+				$status = 'normal';
+				$result = $conn->query("SELECT mail FROM clientInfoData WHERE clientID = $val LIMIT 1");
+				if($result && ($row = $result->fetch_assoc())){
+					$partID = $row['mail'];
+					$stmt_participant->execute();
+					echo send_standard_email($partID, $message_encrypt, $options);
+				}
+			}
+		}
+		if(!empty($_POST['new_message_contacts'])){
+			foreach($_POST['new_message_contacts'] as $val){
+				$val = intval($val);
+				$partType = 'contact';
+				$status = 'normal';
+				$result = $conn->query("SELECT email FROM contactPersons WHERE id = $val LIMIT 1");
+				if($result && ($row = $result->fetch_assoc())){
+					$partID = $row['email'];
+					$stmt_participant->execute();
+					echo send_standard_email($partID, $message_encrypt, $options);
+				}
+			}
+		}
+
+		if($conn->error){
+			showError($conn->error);
+		} else {
+			showSuccess($lang['OK_SEND']);
 		}
 	} elseif(isset($_POST['send_new_message'])) {
 		showError("Missing Subject or Message");
@@ -117,9 +170,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			<div class="modal-body">
 				<div class="row">
 					<h4>Absender</h4>
-					<div class="col-sm-6"><label><input type="radio" name="new_message_sender" value="1" checked> Persönlich</label></div>
-					<div class="col-sm-6"><label><input type="radio" name="new_message_sender" value="2" id="sender_team_radio"> Von Team</label></div>
-					<div id="sender_team_box" class="col-sm-12" style="display:none">
+
+					<div class="col-sm-6"><label><input type="radio" name="new_message_sender" value="2" id="sender_team_radio" checked> Von Team
+						<a title="Die Absender Einstellungen werden unter den Team Einstellungen gesetzt"><i class="fa fa-info-circle"></i></a>
+					</label></div>
+
+					<div class="col-sm-6"><label><input type="radio" name="new_message_sender" value="1"> Persönlich
+						<a title="Die Absender Einstellungen werden unter Allgemein/ E-mail Optionen gesetzt.
+							Diese Nachrichten sind nur für einen selbst ersichtlich."><i class="fa fa-info-circle"></i>
+						</a></label>
+					</div>
+
+					<div id="sender_team_box" class="col-sm-12">
 						<select class="js-example-basic-single" name="new_message_sender_team">
 							<?php
 							$result = $conn->query("SELECT teamData.name, teamID FROM relationship_team_user
@@ -143,21 +205,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 							?>
 						</select>
 					</div>
-					<div class="col-md-6">
-						<br><label>Kunde</label>
-						<select class="js-example-basic-single" name="new_message_company[]" multiple>
-							<?php
-							$result = $conn->query("SELECT clientID, clientInfoData.mail, clientData.name AS clientName, companyData.name AS companyName
-								FROM clientInfoData INNER JOIN clientData ON clientData.id = clientID INNER JOIN companyData ON companyData.id = companyID
-								WHERE mail IS NOT NULL AND clientData.companyID IN (".implode(', ', $available_companies).")");
-							while($result && ( $row = $result->fetch_assoc())){
-								echo '<option value="',$row['id'],'">', $row['companyName'],' - ',$row ['clientName'], ' (',$row['mail'], ')</option>';
-							}
-							?>
-						</select>
-					</div>
 					<div class="col-md-12">
-						<br><label>Ansprechpartner</label>
+						<br><label>Externer Kontakt</label>
 						<select class="js-example-basic-single" name="new_message_contacts[]" multiple>
 							<?php
 							$result = $conn->query("SELECT cp.id, cp.firstname, cp.lastname, cp.email, clientData.name AS clientName, companyData.name AS companyName
@@ -167,17 +216,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 								echo '<option value="',$row['id'],'">', $row['companyName'],' - ',$row ['clientName'],' - ',
 								$row['firstname'],' ',$row['lastname'], ' (',$row['email'], ')</option>';
 							}
+
+							$result = $conn->query("SELECT clientID, clientInfoData.mail, clientData.name AS clientName, companyData.name AS companyName
+								FROM clientInfoData
+								INNER JOIN clientData ON clientData.id = clientID
+								INNER JOIN companyData ON companyData.id = companyID
+								WHERE clientInfoData.mail IS NOT NULL AND clientData.companyID IN (".implode(', ', $available_companies).")");
+							while($result && ( $row = $result->fetch_assoc())){
+								echo '<option value="client_',$row['id'],'">', $row['companyName'],' - ',$row ['clientName'], ' (',$row['mail'], ')</option>';
+							}
 							?>
 						</select>
 					</div>
 				</div>
 				<div class="row">
-					<h4>Nachricht</h4>
+					<h4>Nachricht </h4>
 					<div class="col-md-12">
 						<label>Betreff</label>
 						<input type="text" maxlength="50" name="new_message_subject" class="form-control" required>
 						<br>
-						<label><?php echo $conn->error; echo mc_status(); ?> Nachricht</label>
+						<label><?php echo $conn->error; echo mc_status(); ?> Nachricht <a title="Um die automatisierte Anrede hinzuzufügen, verwenden Sie [ANREDE] um den Text
+							(Sehr geehrter Herr/ Frau [titel] [vorname] [nachname]) an dessen Stelle einzufügen.
+							Achten Sie bitte darauf, dass diese Einstellung vorher im Adressbuch definiert werden muss."><i class="fa fa-info-circle"></i>
+						</a></label>
 						<textarea name="new_message_body" rows="8" style="resize:none" class="form-control"></textarea>
 					</div>
 				</div>

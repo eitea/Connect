@@ -3159,13 +3159,73 @@ if($row['version'] < 164){
 	if (!$conn->error) {
 		echo '<br>Datenstamm: Allgemeine E-Mails';
 	}
-
 	$conn->query("ALTER TABLE clientInfoData ADD COLUMN billDelivery VARCHAR(60)");
 	if (!$conn->error) {
 		echo '<br>Kundendetails: Rechnungsversand';
 	}
-
 	$conn->query("ALTER TABLE messenger_conversations MODIFY COLUMN categoryID VARCHAR(20); ");
+
+	//5b34d0a15ec53 - start
+	$conn->query("ALTER TABLE workflowRules ADD COLUMN isActive ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'TRUE'");
+	if (!$conn->error) {
+		echo '<br>Workflow: Deaktivierung';
+	} else {
+		echo '<br>', $conn->error;
+	}
+	$conn->query("INSERT INTO workflowRules (workflowID) SELECT id FROM emailprojects");
+	if (!$conn->error) {
+		echo '<br>Workflow: Messenger Rule';
+	} else {
+		echo '<br>',$conn->error;
+	}
+	$conn->query("ALTER TABLE messenger_conversations ADD COLUMN identifier VARCHAR(13)");
+	if (!$conn->error) {
+		echo '<br>Messenger: identification step 1/2';
+	} else {
+		echo '<br>', $conn->error;
+	}
+	$stmt = $conn->prepare("UPDATE messenger_conversations SET identifier = ? WHERE id = ? ");
+	$stmt->bind_param("si", $uniqID, $id);
+	$result = $conn->query("SELECT id FROM messenger_conversations");
+	while($row = $result->fetch_assoc()){
+		$uniqID = uniqID();
+		$id = $row['id'];
+		$stmt->execute();
+	}
+	$stmt->close();
+	$conn->query("ALTER TABLE messenger_conversations MODIFY COLUMN identifier VARCHAR(13) UNIQUE NOT NULL");
+	if (!$conn->error) {
+		echo '<br>Messenger: identification step 2/2';
+	} else {
+		echo '<br>', $conn->error;
+	}
+	//5b34d0a15ec53 - end
+
+	//5b34d75a75691
+	$conn->query("ALTER TABLE teamData ADD COLUMN emailName VARCHAR(50)");
+	if (!$conn->error) {
+		echo '<br>Team: Email Anzeigename';
+	} else {
+		echo '<br>', $conn->error;
+	}
+
+	//5b34fa15e7a23
+	$conn->query("CREATE TABLE tags(
+		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		value VARCHAR(50) NOT NULL
+	)");
+
+	$conn->query("INSERT INTO tags (value) VALUES('Anruf'), ('Wichtig'), ('Vertraulich'), ('Frage'), ('Information')");
+	if (!$conn->error) {
+		echo '<br>Tags';
+	} else {
+		echo '<br>', $conn->error;
+	}
+
+	//TODO: encryption update, do the messages like the projects.
+	//each conversation gets THEIR public key saved to it.
+	//every PARTICIPANT gets his personally encrypted conversation private key. (encrypt with user public and user private)
+	//now, when someone sends a message, he encrypts it with messenger public/private, and when he reads it, he uses them too.
 
 }
 // if($row['version'] < 165){}

@@ -11,15 +11,13 @@ if($row = $result->fetch_assoc()){
 	$conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
 }
 
-$bucket = $identifier.'-tasks';
-$s3 = getS3Object($bucket);
-
+$s3 = getS3Object();
 $archive = 'Connect_Tasks';
-$stmt_insertarchive = $conn->prepare("INSERT INTO archive(uniqID, category, categoryID, name, type) VALUES(?, 'TASK', ?, ?, ?)");
-$stmt_insertarchive->bind_param("ssss", $archiveID, $projectid, $filename, $filetype);
+
+$stmt_insertarchive = $conn->prepare("INSERT INTO archive(uniqID, category, categoryID, name, type) VALUES(?, ?, ?, ?, ?)");
+$stmt_insertarchive->bind_param("sssss", $archiveID, $archiveCat, $projectid, $filename, $filetype);
 
 $result = $conn->query("SELECT id, server, smtpSecure, port, service, username, password FROM emailprojects");
-
 while($result && $row = $result->fetch_assoc()){
     $security = empty($row['smtpSecure']) ? '' : '/'.$row['smtpSecure'];
 	//$mailbox = '{'.$row['server'] .':'. $row['port']. '/'.$row['service'] . $security.'/novalidate-cert}'.'INBOX'; //{imap.gmail.com:993/imap/ssl}INBOX ; {localhost:993/imap/ssl/novalidate-cert}
@@ -29,9 +27,17 @@ while($result && $row = $result->fetch_assoc()){
     @imap_createmailbox($imap, imap_utf7_encode($mailbox.$archive));
 	imap_reopen($imap, $mailbox.'INBOX');
 
-    $result = $conn->query("SELECT fromAddress, toAddress, subject, templateID FROM workflowRules WHERE workflowID = ".$row['id']." ORDER BY position ASC"); echo $conn->error;
+    $result = $conn->query("SELECT fromAddress, toAddress, subject, templateID, workflowID FROM workflowRules
+		WHERE isActive = 'TRUE' AND workflowID = ".$row['id']." ORDER BY templateID, position ASC"); echo $conn->error;
     while(($rule = $result->fetch_assoc())){
 		$move_sequence = array();
+		if($rule['templateID']){
+			$archiveCat = 'TASK';
+			$bucket = $identifier.'-tasks';
+		} else {
+			$archiveCat = 'CHAT';
+			$bucket = $identifier.'-uploads';
+		}
         foreach(imap_search($imap, 'ALL') as $mail_number){
             $header = imap_headerinfo($imap, $mail_number);
 			$match = true;
@@ -40,7 +46,7 @@ while($result && $row = $result->fetch_assoc()){
 			if($rule['fromAddress'] && strpos($sender, $rule['fromAddress']) === false ) $match = false;
 			if($rule['toAddress'] && $header->to[0]->mailbox.'@'.$header->to[0]->host != $rule['toAddress']) $match = false;
 			if($rule['subject'] && $pos === false) $match = false;
-
+			if(!$rule['workflowID'] && !preg_match("/\[CON - [0-9a-z]{13}\]$/", $rule['subject'], $out)) $match = false;
 			if($match){
 				$keypair = sodium_crypto_box_keypair();
 				$v2 = base64_encode(sodium_crypto_box_publickey($keypair));
@@ -49,6 +55,9 @@ while($result && $row = $result->fetch_assoc()){
 
 				$html = '';
 				$projectid = uniqid();
+				if(!$rule['templateID']){
+					$projectid = substr($header->subject, -14, -1); echo "Messenger ID : $projectid";
+				}
 				foreach(create_part_array(imap_fetchstructure($imap, $mail_number)) as $partoverview){
 					$part = $partoverview['part_object'];
 					$content = imap_fetchbody($imap, $mail_number, $partoverview['part_number']);
@@ -101,9 +110,25 @@ while($result && $row = $result->fetch_assoc()){
 					$conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) SELECT '$projectid', teamid FROM dynamicprojectsteams WHERE projectid = '{$rule['templateID']}'");
 					echo $conn->error;
 				} else { //message
-
+					$result = $conn->query("SELECT id FROM messenger_conversations WHERE identifier = '$projectid'");
+					if($row = $result->fetch_assoc()){
+						$conversationID = $row['id'];
+						$result = $conn->query("SELECT id FROM relationship_conversation_participant WHERE conversationID = $conversationID AND partID = '$sender' ");
+						if($row = $result->fetch_assoc()){
+							$participantID = $row['id'];
+						} else {
+							echo "Adding new participant... ";
+							$conn->query("INSERT INTO relationship_conversation_participant(conversationID, partType, partID, status)
+								VALUES ($conversationID, 'unknown', '$sender', 'normal')");
+							$participantID = $conn->insert_id;
+						}
+						$result->free();
+						$message = asymmetric_encryption('CHAT', $html, 0, $secret);
+						$conn->query("INSERT INTO messenger_messages(message, participantID, vKey) VALUES ('$message', $participantID, '$v2')");
+					} else {
+						echo "Error: No Message found with identifier $projectid";
+					}
 				}
-
 				$move_sequence[] = $mail_number;
 				imap_delete($imap, $mail_number);
 			}

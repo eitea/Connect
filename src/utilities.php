@@ -683,7 +683,6 @@ function getS3Object($bucket = ''){
 }
 
 use PHPMailer\PHPMailer\PHPMailer;
-
 function send_standard_email($recipient, $content, Array $options = ['subject' => '']){
 	require dirname(__DIR__).'/plugins/phpMailer/autoload.php';
 	global $conn;
@@ -709,12 +708,17 @@ function send_standard_email($recipient, $content, Array $options = ['subject' =
 	}
 	$mail->Host       = $row['host'];
 	$mail->Port       = $row['port'];
-	if(isset($options['sender'])){
+	if(isset($options['teamid'])){
+		$result = $conn->query("SELECT name, email FROM teamData WHERE id = ".$options['teamid']." LIMIT 1");
+		if($teamRow = $result->fetch_assoc()){
+			$mail->setFrom($teamRow['email'], $teamRow['name']);
+		}
+	} elseif(isset($options['sender'])){
 		$mail->setFrom($options['sender'], $options['senderName']);
 	} else {
 		$mail->setFrom($row['sender'], $row['senderName']);
 	}
-	if(isset($options['reply'])) $mail->addReplyTo($row['replyEmail']);
+	if(isset($options['reply'])) $mail->addReplyTo($options['reply']);
 
 	$mail->addAddress($recipient);
 	$mail->isHTML(true);

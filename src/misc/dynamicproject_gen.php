@@ -127,11 +127,11 @@ if($x){
 		<div class="col-md-12">
 			<label>Tags</label>
 			<select class="form-control js-example-tokenizer" name="projecttags[]" multiple="multiple">
-				<option value="Bug">Bug</option>
-				<option value="Erweiterung">Erweiterung</option>
-				<option value="GUI">GUI</option>
-				<option value="Verbesserung">Verbesserung</option>
 				<?php
+				$result = $conn->query("SELECT value FROM tags");
+				while($result && ($row = $result->fetch_assoc())){
+					echo '<option value="'.$row['value'].'">'.$row['value'].'</option>';
+				}
 				foreach(explode(',', $dynrow['projecttags']) as $tag){
 					if($tag) echo '<option value="'.$tag.'" selected>'.$tag.'</option>';
 				}

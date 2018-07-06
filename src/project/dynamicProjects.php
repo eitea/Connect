@@ -71,8 +71,8 @@ $templateResult = $conn->query("SELECT projectname,projectid,v2 FROM dynamicproj
 		if($isDynamicProjectsAdmin == 'TRUE'|| $canCreateTasks == 'TRUE'):
 			if($templateResult->num_rows > 0): ?>
 	        <div class="dropdown" style="display:inline;">
-	            <button class="btn btn-default dropdown-toggle" id="dropdownAddTask" data-toggle="dropdown" type="button"><i class="fa fa-plus"></i></button>
-				<ul class="dropdown-menu" aria-labelledby="dropdownAddTask" >
+	            <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button"><i class="fa fa-plus"></i></button>
+				<ul class="dropdown-menu" >
 	                <div class="container-fluid">
 	                    <li ><button class="btn btn-default btn-block" data-toggle="modal" data-target="#editingModal-" >Neu</button></li>
 	                    <li class="divider"></li>
@@ -115,6 +115,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 } else {
                     showSuccess('Task wurde gestartet. Solange dieser läuft, ist Ausstempeln nicht möglich.');
                 }
+
             } else {
                 showError('<strong>Bitte einstempeln.</strong> Tasks können nur angenommen werden, sofern man eingestempelt ist.');
             }
@@ -156,10 +157,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 		if($result->num_rows > 0 && ($row = $result->fetch_assoc())){
 			$conversationID = $row['id'];
 		} else {
-			$conn->query("INSERT INTO messenger_conversations (subject, category, categoryID) VALUES ('TASK: $dynamicID', 'task', '$dynamicID')"); echo $conn->error;
+			$conn->query("INSERT INTO messenger_conversations (identifier, subject, category, categoryID) VALUES ('".uniqid()."', 'TASK: $dynamicID', 'task', '$dynamicID')"); echo $conn->error;
 			$conversationID = $conn->insert_id;
-			$conn->query("INSERT INTO relationship_conversation_participant (conversationID, partType, partID)
-			SELECT $conversationID, 'USER', projectowner FROM dynamicprojects WHERE projectid = '$dynamicID'");
+			$conn->query("INSERT INTO relationship_conversation_participant (conversationID, partType, partID, status)
+			SELECT $conversationID, 'USER', projectowner, 'open' FROM dynamicprojects WHERE projectid = '$dynamicID'");
+			if($conn->error){
+				showError($conn->error);
+			} else {
+				showSuccess($lang['OK_CREATE']);
+			}
 		}
 		//participant
 		$result = $conn->query("SELECT id FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' and conversationID = $conversationID");
@@ -174,7 +180,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 		if($conn->error){
 			showError($conn->error);
 		} else {
-			showSuccess($lang['OK_ADD']);
+			showSuccess($lang['OK_SEND']);
 		}
 	}
     if(!empty($_POST['createForgottenBooking']) && !empty($_POST['description']) && isset($_POST["time-range"])){
@@ -791,6 +797,10 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
     <?php endif; //endif occupation ?>
 </div>
 
+<?php if(isset($setEdit) && !$setEdit && isset($_POST['description'])): //5ae9e4ee9e35f ?>
+	<div id="hiddenSetEdit" style="display:none"><?php echo $_POST['description']; ?></div>
+<?php endif; ?>
+
 <script src="plugins/rtfConverter/rtf.js-master/samples/cptable.full.js"></script>
 <script src="plugins/rtfConverter/rtf.js-master/samples/symboltable.js"></script>
 <script src="plugins/rtfConverter/rtf.js-master/rtf.js"></script>
@@ -929,31 +939,31 @@ function dynamicOnLoad(modID){
     });
 } //end dynamicOnLoad()
 function appendModal(index){
-    $.ajax({
-    url:'ajaxQuery/AJAX_dynamicEditModal.php',
-    data:{projectid: index,isDPAdmin: "<?php echo $isDynamicProjectsAdmin ?>"},
-    type: 'post',
-    success : function(resp){
-      $("#editingModalDiv").append(resp);
-      existingModals.push(index);
-      onPageLoad();
-      dynamicOnLoad(index);
-    },
-    error : function(resp){alert(resp);},
-    complete: function(resp){
-        if(index){
-            $('#editingModal-'+index).modal('show');
-        } else {
-			<?php if(isset($setEdit) && !$setEdit && isset($_POST['description'])): //5ae9e4ee9e35f ?>
-			setTimeout(function(){
-				$("#editingModal-").modal("show");
-				tinyMCE.activeEditor.setContent('<?php echo $_POST['description']; ?>');
-				$("#editingModal-").find('input[name="name"]').val(<?php echo $_POST['name']; ?>);
-			}, 1500);
-			<?php endif; ?>
+	$.ajax({
+		url:'ajaxQuery/AJAX_dynamicEditModal.php',
+		data:{projectid: index,isDPAdmin: "<?php echo $isDynamicProjectsAdmin ?>"},
+		type: 'post',
+		success : function(resp){
+			$("#editingModalDiv").append(resp);
+			existingModals.push(index);
+			onPageLoad();
+			dynamicOnLoad(index);
+		},
+		error : function(resp){alert(resp);},
+		complete: function(resp){
+			if(index){
+				$('#editingModal-'+index).modal('show');
+			} else {
+				<?php if(isset($setEdit) && !$setEdit && isset($_POST['description'])): //5ae9e4ee9e35f ?>
+				setTimeout(function(){
+					$("#editingModal-").modal("show");
+					tinyMCE.activeEditor.setContent($('#hiddenSetEdit').html());
+					$("#editingModal-").find('input[name="name"]').val("<?php echo $_POST['name']; ?>");
+				}, 1500);
+				<?php endif; ?>
+			}
 		}
-    }
-   });
+	});
 }
 var existingModals = new Array();
 appendModal('');

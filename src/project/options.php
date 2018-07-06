@@ -2,6 +2,12 @@
 require dirname(__DIR__) . '/header.php'; enableToWorkflow($userID);
 include dirname(__DIR__) . "/misc/helpcenter.php";
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
+	if(!empty($_POST['positions'])){
+		foreach($_POST['positions'] as $val){
+			$arr = explode('_', $val);
+			$conn->query("UPDATE workflowRules SET position = '".$arr[1]."' WHERE id =".$arr[0]);
+		}
+	}
     if(isset($_POST['deleteWorkflow'])){
         $val = intval($_POST['deleteWorkflow']);
         $conn->query("DELETE FROM emailprojects WHERE id = $val");
@@ -33,6 +39,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 		} else {
 			$conn->query("INSERT INTO emailprojects(server,port,service,smtpSecure,username,password,logEnabled)
 			VALUES('$server','$port','$service','$security','$username','$password','$logging') ");
+			$workflowID = $conn->insert_id;
+			$conn->query("INSERT INTO workflowRules(workflowRules) VALUES($workflowID)");
 		}
         if ($conn->error) {
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';
@@ -124,11 +132,30 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 		} else {
 			showError("Kein Template");
 		}
-	} elseif(!empty($_POST['positions'])){
-		//$positions = array();
-		foreach($_POST['positions'] as $val){
-			$arr = explode('_', $val);
-			$conn->query("UPDATE workflowRules SET position = '".$arr[1]."' WHERE id =".$arr[0]);
+	} elseif(!empty($_POST['edit_mess_rule'])){
+		$val = intval($_POST['edit_mess_rule']);
+		$receiver = test_input($_POST['rule_mess_receiver']);
+		$conn->query("UPDATE workflowRules SET toAddress = '$receiver' WHERE id = $val");
+		if($conn->error){
+			showError($conn->error . __LINE__);
+		} else {
+			showSuccess('Messenger: '.$subject.$lang['OK_SAVE']);
+		}
+	} elseif(!empty($_POST['rule_deactivate'])){
+		$val = intval($_POST['rule_deactivate']);
+		$conn->query("UPDATE workflowRules SET isActive = 'FALSE' WHERE id = $val");
+		if($conn->error){
+			showError($conn->error . __LINE__);
+		} else {
+			showSuccess($lang['OK_SAVE']);
+		}
+	} elseif(!empty($_POST['rule_activate'])){
+		$val = intval($_POST['rule_activate']);
+		$conn->query("UPDATE workflowRules SET isActive = 'TRUE' WHERE id = $val");
+		if($conn->error){
+			showError($conn->error . __LINE__);
+		} else {
+			showSuccess($lang['OK_SAVE']);
 		}
 	}
 }
@@ -151,7 +178,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 	<div class="col-xs-4"></div>
 </div>
 <?php
-$stmt = $conn->prepare("SELECT id, subject, fromAddress, toAddress, projectname, v2, templateID, autoResponse
+$stmt = $conn->prepare("SELECT id, subject, fromAddress, toAddress, projectname, v2, templateID, autoResponse, isActive
 	FROM workflowRules w LEFT JOIN dynamicprojects d ON d.projectid = w.templateID WHERE workflowID = ? ORDER BY w.position ASC");
 echo $conn->error;
 $stmt->bind_param('i', $id);
@@ -171,7 +198,21 @@ while ($row = $result->fetch_assoc()) {
 	echo '<button type="submit" name="deleteWorkflow" value="'.$row['id'].'" title="Löschen" class="btn btn-default" ><i class="fa fa-trash-o"></i></button> ';
 	echo '</form></div></div>';
 	echo '<div class="row"><div class="col-xs-11 col-xs-offset-1 h4"><form method="POST">Regelsets
-	<div class="page-header-button-group"><a data-toggle="modal" href="#add-rule" class="btn btn-default btn-sm" data-valid="'.$row['id'].'"><i class="fa fa-plus"></i></a>
+	<div class="page-header-button-group"><a data-toggle="modal" href="#add-rule" data-resp="Herzlichen Dank für Ihre Nachricht!
+
+Ihr Anliegen werden wir so schnell wie möglich beantworten. Im Betreff finden sie auch gleich die zugewiesene Ticket Nummer.
+
+%Mandatennamen%
+Höchste Qualität. Garantiert.
+---------------------------
+---------------------------
+
+Thank you very much for your message. We will answer your request as soon as possible. In the subject you will also find the assigned ticket number.
+
+%Mandatennamen%
+Highest Quality. Guaranteed.
+---------------------------
+---------------------------" class="btn btn-default btn-sm" data-valid="'.$row['id'].'"><i class="fa fa-plus"></i></a>
 	<button type="submit" name="savePositions" value="'.$row['id'].'" class="btn btn-default btn-sm"><i class="fa fa-floppy-o"></i></button></div></div></div>';
 	$id = $row['id'];
 	$stmt->execute();
@@ -180,41 +221,43 @@ while ($row = $result->fetch_assoc()) {
 		echo '<div class="row"><div class="col-xs-11 col-xs-offset-1">Es wurden noch keine Regeln definiert. Es werden keine E-Mails abgeholt oder verarbeitet.</div></div>';
 	} else {
 		echo '<div style="margin-left:150px">';
-		echo '<div class="row bold">
-			<div class="col-xs-2">Betreff</div>
-			<div class="col-xs-3">Adressen</div>
-			<div class="col-xs-2">Response</div>
-			<div class="col-xs-2">Template</div>
-			<div class="col-xs-1">Position</div>
-			<div class="col-xs-1"></div>
-		</div>';
-		$options = '';
-
+		echo '<table class="table table-hover"><thead><tr><th>Template</th><th>Betreff</th><th>Adressen</th><th>Response</th><th>Position</th><th></th></tr></thead><tbody>';
 		$j = 1;
 		while($rule = $res->fetch_assoc()){
-			echo '<div class="row" style="border-top:1px solid lightgrey">';
-			echo '<div class="col-xs-2">' . $rule['subject'].'</div>';
-			echo '<div class="col-xs-3">';
+			echo '<tr>';
+			echo '<td>', $rule['projectname'] ? asymmetric_encryption('TASK', $rule['projectname'], $userID, $privateKey, $rule['v2']) : 'Messenger' , '</td>';
+			echo '<td>', $rule['subject'],'</td>';
+			echo '<td>';
 			if($rule['fromAddress']) echo '<b>Absender: </b>', $rule['fromAddress'];
 			if($rule['toAddress']) echo '<b>Empfänger: </b>', $rule['toAddress'];
-			echo '</div>';
-			echo '<div class="col-xs-2">';
+			echo '</td><td>';
 			if($rule['autoResponse']) echo substr($rule['autoResponse'], 0, 20), '...'; //5b20ad39615f9
-			echo '</div>';
-			echo '<div class="col-xs-2">' . asymmetric_encryption('TASK', $rule['projectname'], $userID, $privateKey, $rule['v2']) . '</div>';
-			echo '<div class="col-xs-1"><select name="positions[]" class="form-control">';
+			echo '</td>';
+			echo '<td><select name="positions[]" class="form-control">';
 			for($i=1;$i<=$res->num_rows;$i++){
 				$selected = ($j == $i) ? 'selected' : '';
 				echo "<option $selected value='{$rule['id']}_$i'>$i</option>";
 			}
-			echo '</select></div>';
-			echo '<div class="col-xs-2"><button type="submit" name="deleteRule" value="'.$rule['id'].'" class="btn btn-default"><i class="fa fa-trash-o"></i></button>
-			<a data-toggle="modal" data-resp="'.$rule['autoResponse'].'" data-subject="'.$rule['subject'].'" data-from="'.$rule['fromAddress'].'" data-to="'.$rule['toAddress'].'"
-			data-valid="'.$row['id'].'" data-workid="'.$rule['id'].'" data-templateid="'.$rule['templateID'].'" class="btn btn-default" href="#add-rule"><i class="fa fa-pencil"></i></a></div>';
-			echo '</div>';
+			echo '</select></td>';
+			echo '<td><button type="submit" name="deleteRule" value="',$rule['id'],'" class="btn btn-default"><i class="fa fa-trash-o"></i></button> ';
+			if($rule['templateID']) {
+				echo '<a data-toggle="modal" data-resp="',$rule['autoResponse'],'" data-subject="',$rule['subject'],'" data-from="',$rule['fromAddress'],'"
+				data-to="',$rule['toAddress'],'" data-valid="',$row['id'],'" data-workid="',$rule['id'],'" data-templateid="',$rule['templateID'],'"
+				class="btn btn-default" href="#add-rule"><i class="fa fa-pencil"></i></a> ';
+			} else {
+				echo '<a data-toggle="modal" data-subject="',$rule['subject'],'", data-from="',$rule['fromAddress'],'" data-to="',$rule['toAddress'],'"
+				data-valid="',$rule['id'],'" href="#edit-messenger-rule" class="btn btn-default"><i class="fa fa-pencil"></i></a> ';
+			}
+			if($rule['isActive'] == 'TRUE'){
+				echo '<button type="submit" name="rule_deactivate" value="',$rule['id'],'" class="btn btn-warning">ON</button>';
+			} else {
+				echo '<button type="submit" name="rule_activate" value="',$rule['id'],'" class="btn btn-default">OFF</button>';
+			}
+			echo '</td>';
+			echo '</tr>';
 			$j++;
 		}
-		echo '</div>';
+		echo '</tbody></table></div>';
 	}
 
 	//TODO: templates editieren
@@ -329,31 +372,7 @@ while ($row = $result->fetch_assoc()) {
 						<div class="col-md-12">
 							<label>Automatische Antwort</label><br>
 							Beim erstellen eines Tasks kann automatisch eine Antwort zurück gesendet werden
-							<textarea id="rule_autoResponse" name="rule_autoResponse" rows="8" class="form-control">
-								Herzlichen Dank für Ihre Nachricht!
-
-Ihr Anliegen werden wir so schnell wie möglich beantworten.
-
-Im Betreff finden sie auch gleich die zugewiesene Ticket Nummer.
-
-
-%Mandatennamen%
-Höchste Qualität. Garantiert.
----------------------------
----------------------------
-
-Thank you very much for your message!
-
-We will answer your request as soon as possible.
-
-In the subject you will also find the assigned ticket number.
-
-
-%Mandatennamen%
-Highest Quality. Guaranteed.
----------------------------
----------------------------
-							</textarea>
+							<textarea id="rule_autoResponse" name="rule_autoResponse" rows="8" class="form-control"></textarea>
 						</div>
 					</div>
 				</div>
@@ -362,6 +381,25 @@ Highest Quality. Guaranteed.
 				<input type="hidden" id="edit_rule" name="edit_rule" value="">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
 				<button type="submit" class="btn btn-warning" name="add_rule" id="add_rule"><?php echo $lang['ADD']; ?></button>
+            </div>
+		</form>
+    </div>
+</div>
+
+<div class="modal fade" id="edit-messenger-rule">
+    <div class="modal-dialog modal-content modal-md">
+		<form method="POST">
+            <div class="modal-header h4"><?php echo $lang['ADD']; ?></div>
+            <div class="modal-body">
+				<div class="row">
+					<div class="col-sm-12"> <label>Emfpänger</label>
+						<input type="email" name="rule_mess_receiver" id="rule_mess_receiver" class="form-control" maxlength="100"/>
+					</div>
+				</div>
+            </div><!-- /modal-body -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button type="submit" class="btn btn-warning" name="edit_mess_rule" id="edit_mess_rule"><?php echo $lang['SAVE']; ?></button>
             </div>
 		</form>
     </div>
@@ -390,6 +428,11 @@ $('#add-rule').on('show.bs.modal', function (event) {
 	$('#rule_senders').val(button.data('from'));
 	$('#rule_subject').val(button.data('subject'));
 	$('#rule_autoResponse').val(button.data('resp')); //5b20ad39615f9
+});
+$('#edit-messenger-rule').on('show.bs.modal', function (event) {
+	var button = $(event.relatedTarget);
+	$('#edit_mess_rule').val(button.data('valid'));
+	$('#rule_mess_receiver').val(button.data('to'));
 });
 function checkEmail(){
 	$.post("ajaxQuery/AJAX_checkEmailAvailability.php",{

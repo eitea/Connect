@@ -5,10 +5,12 @@ $teamID = 0;
 if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
     $name = test_input($_POST['createTeam_name']);
 	$email = test_input($_POST['createTeam_email']);
+	$emailName = test_input($_POST['createTeam_emailName']); //5b34d75a75691
     $leader = intval($_POST['leader']);
     $replacement = intval($_POST['replacement']);
     $isDepartment = empty($_POST['create_department']) ? 'FALSE' : 'TRUE';
-    $conn->query("INSERT INTO teamData (name, leader, leaderreplacement, isDepartment, email) VALUES('$name', '$leader', '$replacement', '$isDepartment', '$email')");
+    $conn->query("INSERT INTO teamData (name, leader, leaderreplacement, isDepartment, email, emailName)
+	VALUES('$name', '$leader', '$replacement', '$isDepartment', '$email', '$emailName')");
     $teamID = mysqli_insert_id($conn);
 	if(isset($_POST['createTeam_members'])){
 		foreach($_POST['createTeam_members'] AS $user){
@@ -60,7 +62,8 @@ if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
     $teamID = intval($_POST['changeTeamName']);
     $name = test_input($_POST['teamName']);
 	$email = test_input($_POST['teamMail']); //5b28952ad8a9a
-    $conn->query("UPDATE teamData SET name = '$name', email='$email' WHERE id = $teamID");
+	$emailName = test_input($_POST['teamMailName']); //5b34d75a75691
+    $conn->query("UPDATE teamData SET name = '$name', email='$email', emailName='$emailName' WHERE id = $teamID");
     if(!$conn->error){
         echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
     }
@@ -102,7 +105,7 @@ for($i = 0; $i < 11; $i++){
 
 <div class="container-fluid">
     <?php
-    $result = $conn->query("SELECT id, name, isDepartment, email FROM teamData");
+    $result = $conn->query("SELECT id, name, isDepartment, email, emailName FROM teamData");
     while($result && ($row = $result->fetch_assoc())):
         $teamID = $row['id'];
         ?>
@@ -195,8 +198,11 @@ for($i = 0; $i < 11; $i++){
                         <label>Name</label>
                         <input type="text" name="teamName" value="<?php echo $row['name']; ?>" class="form-control">
 						<br>
-						<label>Email</label>
+						<label>E-mail</label>
                         <input type="text" name="teamMail" value="<?php echo $row['email']; ?>" class="form-control">
+						<br>
+						<label>E-mail Anzeigename</label>
+                        <input type="text" name="teamMailName" value="<?php echo $row['emailName']; ?>" class="form-control">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -215,14 +221,22 @@ for($i = 0; $i < 11; $i++){
                 <h4 class="modal-title">New Team</h4>
             </div>
             <div class="modal-body">
-                <div class="col-md-6">
-                    <label>Name</label>
-                    <input type="text" class="form-control" name="createTeam_name" placeholder="Name" /><br>
-                </div>
-				<div class="col-md-6">
-                    <label>Name</label>
-                    <input type="email" class="form-control" name="createTeam_email" placeholder="E-Mail" /><br>
-                </div>
+				<div class="row">
+					<div class="col-md-6">
+						<label>Name</label>
+						<input type="text" class="form-control" name="createTeam_name" placeholder="Name" />
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+	                    <label>E-Mail</label>
+	                    <input type="email" class="form-control" name="createTeam_email" placeholder="E-Mail" />
+	                </div>
+					<div class="col-md-6">
+	                    <label>E-Mail Anzeigename</label>
+	                    <input type="text" class="form-control" name="createTeam_emailName" placeholder="Anzeigename" maxlength="45"/>
+	                </div>
+				</div>
                 <div class="row">
                     <div class="col-md-6">
                         <label><?php echo $lang['LEADER'] ?></label>

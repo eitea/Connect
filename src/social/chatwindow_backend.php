@@ -7,6 +7,7 @@ if(!empty($_POST['openChat'])){
 	if(isset($_POST['chat_send'])){
 		$v2Key = $publicKey;
 		if(!empty($_POST['chat_message'])){
+			//TODO: see if receiver wants email notifications
 			$message = asymmetric_encryption('CHAT', test_input($_POST['chat_message']), $userID, $privateKey);
 			if($message == test_input($_POST['chat_message'])) $v2Key = '';
 			$conn->query("INSERT INTO messenger_messages(message, participantID, vKey) SELECT '$message', id, '$v2Key'
@@ -30,7 +31,6 @@ if(!empty($_POST['openChat'])){
 						'Key' => $hashkey,
 						'Body' => $file_encrypt
 					));
-
 					$filename = test_input($file_info['filename']);
 					$conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uniqID, uploadUser)
 					VALUES ('CHAT', '$openChatID', '$filename', 'ROOT', '$ext', '$hashkey', $userID)");
@@ -38,7 +38,7 @@ if(!empty($_POST['openChat'])){
 					if($conn->error){ showError($conn->error.__LINE__); }
 					$conn->query("INSERT INTO messenger_messages(message, type, participantID, vKey) SELECT '$hashkey', 'file', id, '$v2Key'
 					FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' AND conversationID = $openChatID");
-
+					
 					if($conn->error){ showError($conn->error.__LINE__); } else { showSuccess($lang['OK_UPLOAD']); }
 				} catch(Exception $e){
 					echo $e->getTraceAsString();

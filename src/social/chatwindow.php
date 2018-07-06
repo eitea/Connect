@@ -1,7 +1,7 @@
 <?php if($openChatID): ?>
 	<div class="panel panel-default">
 		<?php
-		$result = $conn->query("SELECT subject FROM messenger_conversations c WHERE c.id = $openChatID ");
+		$result = $conn->query("SELECT subject, category  FROM messenger_conversations c WHERE c.id = $openChatID ");
 		$messenger_row = $result->fetch_assoc();
 
 		$participantID = false;
@@ -23,7 +23,7 @@
 			while($result && ($row = $result->fetch_assoc())){
 				if($date != substr($row['sentTime'],0, 10)){
 					$date = substr($row['sentTime'],0, 10);
-					echo '<p class="text-center" style="color:grey;">- ',$date,' -</p>';
+					echo '<p class="text-center" style="color:grey;font-size:8pt;">- ',$date,' -</p>';
 				}
 				echo '<div style="display:table;width:100%;">';
 				if($row['partType'] == 'USER' && $row['partID'] == $userID){
@@ -33,7 +33,7 @@
 					$style = 'float:left;';
 				}
 
-				echo '<div class="well" style="width:70%;',$style,'" >';
+				echo '<div class="well" style="width:70%;margin:0;',$style,'" >';
 				if($row['type'] == 'text') echo asymmetric_encryption('CHAT', $row['message'], $userID, $privateKey, $row['vKey']);
 				if($row['type'] == 'file' && $row['fileName']) {
 					echo '<form method="POST" action="../project/detailDownload" target="_blank">
