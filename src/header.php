@@ -378,7 +378,7 @@ if ($_SESSION['color'] == 'light') {
                 <a class="navbar-brand" href="../user/home" style="width:230px;">CONNECT <span style="font-size:9pt">(Beta)</span></a>
 				<?php
 
-if(isset($_SESSION['start']) && timeDiff_Hours($_SESSION['start'], getCurrentTimestamp()) > $row['sessionTime']) redirect('../user/logout');
+//if(isset($_SESSION['start']) && timeDiff_Hours($_SESSION['start'], getCurrentTimestamp()) > $row['sessionTime']) redirect('../user/logout');
 				 ?>
             </div>
             <div class="collapse navbar-collapse hidden-xs" style="display:inline;float:left;">
