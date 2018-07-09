@@ -10,6 +10,12 @@ body{
   font-size:14px;
   margin-bottom:50px;
 }
+.robot-control{
+  border:none;
+  background:none;
+  text-decoration: none;
+  box-shadow:none;
+}
 .panel > .panel-heading a:link {
   color: #6f6f6f;
 }

@@ -56,25 +56,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 				$stmt_participant->execute();
 			}
 		}
-		if(!empty($_POST['new_message_company'])){
-			foreach($_POST['new_message_company'] as $val){
-				$val = intval($val);
-				$partType = 'client';
-				$status = 'normal';
-				$result = $conn->query("SELECT mail FROM clientInfoData WHERE clientID = $val LIMIT 1");
-				if($result && ($row = $result->fetch_assoc())){
-					$partID = $row['mail'];
-					$stmt_participant->execute();
-					echo send_standard_email($partID, $message_encrypt, $options);
-				}
-			}
-		}
 		if(!empty($_POST['new_message_contacts'])){
 			foreach($_POST['new_message_contacts'] as $val){
-				$val = intval($val);
-				$partType = 'contact';
+				$arr = explode('_', $val);
+				$val = intval($arr[1]);
 				$status = 'normal';
-				$result = $conn->query("SELECT email FROM contactPersons WHERE id = $val LIMIT 1");
+				if($arr[0] == 'client'){
+					$partType = 'client';
+					$result = $conn->query("SELECT mail AS email FROM clientInfoData WHERE clientID = $val LIMIT 1");
+				} else {
+					$partType = 'contact';
+					$result = $conn->query("SELECT email FROM contactPersons WHERE id = $val LIMIT 1");
+				}
 				if($result && ($row = $result->fetch_assoc())){
 					$partID = $row['email'];
 					$stmt_participant->execute();
@@ -213,7 +206,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 								FROM contactPersons cp INNER JOIN clientData ON clientData.id = clientID INNER JOIN companyData ON companyData.id = companyID
 								WHERE cp.email IS NOT NULL AND clientData.companyID IN (".implode(', ', $available_companies).")");
 							while($result && ( $row = $result->fetch_assoc())){
-								echo '<option value="',$row['id'],'">', $row['companyName'],' - ',$row ['clientName'],' - ',
+								echo '<option value="contact_',$row['id'],'">', $row['companyName'],' - ',$row ['clientName'],' - ',
 								$row['firstname'],' ',$row['lastname'], ' (',$row['email'], ')</option>';
 							}
 

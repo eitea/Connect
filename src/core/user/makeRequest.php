@@ -1,13 +1,5 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; enableToStamps($userID); ?>
 <?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
-<style>
-.robot-control{
-  border:none;
-  background:none;
-  text-decoration: none;
-  box-shadow:none;
-}
-</style>
 <?php
 $filterRequest_text = 'Alte ausblenden';
 $filterRequest = $unlock = 0;
@@ -17,9 +9,6 @@ $result = $conn->query("SELECT kmMoney FROM UserData WHERE id = $userID");
 $kmMoney = $result->fetch_assoc()['kmMoney'];
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-  if(!empty($_POST['captcha'])){
-    die("Bot detected. Aborting all running Operations.");
-  }
 if(isset($_POST['makeRequest']) && !empty($_POST['start']) && !empty($_POST['end'])){
     if(!empty($_POST['day'])){
         $begin = test_input($_POST['day'].' '.$_POST['start'].':00');

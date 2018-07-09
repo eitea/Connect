@@ -222,6 +222,11 @@ if($userHasUnansweredSurveys){ /* Test if user has unanswered questions that sho
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+	if(!empty($_POST['captcha'])){
+		include __DIR__.'footer.php';
+		session_destroy();
+		die("Bot detected. Alle Prozesse wurden terminiert.");
+	}
     if (isset($_POST['stampIn']) || isset($_POST['stampOut'])) {
 		function checkIn($userID) {
 		  global $conn;
@@ -371,6 +376,10 @@ if ($_SESSION['color'] == 'light') {
         <div class="container-fluid">
             <div class="navbar-header hidden-xs">
                 <a class="navbar-brand" href="../user/home" style="width:230px;">CONNECT <span style="font-size:9pt">(Beta)</span></a>
+				<?php
+
+if(isset($_SESSION['start']) && timeDiff_Hours($_SESSION['start'], getCurrentTimestamp()) > $row['sessionTime']) redirect('../user/logout');
+				 ?>
             </div>
             <div class="collapse navbar-collapse hidden-xs" style="display:inline;float:left;">
                 <ul class="nav navbar-nav" style="margin:10px">
@@ -762,7 +771,6 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 						  ?>
 						  <i class="fa fa-commenting-o"></i><?php echo $lang['MESSAGING']; ?>
 					  </a>
-
 					  <script>
 					  var firstTime = true;
 					  setInterval(function(){
