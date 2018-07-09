@@ -78,7 +78,7 @@ $userdata = $result->fetch_assoc();
 $result = $conn->query("SELECT firstTimeWizard, bookingTimeBuffer, cooldownTimer, sessionTime FROM configurationData");
 if ($result && ($row = $result->fetch_assoc())) {
     if($row['firstTimeWizard'] == 'FALSE') redirect('../setup/wizard');
-	if(isset($_SESSION['start']) && timeDiff_Hours($_SESSION['start'], getCurrentTimestamp()) > $row['sessionTime']) redirect('../user/logout');
+	//if(isset($_SESSION['start']) && timeDiff_Hours($_SESSION['start'], getCurrentTimestamp()) > $row['sessionTime']) redirect('../user/logout');
 	$sessionTimer = $row['sessionTime'];
 	$cd = $row['cooldownTimer'];
 	$bookingTimeBuffer = $row['bookingTimeBuffer'];
