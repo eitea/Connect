@@ -6,6 +6,13 @@ require dirname(__DIR__)."/language.php";
 $i = intval($_GET['timestampID']);
 $x = intval($_GET['userID']);
 
+if (empty($_SESSION['userid'])) {
+    die('Please <a href="../login/auth">login</a> first.');
+}
+
+session_start();
+$timeToUTC = $_SESSION['timeToUTC'];
+
 $A = $B = $_GET['date'].' 08:00';
 $row['status'] = $row['timeToUTC'] = 0;
 if($i > 0){
@@ -26,7 +33,7 @@ if($i > 0){
                 <div class="modal-header"><h4 class="modal-title"><?php echo substr($A, 0, 10); ?></h4></div>
                 <div class="modal-body">
                     <div class="row">
-                    <?php          
+                    <?php
                     echo '<div class="col-md-3"><label>'.$lang['ACTIVITY'].'</label>';
                     echo "<select name='newActivity' class='js-example-basic-single'>";
                     for($j = 0; $j < 7; $j++){

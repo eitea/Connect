@@ -3221,14 +3221,38 @@ if($row['version'] < 164){
 	} else {
 		echo '<br>', $conn->error;
 	}
+}
 
-	//TODO: encryption update, do the messages like the projects.
-	//each conversation gets THEIR public key saved to it.
-	//every PARTICIPANT gets his personally encrypted conversation private key. (encrypt with user public and user private)
-	//now, when someone sends a message, he encrypts it with messenger public/private, and when he reads it, he uses them too.
+if($row['version'] < 165){
+	$conn->query("ALTER TABLE companyData ADD COLUMN emailSignature TEXT");
+	if (!$conn->error) {
+		echo '<br>Mandant: E-Mail Signatur';
+	} else {
+		echo '<br>', $conn->error;
+	}
+
+	$conn->query("ALTER TABLE teamData ADD COLUMN emailSignature TEXT");
+	if (!$conn->error) {
+		echo '<br>Team: E-Mail Signatur';
+	} else {
+		echo '<br>', $conn->error;
+	}
+
+	$conn->query("ALTER TABLE socialprofile ADD COLUMN emailSignature TEXT");
+	if (!$conn->error) {
+		echo '<br>Benutzer: E-Mail Signatur';
+	} else {
+		echo '<br>', $conn->error;
+	}
+
+	$conn->query("ALTER TABLE roles ADD COLUMN canSendToExtern ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL");
+	if (!$conn->error) {
+		echo '<br>Benutzer: Senden an Extern';
+	} else {
+		echo '<br>', $conn->error;
+	}
 
 }
-// if($row['version'] < 165){}
 // if($row['version'] < 166){}
 // if($row['version'] < 167){}
 // if($row['version'] < 168){}
@@ -3244,9 +3268,9 @@ $conn->query("UPDATE configurationData SET version=$VERSION_NUMBER");
 echo '<br><br>Update wurde beendet. Klicken sie auf "Weiter", wenn sie nicht automatisch weitergeleitet werden: <a href="../user/home">Weiter</a>';
 ?>
 <script type="text/javascript">
-  window.setInterval(function(){
-    window.location.href="../user/home";
-  }, 4000);
+window.setInterval(function(){
+	window.location.href="../user/home";
+}, 4000);
 
 var elem = document.getElementById("progress");
 var elem_text = document.getElementById("progress_text");
@@ -3254,17 +3278,17 @@ var width = 10;
 var id = setInterval(frame, 20); //calling frame every Xms, 10ms = 1 second
 function frame() {
 	if (width >= 100) {
-	  clearInterval(id);
+		clearInterval(id);
 	} else {
-	  width++;
-	  elem.style.width = width + '%';
-	  elem_text.innerHTML = width * 1  + '%';
+		width++;
+		elem.style.width = width + '%';
+		elem_text.innerHTML = width * 1  + '%';
 	}
 }
 </script>
 
 <noscript>
-  <meta http-equiv="refresh" content="0;url='.$url.'" />';
+  <meta http-equiv="refresh" content="0;url=../user/home" />';
 </noscript>
 </body>
 </html>

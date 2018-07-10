@@ -719,7 +719,16 @@ function send_standard_email($recipient, $content, Array $options = ['subject' =
 		$mail->setFrom($row['sender'], $row['senderName']);
 	}
 	if(isset($options['reply'])) $mail->addReplyTo($options['reply']);
-
+	if(!empty($options['bcc'])){
+		foreach($options['bcc'] as $email -> $name){
+			$mail->AddBCC($email, $name);
+		}
+	}
+	if(!empty($options['cc'])){
+		foreach($options['cc'] as $email -> $name){
+			$mail->AddCC($email, $name);
+		}
+	}
 	$mail->addAddress($recipient);
 	$mail->isHTML(true);
 	if($options['subject']) {

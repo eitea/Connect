@@ -8,7 +8,7 @@
   if($result_fc && $result_fc->num_rows > 1){
     echo '<div class="col-sm-4"><label>'.$lang['COMPANY'].'</label><select class="js-example-basic-single" name="filterCompany" onchange="select_client.showClients(this.value, '.$filterClient.');" >';
     echo '<option value="0">...</option>';
-    while($result && ($row_fc = $result_fc->fetch_assoc())){
+    while($result_fc && ($row_fc = $result_fc->fetch_assoc())){
       $checked = '';
       if($filterCompany == $row_fc['id']) {
         $checked = 'selected';

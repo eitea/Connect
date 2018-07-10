@@ -53,7 +53,7 @@ if (isset($_POST['saveSocial']) && !empty($_POST['social_realemail'])) {
 } elseif(isset($_POST['saveSocial'])){
 	showError("Es wurde keine E-Mail Adresse angegeben");
 }
-$result = $conn->query("SELECT picture, status, new_message_email, isAvailable FROM socialprofile WHERE userID = $userID"); echo $conn->error;
+$result = $conn->query("SELECT picture, status, new_message_email, isAvailable, emailSignature FROM socialprofile WHERE userID = $userID"); echo $conn->error;
 $social_profile = $result->fetch_assoc();
  ?>
 
@@ -63,9 +63,8 @@ $social_profile = $result->fetch_assoc();
 	 		<button type="submit" name="saveSocial" class="btn btn-default blinking" ><i class="fa fa-floppy-o"></i></button>
 	 	</div> </h3>
 	</div>
-
 	<div class="row">
-		<div class="col-md-4">
+		<div class="col-md-4 text-center">
 			<img src='<?php echo $social_profile['picture'] ? 'data:image/jpeg;base64,'.base64_encode($social_profile['picture']) : 'images/defaultProfilePicture.png'; ?>'  style="width:250px;height:250px;" class='img-circle'>
 			<br><br>
 			<label class="btn btn-default">
@@ -73,46 +72,41 @@ $social_profile = $result->fetch_assoc();
 				<input type="file" name="profilePictureUpload" style="display:none">
 			</label>
 		</div>
-		<div class="col-md-8">
-			<div class="row">
-				<div class="col-sm-5">
-					<label><?php echo $lang['SOCIAL_STATUS'] ?></label>
-					<input type="text" class="form-control" name="social_status" placeholder="<?php echo $lang['SOCIAL_STATUS_EXAMPLE'] ?>" value="<?php echo $social_profile['status']; ?>">
-				</div>
-				<div class="col-sm-7 checkbox">
-					<label><br>
-						<input type="checkbox" name="social_isAvailable" <?php if($social_profile['isAvailable'] == 'TRUE') {echo 'checked';} ?> ><?php echo $lang['SOCIAL_AVAILABLE']; ?>
-					</label>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-5">
-					<label><?php echo $lang['BIRTHDAY']; ?></label>
-					<input type="text" class="form-control datepicker" name="social_birthday" placeholder="1990-01-30" value="<?php echo $userdata['birthday']; ?>" >
-				</div>
-				<div class="col-sm-7 checkbox">
-					<label><br>
-						<input type="checkbox" name="social_display_birthday" <?php if($userdata['displayBirthday'] == 'TRUE') echo 'checked'; ?> /> Im Kalender Anzeigen
-					</label>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-12 checkbox">
-					<label>
-						<input type="checkbox" name="social_newMessageEmail" <?php if($social_profile['new_message_email'] == 'TRUE') {echo 'checked';} ?> >
-						Bei neuer Chat Nachricht per E-Mail informieren
-					</label><br>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-5">
-					<label>E-Mail Adresse</label>
-					<input type="email" required name="social_realemail" value="<?php echo $userdata['real_email']; ?>" class="form-control required-field">
-				</div>
-			</div>
+		<div class="col-lg-5 col-md-8">
+			<label><?php echo $lang['SOCIAL_STATUS'] ?></label>
+			<input type="text" class="form-control" name="social_status" value="<?php echo $social_profile['status']; ?>">
+			<label>
+				<input type="checkbox" name="social_isAvailable" <?php if($social_profile['isAvailable'] == 'TRUE') {echo 'checked';} ?> ><?php echo $lang['SOCIAL_AVAILABLE']; ?>
+			</label>
+			<br><br>
+			<label><?php echo $lang['BIRTHDAY']; ?></label>
+			<input type="text" class="form-control datepicker" name="social_birthday" placeholder="1990-01-30" value="<?php echo $userdata['birthday']; ?>" >
+			<label>
+				<input type="checkbox" name="social_display_birthday" <?php if($userdata['displayBirthday'] == 'TRUE') echo 'checked'; ?> /> Im Kalender Anzeigen
+			</label>
+			<br><br>
+			<label>E-Mail Adresse</label>
+			<input type="email" required name="social_realemail" value="<?php echo $userdata['real_email']; ?>" class="form-control required-field">
+			<label>
+				<input type="checkbox" name="social_newMessageEmail" <?php if($social_profile['new_message_email'] == 'TRUE') {echo 'checked';} ?> >
+				Bei neuer Chat Nachricht per E-Mail informieren
+			</label>
 		</div>
+	</div><hr>
+	<ul class="nav nav-tabs">
+		<li class="active"><a data-toggle="tab" href="#basic">E-Mail Settings</a></li>
+		<!--li><a data-toggle="tab" href="#template">Template</a></li-->
+	</ul>
+	<div class="tab-content">
+		<div id="basic" class="tab-pane fade in active" style="padding:20px">
+			<label>E-Mail Signatur</label>
+			<textarea name="social_emailSignature" rows="4" class="form-control" ><?php echo $social_profile['emailSignature']; ?></textarea>
+			<label>
+				<input type="checkbox" name="social_useEmailSignature" <?php if($social_profile['emailSignature']) echo 'checked'; ?> value="1">
+				Persönliche E-Mail Signatur verwenden
+			</label>
+		</div>
+		<!--div id="template" class="tab-pane fade"></div-->
 	</div>
 </form>
-
-
 <?php require dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php'; ?>

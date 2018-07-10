@@ -1,13 +1,13 @@
 $(document).ready(function() {
     if($('#seconds').length) {
-        var sec = parseInt($("#seconds").innerHTML) + parseInt($("#minutes").innerHTML) * 60 + parseInt($("#hours").innerHTML) * 3600;
+        var sec = parseInt($("#seconds").html()) + parseInt($("#minutes").html()) * 60 + parseInt($("#hours").html()) * 3600;
         function pad(val) {
             return val > 9 ? val : "0" + val;
         }
         window.setInterval(function(){
-            $("#seconds").innerHTML = pad(++sec % 60);
-            $("#minutes").innerHTML = pad(parseInt((sec / 60) % 60, 10));
-            $("#hours").innerHTML = pad(parseInt(sec / 3600, 10));
+            $("#seconds").html(pad(++sec % 60));
+            $("#minutes").html(pad(parseInt((sec / 60) % 60, 10)));
+            $("#hours").html(pad(parseInt(sec / 3600, 10)));
         }, 1000);
     }
 });

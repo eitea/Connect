@@ -61,29 +61,28 @@ if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
 } elseif(isset($_POST['changeTeamName']) && !empty($_POST['teamName'])){
     $teamID = intval($_POST['changeTeamName']);
     $name = test_input($_POST['teamName']);
+	$companyID = intval($_POST['teamCompany']);
 	$email = test_input($_POST['teamMail']); //5b28952ad8a9a
 	$emailName = test_input($_POST['teamMailName']); //5b34d75a75691
-    $conn->query("UPDATE teamData SET name = '$name', email='$email', emailName='$emailName' WHERE id = $teamID");
+    $conn->query("UPDATE teamData SET name = '$name', email='$email', emailName='$emailName', companyID = $companyID WHERE id = $teamID");
+	if(empty($_POST['isDepartment'])){
+	    $conn->query("UPDATE teamData SET isDepartment = 'FALSE' WHERE id = $teamID");
+	    if(!$conn->error){
+	        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
+	    }
+	} else{
+	    $result = $conn->query("SELECT userID FROM relationship_team_user WHERE teamID = $teamID AND userID IN
+	        (SELECT userID FROM relationship_team_user, teamData WHERE teamData.id = teamID AND teamData.isDepartment = 'TRUE')");
+	    if($result && $result->num_rows > 0){
+	        $row = $result->fetch_assoc();
+	        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$userID_toName[$row['userID']].' befindet sich bereits in einer anderen Abteilung.</div>';
+	        $result->free();
+	    } elseif($result) {
+	        $conn->query("UPDATE teamData SET isDepartment = 'TRUE' WHERE id = $teamID");
+	    }
+	}
     if(!$conn->error){
         echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
-    }
-} elseif(!empty($_POST['department_unflag'])){
-    $teamID = intval($_POST['department_unflag']);
-    $conn->query("UPDATE teamData SET isDepartment = 'FALSE' WHERE id = $teamID");
-    if(!$conn->error){
-        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
-    }
-} elseif(!empty($_POST['department_flag'])){
-    $teamID = intval($_POST['department_flag']);
-    //$result = $conn->query("SELECT id FROM teamData WHERE isDepartment = 'TRUE'");
-    $result = $conn->query("SELECT userID FROM relationship_team_user WHERE teamID = $teamID AND userID IN
-        (SELECT userID FROM relationship_team_user, teamData WHERE teamData.id = teamID AND teamData.isDepartment = 'TRUE')");
-    if($result && $result->num_rows > 0){
-        $row = $result->fetch_assoc();
-        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$userID_toName[$row['userID']].' befindet sich bereits in einer anderen Abteilung.</div>';
-        $result->free();
-    } elseif($result) {
-        $conn->query("UPDATE teamData SET isDepartment = 'TRUE' WHERE id = $teamID");
     }
 }
 
@@ -105,29 +104,26 @@ for($i = 0; $i < 11; $i++){
 
 <div class="container-fluid">
     <?php
-    $result = $conn->query("SELECT id, name, isDepartment, email, emailName FROM teamData");
+    $result = $conn->query("SELECT id, name, isDepartment, email, emailName, leader, leaderreplacement, companyID FROM teamData");
     while($result && ($row = $result->fetch_assoc())):
         $teamID = $row['id'];
         ?>
+
         <form method="POST">
             <input type="hidden" name="teamID" value="<?php echo $teamID; ?>">
             <div class="panel panel-default">
 				<div class="panel-heading container-fluid">
 					<div class="col-xs-6"><a data-toggle="collapse" href="#teamCollapse-<?php echo $teamID; ?>"><?php echo $row['name']; ?></a>
-						<small style="padding-left:35px;"><?php echo $row['email']; //5b28952ad8a9a ?></small>
+						<?php if($row['isDepartment'] == 'TRUE') echo '<small style="padding-left:35px;color:green;">Abteilung</small>'; ?>
+						<small style="padding-left:35px;"> <?php echo $row['email']; //5b28952ad8a9a ?></small>
 					</div>
 					<div class="col-xs-6 text-right">
 						<?php $taskResult = $conn->query("SELECT projectid FROM dynamicprojectsteams WHERE teamid = $teamID");
 						if($taskResult->num_rows < 1): ?>
-						<button type="submit" class="btn-empty" style="color:red;" title="Löschen" name="removeTeam" value="<?php echo $teamID; ?>"><i class="fa fa-trash-o"></i></button>
+							<button type="submit" class="btn-empty" style="color:red;" title="Löschen" name="removeTeam" value="<?php echo $teamID; ?>"><i class="fa fa-trash-o"></i></button>
 						<?php endif; ?>
-						<button type="button" class="btn-empty" style="color:brown;" title="Bearbeiten" data-toggle="modal" data-target="#rename-team-<?php echo $teamID; ?>" ><i class="fa fa-pencil"></i></button>
-						<button type="submit" class="btn-empty" style="color:#0078e7;" title="Speichern" name="saveTeam" value="<?php echo $teamID; ?>"><i class="fa fa-floppy-o"></i></button>
-						<?php if($row['isDepartment'] == 'TRUE'): ?>
-							<button type="submit" class="btn-empty" style="color:#00d608;" title="Abteilung entfernen" name="department_unflag" value="<?php echo $teamID; ?>"><i class="fa fa-share-alt"></i></button>
-						<?php else: ?>
-							<button type="submit" class="btn-empty" style="color:#a0a0a0;" title="Als Abteilung markieren" name="department_flag" value="<?php echo $teamID; ?>"><i class="fa fa-share-alt"></i></button>
-						<?php endif; ?>
+						<button type="button" class="btn-empty" title="Bearbeiten" data-toggle="modal" data-target="#edit-team-<?php echo $teamID; ?>" ><i class="fa fa-cog"></i></button>
+						<button type="submit" class="btn-empty" title="Speichern" name="saveTeam" value="<?php echo $teamID; ?>"><i class="fa fa-floppy-o"></i></button>
 					</div>
 				</div>
                 <div class="collapse <?php if($teamID == $activeTab) echo 'in'; ?>" id="teamCollapse-<?php echo $teamID; ?>">
@@ -190,19 +186,78 @@ for($i = 0; $i < 11; $i++){
                 </form>
             </div>
         </div>
-        <div id="rename-team-<?php echo $teamID; ?>" class="modal fade">
+        <div id="edit-team-<?php echo $teamID; ?>" class="modal fade">
             <div class="modal-dialog modal-content modal-md">
                 <form method="POST">
                     <div class="modal-header h4"><?php echo $row['name']; ?> Editieren</div>
                     <div class="modal-body">
-                        <label>Name</label>
-                        <input type="text" name="teamName" value="<?php echo $row['name']; ?>" class="form-control">
-						<br>
-						<label>E-mail</label>
-                        <input type="text" name="teamMail" value="<?php echo $row['email']; ?>" class="form-control">
-						<br>
-						<label>E-mail Anzeigename</label>
-                        <input type="text" name="teamMailName" value="<?php echo $row['emailName']; ?>" class="form-control">
+						<div class="row">
+							<div class="col-md-6">
+								<label>Name</label>
+								<input type="text" class="form-control" name="teamName" value="<?php echo $row['name']; ?>" />
+							</div>
+							<div class="col-md-6">
+								<br>
+								<label>
+									<input type="checkbox" name="isDepartment" value="1" <?php if($row['isDepartment'] == 'TRUE') echo 'checked'; ?> />
+									Abteilung
+								</label>
+							</div>
+						</div>
+						<?php $result_fc = mysqli_query($conn, "SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
+						if($result_fc && $result_fc->num_rows > 1): ?>
+							<div class="row">
+								<div class="col-md-6">
+									<label>Mandant</label>
+									<select class="js-example-basic-single" name="teamCompany">
+										<?php
+									      while($result_fc && ($row_fc = $result_fc->fetch_assoc())){
+									        $checked = $row['companyID'] == $row_fc['id'] ? 'selected' : '';
+									        echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
+									      }
+									      echo '</select>';
+
+										?>
+									</select>
+								</div>
+							</div>
+							<?php endif; ?>
+						<div class="row">
+							<div class="col-md-6">
+								<label>E-Mail</label>
+								<input type="email" class="form-control" name="teamMail" value="<?php echo $row['email']; ?>" />
+							</div>
+							<div class="col-md-6">
+								<label>E-Mail Anzeigename</label>
+								<input type="text" class="form-control" name="teamMailName" value="<?php echo $row['emailName']; ?>" maxlength="45"/>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-6">
+								<label><?php echo $lang['LEADER'] ?></label>
+								<select name="leader" class="js-example-basic-single">
+									<option value="">...</option>
+									<?php
+									foreach($userID_toName as $id=>$name){
+										$selected = $id == $row['leader'] ? 'selected' : '';
+										echo "<option $selected value='$id'>$name</option>";
+									}
+									?>
+								</select><br>
+							</div>
+							<div class="col-md-6">
+								<label><?php echo $lang['LEADER_REPLACEMENT'] ?></label>
+								<select name="replacement" class="js-example-basic-single">
+									<option value="">...</option>
+									<?php
+									foreach($userID_toName as $id=>$name){
+										$selected = $id == $row['leaderreplacement'] ? 'selected' : '';
+										echo "<option $selected value='$id'>$name</option>";
+									}
+									?>
+								</select><br>
+							</div>
+						</div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

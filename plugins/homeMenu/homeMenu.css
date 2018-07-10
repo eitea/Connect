@@ -28,7 +28,9 @@ body{
 ul.nav.navbar-nav .nav.nav-list {
   padding-left: 25px;
 }
-
+ul.nav.nav-tabs {
+	margin-bottom:20px;
+}
 .panel-body .nav.navbar-nav {
   width:100%;
 }

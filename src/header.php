@@ -184,7 +184,7 @@ if($userHasUnansweredSurveys){ /* Test if user has unanswered questions that sho
     if(!$surveysAreSuspended){
         $result = $conn->query(
             "SELECT count(*) count FROM (
-                SELECT userID FROM dsgvo_training_user_relations tur INNER JOIN dsgvo_training t on t.id = tur.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
+                SELECT userID FROM dsgvo_training_user_relations tur INNER JOIN dsgvo_training t ON t.id = tur.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
                     SELECT userID
                     FROM dsgvo_training_completed_questions
                     LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
@@ -192,7 +192,7 @@ if($userHasUnansweredSurveys){ /* Test if user has unanswered questions that sho
                     WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
                  )
                 UNION
-                SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN relationship_team_user tr ON tr.teamID = dtr.teamID INNER JOIN dsgvo_training t on t.id = dtr.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
+                SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN relationship_team_user tr ON tr.teamID = dtr.teamID INNER JOIN dsgvo_training t ON t.id = dtr.trainingID LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
                     SELECT userID
                     FROM dsgvo_training_completed_questions
                     LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
@@ -202,7 +202,7 @@ if($userHasUnansweredSurveys){ /* Test if user has unanswered questions that sho
                 UNION
                 SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations
                 INNER JOIN relationship_company_client ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
-                INNER JOIN dsgvo_training on dsgvo_training.id = dsgvo_training_company_relations.trainingID
+                INNER JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_company_relations.trainingID
                 LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID
                 WHERE relationship_company_client.userID = $userID
                 AND dsgvo_training.onLogin = 'TRUE' AND NOT EXISTS (
@@ -216,7 +216,7 @@ if($userHasUnansweredSurveys){ /* Test if user has unanswered questions that sho
         );
         $error_output .= showError($conn->error, 1);
         $userHasUnansweredOnLoginSurveys = intval($result->fetch_assoc()["count"]) !== 0;
-    }else{
+    } else {
         $userHasUnansweredOnLoginSurveys = false;
     }
 }

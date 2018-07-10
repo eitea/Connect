@@ -95,7 +95,8 @@ function create_tables($conn) {
 		companyRegister VARCHAR(80),
 		companyCommercialCourt VARCHAR(80),
 		companyWKOLink VARCHAR(150),
-		fax VARCHAR(60)
+		fax VARCHAR(60),
+		emailSignature TEXT
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -261,6 +262,7 @@ function create_tables($conn) {
         canCreateTasks ENUM('TRUE', 'FALSE') DEFAULT 'TRUE' NOT NULL,
         canUseArchive ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL,
         canUseWorkflow ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
+		canSendToExtern ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
         FOREIGN KEY (userID) REFERENCES UserData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -615,6 +617,7 @@ function create_tables($conn) {
         isDepartment ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE',
 		email VARCHAR(100),
 		emailName VARCHAR(50),
+		emailSignature TEXT,
         FOREIGN KEY (companyID) REFERENCES companyData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -842,6 +845,7 @@ function create_tables($conn) {
         status varchar(150) DEFAULT '-',
         picture MEDIUMBLOB,
         new_message_email ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+		emailSignature TEXT,
         FOREIGN KEY (userID) REFERENCES UserData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE

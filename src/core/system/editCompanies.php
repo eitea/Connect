@@ -63,6 +63,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $left = max4Lines($_POST['general_detail_left']);
     $middle = max4Lines($_POST['general_detail_middle']);
     $right = max4Lines($_POST['general_detail_right']);
+	$emailSig = test_input($_POST['general_emailSignature']);
 	//5afc141e4a3c7
 	$register = test_input($_POST['general_companyRegister']);
 	$fax = test_input($_POST['general_fax']);
@@ -71,7 +72,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
     $conn->query("UPDATE companyData SET cmpDescription = '$descr',address = '$address', phone = '$phone', mail = '$mail', homepage = '$homepage', erpText = '$erpText',
       detailLeft = '$left', detailMiddle = '$middle', detailRight = '$right', companyPostal = '$plz', uid = '$uid', companyCity = '$city', fax = '$fax',
-	  companyRegister = '$register', companyCommercialCourt = '$court', companyWKOLink = '$wko' WHERE id = $cmpID");
+	  companyRegister = '$register', companyCommercialCourt = '$court', companyWKOLink = '$wko', emailSignature = '$emailSig' WHERE id = $cmpID");
 
 	  if($conn->error){
 		  showError($conn->error);
@@ -559,6 +560,12 @@ if ($result && ($companyRow = $result->fetch_assoc()) && in_array($companyRow['i
       </div>
       <div class="col-sm-3 text-right">
         <textarea name="general_detail_right" class="form-control" placeholder="" maxlength="140" rows="3"><?php echo $companyRow['detailRight'];?></textarea>
+      </div>
+    </div>
+	<div class="row">
+      <div class="col-sm-3"><label>E-Mail Signatur</label></div>
+      <div class="col-sm-9">
+        <textarea name="general_emailSignature" class="form-control" rows="3" placeholder="Wird an versendete E-Mails angehängt"><?php echo $companyRow['emailSignature'];?></textarea>
       </div>
     </div>
   </div>
