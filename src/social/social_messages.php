@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			$partID = $userID;
 			$status = 'creator';
 			$stmt_participant->execute();
-			$options = ['subject' => "Connect - [CON - $identifier]"];
+			$options = ['subject' => "$subject - [CON - $identifier]"];
 
 			if($conn->error) showError($conn->error.__LINE__);
 			$participantID = $conn->insert_id;
