@@ -3,6 +3,10 @@
 require_once dirname(__DIR__)."/connection.php";
 require_once dirname(__DIR__)."/utilities.php";
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 $result = $conn->query("SELECT id FROM identification LIMIT 1");
 if($row = $result->fetch_assoc()){
 	$identifier = $row['id'];
@@ -18,6 +22,7 @@ $stmt_insertarchive = $conn->prepare("INSERT INTO archive(uniqID, category, cate
 $stmt_insertarchive->bind_param("sssss", $archiveID, $archiveCat, $projectid, $filename, $filetype);
 
 $result = $conn->query("SELECT id, server, smtpSecure, port, service, username, password FROM emailprojects");
+if($conn->error) echo $conn->error.__LINE__;
 while($result && $row = $result->fetch_assoc()){
     $security = empty($row['smtpSecure']) ? '' : '/'.$row['smtpSecure'];
 	//$mailbox = '{'.$row['server'] .':'. $row['port']. '/'.$row['service'] . $security.'/novalidate-cert}'.'INBOX'; //{imap.gmail.com:993/imap/ssl}INBOX ; {localhost:993/imap/ssl/novalidate-cert}
@@ -28,7 +33,8 @@ while($result && $row = $result->fetch_assoc()){
 	imap_reopen($imap, $mailbox.'INBOX');
 
     $result = $conn->query("SELECT fromAddress, toAddress, subject, templateID, workflowID FROM workflowRules
-		WHERE isActive = 'TRUE' AND workflowID = ".$row['id']." ORDER BY templateID, position ASC"); echo $conn->error;
+		WHERE isActive = 'TRUE' AND workflowID = ".$row['id']." ORDER BY templateID, position ASC");
+	if($conn->error) echo $conn->error.__LINE__;
     while(($rule = $result->fetch_assoc())){
 		$move_sequence = array();
 		if($rule['templateID']){
@@ -95,6 +101,7 @@ while($result && $row = $result->fetch_assoc()){
 
 				if($rule['templateID']){ //dynamicproject
 					$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$projectid', 'CREATED', 1)");
+					if($conn->error) echo $conn->error.__LINE__;
 					$html = asymmetric_encryption('TASK', $html, 0, $secret);
 					$name = asymmetric_encryption('TASK', substr_replace($header->subject, '', $pos, strlen($rule['subject'])), 0, $secret);
 					$conn->query("INSERT INTO dynamicprojects(
@@ -103,12 +110,12 @@ while($result && $row = $result->fetch_assoc()){
 					SELECT '$projectid', '$name', '$html', companyid, clientid, clientprojectid, projectcolor, IF(projectstart='0000-00-00', UTC_TIMESTAMP , projectstart),
 					projectend, projectstatus, projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, 'FALSE',
 					'$v2', '$encrypted_header' FROM dynamicprojects WHERE projectid = '{$rule['templateID']}'");
-					echo $conn->error;
+					if($conn->error) echo $conn->error.__LINE__;
 					if($rule['autoResponse']) send_standard_email($sender, $rule['autoResponse'], ['subject' => "Connect - Ticket Nr. [$projectid]"]); //5b20ad39615f9
 					$conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) SELECT '$projectid', userid, position FROM dynamicprojectsemployees WHERE projectid = '{$rule['templateID']}'");
-					echo $conn->error;
+					if($conn->error) echo $conn->error.__LINE__;
 					$conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) SELECT '$projectid', teamid FROM dynamicprojectsteams WHERE projectid = '{$rule['templateID']}'");
-					echo $conn->error;
+					if($conn->error) echo $conn->error.__LINE__;
 				} else { //message
 					$result = $conn->query("SELECT id FROM messenger_conversations WHERE identifier = '$projectid'");
 					if($row = $result->fetch_assoc()){
@@ -121,10 +128,12 @@ while($result && $row = $result->fetch_assoc()){
 							$conn->query("INSERT INTO relationship_conversation_participant(conversationID, partType, partID, status)
 								VALUES ($conversationID, 'unknown', '$sender', 'normal')");
 							$participantID = $conn->insert_id;
+							if($conn->error) echo $conn->error.__LINE__;
 						}
 						$result->free();
 						$message = asymmetric_encryption('CHAT', $html, 0, $secret);
 						$conn->query("INSERT INTO messenger_messages(message, participantID, vKey) VALUES ('$message', $participantID, '$v2')");
+						if($conn->error) echo $conn->error.__LINE__;
 					} else {
 						echo "Error: No Message found with identifier $projectid";
 					}

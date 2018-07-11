@@ -686,7 +686,6 @@ use PHPMailer\PHPMailer\PHPMailer;
 function send_standard_email($recipient, $content, Array $options = ['subject' => '']){
 	require dirname(__DIR__).'/plugins/phpMailer/autoload.php';
 	global $conn;
-	//send mail
 	$mail = new PHPMailer();
 	$mail->CharSet = 'UTF-8';
 	$mail->Encoding = "base64";
@@ -736,6 +735,7 @@ function send_standard_email($recipient, $content, Array $options = ['subject' =
 	} else {
 		$mail->Subject = 'Connect';
 	}
+
 	$mail->Body    =  $content;
 	$mail->AltBody = 'Your e-mail provider does not support HTML. Use an Html Viewer to format this email. '. $content;
 	if(!$mail->send()) return $mail->ErrorInfo;

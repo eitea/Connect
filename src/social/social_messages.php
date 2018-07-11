@@ -20,8 +20,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	if(isset($_POST['send_new_message']) && !empty($_POST['new_message_subject']) && !empty($_POST['new_message_body'])){
 		$subject = test_input($_POST['new_message_subject']);
 		$message =  test_input($_POST['new_message_body']);
-		$message_encrypt = asymmetric_encryption('CHAT', $message, $userID, $privateKey, 'encrypt', $err);
-		$v2Key = $message_encrypt == $message ? '' : $publicKey;
 
 		$stmt_participant = $conn->prepare("INSERT INTO relationship_conversation_participant(conversationID, partType, partID, status) VALUES (?, ?, ?, ?)");
 		$stmt_participant->bind_param('isss', $conversationID, $partType, $partID, $status);
@@ -41,8 +39,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			if($conn->error) showError($conn->error.__LINE__);
 			$participantID = $conn->insert_id;
 
-			$conn->query("INSERT INTO messenger_messages(message, participantID, vKey) VALUES('$message_encrypt', $participantID, '$v2Key')");
-			if($conn->error) showError($conn->error.__LINE__);
 			//participants
 			if(!empty($_POST['new_message_user'])){
 				foreach($_POST['new_message_user'] as $val){
@@ -96,19 +92,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 				$arr = explode('_', $val);
 				$val = intval($arr[1]);
 				$status = 'normal';
+
 				if($arr[0] == 'client'){
 					$partType = 'client';
-					$result = $conn->query("SELECT mail AS email FROM clientInfoData WHERE clientID = $val LIMIT 1");
+					$result = $conn->query("SELECT mail AS email, name AS lastname, firstname, title, gender FROM clientInfoData WHERE clientID = $val LIMIT 1");
+
 				} else {
 					$partType = 'contact';
-					$result = $conn->query("SELECT email FROM contactPersons WHERE id = $val LIMIT 1");
+					$result = $conn->query("SELECT email, firstname, lastname, gender, title FROM contactPersons WHERE id = $val LIMIT 1");
 				}
 				if($result && ($row = $result->fetch_assoc())){
 					$partID = $row['email'];
 					$stmt_participant->execute();
-					echo send_standard_email($partID, $message_encrypt, $options);
+
+					if(strpos($message, '[ANREDE]') !== false){
+						$intro = 'Sehr geehrter ';
+						if($row['gender'] == 'male'){
+							$intro .= 'Herr ';
+						} else {
+							$intro .= 'Frau ';
+						}
+						$intro .= $row['title'].' '.$row['firstname'].' '.$row['lastname'];
+						$message = str_replace('[ANREDE]', $intro, $message);
+					}
+					echo send_standard_email($partID, $message, $options);
 				}
 			}
+			$message_encrypt = asymmetric_encryption('CHAT', $message, $userID, $privateKey, 'encrypt', $err);
+			$v2Key = $message_encrypt == $message ? '' : $publicKey;
+
+			$conn->query("INSERT INTO messenger_messages(message, participantID, vKey) VALUES('$message_encrypt', $participantID, '$v2Key')");
+			if($conn->error) showError($conn->error.__LINE__);
 		}
 		$stmt_participant->close();
 		if($conn->error){
