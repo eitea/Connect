@@ -8,6 +8,7 @@ $(document).ready(function() {
             $("#seconds").html(pad(++sec % 60));
             $("#minutes").html(pad(parseInt((sec / 60) % 60, 10)));
             $("#hours").html(pad(parseInt(sec / 3600, 10)));
+			$("#lifetime_counter").html(parseInt($("#lifetime_counter").html())-1);
         }, 1000);
     }
 });

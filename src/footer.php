@@ -1,6 +1,11 @@
+<?php
+$arr = session_get_cookie_params();
+if($arr['lifetime']) echo '<div class="text-right"><span id="lifetime_counter">',$arr['lifetime'],'</span> Sekunden bis Logout</div>';
+?>
 </div>
 </div>
 <div id="currentSurveyModal"></div>
+<button type='button' class='btn btn-primary feedback-button'>Feedback</button>
 <script>
 $(".openSurvey").click(function(){
     openSurveyModal()
@@ -22,12 +27,8 @@ function openSurveyModal(){
         }
    });
 }
-<?php if($userHasUnansweredOnLoginSurveys){echo "setTimeout(function(){ openSurveyModal() },500); clearTimeout(window.homeReloadTimeout);";} // ?>
-</script>
-<?php // endif; ?>
+<?php if($userHasUnansweredOnLoginSurveys){echo "setTimeout(function(){ openSurveyModal() },500); clearTimeout(window.homeReloadTimeout);";} ?>
 
-<button type='button' class='btn btn-primary feedback-button'>Feedback</button>
-<script>
 $("#feedback_form").submit(function(event){
     //console.log("feedBack");
     event.preventDefault();

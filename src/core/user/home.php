@@ -290,7 +290,12 @@ if($result && ($row = $result->fetch_assoc())){
 $start = getCurrentTimestamp();
 $result = $conn->query("SELECT id, birthday FROM UserData WHERE birthday IS NOT NULL AND displayBirthday = 'TRUE'"); echo $conn->error;
 while($result && ($row = $result->fetch_assoc())){
-    $dates[] = "{ title: 'Geburtstag: ".$userID_toName[$row['id']]."', start: '".substr($start, 0, 4).substr($row['birthday'], 4)."', textColor: 'white', backgroundColor: '#d65eb5'}";
+	if(timeDiff_Hours($start, $row['birthday']) >= 0){
+		$val = substr($start, 0, 4).substr($row['birthday'], 4);
+	} else {
+		$val = (substr($start, 0, 4) +1).substr($row['birthday'], 4);
+	}
+    $dates[] = "{ title: 'Geburtstag: ".$userID_toName[$row['id']]."', start: '".$val."', textColor: 'white', backgroundColor: '#f763ba'}";
 }
 
 $result = $conn->query("SELECT begin, name FROM holidays WHERE begin > '$start' AND begin < '".date('Y-m-d', strtotime('+1 year'))."' AND (ASCII(SUBSTRING(name, LENGTH(name)-1,1)) = 167 OR ASCII(SUBSTRING(name, LENGTH(name)-1,1)) = 41)"); echo $conn->error;
