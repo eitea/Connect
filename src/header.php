@@ -31,40 +31,14 @@ if($row = $result->fetch_assoc()){
 	$identifier = uniqid('');
 	$conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
 }
-$result = $conn->query("SELECT * FROM roles WHERE userID = $userID");
+$result = $conn->query("SELECT * FROM roles WHERE userID = $userID LIMIT 1");
 if ($result && $result->num_rows > 0) {
-    $row = $result->fetch_assoc();
-    $isCoreAdmin = $row['isCoreAdmin'];
-    $isTimeAdmin = $row['isTimeAdmin'];
-    $isProjectAdmin = $row['isProjectAdmin'];
-    $isReportAdmin = $row['isReportAdmin'];
-    $isERPAdmin = $row['isERPAdmin'];
-    $isFinanceAdmin = $row['isFinanceAdmin'];
-    $isDSGVOAdmin = $row['isDSGVOAdmin'];
-    $isDynamicProjectsAdmin = $row['isDynamicProjectsAdmin'];
-    $canBook = $row['canBook'];
-    $canStamp = $row['canStamp'];
-    $canEditTemplates = $row['canEditTemplates'];
-    $canUseSocialMedia = $row['canUseSocialMedia'];
-    $canUseClients = $row['canUseClients'];
-    $canEditClients = $row['canEditClients'];
-    $canUseSuppliers = $row['canUseSuppliers'];
-    $canEditSuppliers = $row['canEditSuppliers'];
-    $canCreateTasks = $row['canCreateTasks'];
-    $canUseArchive = $row['canUseArchive'];
-    $canUseWorkflow = $row['canUseWorkflow']; //5ab7ae7596e5c
+    $user_roles = $result->fetch_assoc();
 } else {
-	echo $conn->error;
-    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = false;
-    $canBook = $canStamp = $canEditTemplates = $canUseSocialMedia = $canCreateTasks  = $canUseSuppliers = $canUseClients = $canEditClients = false;
-    $canEditSuppliers = $canUseArchive = $canUseWorkflow = false;
+	showError("Es konnten keine Berechtigungen für $userID gefunden werden".$conn->error);
 }
-if ($userID == 1) { //superuser
-    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = $isReportAdmin = $isERPAdmin = $isFinanceAdmin = $isDSGVOAdmin = $isDynamicProjectsAdmin = 'TRUE';
-    $canStamp = $canBook = $canUseSocialMedia = $canCreateTasks  = $canUseClients = $canUseSuppliers = $canEditSuppliers = $canEditClients = $canUseArchive = $canUseWorkflow ='TRUE';
-}
-if($isERPAdmin == 'TRUE'){
-    $canEditClients = $canEditSuppliers = 'TRUE';
+if($user_roles['isERPAdmin'] == 'TRUE'){
+    $user_roles['canEditClients'] = $user_roles['canEditSuppliers'] = 'TRUE';
 }
 $result = $conn->query("SELECT psw, lastPswChange, forcedPwdChange, birthday, displayBirthday, real_email FROM UserData WHERE id = $userID");
 echo $conn->error;
@@ -92,7 +66,7 @@ if ($result && ($row = $result->fetch_assoc())) {
 $result = $conn->query("SELECT id, CONCAT(firstname,' ', lastname) AS name FROM UserData")->fetch_all(MYSQLI_ASSOC); echo $conn->error;
 $userID_toName = array_combine( array_column($result, 'id'), array_column($result, 'name'));
 
-if ($isTimeAdmin) {
+if ($user_roles['isTimeAdmin']) {
     $numberOfAlerts = 0;
     //requests
     $result = $conn->query("SELECT id FROM $userRequests WHERE status = '0'");
@@ -410,7 +384,7 @@ if ($_SESSION['color'] == 'light') {
             </div>
             <div class="navbar-right" style="margin-right:10px;">
                 <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>
-                <?php if ($canUseSocialMedia == 'TRUE'): ?>
+                <?php if ($user_roles['canUseSocialMedia'] == 'TRUE'): ?>
 					<a href="../social/profile" class="hidden-xs">
 						<?php $result = $conn->query("SELECT picture FROM socialprofile WHERE userID = $userID"); echo $conn->error;
 						if($result && ($row = $result->fetch_assoc())): ?>
@@ -419,7 +393,7 @@ if ($_SESSION['color'] == 'light') {
 					</a>
 				<?php endif; ?>
                     <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
-                <?php if ($isTimeAdmin == 'TRUE' && $numberOfAlerts > 0): ?>
+                <?php if ($user_roles['isTimeAdmin'] == 'TRUE' && $numberOfAlerts > 0): ?>
                     <a href="../time/check" class="btn navbar-btn navbar-link hidden-xs" title="Your Database is in an invalid state, please fix these Errors after clicking this button.">
                         <i class="fa fa-bell"></i><span class="badge badge-alert" style="position:absolute;top:5px;right:220px;"> <?php echo $numberOfAlerts; ?></span>
                     </a>
@@ -743,7 +717,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
   <div class="inner">
       <div class="navbar navbar-default" role="navigation">
           <ul class="nav navbar-nav" id="sidenav01">
-              <?php if ($canStamp == 'TRUE'): ?>
+              <?php if ($user_roles['canStamp'] == 'TRUE'): ?>
                   <li>
                       <div class='container-fluid'>
                           <form method='post' action="../user/home"><br>
@@ -811,7 +785,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 				  ?>
 
                   <!-- User-Section: BOOKING -->
-                  <?php if ($canBook == 'TRUE' && $showProjectBookingLink): ?>
+                  <?php if ($user_roles['canBook'] == 'TRUE' && $showProjectBookingLink): ?>
                       <li><a <?php if ($this_page == 'userProjecting.php') {echo $setActiveLink;}?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
                   <?php endif;?>
                   <?php
@@ -822,7 +796,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                       WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).")
 					  AND d.projectstatus = 'ACTIVE' AND (d.projectleader = $userID OR de.userid IS NOT NULL OR rtu.userID IS NOT NULL)");
                       echo $conn->error;
-                      if (($result && $result->num_rows > 0) || $userHasSurveys || $isDynamicProjectsAdmin || $canCreateTasks): ?>
+                      if (($result && $result->num_rows > 0) || $userHasSurveys || $user_roles['isDynamicProjectsAdmin'] || $user_roles['canCreateTasks']): ?>
                       <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view">
 						  <?php if($result->num_rows > 0) echo '<span class="pull-right"><small>'.$result->num_rows.'</small></span>'; ?>
                           <i class="fa fa-tasks"></i><?php echo $lang['DYNAMIC_PROJECTS']; ?>
@@ -830,14 +804,14 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                       </a></li>
                   <?php endif; ?>
               <?php endif; //endif(canStamp) ?>
-            <?php if ($canUseClients == 'TRUE' || $canEditClients == 'TRUE' || $canUseSuppliers == 'TRUE' || $canEditSuppliers == 'TRUE'): ?>
+            <?php if ($user_roles['canUseClients'] == 'TRUE' || $user_roles['canEditClients'] == 'TRUE' || $user_roles['canUseSuppliers'] == 'TRUE' || $user_roles['canEditSuppliers'] == 'TRUE'): ?>
             <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink; }?> href="../system/clients"><i class="fa fa-file-text-o"></i><span><?php echo $lang['ADDRESS_BOOK']; ?></span></a></li>
             <?php endif;//canuseClients ?>
           </ul>
       </div>
     <div class="panel-group" id="sidebar-accordion">
       <!-- Section One: CORE -->
-      <?php if ($isCoreAdmin == 'TRUE'): ?>
+      <?php if ($user_roles['isCoreAdmin'] == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading" role="tab">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-core"  id="adminOption_CORE"><i class="fa fa-caret-down pull-right"></i>
@@ -922,7 +896,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <?php endif; ?>
 
       <!-- Section Two: TIME -->
-      <?php if ($isTimeAdmin == 'TRUE'): ?>
+      <?php if ($user_roles['isTimeAdmin'] == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading" role="tab">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-time"  id="adminOption_TIME"><i class="fa fa-caret-down pull-right"></i>
@@ -947,7 +921,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <?php endif;?>
 
       <!-- Section Three: PROJECTS -->
-      <?php if ($isProjectAdmin == 'TRUE' || $canUseWorkflow == 'TRUE'): ?>
+      <?php if ($user_roles['isProjectAdmin'] == 'TRUE' || $user_roles['canUseWorkflow'] == 'TRUE'): ?>
           <div class="panel panel-default panel-borderless">
               <div class="panel-heading" role="tab">
                   <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-project"  id="adminOption_PROJECT"><i class="fa fa-caret-down pull-right"></i>
@@ -957,7 +931,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
               <div id="collapse-project" class="panel-collapse collapse" role="tabpanel">
                   <div class="panel-body">
                       <ul class="nav navbar-nav">
-                          <?php if ($isProjectAdmin == 'TRUE'): ?>
+                          <?php if ($user_roles['isProjectAdmin'] == 'TRUE'): ?>
                               <li><a <?php if ($this_page == 'project_public.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['PROJECTS']; ?></span></a></li>
                               <li><a <?php if ($this_page == 'audit_projectBookings.php') {echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
                           <?php endif; ?>
@@ -974,7 +948,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <!-- Section Four: REPORTS    !! REMOVED 5aa0dafd9fbf0 !! -->
 
       <!-- Section Five: ERP -->
-      <?php if ($isERPAdmin == 'TRUE'): ?>
+      <?php if ($user_roles['isERPAdmin'] == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading" role="tab">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-erp"  id="adminOption_ERP"><i class="fa fa-caret-down pull-right"></i><i class="fa fa-file-text-o"></i> ERP</a>
@@ -1055,7 +1029,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
         ?>
       <?php endif;?>
       <!-- Section Six: FINANCES -->
-      <?php if ($isFinanceAdmin == 'TRUE'): ?>
+      <?php if ($user_roles['isFinanceAdmin'] == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading">
             <a data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-finance"  id="adminOption_FINANCE"><i class="fa fa-caret-down pull-right"></i><i class="fa fa-book"></i><?php echo $lang['FINANCES']; ?></a>
@@ -1110,7 +1084,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
         ?>
       <?php endif;?>
       <!-- Section Six: DSGVO -->
-      <?php if ($isDSGVOAdmin == 'TRUE'): ?>
+      <?php if ($user_roles['isDSGVOAdmin'] == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading">
             <a data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-dsgvo"  id="adminOption_DSGVO"><i class="fa fa-caret-down pull-right"></i><strong style="padding: 0px 6px;"> § </strong>DSGVO</a>
@@ -1170,7 +1144,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
         ?>
       <?php endif;?>
       <!-- Section Seven: ARCHIVE -->
-      <?php if ($canUseArchive == 'TRUE'): ?>
+      <?php if ($user_roles['canUseArchive'] == 'TRUE'): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading">
             <a data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-archives"  id="adminOption_ARCHIVE"><i class="fa fa-caret-down pull-right"></i><i class="fa fa-folder-open-o"></i><?php echo $lang['ARCHIVE'] ?></a>

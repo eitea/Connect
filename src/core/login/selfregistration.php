@@ -61,19 +61,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if (is_numeric($_POST['sat'])) { $sat = $_POST['sat']; } else { $accept = false; }
     if (is_numeric($_POST['sun'])) { $sun = $_POST['sun']; } else { $accept = false; }
 
-    $isCoreAdmin = $isTimeAdmin = $isProjectAdmin = 'FALSE';
-    $canBook = $canStamp = 'FALSE';
-    if(isset($_POST['canStamp'])){
-      $canStamp = 'TRUE';
-    }
-    if(isset($_POST['canStamp']) && isset($_POST['canBook'])){
-      $canBook = 'TRUE';
-    }
-
     if($accept && $real_email){
       //create user
       $psw = password_hash($pass, PASSWORD_BCRYPT);
-      $sql = "INSERT INTO $userTable (firstname, lastname, psw, gender, email, beginningDate, real_email)
+      $sql = "INSERT INTO UserData (firstname, lastname, psw, gender, email, beginningDate, real_email)
       VALUES ('$firstname', '$lastname', '$psw', '$gender', '$email', '$begin', '$real_email');";
       //if user was successfully created, insert the rest and send an email.
       if($conn->query($sql)){
@@ -81,12 +72,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         echo mysqli_error($conn);
         $conn->query("INSERT INTO archive_folders VALUES(0,$curID,'ROOT',-1)");
         //create interval
-        $sql = "INSERT INTO $intervalTable (mon, tue, wed, thu, fri, sat, sun, userID, vacPerYear, overTimeLump, pauseAfterHours, hoursOfrest, startDate)
+        $sql = "INSERT INTO intervalData (mon, tue, wed, thu, fri, sat, sun, userID, vacPerYear, overTimeLump, pauseAfterHours, hoursOfrest, startDate)
         VALUES ($mon, $tue, $wed, $thu, $fri, $sat, $sun, $curID, '25', '$overTimeLump','6', '0.5', '$begin');";
         $conn->query($sql);
         echo mysqli_error($conn);
         //create roletable
-        $sql = "INSERT INTO $roleTable (userID, isCoreAdmin, isProjectAdmin, isTimeAdmin, canStamp, canBook) VALUES($curID, '$isCoreAdmin', '$isProjectAdmin', '$isTimeAdmin', '$canStamp', '$canBook');";
+        $sql = "INSERT INTO roles (userID) VALUES($curID);";
         $conn->query($sql);
         echo mysqli_error($conn);
         //create socialprofile
@@ -205,15 +196,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <label>
               <input type="radio" name="gender" value="male" >Male <br>
             </label>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <?php echo $lang['ALLOW_PRJBKING_ACCESS']; ?>: <br>
-          <div class="checkbox">
-            <label><input type="checkbox" checked name="canStamp">Can Checkin <br></label>
-          </div>
-          <div class="checkbox">
-            <label><input type="checkbox" name="canBook">Can Book <br></label>
           </div>
         </div>
         <div class="col-md-3">

@@ -68,7 +68,7 @@ $templateResult = $conn->query("SELECT projectname,projectid,v2 FROM dynamicproj
 <div class="page-header-fixed">
 	<div class="page-header"><h3>Tasks<div class="page-header-button-group">
 	    <?php include dirname(__DIR__) . '/misc/set_filter.php';
-		if($isDynamicProjectsAdmin == 'TRUE'|| $canCreateTasks == 'TRUE'):
+		if($user_roles['isDynamicProjectsAdmin'] == 'TRUE'|| $user_roles['canCreateTasks'] == 'TRUE'):
 			if($templateResult->num_rows > 0): ?>
 	        <div class="dropdown" style="display:inline;">
 	            <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button"><i class="fa fa-plus"></i></button>
@@ -275,7 +275,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             showError('<strong>Project not Available.</strong> '.$lang['ERROR_STRIKE']);
         }
     }
-    if($isDynamicProjectsAdmin == 'TRUE' || $canCreateTasks == 'TRUE'){
+    if($user_roles['isDynamicProjectsAdmin'] == 'TRUE' || $user_roles['canCreateTasks'] == 'TRUE'){
         if(!empty($_POST['deleteProject'])){
             $val = test_input($_POST['deleteProject']);
             $conn->query("DELETE FROM dynamicprojectslogs WHERE projectid = '$val'");
@@ -331,7 +331,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 				$percentage = intval($_POST['completed']);
 				$estimate = test_input($_POST['estimatedHours']);
 				$isTemplate = isset($_POST['isTemplate']) ? 'TRUE' : 'FALSE';
-				if($isDynamicProjectsAdmin == 'TRUE'){
+				if($user_roles['isDynamicProjectsAdmin'] == 'TRUE'){
 					$skill = intval($_POST['projectskill']);
 					$parent = test_input($_POST["parent"]); //dynamproject id
 				} else {
@@ -481,7 +481,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
         $hasActiveBooking = $result->num_rows;
 
 	    $nonAdminQuery = '';
-        if($isDynamicProjectsAdmin == 'FALSE'){
+        if($user_roles['isDynamicProjectsAdmin'] == 'FALSE'){
 			foreach($available_teams as $val) $nonAdminQuery .= " OR conteamsids LIKE '% $val %' ";
 			$nonAdminQuery = "AND (d.projectowner = $userID OR d.projectleader = $userID OR conemployees LIKE '% $userID %' $nonAdminQuery)";
         }
@@ -545,7 +545,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             echo $row['conteams'];
             echo '</td>';
             echo '<td>';
-            if(($isDynamicProjectsAdmin == 'TRUE' || $row['projectowner'] == $userID)){
+            if(($user_roles['isDynamicProjectsAdmin'] == 'TRUE' || $row['projectowner'] == $userID)){
                 $checked = $row['needsreview'] == 'TRUE' ? 'checked' : '';
                 echo '<input type="checkbox" onchange="reviewChange(event,\''.$x.'\')" '.$checked.'/>';
             }
@@ -565,7 +565,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             }
             if(!$row['workingUser']){ //5acdfb19c0e84
                 //echo " <button type='button' class='btn btn-default' title='Task Planen' data-toggle='modal' data-target='#task-plan-$x'><i class='fa fa-clock-o'></i></button> ";
-                if($isDynamicProjectsAdmin == 'TRUE' || $row['projectowner'] == $userID) { //don't show edit tools for trainings
+                if($user_roles['isDynamicProjectsAdmin'] == 'TRUE' || $row['projectowner'] == $userID) { //don't show edit tools for trainings
                     echo '<button type="submit" name="deleteProject" value="'.$x.'" class="btn btn-default" title="Löschen"><i class="fa fa-trash-o"></i></button> ';
                     echo '<button type="button" name="editModal" value="'.$x.'" class="btn btn-default" title="Bearbeiten"><i class="fa fa-pencil"></i></button> ';
                 }
@@ -941,7 +941,7 @@ function dynamicOnLoad(modID){
 function appendModal(index){
 	$.ajax({
 		url:'ajaxQuery/AJAX_dynamicEditModal.php',
-		data:{projectid: index,isDPAdmin: "<?php echo $isDynamicProjectsAdmin ?>"},
+		data:{projectid: index,isDPAdmin: "<?php echo $user_roles['isDynamicProjectsAdmin']; ?>"},
 		type: 'post',
 		success : function(resp){
 			$("#editingModalDiv").append(resp);

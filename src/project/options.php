@@ -72,7 +72,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 			$leader = isset($_POST['leader']) ? intval($_POST['leader']) : '';
 			$percentage = intval($_POST['completed']);
 			$estimate = test_input($_POST['estimatedHours']);
-			if($isDynamicProjectsAdmin == 'TRUE'){
+			if($user_roles['isDynamicProjectsAdmin'] == 'TRUE'){
 				$skill = intval($_POST['projectskill']);
 				$parent = test_input($_POST["parent"]); //dynamproject id
 			} else {

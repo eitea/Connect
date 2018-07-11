@@ -372,7 +372,8 @@ WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clie
             echo ($row['isSupplier'] == 'FALSE') ? '<td>'.$lang['CLIENT'].'</td>' : '<td>'.$lang['SUPPLIER'].'</td>';
             echo '<td>'.$row['clientNumber'].'</td>';
             echo '<td>';
-            if(($row['isSupplier'] == 'TRUE' && ($canEditSuppliers || $isERPAdmin || $isCoreAdmin)) || $row['isSupplier'] == 'FALSE' && ($canEditClients || $isERPAdmin || $isCoreAdmin)){
+            if($user_roles['isCoreAdmin'] == 'TRUE' || $user_roles['isERPAdmin'] == 'TRUE' || ($row['isSupplier'] == 'TRUE' && $user_roles['canEditSupplier']=='TRUE')
+			|| ($row['isSupplier'] == 'FALSE' && $user_roles['canEditClients']=='TRUE')){
                 echo '<button type="button" class="btn btn-default" name="deleteModal" value="'.$row['id'].'" title="'.$lang['DELETE'].'" ><i class="fa fa-trash-o"></i></button>';
                 echo '<button type="button" class="btn btn-default" name="editModal" value="'.$row['id'].'" ><i class="fa fa-pencil"></i></button>';
 

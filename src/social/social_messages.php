@@ -156,7 +156,7 @@ while($row = $result->fetch_assoc()){
 						WHERE m.sentTime >= (SELECT lastCheck FROM relationship_conversation_participant rcp2 WHERE rcp2.conversationID = rcp1.conversationID
 						AND rcp2.status != 'exited' AND rcp2.partType = 'USER' AND rcp2.partID = '$userID')
 						GROUP BY conversationID) tbl
-					ON tbl.conversationID = c.id");
+					ON tbl.conversationID = c.id ORDER BY c.id DESC");
 				echo $conn->error;
 				while($result && ($row = $result->fetch_assoc())){
 					$conversationID = $row['id'];
@@ -202,111 +202,88 @@ while($row = $result->fetch_assoc()){
 		<div class="modal-dialog modal-content modal-md">
 			<div class="modal-header"><h4>Neue Nachricht</h4></div>
 			<div class="modal-body">
-				<ul class="nav nav-tabs">
-					<li class="active"><a data-toggle="tab" href="#message_message_tab">Nachricht</a></li>
-					<li><a data-toggle="tab" href="#message_from_to_tab">Von - An</a></li>
-					<li><a data-toggle="tab" href="#message_cc_bcc_tab">CC/ BCC</a></li>
-				</ul>
-				<div class="tab-content">
-					<div id="message_from_to_tab" class="tab-pane fade in">
-						<div class="row">
-							<div class="col-sm-6"><label><input type="radio" name="new_message_sender" value="2" id="sender_team_radio" checked> Von Team
-								<a title="Die Absender Einstellungen werden unter den Team Einstellungen gesetzt"><i class="fa fa-info-circle"></i></a>
-							</label></div>
+				<div class="row">
+					<div class="col-sm-6"><label><input type="radio" name="new_message_sender" value="2" id="sender_team_radio" checked> Von Team
+						<a title="Die Absender Einstellungen werden unter den Team Einstellungen gesetzt"><i class="fa fa-info-circle"></i></a>
+					</label></div>
 
-							<div class="col-sm-6"><label><input type="radio" name="new_message_sender" value="1"> Von Persönlich
-								<a title="Die Absender Einstellungen werden unter Allgemein/ E-mail Optionen gesetzt.
-									Diese Nachrichten sind nur für einen selbst ersichtlich."><i class="fa fa-info-circle"></i>
-								</a></label>
-							</div>
+					<div class="col-sm-6"><label><input type="radio" name="new_message_sender" value="1"> Von Persönlich
+						<a title="Die Absender Einstellungen werden unter Allgemein/ E-mail Optionen gesetzt.
+						Diese Nachrichten sind nur für einen selbst ersichtlich."><i class="fa fa-info-circle"></i>
+					</a></label>
+				</div>
 
-							<div id="sender_team_box" class="col-sm-12">
-								<select class="js-example-basic-single" name="new_message_sender_team">
-									<?php foreach($teamID_toName as $id => $name) echo '<option value="',$id,'">', $name, '</option>'; ?>
-								</select>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-12">
-								<br><label>An Mitarbeiter</label>
-								<select class="js-example-basic-single" name="new_message_user[]" multiple>
-									<?php
-									$options_message_user = '';
-									foreach($available_users as $val){
-										if($val > 0) $options_message_user .= '<option value="'.$val.'">'.$userID_toName[$val].'</option>';
-									}
-									echo $options_message_user;
-									?>
-								</select>
-								<br><br>
-								<label>An externen Kontakt *</label>
-								<select class="js-example-basic-single" name="new_message_contacts[]" multiple>
-									<?php
-									$options_message_contacts = '';
-									$result = $conn->query("SELECT cp.id, cp.firstname, cp.lastname, cp.email, clientData.name AS clientName, companyData.name AS companyName
-										FROM contactPersons cp INNER JOIN clientData ON clientData.id = clientID INNER JOIN companyData ON companyData.id = companyID
-										WHERE cp.email IS NOT NULL AND clientData.companyID IN (".implode(', ', $available_companies).")");
-									while($result && ( $row = $result->fetch_assoc())){
-										$options_message_contacts .= '<option value="contact_'.$row['id'].'">'. $row['companyName'].' - '.$row ['clientName'].' - '.
-										$row['firstname'].' '.$row['lastname']. ' ('.$row['email']. ')</option>';
-									}
-
-									$result = $conn->query("SELECT clientID, clientInfoData.mail, clientData.name AS clientName, companyData.name AS companyName
-										FROM clientInfoData INNER JOIN clientData ON clientData.id = clientID INNER JOIN companyData ON companyData.id = companyID
-										WHERE clientInfoData.mail IS NOT NULL AND clientData.companyID IN (".implode(', ', $available_companies).")");
-									while($result && ( $row = $result->fetch_assoc())){
-										$options_message_contacts .=  '<option value="client_'.$row['clientID'].'">'.$row['companyName'].' - '.$row ['clientName'].' ('.$row['mail'].')</option>';
-									}
-									echo $options_message_contacts;
-									?>
-								</select>
-								<small>* Öffnet für jedenen externen Kontakt eine eigene Konversation</small>
-							</div>
-						</div>
-					</div>
-					<div id="message_cc_bcc_tab" class="tab-pane fade">
-						<h4>CC</h4>
-						<div class="row">
-							<div class="col-md-12">
-								<label>CC Mitarbeiter</label>
-								<select class="js-example-basic-single" name="new_message_cc_user[]" multiple>
-									<?php echo $options_message_user; ?>
-								</select>
-								<br><br>
-								<label>CC externen Kontakt</label>
-								<select class="js-example-basic-single" name="new_message_cc_contacts[]" multiple>
-									<?php echo $options_message_contacts; ?>
-								</select>
-							</div>
-						</div>
-						<h4>BCC</h4>
-						<div class="row">
-							<div class="col-md-12">
-								<label>BCC Mitarbeiter</label>
-								<select class="js-example-basic-single" name="new_message_bcc_user[]" multiple>
-									<?php echo $options_message_user; ?>
-								</select>
-								<br><br>
-								<label>BCC externen Kontakt</label>
-								<select class="js-example-basic-single" name="new_message_bcc_contacts[]" multiple>
-									<?php echo $options_message_contacts; ?>
-								</select>
-							</div>
-						</div>
-					</div>
-					<div id="message_message_tab" class="tab-pane fade in active">
-						<label>Betreff*</label>
-						<input type="text" maxlength="50" name="new_message_subject" class="form-control required-field" required>
-						<br>
-						<label><?php echo $conn->error; echo mc_status(); ?> Nachricht* <a title="Um die automatisierte Anrede hinzuzufügen, verwenden Sie [ANREDE] um den Text
-							(Sehr geehrter Herr/ Frau [titel] [vorname] [nachname]) an dessen Stelle einzufügen.
-							Achten Sie bitte darauf, dass diese Einstellung vorher im Adressbuch definiert werden muss."><i class="fa fa-info-circle"></i>
-						</a></label>
-						<textarea name="new_message_body" rows="8" style="resize:none" class="form-control"></textarea>
-						<small>*Felder werden benötigt</small>
-					</div>
+				<div id="sender_team_box" class="col-sm-12">
+					<select class="js-example-basic-single" name="new_message_sender_team">
+						<?php foreach($teamID_toName as $id => $name) echo '<option value="',$id,'">', $name, '</option>'; ?>
+					</select>
 				</div>
 			</div>
+			<div class="row">
+				<div class="col-md-6">
+					<label>An Mitarbeiter</label>
+					<select class="js-example-basic-single" name="new_message_user[]" multiple>
+						<?php
+						$options_message_user = '';
+						foreach($available_users as $val){
+							if($val > 0) $options_message_user .= '<option value="'.$val.'">'.$userID_toName[$val].'</option>';
+						}
+						echo $options_message_user;
+						?>
+					</select>
+				</div>
+				<div class="col-md-6">
+					<label>An externen Kontakt <a title="Öffnet für jeden Kontakt eine eigene Konversation"><i class="fa fa-info-circle"></i></a></label>
+					<select class="js-example-basic-single" name="new_message_contacts[]" multiple>
+						<?php
+						$options_message_contacts = '';
+						$result = $conn->query("SELECT cp.id, cp.firstname, cp.lastname, cp.email, clientData.name AS clientName, companyData.name AS companyName
+							FROM contactPersons cp INNER JOIN clientData ON clientData.id = clientID INNER JOIN companyData ON companyData.id = companyID
+							WHERE cp.email IS NOT NULL AND clientData.companyID IN (".implode(', ', $available_companies).")");
+							while($result && ( $row = $result->fetch_assoc())){
+								$options_message_contacts .= '<option value="contact_'.$row['id'].'">'. $row['companyName'].' - '.$row ['clientName'].' - '.
+								$row['firstname'].' '.$row['lastname']. ' ('.$row['email']. ')</option>';
+							}
+
+							$result = $conn->query("SELECT clientID, clientInfoData.mail, clientData.name AS clientName, companyData.name AS companyName
+								FROM clientInfoData INNER JOIN clientData ON clientData.id = clientID INNER JOIN companyData ON companyData.id = companyID
+								WHERE clientInfoData.mail IS NOT NULL AND clientData.companyID IN (".implode(', ', $available_companies).")");
+								while($result && ( $row = $result->fetch_assoc())){
+									$options_message_contacts .=  '<option value="client_'.$row['clientID'].'">'.$row['companyName'].' - '.$row ['clientName'].' ('.$row['mail'].')</option>';
+								}
+								echo $options_message_contacts;
+								?>
+							</select>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<label>Betreff*</label>
+							<input type="text" maxlength="50" name="new_message_subject" class="form-control required-field" required>
+							<br>
+							<label><?php echo $conn->error; echo mc_status(); ?> Nachricht* <a title="Um die automatisierte Anrede hinzuzufügen, verwenden Sie [ANREDE] um den Text
+								(Sehr geehrter Herr/ Frau [titel] [vorname] [nachname]) an dessen Stelle einzufügen.
+								Achten Sie bitte darauf, dass diese Einstellung vorher im Adressbuch definiert werden muss."><i class="fa fa-info-circle"></i>
+							</a></label>
+							<textarea name="new_message_body" rows="8" style="resize:none" class="form-control"></textarea>
+							<small>*Felder werden benötigt</small>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-6">
+							<label>CC externen Kontakt</label>
+							<select class="js-example-basic-single" name="new_message_cc_contacts[]" multiple>
+								<?php echo $options_message_contacts; ?>
+							</select>
+						</div>
+						<div class="col-md-6">
+							<label>BCC externen Kontakt</label>
+							<select class="js-example-basic-single" name="new_message_bcc_contacts[]" multiple>
+								<?php echo $options_message_contacts; ?>
+							</select>
+						</div>
+					</div>
+				</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
 				<button type="submit" class="btn btn-warning" name="send_new_message">Senden</button>

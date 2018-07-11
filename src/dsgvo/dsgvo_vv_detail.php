@@ -310,6 +310,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	        </div>
 	    </div>
 	</div>
+
 	<div class="col-md-12">
 	    <div class="panel panel-default">
 	        <div class="panel-heading">Generelle organisatorische und technische Maßnahmen zum Schutz der personenbezogenen Daten</div>
@@ -319,7 +320,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 			$key = 'GRET_TEXTAREA';
 	        $settings = getSettings($key);
 			if(isset($_POST[$key])){
-				$settings[$key]['setting'] = $setting = strip_tags($_POST[$key]);
+				$settings[$key]['setting'] = $setting = htmlspecialchars($_POST[$key]);
 				$setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
 				$valID = $settings[$key]['valID'];
 				if($valID){

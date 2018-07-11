@@ -6,7 +6,7 @@ $routes = array(
 	'php/info' => 'core/dev/phpinfo.php',                             'php/debug' => 'core/dev/crypt.php',
 
 	'user/home' => 'core/user/home.php',                              'user/time' => 'core/user/timeCalcTable.php',                'user/book' => 'core/user/userProjecting.php',
-	'user/logout' => 'core/user/logout.php',                          'user/request' => 'core/user/makeRequest.php',               'user/ready' => 'core/user/readyPlan.php',
+	'user/logout' => 'core/user/logout.php',                          'user/request' => 'core/user/makeRequest.php',
 
 	'social/post' => 'social/social_messages.php',               	  'social/profile' => 'social/user_profile.php',
 

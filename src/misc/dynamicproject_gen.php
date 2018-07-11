@@ -17,7 +17,7 @@ if($x){
     $dynrow['projectpriority'] = 3;
     $dynrow['projectstatus'] = 'ACTIVE';
     $dynrow['projectowner'] = $userID;
-    $dynrow['projectleader'] = ($isDynamicProjectsAdmin == 'TRUE') ? 0 : $userID;
+    $dynrow['projectleader'] = ($user_roles['isDynamicProjectsAdmin'] == 'TRUE') ? 0 : $userID;
     $dynrow_teams = array('teamid' => '');
     $dynrow_emps = array('userid' => '', 'position' => '');
     $dynrow['companyid'] = $_SESSION['filterings']['company'] ?? 0; //isset, or 0
@@ -49,7 +49,7 @@ if($x){
 		<br></div>
 		<?php
 		$modal_options = '';
-		if($isDynamicProjectsAdmin == 'TRUE'){
+		if($user_roles['isDynamicProjectsAdmin'] == 'TRUE'){
 			$result = $conn->query("SELECT id, firstname, lastname FROM UserData WHERE id IN (".implode(', ', $available_users).")");
 		} else {
 			$result = $conn->query("SELECT id, firstname, lastname FROM UserData WHERE id = $userID");
@@ -67,7 +67,7 @@ if($x){
 				<label><?php echo $lang["EMPLOYEE"]; ?>/ Team*</label>
 				<select class="select2-team-icons required-field" name="employees[]" multiple="multiple">
 					<?php
-					if($isDynamicProjectsAdmin != 'TRUE'){
+					if($user_roles['isDynamicProjectsAdmin'] != 'TRUE'){
 						$result = str_replace('<option value="', '<option selected value="user;', $modal_options);
 					} else {
 						$result = str_replace('<option value="', '<option value="user;', $modal_options);
@@ -78,7 +78,7 @@ if($x){
 						}
 					}
 					echo $result;
-					if($isDynamicProjectsAdmin == 'TRUE'){
+					if($user_roles['isDynamicProjectsAdmin'] == 'TRUE'){
 						$result = $conn->query("SELECT id, name FROM $teamTable");
 						while ($row = $result->fetch_assoc()) {
 							$selected = '';
@@ -183,13 +183,13 @@ if($x){
 			</div>
 			<div class="col-md-6">
 				<div class="col-md-6">
-					<?php if($isDynamicProjectsAdmin == 'TRUE'): ?>
+					<?php if($user_roles['isDynamicProjectsAdmin'] == 'TRUE'): ?>
 						<label>Skill Minimum</label>
 						<input type="range" step="10" value="<?php echo $dynrow['level']; ?>" oninput="document.getElementById('projectskill-<?php echo $x; ?>').value = this.value;"><br>
 					<?php endif; ?>
 				</div>
 				<div class="col-md-6">
-					<?php  if($isDynamicProjectsAdmin == 'TRUE'): ?>
+					<?php  if($user_roles['isDynamicProjectsAdmin'] == 'TRUE'): ?>
 						<label>Level</label>
 						<input id="projectskill-<?php echo $x; ?>" type="number" class="form-control" name="projectskill" value="<?php echo $dynrow['level']; ?>"><br>
 					<?php endif; ?>
@@ -202,7 +202,7 @@ if($x){
 				<input type="color" class="form-control" value="<?php echo $dynrow['projectcolor']; ?>" name="color"><br>
 			</div>
 			<div class="col-md-4">
-			<?php  if($isDynamicProjectsAdmin == 'TRUE'): ?>
+			<?php  if($user_roles['isDynamicProjectsAdmin'] == 'TRUE'): ?>
 				<label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PARENT"]; ?>:</label>
 				<select class="form-control js-example-basic-single" name="parent">
 					<option value=''>Keines</option>
@@ -221,12 +221,12 @@ if($x){
 			<div class="col-md-6">
 				<label><?php echo $lang["LEADER"]; ?></label>
 				<select class="select2-team-icons" name="leader">
-					<?php if($isDynamicProjectsAdmin == 'TRUE') echo '<option value="">...</option>'; ?>
+					<?php if($user_roles['isDynamicProjectsAdmin'] == 'TRUE') echo '<option value="">...</option>'; ?>
 					<?php echo str_replace('<option value="'.$dynrow['projectleader'].'" ', '<option selected value="'.$dynrow['projectleader'].'" ', $modal_options); ?>
 				</select><br>
 			</div>
 			<div class="col-md-6">
-			<?php  if($isDynamicProjectsAdmin == 'TRUE'): ?>
+			<?php  if($user_roles['isDynamicProjectsAdmin'] == 'TRUE'): ?>
 				<label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES"]; ?></label>
 				<select class="select2-team-icons" name="optionalemployees[]" multiple="multiple">
 					<?php

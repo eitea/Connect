@@ -307,7 +307,7 @@ if($scale > 2){ //3 columns
                   }
                   echo $result;
                   $selected = '';
-				  if(!empty($available_teams) && $isDynamicProjectsAdmin == 'FALSE'){
+				  if(!empty($available_teams) && $user_roles['isDynamicProjectsAdmin'] == 'FALSE'){
 					  $result = $conn->query("SELECT id, name FROM teamData WHERE id IN (".implode(', ', $available_teams).") ");
 				  } else {
 					  $result = $conn->query("SELECT id, name FROM teamData");
