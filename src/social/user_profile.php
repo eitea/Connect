@@ -22,22 +22,14 @@ if (isset($_POST['saveSocial']) && !empty($_POST['social_realemail'])) {
 		}
 	}
 	// other settings
-	if (!empty($_POST['social_status'])) {
-		$status = test_input($_POST['social_status']);
-		$conn->query("UPDATE socialprofile SET status = '$status' WHERE userID = $userID");
-	}
-	if (isset($_POST['social_isAvailable'])) {
-		$sql = "UPDATE socialprofile SET isAvailable = 'TRUE' WHERE userID = '$userID'";
-	} else {
-		$sql = "UPDATE socialprofile SET isAvailable = 'FALSE' WHERE userID = '$userID'";
-	}
-	$conn->query($sql);
-	if (isset($_POST['social_newMessageEmail'])) {
-		$sql = "UPDATE socialprofile SET new_message_email = 'TRUE' WHERE userID = '$userID'";
-	} else {
-		$sql = "UPDATE socialprofile SET new_message_email = 'FALSE' WHERE userID = '$userID'";
-	}
-	$conn->query($sql);
+	$signature = $status = '';
+	$notification = $available = 'FALSE';
+	if (!empty($_POST['social_status'])) { $status = test_input($_POST['social_status']); }
+	if (isset($_POST['social_isAvailable'])) { $available = 'TRUE'; }
+	if (isset($_POST['social_newMessageEmail'])) { $notification = 'TRUE'; }
+	if (isset($_POST['social_useEmailSignature']) && !empty($_POST['social_emailSignature'])){ $signature = test_input($_POST['social_emailSignature']); }
+	$conn->query("UPDATE socialprofile SET isAvailable = '$available', emailSignature = '$signature', new_message_email = '$notification',
+		status = '$status' WHERE userID = '$userID'");
 
 	//5ab7bd3310438
 	if(!empty($_POST['social_birthday']) && test_Date($_POST['social_birthday'], 'Y-m-d')){
