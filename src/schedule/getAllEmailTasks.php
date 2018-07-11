@@ -21,9 +21,9 @@ $archive = 'Connect_Tasks';
 $stmt_insertarchive = $conn->prepare("INSERT INTO archive(uniqID, category, categoryID, name, type) VALUES(?, ?, ?, ?, ?)");
 $stmt_insertarchive->bind_param("sssss", $archiveID, $archiveCat, $projectid, $filename, $filetype);
 
-$result = $conn->query("SELECT id, server, smtpSecure, port, service, username, password FROM emailprojects");
+$result_serv = $conn->query("SELECT id, server, smtpSecure, port, service, username, password FROM emailprojects");
 if($conn->error) echo $conn->error.__LINE__;
-while($result && $row = $result->fetch_assoc()){
+while($result_serv && $row = $result_serv->fetch_assoc()){
     $security = empty($row['smtpSecure']) ? '' : '/'.$row['smtpSecure'];
 	//$mailbox = '{'.$row['server'] .':'. $row['port']. '/'.$row['service'] . $security.'/novalidate-cert}'.'INBOX'; //{imap.gmail.com:993/imap/ssl}INBOX ; {localhost:993/imap/ssl/novalidate-cert}
     $mailbox = '{'.$row['server'] .':'. $row['port']. '/'.$row['service'] . $security.'/novalidate-cert}';
@@ -32,10 +32,10 @@ while($result && $row = $result->fetch_assoc()){
     @imap_createmailbox($imap, imap_utf7_encode($mailbox.$archive));
 	imap_reopen($imap, $mailbox.'INBOX');
 
-    $result = $conn->query("SELECT fromAddress, toAddress, subject, templateID, workflowID FROM workflowRules
+    $result_rul = $conn->query("SELECT fromAddress, toAddress, subject, templateID, workflowID FROM workflowRules
 		WHERE isActive = 'TRUE' AND workflowID = ".$row['id']." ORDER BY templateID, position ASC");
 	if($conn->error) echo $conn->error.__LINE__;
-    while(($rule = $result->fetch_assoc())){
+    while(($rule = $result_rul->fetch_assoc())){
 		$move_sequence = array();
 		if($rule['templateID']){
 			$archiveCat = 'TASK';
@@ -117,6 +117,7 @@ while($result && $row = $result->fetch_assoc()){
 					$conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) SELECT '$projectid', teamid FROM dynamicprojectsteams WHERE projectid = '{$rule['templateID']}'");
 					if($conn->error) echo $conn->error.__LINE__;
 				} else { //message
+					echo 'Message Detected';
 					$result = $conn->query("SELECT id FROM messenger_conversations WHERE identifier = '$projectid'");
 					if($row = $result->fetch_assoc()){
 						$conversationID = $row['id'];
