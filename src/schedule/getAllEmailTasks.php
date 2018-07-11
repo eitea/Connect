@@ -32,7 +32,7 @@ while($result_serv && $row = $result_serv->fetch_assoc()){
     @imap_createmailbox($imap, imap_utf7_encode($mailbox.$archive));
 	imap_reopen($imap, $mailbox.'INBOX');
 
-    $result_rul = $conn->query("SELECT fromAddress, toAddress, subject, templateID, workflowID FROM workflowRules
+    $result_rul = $conn->query("SELECT fromAddress, toAddress, subject, templateID, workflowID, autoResponse FROM workflowRules
 		WHERE isActive = 'TRUE' AND workflowID = ".$row['id']." ORDER BY templateID, position ASC");
 	if($conn->error) echo $conn->error.__LINE__;
     while(($rule = $result_rul->fetch_assoc())){

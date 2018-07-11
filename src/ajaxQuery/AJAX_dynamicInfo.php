@@ -156,7 +156,7 @@ $messageResult = $conn->query("SELECT id FROM messenger_conversations WHERE cate
 					$unreadMessages = getUnreadMessages($openChatID);
 				?>
 					<li><a data-toggle="tab" href="#projectMessagesTab<?php echo $x; ?>">Nachrichten
-						<?php if($unreadMessages) echo '<span class="badge badge-alert">'.$unreadMessages.'</span>'; //5b2b907550d12 ?></a> 
+						<?php if($unreadMessages) echo '<span class="badge badge-alert">'.$unreadMessages.'</span>'; //5b2b907550d12 ?></a>
 					</li>
 				<?php endif; ?>
             </ul>
@@ -192,14 +192,14 @@ $messageResult = $conn->query("SELECT id FROM messenger_conversations WHERE cate
 								echo '<td><form method="POST" style="display:inline" action="../project/detailDownload" target="_blank"><input type="hidden" name="keyReference" value="TASK_'.$x.'" />
 								<button type="submit" class="btn btn-default" name="download-file" value="'.$row['uniqID'].'"><i class="fa fa-download"></i></form></td>';
 								echo '</tr>';
-								if($row['type'] == 'jpg' || $row['type'] == 'jpeg'){
+								if($row['type'] == 'jpg' || $row['type'] == 'jpeg' || $row['type'] == 'png'){
 							        $object = $s3->getObject(array(
 							            'Bucket' => $bucket,
 							            'Key' => $row['uniqID']
 							        ));
 
-									if(strpos($description, $row['uniqID'])){
-										$description = str_replace("cid:".$row['uniqID'], "data:image/jpeg;base64,".base64_encode(asymmetric_encryption('TASK', $object[ 'Body' ], $userID, $privateKey, $dynrow['v2'])), $description);
+									if(strpos($description, 'cid:'.$row['uniqID'])){
+										$description = str_replace('cid:'.$row['uniqID'], "data:image/jpeg;base64,".base64_encode(asymmetric_encryption('TASK', $object[ 'Body' ], $userID, $privateKey, $dynrow['v2'])), $description);
 									} else {
 										$description .= '<img style="width:80%;" src="data:image/jpeg;base64,'.base64_encode(asymmetric_encryption('TASK', $object[ 'Body' ], $userID, $privateKey, $dynrow['v2'])).'" />';
 									}
@@ -211,21 +211,21 @@ $messageResult = $conn->query("SELECT id FROM messenger_conversations WHERE cate
 				</div>
                 <div id="projectDescription<?php echo $x; ?>" class="tab-pane fade in active"><br>
                     <?php
-                    $micro = $conn->query("SELECT * FROM microtasks WHERE projectid = '$x'");
-                    if($micro && $micro->num_rows > 0){
-                        while($nextmtask = $micro->fetch_assoc()){
-                            if($nextmtask['ischecked'] == 'TRUE'){
-                                $mtaskid = $nextmtask['microtaskid'];
-                                $description = preg_replace("/id=.$mtaskid./","id=\"$mtaskid\" checked",$description);
-                                $user = $nextmtask['finisher'];
-                                $username = $conn->query("SELECT CONCAT(firstname,CONCAT(' ',lastname)) AS name FROM userdata WHERE id = '$user'");
-                                if($username){
-                                    $username = $username->fetch_assoc()['name'];
-                                    $description = preg_replace("/id=.$mtaskid. checked disabled title=../","id=\"$mtaskid\" checked disabled title=\"$username\"",$description);
-                                }
-                            }
-                        }
-                    }
+                    // $micro = $conn->query("SELECT * FROM microtasks WHERE projectid = '$x'");
+                    // if($micro && $micro->num_rows > 0){
+                    //     while($nextmtask = $micro->fetch_assoc()){
+                    //         if($nextmtask['ischecked'] == 'TRUE'){
+                    //             $mtaskid = $nextmtask['microtaskid'];
+                    //             $description = preg_replace("/id=.$mtaskid./","id=\"$mtaskid\" checked",$description);
+                    //             $user = $nextmtask['finisher'];
+                    //             $username = $conn->query("SELECT CONCAT(firstname,CONCAT(' ',lastname)) AS name FROM userdata WHERE id = '$user'");
+                    //             if($username){
+                    //                 $username = $username->fetch_assoc()['name'];
+                    //                 $description = preg_replace("/id=.$mtaskid. checked disabled title=../","id=\"$mtaskid\" checked disabled title=\"$username\"",$description);
+                    //             }
+                    //         }
+                    //     }
+                    // }
                     echo $description;
                     ?>
                 </div>

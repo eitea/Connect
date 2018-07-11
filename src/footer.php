@@ -1,6 +1,7 @@
 <?php
-$arr = session_get_cookie_params();
-if($arr['lifetime']) echo '<div class="text-right"><span id="lifetime_counter">',$arr['lifetime'],'</span> Sekunden bis Logout</div>';
+$lifetime = session_get_cookie_params()['lifetime'];
+if(!$lifetime) $lifetime = ini_get("session.gc_maxlifetime");
+ echo '<div class="text-right"><span id="lifetime_counter">',$lifetime,'</span> Sekunden bis Logout</div>';
 ?>
 </div>
 </div>
