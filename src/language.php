@@ -236,6 +236,9 @@ $lang_ger['CITY'] = 'Ort';
 $lang_eng['CLASS'] = 'Class';
 $lang_ger['CLASS'] = 'Klasse';
 
+$lang_eng['CLICK_TO_INSERT'] = 'Click to insert';
+$lang_ger['CLICK_TO_INSERT'] = 'Klicken zum Einfügen';
+
 $lang_eng['CLIENT'] = 'Client';
 $lang_ger['CLIENT'] = 'Kunde';
 
@@ -493,6 +496,9 @@ $lang_ger['ENTRANCE_DATE'] = 'Eintrittsdatum';
 
 $lang_eng['EMAIL_TASK'] = 'Automatic Task Builder';
 $lang_ger['EMAIL_TASK'] = 'Automatischer Task Builder';
+
+$lang_eng['EMAIL_TEMPLATES'] = 'E-Mail Templates';
+$lang_ger['EMAIL_TEMPLATES'] = 'E-Mail Vorlagen';
 
 $lang_eng['ERP_TEXT_DESCRIPTION'] = 'This text will be printed inside the footer at proposals and receits';
 $lang_ger['ERP_TEXT_DESCRIPTION'] = 'Dieser Text wird als Abschlusstext bei Angeboten, Auftragsbestätigungen und Rechnungen angedruckt';
@@ -810,6 +816,9 @@ $lang_ger['LEADER'] = 'Verantwortlicher Mitarbeiter';
 
 $lang_eng['LEADER_REPLACEMENT'] = 'Leader Replacement';
 $lang_ger['LEADER_REPLACEMENT'] = 'Stellvertretender Mitarbeiter';
+
+$lang_eng['LIFETIME_COUNTER'] = 'Seconds until logout';
+$lang_ger['LIFETIME_COUNTER'] = 'Sekunden bis Logout';
 
 $lang_eng['LOCK_BOOKING_MONTH'] = 'Lock booking months';
 $lang_ger['LOCK_BOOKING_MONTH'] = 'Buchungsmonat sperren';
