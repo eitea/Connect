@@ -683,6 +683,16 @@ function getS3Object($bucket = ''){
 }
 
 use PHPMailer\PHPMailer\PHPMailer;
+/*
+$options [
+ subject
+ teamid (pk teamData)
+ senderid (pk UserData)
+ reply{email}
+ bcc{email}
+ cc{email}
+]
+*/
 function send_standard_email($recipient, $content, Array $options = ['subject' => '']){
 	require dirname(__DIR__).'/plugins/phpMailer/autoload.php';
 	global $conn;
@@ -705,17 +715,36 @@ function send_standard_email($recipient, $content, Array $options = ['subject' =
 	if(empty($row['smptSecure'])){
 		$mail->SMTPSecure = $row['smtpSecure'];
 	}
+	$signature = $companyID = '';
 	$mail->Host       = $row['host'];
 	$mail->Port       = $row['port'];
 	if(isset($options['teamid'])){
-		$result = $conn->query("SELECT name, email FROM teamData WHERE id = ".$options['teamid']." LIMIT 1");
+		$result = $conn->query("SELECT emailName, email, emailSignature, companyID FROM teamData WHERE id = ".$options['teamid']." LIMIT 1");
 		if($teamRow = $result->fetch_assoc()){
-			$mail->setFrom($teamRow['email'], $teamRow['name']);
+			$mail->setFrom($teamRow['email'], $teamRow['emailName']);
+			$signature = $teamRow['emailSignature'];
+			$companyID = $teamRow['companyID'];
+		} else{
+			echo 'Could not find teamid ', $conn->error;
 		}
-	} elseif(isset($options['sender'])){
-		$mail->setFrom($options['sender'], $options['senderName']);
+	} elseif(isset($options['senderid'])){
+		$result = $conn->query("SELECT firstname, lastname, real_email, emailSignature, u.companyID FROM UserData u
+			LEFT JOIN socialprofile ON u.id = UserID WHERE u.id = ".$options['senderid']);
+		if($teamRow = $result->fetch_assoc()){
+			$mail->setFrom($teamRow['real_email'], $teamRow['firstname'].' '.$teamRow['lastname']);
+			$signature = $teamRow['emailSignature'];
+			$companyID = $teamRow['companyID'];
+		} else {
+			echo 'Could not find senderid: ', $conn->error;
+		}
 	} else {
 		$mail->setFrom($row['sender'], $row['senderName']);
+	}
+	if(!$signature && $companyID){
+		$result = $conn->query("SELECT emailSignature FROM companyData WHERE id = $companyID");
+		if($row_fc = $result->fetch_assoc()){
+			$signature = $row_fc['emailSignature'];
+		}
 	}
 	if(isset($options['reply'])) $mail->addReplyTo($options['reply']);
 	if(!empty($options['bcc'])){
@@ -736,7 +765,7 @@ function send_standard_email($recipient, $content, Array $options = ['subject' =
 		$mail->Subject = 'Connect';
 	}
 
-	$mail->Body    =  $content;
+	$mail->Body    =  $content .'<br><br>'. $signature;
 	$mail->AltBody = 'Your e-mail provider does not support HTML. Use an Html Viewer to format this email. '. $content;
 	if(!$mail->send()) return $mail->ErrorInfo;
 }

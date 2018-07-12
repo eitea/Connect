@@ -3251,9 +3251,12 @@ if($row['version'] < 165){
 	} else {
 		echo '<br>', $conn->error;
 	}
+}
+
+
+if($row['version'] < 166){
 
 }
-// if($row['version'] < 166){}
 // if($row['version'] < 167){}
 // if($row['version'] < 168){}
 // if($row['version'] < 169){}

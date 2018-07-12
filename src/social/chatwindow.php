@@ -1,12 +1,12 @@
 <?php if($openChatID): ?>
 	<div class="panel panel-default" style="margin-bottom:0">
 		<?php
-		$result = $conn->query("SELECT subject, category  FROM messenger_conversations c WHERE c.id = $openChatID ");
-		$messenger_row = $result->fetch_assoc();
+		$result_cw = $conn->query("SELECT subject, category  FROM messenger_conversations c WHERE c.id = $openChatID ");
+		$messenger_row = $result_cw->fetch_assoc();
 
 		$participantID = false;
-		$result = $conn->query("SELECT id FROM relationship_conversation_participant WHERE conversationID = $openChatID AND partType='USER' AND partID='$userID'");
-		if($result && $result->num_rows > 0) $participantID = $result->fetch_assoc()['id'];
+		$result_cw = $conn->query("SELECT id FROM relationship_conversation_participant WHERE conversationID = $openChatID AND partType='USER' AND partID='$userID'");
+		if($result_cw && $result_cw->num_rows > 0) $participantID = $result_cw->fetch_assoc()['id'];
 
 		if($participantID) $conn->query("UPDATE relationship_conversation_participant SET lastCheck = UTC_TIMESTAMP WHERE id = $participantID");
 		?>
@@ -14,14 +14,14 @@
 		<div class="panel-body scrollDown" style="height:40vh; overflow-y:auto;">
 			<?php
 			$date = '';
-			$result = $conn->query("SELECT message, vKey, sentTime, m.type, rcp.partType, rcp.partID, rcp.status, rcp.lastCheck,
+			$result_cw = $conn->query("SELECT message, vKey, sentTime, m.type, rcp.partType, rcp.partID, rcp.status, rcp.lastCheck,
 				archive.name AS fileName, archive.type AS fileType, m.id AS messageID
 				FROM messenger_messages m LEFT JOIN relationship_conversation_participant rcp ON rcp.id = m.participantID
 				LEFT JOIN archive ON m.message = archive.uniqID
 				WHERE rcp.conversationID = $openChatID ORDER BY m.sentTime ASC LIMIT 20");
 			echo $conn->error;
-			if($result->num_rows == 20) echo '<a>Ältere Nachricten laden</a>';
-			while($result && ($row_temp = $result->fetch_assoc())){
+			if($result_cw->num_rows == 20) echo '<a>Ältere Nachricten laden</a>';
+			while($result_cw && ($row_temp = $result_cw->fetch_assoc())){
 				$row = $row_temp; //so we save the last row for read/unread
 				if($date != substr($row['sentTime'],0, 10)){
 					$date = substr($row['sentTime'],0, 10);
@@ -47,11 +47,11 @@
 				echo '</div>';
 			}
 			if($row['partType'] == 'USER' && $row['partID'] == $userID){
-				$result = $conn->query("SELECT partType, partID FROM relationship_conversation_participant WHERE conversationID = $openChatID
+				$result_cw = $conn->query("SELECT partType, partID FROM relationship_conversation_participant WHERE conversationID = $openChatID
 					AND lastCheck > '{$row['sentTime']}' AND (partType != 'USER' OR partID != $userID)");
-				if($result && $result->num_rows > 0){
+				if($result_cw && $result_cw->num_rows > 0){
 					echo '<p style="font-size:75%;width:100%;text-align:right;">Gesehen: ';
-					while($row = $result->fetch_assoc()){
+					while($row = $result_cw->fetch_assoc()){
 						if($row['partType'] == 'USER')
 						echo $userID_toName[$row['partID']], '; ';
 					}

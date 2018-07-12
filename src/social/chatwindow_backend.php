@@ -7,14 +7,25 @@ if(!empty($_POST['openChat'])){
 	if(isset($_POST['chat_send'])){
 		$v2Key = $publicKey;
 		if(!empty($_POST['chat_message'])){
-			$message = asymmetric_encryption('CHAT', test_input($_POST['chat_message']), $userID, $privateKey);
-			if($message == test_input($_POST['chat_message'])) $v2Key = '';
-
-			//TODO: check the recipients for email notifications (users, clients, contacts, teams..)
-
-			$conn->query("INSERT INTO messenger_messages(message, participantID, vKey) SELECT '$message', id, '$v2Key'
+			$message = test_input($_POST['chat_message']);
+			$message_encrypt = asymmetric_encryption('CHAT', $message, $userID, $privateKey);
+			if($message == $message_encrypt) $v2Key = '';
+			$conn->query("INSERT INTO messenger_messages(message, participantID, vKey) SELECT '$message_encrypt', id, '$v2Key'
 			FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' AND conversationID = $openChatID");
 			if($conn->error) showError($conn->error.__LINE__);
+
+			//TODO: how do i reply from team, when sent from team and not as user?
+			// $result = $conn->query("SELECT partID FROM relationship_conversation_participant WHERE conversationID = $openChatID AND partType = 'contact' OR partType = 'client'");
+			// if($result && $result->num_rows){
+			// 	$result_temp = $conn->query("SELECT subject, identifier FROM messenger_conversations WHERE id = $openChatID LIMIT 1");
+			// 	$row = $result_temp->fetch_assoc();
+			// 	$subject = $row['subject'];
+			// 	$identifier = $row['identifier'];
+			// 	while($row_part = $result->fetch_assoc()){
+			// 		//TODO: check the recipients for email notifications (users, clients, contacts, teams..)
+			// 		//$options = ['subject' => "$subject - [CON - $identifier]", 'userid' => $userID];
+			// 	}
+			// }
 		}
 		if(file_exists($_FILES['chat_newfile']['tmp_name']) && is_uploaded_file($_FILES['chat_newfile']['tmp_name'])){
 			$s3 = getS3Object($bucket);
