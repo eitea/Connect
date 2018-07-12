@@ -110,6 +110,9 @@ $lang_ger['ASK_DELETE'] = 'Wollen Sie %s dauerhaft löschen?';
 $lang_eng['ARCHIVE'] = 'Archive';
 $lang_ger['ARCHIVE'] = 'Archiv';
 
+$lang_eng['ARCHIVE_STRUCTURE'] = 'Archive structure';
+$lang_ger['ARCHIVE_STRUCTURE'] = 'Archivstruktur';
+
 $lang_eng['ASSIGNED'] = 'Assigned';
 $lang_ger['ASSIGNED'] = 'Zugewiesene';
 
@@ -338,6 +341,12 @@ $lang_ger['DATATABLES_LANG_OPTIONS'] = '
 $lang_eng['DATA_MATRIX'] = 'Data Matrix';
 $lang_ger['DATA_MATRIX'] = 'Datenmatrix';
 
+$lang_eng['DATA_MATRIX_SUBHEADING'] = 'List of processed data fields and their transmission';
+$lang_ger['DATA_MATRIX_SUBHEADING'] = 'Auflistung der verarbeiteten Datenfelder und deren Übermittlung';
+
+$lang_eng['DATA_MATRIX_GROUP_SUBHEADING'] = 'Data categories of collected personal data with deletion periods';
+$lang_ger['DATA_MATRIX_GROUP_SUBHEADING'] = 'Datenkategorien der gesammelten personenbezogenen Daten mit Löschfristen';
+
 $lang_eng['DATE'] = 'Date';
 $lang_ger['DATE'] = 'Datum';
 
@@ -361,6 +370,9 @@ $lang_ger['DEACTIVATE'] = 'Deaktivieren';
 
 $lang_eng['DEFAULT'] = 'Default';
 $lang_ger['DEFAULT'] = 'Standard';
+
+$lang_eng['DEFAULT_FOLDERS'] = 'Default folders';
+$lang_ger['DEFAULT_FOLDERS'] = 'Standardordner';
 
 $lang_eng['DELETE'] = 'Delete';
 $lang_ger['DELETE'] = 'Löschen';
@@ -469,6 +481,9 @@ $lang_ger['EDIT_USERS'] = 'Benutzer Editieren';
 
 $lang_eng['EDIT_PERSONAL_INFO'] = 'Edit Personal info';
 $lang_ger['EDIT_PERSONAL_INFO'] = 'Benutzer-Informationen';
+
+$lang_eng['EDIT_PROCESS'] = 'Edit process';
+$lang_ger['EDIT_PROCESS'] = 'Vorgang editieren';
 
 $lang_eng['EMPLOYEE'] = 'Employee';
 $lang_ger['EMPLOYEE'] = 'Mitarbeiter';
@@ -661,6 +676,9 @@ $lang_ger['GREETING_AFTERNOON'] = 'Hallo';
 
 $lang_eng['GREETING_EVENING'] = 'Good Evening';
 $lang_ger['GREETING_EVENING'] = 'Guten Abend';
+
+$lang_eng['GROUP'] = 'Group';
+$lang_ger['GROUP'] = 'Gruppierung';
 
 $lang_eng['GENERAL_INFORMATION'] = 'General Information';
 $lang_ger['GENERAL_INFORMATION'] = 'Allgemeine Informationen';
@@ -934,6 +952,12 @@ $lang_ger['NEW_CLIENT_CREATE'] = 'Neuer Kunde';
 
 $lang_eng['NEW_CONFIRMATION'] = 'New Order Confrimation';
 $lang_ger['NEW_CONFIRMATION'] = 'Neue Auftragsbestätigung';
+
+$lang_eng['NEW_DATA_CATEGORY'] = 'New data category';
+$lang_ger['NEW_DATA_CATEGORY'] = 'Neue Datenkategorie';
+
+$lang_eng['NEW_GROUP'] = 'New group';
+$lang_ger['NEW_GROUP'] = 'Neue gruppe';
 
 $lang_eng['NEW_OFFER'] = 'New Offer';
 $lang_ger['NEW_OFFER'] = 'Neues Angebot';
@@ -1366,6 +1390,9 @@ $lang_ger['TAXES'] = 'Steuern';
 
 $lang_eng['TAX_RATES'] = 'Tax Rates';
 $lang_ger['TAX_RATES'] = 'Steuersätze';
+
+$lang_eng['TEMPLATE'] = 'Template';
+$lang_ger['TEMPLATE'] = 'Vorlage';
 
 $lang_eng['TEMPLATES'] = 'Templates';
 $lang_ger['TEMPLATES'] = 'Vorlagen';
