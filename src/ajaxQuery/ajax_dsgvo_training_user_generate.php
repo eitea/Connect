@@ -44,14 +44,15 @@ $result = $conn->query(
         UNION
         SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations
         INNER JOIN relationship_company_client ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
-        LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID
+        INNER JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_company_relations.trainingID
+        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dsgvo_training_company_relations.trainingID
         WHERE relationship_company_client.userID = $userID
-        AND NOT EXISTS (
+        AND dsgvo_training.onLogin = 'TRUE' AND NOT EXISTS (
             SELECT userID
             FROM dsgvo_training_completed_questions
-            LEFT JOIN dsgvo_training_questions dtq ON dtq.id = dsgvo_training_completed_questions.questionID
-            LEFT JOIN dsgvo_training ON dsgvo_training.id = dtq.trainingID
-            WHERE questionID = dtq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
+            LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
+            LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
+            WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
         )
     ) temp"
 );

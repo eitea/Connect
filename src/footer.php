@@ -8,6 +8,10 @@ if(!$lifetime) $lifetime = ini_get("session.gc_maxlifetime");
 <div id="currentSurveyModal"></div>
 <button type='button' class='btn btn-primary feedback-button'>Feedback</button>
 <script>
+// debug
+$userHasUnansweredSurveys = <?php echo $userHasUnansweredSurveys?"true":"false" ?>;
+$userHasUnansweredOnLoginSurveys = <?php echo $userHasUnansweredOnLoginSurveys?"true":"false" ?>;
+$surveysAreSuspended = <?php echo $surveysAreSuspended?"true":"false" ?>;
 $(".openSurvey").click(function(){
     openSurveyModal()
 });

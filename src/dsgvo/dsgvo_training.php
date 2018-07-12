@@ -302,7 +302,7 @@ showError($conn->error);
     <h3>Schulungen
         <div class="page-header-button-group">
             <span data-container="body" data-toggle="tooltip" title="Hinzufügen eines neuen Sets (Container für Module)">
-                <button type="button" data-toggle="modal" data-target="#newModuleModal" class="btn btn-default"><i class="fa fa-cubes"></i> neuses Set</button>
+                <button type="button" data-toggle="modal" data-target="#newModuleModal" class="btn btn-default"><i class="fa fa-cubes"></i> neues Set</button>
             </span>
             <!-- Moved to panels -->
             <!-- <span data-container="body" data-toggle="tooltip" title="Hinzufügen eines neuen Moduls (Container für Fragen)">
@@ -534,7 +534,7 @@ $("button[name=infoTraining]").click(function(){
     setCurrentModal({trainingID: $(this).val()},'get', 'ajaxQuery/AJAX_dsgvoTrainingInfo.php')
 })
 $("button[name=detailedInfoTraining]").click(function(){
-    setCurrentModal({trainingID: $(this).val()},'get', 'ajaxQuery/AJAX_dsgvoDetailedTrainingInfo.php')
+    setCurrentModal({trainingID: $(this).val()},'get', 'ajaxQuery/ajax_dsgvo_training_detailed_training_info.php')
 })
 $("button[name=importExport]").click(function(){
     setCurrentModal({operation: $(this).val()}, 'post', 'ajaxQuery/ajax_dsgvo_training_import_export.php')
