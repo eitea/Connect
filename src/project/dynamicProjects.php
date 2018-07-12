@@ -63,6 +63,7 @@ while($result && ( $row = $result->fetch_assoc())){
 	$available_teams[] = $row['teamID'];
     $filterings['employees'][] = 'team;'.$row['teamID'];
 }
+
 $templateResult = $conn->query("SELECT projectname,projectid,v2 FROM dynamicprojects WHERE isTemplate = 'TRUE'");
 ?>
 <div class="page-header-fixed">
@@ -553,9 +554,9 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             echo '</td>';
             echo '<td>';
             if($row['workingUser'] == $userID) {
-                $disabled = (time() - strtotime($row['workStart']) > 60) ? 'title="Task stoppen"' : 'disabled title="1 Minute Wartezeit"';
-                echo '<button class="btn btn-default" '.$disabled.' type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal" name="pauseBtn"><i class="fa fa-pause"></i></button> ';
-                $occupation = array('bookingID' => $row['workingID'], 'dynamicID' => $x, 'companyid' => $row['companyid'], 'clientid' => $row['clientid'], 'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage']);
+				$occupation = array('bookingID' => $row['workingID'], 'dynamicID' => $x, 'companyid' => $row['companyid'], 'clientid' => $row['clientid'],
+				'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage'], 'noBooking' => ((time() - strtotime($row['workStart'])) < 60));
+                echo '<button class="btn btn-default" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal" name="pauseBtn"><i class="fa fa-pause"></i></button> ';
             } elseif(strtotime($A) < time() && $row['projectstatus'] == 'ACTIVE' && !$row['workingUser'] && !$hasActiveBooking){
                 if(!$row['projectleader']){
                     echo "<button class='btn btn-default' type='button' title='Task starten' data-toggle='modal' data-target='#play-take-$x'><i class='fa fa-play'></i></button> ";
@@ -693,56 +694,58 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             <form method="POST">
                 <div class="modal-header h4"><button type="button" class="close"><span>&times;</span></button><?php echo $lang["DYNAMIC_PROJECTS_BOOKING_PROMPT"]; ?></div>
                 <div class="modal-body">
-                    <div class="row" id="occupation_booking_fields">
-                        <?php if(!$occupation['companyid'] && count($available_companies) > 2): ?>
-                            <div class="col-md-4">
-                                <label><?php echo $lang['COMPANY']; ?></label>
-                                <select class="js-example-basic-single" onchange="showClients(this.value, <?php echo intval($occupation['clientid']); ?>, 'book-dynamic-clientHint')">
-                                    <?php
-                                    $result = $conn->query("SELECT id, name FROM companyData WHERE id IN (".implode(', ', $available_companies).") ");
-                                    echo '<option value="0"> ... </option>';
-                                    while($row = $result->fetch_assoc()){
-                                        echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
-                                    }
-                                    ?>
-                                </select><br><br>
-                            </div>
-                        <?php endif; if(!$occupation['clientid']): ?>
-                            <div class="col-md-4">
-                                <label><?php echo $lang['CLIENT']; ?></label>
-                                <select id="book-dynamic-clientHint" class="js-example-basic-single" onchange="showProjects(this.value, '<?php echo intval($occupation['projectid']); ?>', 'book-dynamic-projectHint')" >
-                                    <option value="0"> ... </option>
-                                <?php
-                                $result = $conn->query("SELECT id, name FROM clientData WHERE isSupplier = 'FALSE' AND companyID IN (".implode(', ', $available_companies).")");
-                                if ($occupation['companyid']){
-                                    $result = $conn->query("SELECT id, name FROM clientData WHERE isSupplier = 'FALSE' AND companyID = ".$occupation['companyid']);
-                                }
-                                while ($row = $result->fetch_assoc()){
-                                    echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
-                                }
-                                ?>
-                                </select><br><br>
-                            </div>
-                        <?php endif; if(!$occupation['projectid']): ?>
-                            <div class="col-md-4">
-                                <label><?php echo $lang['PROJECT']; ?></label>
-                                <select id="book-dynamic-projectHint" class="js-example-basic-single" name="bookDynamicProjectID">
-                                    <?php if($occupation['clientid']){
-                                        $result = $conn->query("SELECT id, name FROM projectData WHERE clientID = ".$occupation['clientid']);
-                                        echo '<option value="0"> ... </option>';
-                                        while($row = $result->fetch_assoc()){
-                                            echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
-                                        }
-                                    } ?>
-                                </select><br><br>
-                            </div>
-                        <?php endif; ?>
-                        <div class="col-md-12">
-                            <textarea name="description" rows="4" class="form-control" style="max-width:100%; min-width:100%" placeholder="Info..."></textarea><br>
-                        </div>
-                    </div>
+					<? if(!$occupation['noBooking']): ?>
+	                    <div class="row" id="occupation_booking_fields">
+	                        <?php if(!$occupation['companyid'] && count($available_companies) > 2): ?>
+	                            <div class="col-md-4">
+	                                <label><?php echo $lang['COMPANY']; ?></label>
+	                                <select class="js-example-basic-single" onchange="showClients(this.value, <?php echo intval($occupation['clientid']); ?>, 'book-dynamic-clientHint')">
+	                                    <?php
+	                                    $result = $conn->query("SELECT id, name FROM companyData WHERE id IN (".implode(', ', $available_companies).") ");
+	                                    echo '<option value="0"> ... </option>';
+	                                    while($row = $result->fetch_assoc()){
+	                                        echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
+	                                    }
+	                                    ?>
+	                                </select><br><br>
+	                            </div>
+	                        <?php endif; if(!$occupation['clientid']): ?>
+	                            <div class="col-md-4">
+	                                <label><?php echo $lang['CLIENT']; ?></label>
+	                                <select id="book-dynamic-clientHint" class="js-example-basic-single" onchange="showProjects(this.value, '<?php echo intval($occupation['projectid']); ?>', 'book-dynamic-projectHint')" >
+	                                    <option value="0"> ... </option>
+	                                <?php
+	                                $result = $conn->query("SELECT id, name FROM clientData WHERE isSupplier = 'FALSE' AND companyID IN (".implode(', ', $available_companies).")");
+	                                if ($occupation['companyid']){
+	                                    $result = $conn->query("SELECT id, name FROM clientData WHERE isSupplier = 'FALSE' AND companyID = ".$occupation['companyid']);
+	                                }
+	                                while ($row = $result->fetch_assoc()){
+	                                    echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
+	                                }
+	                                ?>
+	                                </select><br><br>
+	                            </div>
+	                        <?php endif; if(!$occupation['projectid']): ?>
+	                            <div class="col-md-4">
+	                                <label><?php echo $lang['PROJECT']; ?></label>
+	                                <select id="book-dynamic-projectHint" class="js-example-basic-single" name="bookDynamicProjectID">
+	                                    <?php if($occupation['clientid']){
+	                                        $result = $conn->query("SELECT id, name FROM projectData WHERE clientID = ".$occupation['clientid']);
+	                                        echo '<option value="0"> ... </option>';
+	                                        while($row = $result->fetch_assoc()){
+	                                            echo '<option value="'.$row['id'].'">'.$row['name'].'</option>';
+	                                        }
+	                                    } ?>
+	                                </select><br><br>
+	                            </div>
+	                        <?php endif; ?>
+	                        <div class="col-md-12">
+	                            <textarea name="description" rows="4" class="form-control" style="max-width:100%; min-width:100%" placeholder="Info..."></textarea><br>
+	                        </div>
+	                    </div>
+					<?php  else: echo 'Unter 60 Sekunden wird keine Buchung erstellt<hr>'; endif; //5b47049682f6e ?>
                     <div class="col-md-12">
-                        <label><input type="checkbox" name="completeWithoutBooking" value="1" id="occupation_booking_fields_toggle">Task ohne Buchung abschließen</label><br><br>
+                        <label><input type="checkbox" <? if($occupation['noBooking']) echo 'checked  onclick="return false;"'; ?> name="completeWithoutBooking" value="1" id="occupation_booking_fields_toggle">Task ohne Buchung abschließen</label><br><br>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
@@ -1054,9 +1057,6 @@ $(".openDoneSurvey").click(function(){ // answer already done surveys/trainings 
         }
    });
 });
-setTimeout( function(){
-    $('button[name="pauseBtn"]').prop("disabled", false);
-}, 60000 );
 $(document).ready(function() {
 	$('#new-message-modal').on('show.bs.modal', function (event) {
 	  var button = $(event.relatedTarget);

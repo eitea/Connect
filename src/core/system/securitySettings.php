@@ -317,6 +317,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $canEditClients = isset($_POST['canEditClients']) ? 'TRUE' : 'FALSE';
         $canEditSuppliers = isset($_POST['canEditSuppliers']) ? 'TRUE' : 'FALSE';
         $canUseWorkflow = isset($_POST['canUseWorkflow']) ? 'TRUE' : 'FALSE'; //5ab7ae7596e5c
+		$canSendToExtern = isset($_POST['canSendToExtern']) ? 'TRUE' : 'FALSE';
 
 		//TODO: we need to grant access to these too.
 		$conn->query("DELETE FROM relationship_company_client WHERE userID = $x");
@@ -342,10 +343,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 			$conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'ERP' AND userID = $x");
 		}
 
-        $conn->query("UPDATE roles SET isDSGVOAdmin = '$isDSGVOAdmin', isCoreAdmin = '$isCoreAdmin', isDynamicProjectsAdmin = '$isDynamicProjectsAdmin', isTimeAdmin = '$isTimeAdmin',
-        isProjectAdmin = '$isProjectAdmin', isReportAdmin = '$isReportAdmin', isERPAdmin = '$isERPAdmin', isFinanceAdmin = '$isFinanceAdmin', canStamp = '$canStamp', canBook = '$canBook',
-        canEditTemplates = '$canEditTemplates', canUseSocialMedia = '$canUseSocialMedia', canCreateTasks = '$canCreateTasks', canUseArchive = '$canUseArchive', canUseClients = '$canUseClients',
-        canUseSuppliers = '$canUseSuppliers', canEditClients = '$canEditClients', canEditSuppliers = '$canEditSuppliers', canUseWorkflow = '$canUseWorkflow' WHERE userID = '$x'");
+		$conn->query("UPDATE roles SET isDSGVOAdmin = '$isDSGVOAdmin', isCoreAdmin = '$isCoreAdmin', isDynamicProjectsAdmin = '$isDynamicProjectsAdmin',
+			isTimeAdmin = '$isTimeAdmin', isProjectAdmin = '$isProjectAdmin', isReportAdmin = '$isReportAdmin', isERPAdmin = '$isERPAdmin', canBook = '$canBook',
+			isFinanceAdmin = '$isFinanceAdmin', canStamp = '$canStamp', canEditTemplates = '$canEditTemplates', canEditClients = '$canEditClients',
+			canUseSocialMedia = '$canUseSocialMedia', canCreateTasks = '$canCreateTasks', canUseArchive = '$canUseArchive', canUseClients = '$canUseClients',
+			canUseSuppliers = '$canUseSuppliers', canEditSuppliers = '$canEditSuppliers', canUseWorkflow = '$canUseWorkflow', canSendToExtern = '$canSendToExtern'
+			WHERE userID = '$x'");
 
 		if(isset($_POST['hasTaskAccess'])){
 			//TODO: see if user has access already, and if not, and you can grant it, grant it.
@@ -551,6 +554,11 @@ if(!empty($key_downloads)){
                             <div class="col-md-3">
                                 <label>
                                     <input type="checkbox" name="canUseWorkflow" <?php if($row['canUseWorkflow'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['CAN_USE_WORKFLOW']; ?>
+                                </label>
+                            </div>
+							<div class="col-md-3">
+                                <label>
+                                    <input type="checkbox" name="canSendToExtern" <?php if($row['canSendToExtern'] == 'TRUE'){echo 'checked';} ?> />Kann persönliche Nachrichten nach Extern senden
                                 </label>
                             </div>
                         </div>
