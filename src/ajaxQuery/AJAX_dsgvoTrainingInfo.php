@@ -1,4 +1,5 @@
 <?php
+session_start();
 if (!isset($_REQUEST["trainingID"])){
     echo "error";
     die();
@@ -128,7 +129,7 @@ var myChart = new Chart(ctx, {
 </script>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
         </div>
       </div>
     </div>

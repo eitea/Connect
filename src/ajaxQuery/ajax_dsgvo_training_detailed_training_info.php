@@ -1,4 +1,5 @@
 <?php
+session_start();
 if (!isset($_REQUEST["trainingID"])) {
     echo "error";
     die();
@@ -11,8 +12,15 @@ function formatPercent($num)
     $num = round($num * 1000) / 10;
     return "$num%";
 }
-function getColor($percent, $inverse = false)
+function formatTime($num, $noAnswers = false)
 {
+    global $lang;
+    if($noAnswers) return "N/A";
+    return "$num ".$lang['SECONDS'];
+}
+function getColor($percent, $inverse = false, $noAnswers = false)
+{
+    if($noAnswers) return "#e2e2e2";
     switch (($inverse ? 10 - round($percent * 10) : round($percent * 10))) {
         case 10:
             return "#00FF00";
@@ -84,14 +92,14 @@ $total = intval($result->fetch_assoc()["count"]);
                     <tr>
                         <th>ID</th>
                         <th>Name</th>
-                        <th>Richtig</th>
-                        <th>% Richtig</th>
-                        <th>Falsch</td>
-                        <th>% Falsch</td>
-                        <th>Keine Antwort</td>
-                        <th>% Keine Antwort</td>
-                        <th>Gesamtzeit</td>
-                        <th>Durchschnittliche Zeit pro Frage</td>
+                        <th><?php echo $lang['TRAINING_QUESTION_CORRECT']['TRUE'] ?></th>
+                        <th>% <?php echo $lang['TRAINING_QUESTION_CORRECT']['TRUE'] ?></th>
+                        <th><?php echo $lang['TRAINING_QUESTION_CORRECT']['FALSE'] ?></td>
+                        <th>% <?php echo $lang['TRAINING_QUESTION_CORRECT']['FALSE'] ?></td>
+                        <th><?php echo $lang['TRAINING_QUESTION_CORRECT']['UNANSWERED'] ?></td>
+                        <th>% <?php echo $lang['TRAINING_QUESTION_CORRECT']['UNANSWERED'] ?></td>
+                        <th><?php echo $lang['TOTAL_TIME'] ?></td>
+                        <th><?php echo $lang['TIME_PER_QUESTION'] ?></td>
                     </tr>
                 </thead>
                 <tbody>
@@ -122,20 +130,22 @@ while ($row = $result_user->fetch_assoc()) {
     $time = intval($result->fetch_assoc()["duration"]);
     if($total - $unanswered == 0){
         $timePerQuestion = 0;
+        $noAnswers = true;
     }else{
         $timePerQuestion = round($time / ($total - $unanswered));
+        $noAnswers = false;
     }
     echo "<tr>";
     echo "<td>$user</td>";
     echo "<td>$name</td>";
-    echo "<td style='background-color:" . getColor($percentRight) . ";'>$right</td>";
-    echo "<td style='background-color:" . getColor($percentRight) . ";'>" . formatPercent($percentRight) . "</td>";
-    echo "<td style='background-color:" . getColor($percentWrong, true) . ";'>$wrong</td>";
-    echo "<td style='background-color:" . getColor($percentWrong, true) . ";'>" . formatPercent($percentWrong) . "</td>";
-    echo "<td style='background-color:" . getColor($percentUnanswered, true) . ";'>$unanswered</td>";
-    echo "<td style='background-color:" . getColor($percentUnanswered, true) . ";'>" . formatPercent($percentUnanswered) . "</td>";
-    echo "<td>$time Sekunden</td>";
-    echo "<td>$timePerQuestion Sekunden</td>";
+    echo "<td style='background-color:" . getColor($percentRight, false, $noAnswers) . ";'>$right</td>";
+    echo "<td style='background-color:" . getColor($percentRight, false, $noAnswers) . ";'>" . formatPercent($percentRight) . "</td>";
+    echo "<td style='background-color:" . getColor($percentWrong, true, $noAnswers) . ";'>$wrong</td>";
+    echo "<td style='background-color:" . getColor($percentWrong, true, $noAnswers) . ";'>" . formatPercent($percentWrong) . "</td>";
+    echo "<td style='background-color:" . getColor($percentUnanswered, true, $noAnswers) . ";'>$unanswered</td>";
+    echo "<td style='background-color:" . getColor($percentUnanswered, true, $noAnswers) . ";'>" . formatPercent($percentUnanswered) . "</td>";
+    echo "<td>" . formatTime($time, $noAnswers) . "</td>";
+    echo "<td>" . formatTime($timePerQuestion, $noAnswers) . "</td>";
     echo "</tr>";
 }
 ?>

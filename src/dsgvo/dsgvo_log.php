@@ -30,17 +30,17 @@ showError($conn->error);
                 <form>
                     <div class="input-group">
                         <select class="form-control" name="filter1" style="width:50%">
-                            <option value="all" <?php echo $current_filter_scope == "all"?"selected":"" ?> >Alle Bereiche</option>
+                            <option value="all" <?php echo $current_filter_scope == "all"?"selected":"" ?> ><?php echo $lang['ALL_SECTIONS'] ?></option>
                             <option value="VV" <?php echo $current_filter_scope == "VV"?"selected":"" ?> ><?php echo $lang["PROCEDURE_DIRECTORY"] ?></option><!-- todo: find a more dynamic method -->
-                            <option value="TRAINING" <?php echo $current_filter_scope == "TRAINING"?"selected":"" ?> >Schulung</option>
+                            <option value="TRAINING" <?php echo $current_filter_scope == "TRAINING"?"selected":"" ?> ><?php echo $lang["TRAINING"] ?></option>
                         </select>
                         <select class="form-control" name="filter2" style="width:50%">
-                            <option value="all" <?php echo $current_filter_short_description == "all"?"selected":"" ?> >Alle Operationen</option>
-                            <option value="INSERT" <?php echo $current_filter_short_description == "INSERT"?"selected":"" ?> >Einfügen</option>
-                            <option value="UPDATE" <?php echo $current_filter_short_description == "UPDATE"?"selected":"" ?> >Ändern</option>
-                            <option value="DELETE" <?php echo $current_filter_short_description == "DELETE"?"selected":"" ?> >Löschen</option>
-                            <option value="CLONE" <?php echo $current_filter_short_description == "CLONE"?"selected":"" ?> >Duplizieren</option>
-                            <option value="IMPORT" <?php echo $current_filter_short_description == "IMPORT"?"selected":"" ?> >Importieren</option>
+                            <option value="all" <?php echo $current_filter_short_description == "all"?"selected":"" ?> ><?php echo $lang["ALL_EVENTS"] ?></option>
+                            <option value="INSERT" <?php echo $current_filter_short_description == "INSERT"?"selected":"" ?> ><?php echo $lang["DSGVO_LOG_EVENT_TYPES"]["INSERT"] ?></option>
+                            <option value="UPDATE" <?php echo $current_filter_short_description == "UPDATE"?"selected":"" ?> ><?php echo $lang["DSGVO_LOG_EVENT_TYPES"]["UPDATE"] ?></option>
+                            <option value="DELETE" <?php echo $current_filter_short_description == "DELETE"?"selected":"" ?> ><?php echo $lang["DSGVO_LOG_EVENT_TYPES"]["DELETE"] ?></option>
+                            <option value="CLONE" <?php echo $current_filter_short_description == "CLONE"?"selected":"" ?> ><?php echo $lang["DSGVO_LOG_EVENT_TYPES"]["CLONE"] ?></option>
+                            <option value="IMPORT" <?php echo $current_filter_short_description == "IMPORT"?"selected":"" ?> ><?php echo $lang["DSGVO_LOG_EVENT_TYPES"]["IMPORT"] ?></option>
                         </select>
                         <span class="input-group-btn">
                             <button type="submit" class="btn btn-warning">
@@ -57,14 +57,14 @@ showError($conn->error);
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Uhrzeit</th>
+                        <th><?php echo $lang['TIMES'] ?></th>
                         <th>
-                            <?php echo mc_status(); ?>Beschreibung</th>
-                        <th>Benutzer</th>
+                            <?php echo mc_status(); ?><?php echo $lang['DESCRIPTION'] ?></th>
+                        <th><?php echo $lang['USER'] ?></th>
                         <th>
-                            <?php echo mc_status(); ?>Bereich</th>
+                            <?php echo mc_status(); ?><?php echo $lang['SECTION'] ?></th>
                         <th>
-                            <?php echo mc_status(); ?>Lange Beschreibung</th>
+                            <?php echo mc_status(); ?><?php echo $lang['LONG_DESCRIPTION'] ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -103,26 +103,26 @@ showError($conn->error);
         switch($short_description){ // the most used operations get their own color, the rest is blue
             case "INSERT": 
                 $tr_classes = "bg-success"; 
-                $short_tooltip = "Ein neuer Eintrag wurde hinzugefügt";
+                $short_tooltip = $lang["DSGVO_LOG_EVENT_DESCRIPTION"]["INSERT"];
                 $short_description_classes = "text-success text-bold";
                 break;
             case "UPDATE": 
                 $tr_classes = "bg-warning"; 
-                $short_tooltip = "Ein bestehender Eintrag wurde verändert";
+                $short_tooltip = $lang["DSGVO_LOG_EVENT_DESCRIPTION"]["UPDATE"];
                 $short_description_classes = "text-warning";
                 break;
             case "DELETE": 
                 $tr_classes = "bg-danger"; 
-                $short_tooltip = "Ein bestehender Eintrag wurde entfernt";
+                $short_tooltip = $lang["DSGVO_LOG_EVENT_DESCRIPTION"]["DELETE"];
                 $short_description_classes = "text-danger";
                 break;
             default:
                 switch($short_description){
                     case "CLONE": 
-                        $short_tooltip = "Ein bestehender Eintrag wurde dupliziert";
+                        $short_tooltip = $lang["DSGVO_LOG_EVENT_DESCRIPTION"]["CLONE"];
                         break;
                     case "IMPORT":
-                        $short_tooltip = "Ein Eintrag wurde importiert";
+                        $short_tooltip = $lang["DSGVO_LOG_EVENT_DESCRIPTION"]["IMPORT"];
                         break;                    
                 }
                 $tr_classes = "bg-info";
@@ -131,14 +131,14 @@ showError($conn->error);
         echo "<tr class='$tr_classes'>";
         echo "<td data-toggle='tooltip' data-container='body' data-placement='right' title='$timediff (Log ID: $id)'>$log_time</td>";
         echo "<td class='$short_description_classes' data-toggle='tooltip' data-container='body' data-placement='right' title='$short_tooltip'><strong>$short_description</strong></td>";
-        echo "<td data-toggle='tooltip' data-container='body' data-placement='right' title='Benutzer ID: $user_id'>$user_name</td>";
+        echo "<td data-toggle='tooltip' data-container='body' data-placement='right' title='ID: $user_id'>$user_name</td>";
         echo "<td>$scope</td>";
         echo "<td>$long_description</td>";
         echo "</tr>";
     }
 
     if($number_of_shown_logs != $total_number_of_logs){
-        showInfo("Zeige $number_of_shown_logs Einträge von $total_number_of_logs Logeinträgen");
+        showInfo(sprintf($lang["NUMBER_OF_LOGS"], $number_of_shown_logs, $total_number_of_logs));
     }
 
     ?>

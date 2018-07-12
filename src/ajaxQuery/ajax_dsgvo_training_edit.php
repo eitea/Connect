@@ -1,4 +1,5 @@
 <?php 
+session_start();
 if (!isset($_REQUEST["trainingID"])){
     echo "error";
     die();
@@ -38,7 +39,7 @@ while($result && ($row = $result->fetch_assoc())){
  <form method="POST">
  <div class="modal fade">
       <div class="modal-dialog modal-content modal-md">
-        <div class="modal-header"><i class="fa fa-cube"></i> Modul Bearbeiten</div>
+        <div class="modal-header"><i class="fa fa-cube"></i> <?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['EDIT_MODULE'] ?></div>
         <div class="modal-body">
             <label>Name*</label>
             <input type="text" class="form-control" name="name" placeholder="Name des Sets" value="<?php echo $name ?>"/>
@@ -54,8 +55,7 @@ while($result && ($row = $result->fetch_assoc())){
                 }
                 ?>
             </select>
-            <label>Zugeordnete Personen</label>
-            <label><?php echo $lang["EMPLOYEE"]; ?>/Team/Mandant*</label>
+            <label><?php echo $lang["EMPLOYEE"]; ?>/Team/<?php echo $lang['COMPANY'] ?>*</label>
                 <select class="select2-team-icons required-field" name="employees[]" multiple="multiple">
                 <?php
                 $result = $conn->query("SELECT UserData.id id, firstname, lastname FROM relationship_company_client INNER JOIN UserData on UserData.id = relationship_company_client.userID WHERE companyID = $companyID GROUP BY UserData.id");
@@ -86,21 +86,21 @@ while($result && ($row = $result->fetch_assoc())){
                 }
                 ?>
             </select><br>
-            <label>Beantwortungsart</label><br/>
-            <label><input type="radio" name="onLogin" value="TRUE" <?php if($onLogin == 'TRUE') echo "checked" ?> />Beantwortung bei Login</label><br/>
-            <label><input type="radio" name="onLogin" value="FALSE" <?php if($onLogin == 'FALSE') echo "checked" ?> />Beantwortung freiwillig</label>
-            <br/><label>Überschreiben von Antworten</label><br/>
-            <label><input type="radio" name="allowOverwrite" value="TRUE" <?php if($allowOverwrite == 'TRUE') echo "checked" ?> />Alte Antworten werden durch das erneute Beantworten überschrieben.</label><br/>
-            <label><input type="radio" name="allowOverwrite" value="FALSE" <?php if($allowOverwrite == 'FALSE') echo "checked" ?> />User können das Training wiederholen, aber es bleiben die alten Antworten bestehen.</label>
-            <br/><label>Anordnung der Antworten</label><br/>
-            <label><input type="radio" name="random" value="TRUE" <?php if($random == 'TRUE') echo "checked" ?> />Antwortmöglichkeiten zufällig anordnen.</label><br/>
-            <label><input type="radio" name="random" value="FALSE" <?php if($random == 'FALSE') echo "checked" ?> />Antwortmöglichkeiten wie in der Frage belassen.</label>
-            <br /><label>Wiederholungsintervall in Tagen</label>
-            <input type="number" title="Kann nur aktiviert werden, wenn das Überschreiben von Antworten erlaubt ist und die Beantwortung bei Login erfolgt" min="1" max="365" class="form-control" name="answerEveryNDays" value="<?php echo $answerEveryNDays; ?>" <?php if($onLogin == 'FALSE' || $allowOverwrite == 'FALSE') echo "disabled" ?> />
+            <label><?php echo $lang['TRAINING_SETTINGS']['ANSWER_TYPE'] ?></label><br/>
+            <label><input type="radio" name="onLogin" value="TRUE" <?php if($onLogin == 'TRUE') echo "checked" ?> /><?php echo $lang['TRAINING_SETTINGS']['ANSWER_LOGIN'] ?></label><br/>
+            <label><input type="radio" name="onLogin" value="FALSE" <?php if($onLogin == 'FALSE') echo "checked" ?> /><?php echo $lang['TRAINING_SETTINGS']['ANSWER_OPTIONAL'] ?></label>
+            <br/><label><?php echo $lang['TRAINING_SETTINGS']['OVERWRITE_ANSWERS'] ?></label><br/>
+            <label><input type="radio" name="allowOverwrite" value="TRUE" <?php if($allowOverwrite == 'TRUE') echo "checked" ?> /><?php echo $lang['TRAINING_SETTINGS']['OVERWRITE'] ?></label><br/>
+            <label><input type="radio" name="allowOverwrite" value="FALSE" <?php if($allowOverwrite == 'FALSE') echo "checked" ?> /><?php echo $lang['TRAINING_SETTINGS']['NO_OVERWRITE'] ?></label>
+            <br/><label><?php echo $lang['TRAINING_SETTINGS']['ANSWER_ORDER'] ?></label><br/>
+            <label><input type="radio" name="random" value="TRUE" <?php if($random == 'TRUE') echo "checked" ?> /><?php echo $lang['TRAINING_SETTINGS']['RANDOM_ORDER'] ?></label><br/>
+            <label><input type="radio" name="random" value="FALSE" <?php if($random == 'FALSE') echo "checked" ?> /><?php echo $lang['TRAINING_SETTINGS']['PRESERVE_ORDER'] ?></label>
+            <br /><label><?php echo $lang['TRAINING_SETTINGS']['REPEAT_DAYS'] ?></label>
+            <input type="number" title="<?php echo $lang['TRAINING_SETTINGS']['REPEAT_DAYS_NOTE'] ?>" min="1" max="365" class="form-control" name="answerEveryNDays" value="<?php echo $answerEveryNDays; ?>" <?php if($onLogin == 'FALSE' || $allowOverwrite == 'FALSE') echo "disabled" ?> />
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
-          <button type="submit" class="btn btn-warning" name="editTraining" value="<?php echo $trainingID; ?>">Training bearbeiten</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
+          <button type="submit" class="btn btn-warning" name="editTraining" value="<?php echo $trainingID; ?>"><?php echo $lang['SAVE'] ?></button>
         </div>
       </div>
     </div>

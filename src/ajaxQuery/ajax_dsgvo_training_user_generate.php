@@ -44,14 +44,15 @@ $result = $conn->query(
         UNION
         SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations
         INNER JOIN relationship_company_client ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
-        LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID
+        INNER JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_company_relations.trainingID
+        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dsgvo_training_company_relations.trainingID
         WHERE relationship_company_client.userID = $userID
-        AND NOT EXISTS (
+        AND dsgvo_training.onLogin = 'TRUE' AND NOT EXISTS (
             SELECT userID
             FROM dsgvo_training_completed_questions
-            LEFT JOIN dsgvo_training_questions dtq ON dtq.id = dsgvo_training_completed_questions.questionID
-            LEFT JOIN dsgvo_training ON dsgvo_training.id = dtq.trainingID
-            WHERE questionID = dtq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
+            LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
+            LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
+            WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
         )
     ) temp"
 );
@@ -213,7 +214,7 @@ if(!$hasQuestions){
 
     <div class="modal fade survey-modal">
         <div class="modal-dialog modal-content modal-md">
-            <div class="modal-header">Bitte beantworten Sie folgende Fragen
+            <div class="modal-header"><?php echo $lang['PLEASE_ANSWER_QUESTIONS'] ?> 
             <a data-toggle="modal" data-target="#explain-surveys"><i class="fa fa-question-circle-o"></i></a>
             <span id="timeElement"></span>
             </div>
@@ -221,11 +222,11 @@ if(!$hasQuestions){
                 <div id="surveyElement"></div>
             </div>
             <div class="modal-footer">
-                <button data-toggle="modal" data-target="#explain-surveys" class="btn btn-default" type="button">Hilfe</a>
+                <button data-toggle="modal" data-target="#explain-surveys" class="btn btn-default" type="button"><?php echo $lang['HELP'] ?></a>
                 <?php if($onLogin && $allowSuspension): ?>
-                  <button type="button" class="btn btn-warning" id="suspend_trainings_btn">Um einen Tag aufschieben</button>
+                  <button type="button" class="btn btn-warning" id="suspend_trainings_btn"><?php echo $lang['POSTPONE_ONE_DAY'] ?></button>
                 <?php endif; ?>
-                <?php if(!$onLogin): ?>  <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button> <?php endif; ?>
+                <?php if(!$onLogin): ?>  <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button> <?php endif; ?>
             </div>
         </div>
     </div>
@@ -272,7 +273,7 @@ if(!$hasQuestions){
                 var hours = Math.floor(seconds / 3600);
                 var minutes = Math.floor((seconds - (hours*3600)) / 60);
                 seconds = Math.floor(seconds % 60);
-                timeElement.html("Zeit auf der Seite: "+ padZero(hours) + ":" + padZero(minutes) + ":" + padZero(seconds));
+                timeElement.html("<?php echo $lang['TIME_ON_PAGE'] ?>: "+ padZero(hours) + ":" + padZero(minutes) + ":" + padZero(seconds));
             }
             function timerCallback() {
                 setLinkTargets();
@@ -286,6 +287,7 @@ if(!$hasQuestions){
                 renderTime(seconds)
             }
             survey.onCurrentPageChanged.add(timerCallback);
+            clearInterval(timerID);
             timerID = window.setInterval(timerCallback, 1000);
             $("#surveyElement").Survey({ model: survey });
             $("#suspend_trainings_btn").click(function(){
@@ -314,19 +316,10 @@ if(!$hasQuestions){
 
 <div id="explain-surveys" class="modal fade">
   <div class="modal-dialog modal-content modal-sm">
-    <div class="modal-header h4">Trainings</div>
+    <div class="modal-header h4"><?php echo $lang['TRAINING'] ?></div>
     <div class="modal-body">
-        <div>
-            Jede dieser Seiten stellt ein Set von Fragen dar.
-            Jede Frage, die nicht mit (Pflichtfeld) markiert ist, ist optional und kann einfach übersprungen werden.
-            Übersprungene Fragen können später jederzeit nachgeholt werden.
-        </div><br/>
-        <div>
-            Fragen können beliebig oft wiederholt werden, aber der Administrator kann auswählen, ob diese den vorhergehenden Versuch überschreiben.
-        </div><br/>
-        <div>
-            Die Auswertung der Fragen erfolgt am Schluss, wobei die Anzahl der richtigen und falschen Fragen ersichtlich ist.
-        </div>
+        <?php echo $lang['TRAINING_HELP'] ?>
+    </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
     </div>

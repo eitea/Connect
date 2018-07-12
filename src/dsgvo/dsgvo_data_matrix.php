@@ -153,21 +153,6 @@ if (isset($_POST['save_all']) && isset($matrixID)) {
 				<button type="submit" form="main-form" class="btn btn-default blinking" name="save_all" value="true"><i class="fa fa-floppy-o"></i></button>
 			</div>
 		</h3>
-		<br>
-		<div class="">
-			<select class="js-example-basic-single" name="company_id" id="company_chooser">
-				<option>...</option>
-				<?php
-				$result = $conn->query("SELECT id,name FROM $companyTable");
-				while ($result && ($row = $result->fetch_assoc())) {
-					if (in_array($row['id'], $available_companies)) {
-						$selected = $cmpID == $row["id"]?"selected":"";
-						echo "<option $selected value='${row['id']}'>${row['name']}</option>";
-					}
-				}
-				?>
-			</select>
-		</div>
 	</div>
 </div>
 
@@ -181,11 +166,11 @@ $("#company_chooser").change(function () {
 
 <form method="POST" id="main-form">
 
-	<div class="page-content-fixed-180">
+	<div class="page-content-fixed-130">
 		<?php if (isset($matrixID)): ?>
 			<div class="col-md-12">
 				<div class="panel panel-default">
-					<div class="panel-heading">Auflistung der verarbeiteten Datenfelder und deren Übermittlung</div>
+					<div class="panel-heading"><?php echo $lang['DATA_MATRIX_SUBHEADING'] ?></div>
 					<div class="panel-body">
 						<?php
 						$i = 1;
@@ -199,7 +184,7 @@ $("#company_chooser").change(function () {
 							?>
 							<div class="row">
 								<div class="col-sm-6">
-									<label>Gruppierung</label>
+									<label><?php echo $lang['GROUP'] ?></label>
 									<div class="input-group">
 										<input type="text" class="form-control" maxlength="350" name="<?php echo $row['opt_name']; ?>" value="<?php echo $row['opt_descr']; ?>" />
 										<span class="input-group-btn">
@@ -209,7 +194,7 @@ $("#company_chooser").change(function () {
 										</span>
 									</div>
 									<br>
-									<label>Datenkategorien der gesammelten personenbezogenen Daten mit Löschfristen</label>
+									<label><?php echo $lang['DATA_MATRIX_GROUP_SUBHEADING'] ?></label>
 									<br>
 								</div>
 							</div>
@@ -271,7 +256,7 @@ $("#company_chooser").change(function () {
 								<?php endwhile; //cat row ?>
 							</div>
 							<div class="col-sm-11 col-sm-offset-1">
-								<label>Neue Datenkategorie</label>
+								<label><?php echo $lang['NEW_DATA_CATEGORY'] ?></label>
 								<div class="input-group">
 									<input type="text" class="form-control" maxlength="350" name="APP_CAT_<?php echo $num ?>_<?php echo $j ?>" />
 									<span class="input-group-btn">
@@ -287,7 +272,7 @@ $("#company_chooser").change(function () {
 							<br>
 						<?php endwhile;?>
 						<div class="col-sm-12">
-							<label>Neue Gruppierung</label>
+							<label><?php echo $lang['NEW_GROUP'] ?></label>
 							<div class="input-group">
 								<input type="text" class="form-control" maxlength="350" name="APP_GROUP_<?php echo $i; ?>" />
 								<span class="input-group-btn">
