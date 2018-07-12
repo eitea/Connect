@@ -18,7 +18,7 @@ $routes = array(
 	'system/password' => 'core/system/options_password.php',          'system/email' => 'core/system/options_report.php',          'system/tasks' => 'core/system/taskScheduler.php',
 	'system/backup' => 'core/system/system_backup.php',               'system/restore' => 'core/system/system_restore.php',        'system/clients' => 'core/system/editCustomers.php',
 	'system/archive' => 'core/system/options_archive.php',            'system/security' => 'core/system/securitySettings.php',     'system/restic' => 'core/system/resticBackup.php',
-	'system/downloadSql' => 'core/system/backup_download.php',        'system/cryptlog'=> 'core/system/viewCryptLog.php',
+	'system/downloadSql' => 'core/system/backup_download.php',        'system/cryptlog'=> 'core/system/viewCryptLog.php',		   'system/tags' => 'core/system/options_tags.php',
 	'system/checkinLogs' => 'core/system/checkinLogs.php',
 
 	'time/view' => 'time/time_projects.php',                          'time/corrections' => 'time/time_adjusts.php',               'time/travels' => 'time/time_travel.php',
