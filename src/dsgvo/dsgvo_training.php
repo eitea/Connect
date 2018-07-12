@@ -299,19 +299,15 @@ showError($conn->error);
 ?>
 <div class="page-header-fixed">
 <div class="page-header">
-    <h3>Schulungen
+    <h3><?php echo $lang['TRAINING'] ?>
         <div class="page-header-button-group">
-            <span data-container="body" data-toggle="tooltip" title="Hinzufügen eines neuen Sets (Container für Module)">
-                <button type="button" data-toggle="modal" data-target="#newModuleModal" class="btn btn-default"><i class="fa fa-cubes"></i> neues Set</button>
+            <span data-container="body" data-toggle="tooltip" title="<?php echo $lang["NEW_SET_DESCRIPTION"] ?>">
+                <button type="button" data-toggle="modal" data-target="#newModuleModal" class="btn btn-default"><i class="fa fa-cubes"></i> <?php echo $lang['NEW_SET'] ?></button>
             </span>
-            <!-- Moved to panels -->
-            <!-- <span data-container="body" data-toggle="tooltip" title="Hinzufügen eines neuen Moduls (Container für Fragen)">
-                <button type="button" data-toggle="modal" data-target="#newTrainingModal" class="btn btn-default"><i class="fa fa-cube"></i> neues Modul</button>
-            </span> -->
-            <span data-container="body" data-toggle="tooltip" title="Importieren von exportierten Sets">
+            <span data-container="body" data-toggle="tooltip" title="<?php echo $lang["IMPORT_DESCRIPTION"] ?>">
                 <button type="button" name="importExport" value="import" class="btn btn-default"><i class="fa fa-upload"></i> Import</button>
             </span>
-            <span data-container="body" data-toggle="tooltip" title="Exportieren aller Sets">
+            <span data-container="body" data-toggle="tooltip" title="<?php echo $lang["EXPORT_ALL_SETS"] ?>">
                 <button type="button" name="importExport" value="export" class="btn btn-default"><i class="fa fa-download"></i> Export</button>
             </span>
         </div>
@@ -333,16 +329,16 @@ showError($conn->error);
     </span>
     <div class="col-xs-6 text-right">
         <form method="post">
-            <span data-container="body" data-toggle="tooltip" title="Hinzufügen eines neuen Moduls">
+            <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['NEW_MODULE'] ?>">
                 <button type="button" style="background:none;border:none;color:black;" name="addTraining" value="<?php echo $moduleID; ?>"><i class="fa fa-plus"></i></button>
             </span>
-            <span data-container="body" data-toggle="tooltip" title="Set bearbeiten">                   
+            <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['EDIT_SET'] ?>">                   
                 <button type="button" style="background:none;border:none;color:black;" name="editModule" value="<?php echo $moduleID; ?>"><i class="fa fa-pencil-square-o"></i></button>
             </span>   
-            <span data-container="body" data-toggle="tooltip" title="Exportieren eines einzelnen Sets">
+            <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['EXPORT_SET'] ?>">
                 <button type="button" style="background:none;border:none;color:black;" name="export" value="<?php echo $moduleID; ?>"><i class="fa fa-download"></i></button>
             </span>
-            <span data-container="body" data-toggle="tooltip" title="Gesamtes Set mit allen Modulen und Fragen löschen">            
+            <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['DELETE_SET'] ?>">            
                 <button type="submit" style="background:none;border:none;color:#d90000;" name="removeModule" value="<?php echo $moduleID; ?>"><i class="fa fa-trash-o"></i></button>
             </span>
         </form>
@@ -363,7 +359,7 @@ showError($conn->error);
         <div class="col-xs-6"><a data-toggle="collapse" href="#trainingCollapse-<?php echo $trainingID; ?>"><i style="margin-left:-10px" class="fa fa-cube"></i> <?php echo $row['name']; ?></a></div>
     </span>
     <div class="col-xs-6 text-right">
-        <span data-container="body" data-toggle="tooltip" title="Gesamtes Modul mit allen Fragen löschen">            
+        <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['DELETE_MODULE'] ?>">            
             <button type="submit" style="background:none;border:none;color:#d90000;" name="removeTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-trash-o"></i></button>
         </span>        
     </div>
@@ -384,13 +380,13 @@ showError($conn->error);
                             }
                             ?>
             <div class="col-md-12">
-                <span data-container="body" data-toggle="tooltip" title="Frage löschen">   
+                <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['DELETE_QUESTION'] ?>">   
                     <button type="submit" style="background:none;border:none" name="removeQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-trash"></i></button>
                 </span>
-                <span data-container="body" data-toggle="tooltip" title="Frage bearbeiten">   
+                <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['EDIT_QUESTION'] ?>">   
                     <button type="button" style="background:none;border:none" name="editQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-edit"></i></button>
                 </span>
-                <span data-container="body" data-toggle="tooltip" title="Einzelauswertung der Frage">                   
+                <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['QUESTION_STATS'] ?>">                   
                     <button type="button" style="background:none;border:none" name="infoQuestion" value="<?php echo $questionID; ?>"><i class="fa fa-pie-chart"></i></button>
                 </span>
     <?php echo $title ?></div>
@@ -401,19 +397,19 @@ showError($conn->error);
 
             <div class="col-md-12 float-right">
             <div class="btn-group float-right" style="float:right!important">
-                <span data-container="body" data-toggle="tooltip" title="Frage hinzufügen">                   
+                <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['ADD_QUESTION'] ?>">                   
                     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addQuestionModal_<?php echo $trainingID; ?>"><i class="fa fa-plus"></i></button>
                 </span>
-                <span data-container="body" data-toggle="tooltip" title="Auswertung des Moduls als Graph">                   
+                <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['STATS_GRAPH'] ?>">                   
                     <button type="button" class="btn btn-default" name="infoTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-bar-chart-o"></i></button>
                 </span>
-                <span data-container="body" data-toggle="tooltip" title="Auswertung des Moduls als Tabelle">                   
+                <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['STATS_TABLE'] ?>">                   
                     <button type="button" class="btn btn-default" name="detailedInfoTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-list-alt"></i></button>
                 </span>
-                <span data-container="body" data-toggle="tooltip" title="Modul aus der Sicht des Benutzers abspielen">                   
+                <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['TRY'] ?>">                   
                     <button type="button" class="btn btn-default" name="testTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-play"></i></button>
                 </span>
-                <span data-container="body" data-toggle="tooltip" title="Modul bearbeiten">                   
+                <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['EDIT_MODULE'] ?>">                   
                     <button type="button" class="btn btn-warning" name="editTraining" value="<?php echo $trainingID; ?>"><i class="fa fa-pencil-square-o"></i></button>
                 </span>
             </div>
@@ -424,14 +420,14 @@ showError($conn->error);
     <!-- question add modal -->
         <div class="modal fade" id="addQuestionModal_<?php echo $trainingID; ?>">
         <div class="modal-dialog modal-content modal-lg">
-        <div class="modal-header">Neue Frage</div>
+        <div class="modal-header"><?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['ADD_QUESTION'] ?></div>
         <div class="modal-body">
             <input type="text" name="title" class="form-control" placeholder="Title"></input><br/>
             <textarea name="question" class="form-control tinymce" placeholder="Question"></textarea>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
-            <button type="submit" class="btn btn-warning" name="addQuestion" value="<?php echo $trainingID; ?>">Frage erstellen</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL'] ?></button>
+            <button type="submit" class="btn btn-warning" name="addQuestion" value="<?php echo $trainingID; ?>"><?php echo $lang['ADD'] ?></button>
         </div>
         </div>
     </div>
@@ -451,7 +447,7 @@ showError($conn->error);
     <div class="modal-dialog modal-md" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title"><i class="fa fa-cube"></i> Neues Modul</h4>
+          <h4 class="modal-title"><i class="fa fa-cube"></i> <?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['NEW_MODULE'] ?></h4>
         </div>
         <div class="modal-body">
         <label>Name*</label>
@@ -469,7 +465,7 @@ showError($conn->error);
             </select>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
           <button type="submit" class="btn btn-warning" name="createTraining" value="true"><?php echo $lang['ADD']; ?></button>
         </div>
       </div>
@@ -493,7 +489,7 @@ showError($conn->error);
         <input type="text" class="form-control" name="name" placeholder="Name des Sets" />
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
           <button type="submit" class="btn btn-warning" name="createModule" value="true"><?php echo $lang['ADD']; ?></button>
         </div>
       </div>

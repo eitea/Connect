@@ -1,4 +1,5 @@
-<?php 
+<?php
+session_start();
 if (!isset($_REQUEST["moduleID"])){
     echo "error";
     die();
@@ -13,15 +14,15 @@ $moduleID = intval($_REQUEST["moduleID"]);
     <div class="modal-dialog modal-md" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title"><i class="fa fa-cube"></i> Neues Modul</h4>
+          <h4 class="modal-title"><i class="fa fa-cube"></i> <?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['NEW_MODULE'] ?></h4>
         </div>
         <div class="modal-body">
         <label>Name*</label>
-        <input type="text" class="form-control" name="name" placeholder="Name des Moduls" required/>
+        <input type="text" class="form-control" name="name" placeholder="" required/>
         <input type="hidden" name="module" value="<?php echo $moduleID; ?>"/>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
           <button type="submit" class="btn btn-warning" name="createTraining" value="true"><?php echo $lang['ADD']; ?></button>
         </div>
       </div>

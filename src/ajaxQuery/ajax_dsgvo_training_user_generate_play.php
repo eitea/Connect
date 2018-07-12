@@ -94,7 +94,7 @@ while($row_question = $result_questions->fetch_assoc()){
 
     <div class="modal fade survey-modal">
         <div class="modal-dialog modal-content modal-md">
-            <div class="modal-header">Bitte beantworten Sie folgende Fragen 
+            <div class="modal-header"><?php echo $lang['PLEASE_ANSWER_QUESTIONS'] ?> 
             <a data-toggle="modal" data-target="#explain-surveys"><i class="fa fa-question-circle-o"></i></a>
             <span id="timeElement"></span>
             </div>
@@ -102,7 +102,7 @@ while($row_question = $result_questions->fetch_assoc()){
                 <div id="surveyElement"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
             </div>
         </div>
     </div>
@@ -149,7 +149,7 @@ while($row_question = $result_questions->fetch_assoc()){
                 var hours = Math.floor(seconds / 3600);
                 var minutes = Math.floor((seconds - (hours*3600)) / 60);
                 seconds = Math.floor(seconds % 60);
-                timeElement.html("Zeit auf der Seite: "+ padZero(hours) + ":" + padZero(minutes) + ":" + padZero(seconds));
+                timeElement.html("<?php echo $lang['TIME_ON_PAGE'] ?>: "+ padZero(hours) + ":" + padZero(minutes) + ":" + padZero(seconds));
             }
             function timerCallback() {
                 setLinkTargets();
@@ -163,6 +163,7 @@ while($row_question = $result_questions->fetch_assoc()){
                 renderTime(seconds)
             }
             survey.onCurrentPageChanged.add(timerCallback);
+            clearInterval(timerID);
             timerID = window.setInterval(timerCallback, 1000);
             $("#surveyElement").Survey({ model: survey });
     </script>

@@ -235,7 +235,7 @@ foreach ($available_companies as $company) {
     $routesGER[] = array("name" => "DSGVO Logs ($name)", "url" => "../dsgvo/log?n=$companyID", "tags" => array("Schulung Logs", "Verfahrensverzeichnis Logs"));
 }
 
-if ($advanced && $enableToAdvancedSearch) { // todo: search itself should be done in the database itself in future versions
+if ($advanced && $enableToAdvancedSearch) { // todo: search should be done in the database itself in future versions
     $users = array();
     $teams = array();
     $clients = array();

@@ -447,7 +447,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             echo '<td>' .mc_status('DSGVO'). secure_data('DSGVO', $row['name'], 'decrypt', $userID, $privateKey) . '</td>';
             echo '<td>' . $row['version'] . '</td>';
             echo '<td><form method="POST">';
-            echo '<a href="edit?d=' . $row['id'] . '" title="Bearbeiten" class="btn btn-default"><i class="fa fa-pencil"></i></a> ';
+            echo '<a href="edit?d=' . $row['id'] . '" title="'.$lang['EDIT'].'" class="btn btn-default"><i class="fa fa-pencil"></i></a> ';
             echo '<button type="submit" name="clone" value="' . $row['id'] . '" title="Klonen" class="btn btn-default" ><i class="fa fa-files-o"></i></button> ';
             echo '<button type="submit" name="delete" value="' . $row['id'] . '" title="Löschen" class="btn btn-default" ><i class="fa fa-trash-o"></i></button> ';
             echo '<button type="button" name="setSelect" value="' . $row['id'] . '" data-toggle="modal" data-target="#send-as-mail" class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';

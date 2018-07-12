@@ -566,6 +566,9 @@ $lang_ger['EXPIRATION_DATE'] = 'Gültigkeitsdatum';
 $lang_eng['EXPIRED'] = 'Expired';
 $lang_ger['EXPIRED'] = 'Abgelaufen';
 
+$lang_eng['EXPORT_ALL_SETS'] = 'Export all sets';
+$lang_ger['EXPORT_ALL_SETS'] = 'Exportieren aller Sets';
+
 $lang_eng['FEEDBACK_PROBLEM'] = 'Expiration Date';
 $lang_ger['FEEDBACK_PROBLEM'] = 'Ich habe ein Problem';
 
@@ -667,7 +670,6 @@ $lang_ger['HEADLINE'] = 'Überschrift';
 
 $lang_eng['HELP'] = 'Help';
 $lang_ger['HELP'] = 'Hilfe';
-
 
 $lang_eng['HIDE_ZEROE_VALUE'] = 'Hide empty rows';
 $lang_ger['HIDE_ZEROE_VALUE'] = 'Leere Zeilen ausblenden';
@@ -788,6 +790,9 @@ $lang_ger['INTERVAL'] = 'Intervall';
 $lang_eng['INVALID_LOGIN'] = 'Invalid e-mail or password';
 $lang_ger['INVALID_LOGIN'] = 'Ungültige e-mail oder falsches Passwort';
 
+$lang_eng['IMPORT_DESCRIPTION'] = 'Import exported sets';
+$lang_ger['IMPORT_DESCRIPTION'] = 'Importieren von exportierten Sets';
+
 $lang_eng['IS_TIME'] = 'Is';
 $lang_ger['IS_TIME'] = 'Ist';
 
@@ -876,6 +881,9 @@ $lang_ger['POST_TO'] = 'An';
 $lang_eng['POST'] = 'Post message';
 $lang_ger['POST'] = 'Nachricht verschicken';
 
+$lang_eng['POSTPONE_ONE_DAY'] = 'Postpone by one day';
+$lang_ger['POSTPONE_ONE_DAY'] = 'Um einen Tag aufschieben';
+
 $lang_eng['MESSAGE'] = 'Message';
 $lang_ger['MESSAGE'] = 'Nachricht';
 
@@ -938,6 +946,12 @@ $lang_ger['NEW_PROPOSAL'] = 'Neues Angebot';
 
 $lang_eng['NEW_RECEIPT'] = 'New Receipt';
 $lang_ger['NEW_RECEIPT'] = 'Neue Rechnung';
+
+$lang_eng['NEW_SET'] = 'New set';
+$lang_ger['NEW_SET'] = 'Neues Set';
+
+$lang_eng['NEW_SET_DESCRIPTION'] = 'Add a new set (Container for modules)';
+$lang_ger['NEW_SET_DESCRIPTION'] = 'Hinzufügen eines neuen Sets (Container für Module)';
 
 $lang_eng['NEW_TEMPLATE'] = 'New Template';
 $lang_ger['NEW_TEMPLATE'] = 'Neue Vorlage';
@@ -1055,6 +1069,9 @@ $lang_ger['PER_YEAR'] = ' pro Jahr';
 
 $lang_eng['PHONE_NUMBER'] = 'Telephone Number';
 $lang_ger['PHONE_NUMBER'] = 'Telefonnummer';
+
+$lang_eng['PLEASE_ANSWER_QUESTIONS'] = 'Please answer the following questions';
+$lang_ger['PLEASE_ANSWER_QUESTIONS'] = 'Bitte beantworten Sie folgende Fragen';
 
 $lang_eng['PLZ'] = 'Postal Code';
 $lang_ger['PLZ'] = 'PLZ';
@@ -1224,6 +1241,9 @@ $lang_ger['SEARCH'] = 'Suche';
 $lang_eng['SEARCH_OPTIONS'] = 'Search Options';
 $lang_ger['SEARCH_OPTIONS'] = 'Suchoptionen';
 
+$lang_eng['SECONDS'] = 'Seconds';
+$lang_ger['SECONDS'] = 'Sekunden';
+
 $lang_eng['SECTION'] = 'Section';
 $lang_ger['SECTION'] = 'Bereich';
 
@@ -1350,6 +1370,12 @@ $lang_ger['TIME'] = 'Von - Bis';
 $lang_eng['TIME_CALCULATION_TABLE'] = 'Time calculation Table';
 $lang_ger['TIME_CALCULATION_TABLE'] = 'Stundenplan';
 
+$lang_eng['TIME_ON_PAGE'] = 'Time on page';
+$lang_ger['TIME_ON_PAGE'] = 'Zeit auf der Seite';
+
+$lang_eng['TIME_PER_QUESTION'] = 'Time per question';
+$lang_ger['TIME_PER_QUESTION'] = 'Zeit pro Frage';
+
 $lang_eng['TIMES'] = 'Time';
 $lang_ger['TIMES'] = 'Zeit';
 
@@ -1368,11 +1394,22 @@ $lang_ger['TO'] = 'Bis';
 $lang_eng['TOTAL_PRICE'] = 'Total price';
 $lang_ger['TOTAL_PRICE'] = 'Gesamtpreis';
 
+$lang_eng['TOTAL_TIME'] = 'Total time';
+$lang_ger['TOTAL_TIME'] = 'Gesamtzeit';
+
 $lang_eng['TODAY'] = 'Today';
 $lang_ger['TODAY'] = 'Heute';
 
 $lang_eng['TRAINING'] = 'Training';
 $lang_ger['TRAINING'] = 'Schulung';
+
+$lang_eng['TRAINING_HELP'] = 'Every question not marked with (Required) is optional and can be skipped. You can answer optional questions any time.
+<br/><br/>Every question can be repeated but the administrator can decide whether previous answers can be overwritten.
+<br/><br/>You will see your score at the end of the survey.';
+$lang_ger['TRAINING_HELP'] = 'Jede dieser Seiten stellt ein Set von Fragen dar.
+Jede Frage, die nicht mit (Pflichtfeld) markiert ist, ist optional und kann einfach übersprungen werden. Übersprungene Fragen können später jederzeit nachgeholt werden.
+<br/><br/>Fragen können beliebig oft wiederholt werden, aber der Administrator kann auswählen, ob diese den vorhergehenden Versuch überschreiben.
+<br/><br/>Die Auswertung der Fragen erfolgt am Schluss, wobei die Anzahl der richtigen und falschen Fragen ersichtlich ist.';
 
 $lang_eng['TRANSITION'] = 'Transition';
 $lang_ger['TRANSITION'] = 'Überleitung';
@@ -1566,6 +1603,64 @@ $lang_ger['TIME_UNIT_TOSTRING'] = array('', 'Tag(e)', 'Woche(n)', 'Monat(e)', 'J
 
 $lang_eng['TRAINING_QUESTION_CORRECT'] = array('TRUE' => 'Right', 'FALSE' => 'Wrong', 'UNANSWERED' => 'Unanswered');
 $lang_ger['TRAINING_QUESTION_CORRECT'] = array('TRUE' => 'Richtig', 'FALSE' => 'Falsch', 'UNANSWERED' => 'Nicht beantwortet');
+
+$lang_eng['TRAINING_BUTTON_DESCRIPTIONS'] = array(
+  'NEW_MODULE' => 'Create a new module', 
+  'EDIT_SET' => 'Edit set', 
+  'EXPORT_SET' => 'Export this set', 
+  'DELETE_SET' => 'Delete set with all modules and questions', 
+  'DELETE_MODULE' => 'Delete module with all questions',
+  'DELETE_QUESTION' => 'Delete question',
+  'EDIT_QUESTION' => 'Edit question',
+  'QUESTION_STATS' => 'Stats for this question',
+  'ADD_QUESTION' => 'Add a question',
+  'STATS_GRAPH' => 'Module stats as graph',
+  'STATS_TABLE' => 'Module stats as table',
+  'TRY' => 'Try from a user\'s perspective',
+  'EDIT_MODULE' => 'Edit module',
+);
+$lang_ger['TRAINING_BUTTON_DESCRIPTIONS'] = array(
+  'NEW_MODULE' => 'Hinzufügen eines neuen Moduls', 
+  'EDIT_SET' => 'Set bearbeiten', 
+  'EXPORT_SET' => 'Exportieren eines einzelnen Sets', 
+  'DELETE_SET' => 'Gesamtes Set mit allen Modulen und Fragen löschen', 
+  'DELETE_MODULE' => 'Gesamtes Modul mit allen Fragen löschen',
+  'DELETE_QUESTION' => 'Frage löschen',
+  'EDIT_QUESTION' => 'Frage bearbeiten',
+  'QUESTION_STATS' => 'Einzelauswertung der Frage',
+  'ADD_QUESTION' => 'Frage hinzufügen',
+  'STATS_GRAPH' => 'Auswertung des Moduls als Graph',
+  'STATS_TABLE' => 'Auswertung des Moduls als Tabelle',
+  'TRY' => 'Modul aus der Sicht des Benutzers abspielen',
+  'EDIT_MODULE' => 'Modul bearbeiten',
+);
+
+$lang_eng['TRAINING_SETTINGS'] = array(
+  'ANSWER_TYPE' => 'Answer type', 
+  'OVERWRITE_ANSWERS' => 'Overwriting answers', 
+  'ANSWER_ORDER' => 'Answer order', 
+  'REPEAT_DAYS' => 'Repeat interval (days)', 
+  'ANSWER_LOGIN' => 'After login', 
+  'ANSWER_OPTIONAL' => 'Optional', 
+  'OVERWRITE' => 'Allow users to overwrite old answers', 
+  'NO_OVERWRITE' => 'Keep first answer (users can still repeat the training)', 
+  'RANDOM_ORDER' => 'Random order', 
+  'PRESERVE_ORDER' => 'Preserve answer order', 
+  'REPEAT_DAYS_NOTE' => 'Only active if overwriting answers and answer on login is selected',
+);
+$lang_ger['TRAINING_SETTINGS'] = array(
+  'ANSWER_TYPE' => 'Beantwortungsart', 
+  'OVERWRITE_ANSWERS' => 'Überschreiben von Antworten', 
+  'ANSWER_ORDER' => 'Anordnung der Antworten', 
+  'REPEAT_DAYS' => 'Wiederholungsintervall in Tagen', 
+  'ANSWER_LOGIN' => 'Beantwortung bei Login', 
+  'ANSWER_OPTIONAL' => 'Beantwortung freiwillig', 
+  'OVERWRITE' => 'Alte Antworten werden durch das erneute Beantworten überschrieben', 
+  'NO_OVERWRITE' => 'User können das Training wiederholen, aber es bleiben die alten Antworten bestehen', 
+  'RANDOM_ORDER' => 'Antwortmöglichkeiten zufällig anordnen', 
+  'PRESERVE_ORDER' => 'Antwortmöglichkeiten wie in der Frage belassen', 
+  'REPEAT_DAYS_NOTE' => 'Kann nur aktiviert werden, wenn das Überschreiben von Antworten erlaubt ist und die Beantwortung bei Login erfolgt',
+);
 
 $lang_eng['TRAINING_RESULT'] = array('RIGHT' => 'Right','RIGHT_NO_UPDATE' => 'Right, but not updated', 'WRONG' => 'Wrong', 'WRONG_NO_UPDATE' => 'Wrong, but not updated');
 $lang_ger['TRAINING_RESULT'] = array('RIGHT' => 'Richtig','RIGHT_NO_UPDATE' => 'Right, aber nicht gespeichert', 'WRONG' => 'Falsch', 'WRONG_NO_UPDATE' => 'Falsch, aber nicht gespeichert');

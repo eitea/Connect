@@ -1,4 +1,5 @@
 <?php
+session_start();
 if (!isset($_REQUEST["trainingID"])) {
     echo "error";
     die();
@@ -13,8 +14,9 @@ function formatPercent($num)
 }
 function formatTime($num, $noAnswers = false)
 {
+    global $lang;
     if($noAnswers) return "N/A";
-    return $num === 1?"$num Sekunde":"$num Sekunden";
+    return "$num ".$lang['SECONDS'];
 }
 function getColor($percent, $inverse = false, $noAnswers = false)
 {
@@ -90,14 +92,14 @@ $total = intval($result->fetch_assoc()["count"]);
                     <tr>
                         <th>ID</th>
                         <th>Name</th>
-                        <th>Richtig</th>
-                        <th>% Richtig</th>
-                        <th>Falsch</td>
-                        <th>% Falsch</td>
-                        <th>Keine Antwort</td>
-                        <th>% Keine Antwort</td>
-                        <th>Gesamtzeit</td>
-                        <th>Zeit pro Frage</td>
+                        <th><?php echo $lang['TRAINING_QUESTION_CORRECT']['TRUE'] ?></th>
+                        <th>% <?php echo $lang['TRAINING_QUESTION_CORRECT']['TRUE'] ?></th>
+                        <th><?php echo $lang['TRAINING_QUESTION_CORRECT']['FALSE'] ?></td>
+                        <th>% <?php echo $lang['TRAINING_QUESTION_CORRECT']['FALSE'] ?></td>
+                        <th><?php echo $lang['TRAINING_QUESTION_CORRECT']['UNANSWERED'] ?></td>
+                        <th>% <?php echo $lang['TRAINING_QUESTION_CORRECT']['UNANSWERED'] ?></td>
+                        <th><?php echo $lang['TOTAL_TIME'] ?></td>
+                        <th><?php echo $lang['TIME_PER_QUESTION'] ?></td>
                     </tr>
                 </thead>
                 <tbody>
