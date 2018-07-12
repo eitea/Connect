@@ -1,4 +1,5 @@
-<?php 
+<?php
+session_start();
 if (!isset($_REQUEST["questionID"])) {
     echo "error";
     die();
@@ -26,8 +27,8 @@ $version = $row["version"];
         <textarea name="question" class="form-control tinymce" placeholder="Question"><?php echo $text; ?></textarea>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
-        <button type="submit" class="btn btn-warning" name="editQuestion" value="<?php echo $questionID; ?>">Bearbeiten</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
+        <button type="submit" class="btn btn-warning" name="editQuestion" value="<?php echo $questionID; ?>"><?php echo $lang['EDIT'] ?></button>
     </div>
     </div>
 </div>

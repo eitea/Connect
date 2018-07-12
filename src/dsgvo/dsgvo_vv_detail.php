@@ -515,7 +515,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                    $str_heads .= '<th data-toggle="tooltip" data-container="body" data-placement="left" title="'.$tooltip.$client.'"><div class="btn-group">
 						<button style="white-space: normal;" type="button" class="btn btn-link" data-toggle="dropdown">'.$val['setting'][0].'</button> <ul class="dropdown-menu">
 						<li><button type="button" class="btn btn-link" data-toggle="modal" data-target="#add-cate"
-						data-valid="'.$val['valID'][0].'" data-setting="'.$val['setting'][0].'" data-client="'.$val['client'][0].'" data-cat="'.$val['category'][0].'">Bearbeiten</button></li>
+						data-valid="'.$val['valID'][0].'" data-setting="'.$val['setting'][0].'" data-client="'.$val['client'][0].'" data-cat="'.$val['category'][0].'">'.$lang['EDIT'].'</button></li>
 						<li><button type="submit" class="btn btn-link" name="delete_cat" value="'.$val['valID'][0].'">Löschen</button></li>
 						</ul></div></th>';
 	                } else {

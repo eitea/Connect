@@ -80,6 +80,12 @@ $lang_ger['ADVANCED_SEARCH'] = 'Erweiterte Suche';
 $lang_eng['AFFECTED_MONTH'] = 'Affected Month';
 $lang_ger['AFFECTED_MONTH'] = 'Betroffener Monat';
 
+$lang_eng['ALL_SECTIONS'] = 'All sections';
+$lang_ger['ALL_SECTIONS'] = 'Alle Bereiche';
+
+$lang_eng['ALL_EVENTS'] = 'All events';
+$lang_ger['ALL_EVENTS'] = 'Alle Ereignisse';
+
 $lang_eng['ALLOW_PRJBKING_ACCESS'] = 'Allow Project-Bookin Access';
 $lang_ger['ALLOW_PRJBKING_ACCESS'] = 'Projektbuchung erlauben';
 
@@ -103,6 +109,9 @@ $lang_ger['ASK_DELETE'] = 'Wollen Sie %s dauerhaft löschen?';
 
 $lang_eng['ARCHIVE'] = 'Archive';
 $lang_ger['ARCHIVE'] = 'Archiv';
+
+$lang_eng['ARCHIVE_STRUCTURE'] = 'Archive structure';
+$lang_ger['ARCHIVE_STRUCTURE'] = 'Archivstruktur';
 
 $lang_eng['ASSIGNED'] = 'Assigned';
 $lang_ger['ASSIGNED'] = 'Zugewiesene';
@@ -230,6 +239,9 @@ $lang_ger['CITY'] = 'Ort';
 $lang_eng['CLASS'] = 'Class';
 $lang_ger['CLASS'] = 'Klasse';
 
+$lang_eng['CLICK_TO_INSERT'] = 'Click to insert';
+$lang_ger['CLICK_TO_INSERT'] = 'Klicken zum Einfügen';
+
 $lang_eng['CLIENT'] = 'Client';
 $lang_ger['CLIENT'] = 'Kunde';
 
@@ -329,6 +341,12 @@ $lang_ger['DATATABLES_LANG_OPTIONS'] = '
 $lang_eng['DATA_MATRIX'] = 'Data Matrix';
 $lang_ger['DATA_MATRIX'] = 'Datenmatrix';
 
+$lang_eng['DATA_MATRIX_SUBHEADING'] = 'List of processed data fields and their transmission';
+$lang_ger['DATA_MATRIX_SUBHEADING'] = 'Auflistung der verarbeiteten Datenfelder und deren Übermittlung';
+
+$lang_eng['DATA_MATRIX_GROUP_SUBHEADING'] = 'Data categories of collected personal data with deletion periods';
+$lang_ger['DATA_MATRIX_GROUP_SUBHEADING'] = 'Datenkategorien der gesammelten personenbezogenen Daten mit Löschfristen';
+
 $lang_eng['DATE'] = 'Date';
 $lang_ger['DATE'] = 'Datum';
 
@@ -352,6 +370,9 @@ $lang_ger['DEACTIVATE'] = 'Deaktivieren';
 
 $lang_eng['DEFAULT'] = 'Default';
 $lang_ger['DEFAULT'] = 'Standard';
+
+$lang_eng['DEFAULT_FOLDERS'] = 'Default folders';
+$lang_ger['DEFAULT_FOLDERS'] = 'Standardordner';
 
 $lang_eng['DELETE'] = 'Delete';
 $lang_ger['DELETE'] = 'Löschen';
@@ -461,6 +482,9 @@ $lang_ger['EDIT_USERS'] = 'Benutzer Editieren';
 $lang_eng['EDIT_PERSONAL_INFO'] = 'Edit Personal info';
 $lang_ger['EDIT_PERSONAL_INFO'] = 'Benutzer-Informationen';
 
+$lang_eng['EDIT_PROCESS'] = 'Edit process';
+$lang_ger['EDIT_PROCESS'] = 'Vorgang editieren';
+
 $lang_eng['EMPLOYEE'] = 'Employee';
 $lang_ger['EMPLOYEE'] = 'Mitarbeiter';
 
@@ -487,6 +511,9 @@ $lang_ger['ENTRANCE_DATE'] = 'Eintrittsdatum';
 
 $lang_eng['EMAIL_TASK'] = 'Automatic Task Builder';
 $lang_ger['EMAIL_TASK'] = 'Automatischer Task Builder';
+
+$lang_eng['EMAIL_TEMPLATES'] = 'E-Mail Templates';
+$lang_ger['EMAIL_TEMPLATES'] = 'E-Mail Vorlagen';
 
 $lang_eng['ERP_TEXT_DESCRIPTION'] = 'This text will be printed inside the footer at proposals and receits';
 $lang_ger['ERP_TEXT_DESCRIPTION'] = 'Dieser Text wird als Abschlusstext bei Angeboten, Auftragsbestätigungen und Rechnungen angedruckt';
@@ -559,6 +586,9 @@ $lang_ger['EXPIRATION_DATE'] = 'Gültigkeitsdatum';
 
 $lang_eng['EXPIRED'] = 'Expired';
 $lang_ger['EXPIRED'] = 'Abgelaufen';
+
+$lang_eng['EXPORT_ALL_SETS'] = 'Export all sets';
+$lang_ger['EXPORT_ALL_SETS'] = 'Exportieren aller Sets';
 
 $lang_eng['FEEDBACK_PROBLEM'] = 'Expiration Date';
 $lang_ger['FEEDBACK_PROBLEM'] = 'Ich habe ein Problem';
@@ -647,6 +677,9 @@ $lang_ger['GREETING_AFTERNOON'] = 'Hallo';
 $lang_eng['GREETING_EVENING'] = 'Good Evening';
 $lang_ger['GREETING_EVENING'] = 'Guten Abend';
 
+$lang_eng['GROUP'] = 'Group';
+$lang_ger['GROUP'] = 'Gruppierung';
+
 $lang_eng['GENERAL_INFORMATION'] = 'General Information';
 $lang_ger['GENERAL_INFORMATION'] = 'Allgemeine Informationen';
 
@@ -661,7 +694,6 @@ $lang_ger['HEADLINE'] = 'Überschrift';
 
 $lang_eng['HELP'] = 'Help';
 $lang_ger['HELP'] = 'Hilfe';
-
 
 $lang_eng['HIDE_ZEROE_VALUE'] = 'Hide empty rows';
 $lang_ger['HIDE_ZEROE_VALUE'] = 'Leere Zeilen ausblenden';
@@ -782,6 +814,9 @@ $lang_ger['INTERVAL'] = 'Intervall';
 $lang_eng['INVALID_LOGIN'] = 'Invalid e-mail or password';
 $lang_ger['INVALID_LOGIN'] = 'Ungültige e-mail oder falsches Passwort';
 
+$lang_eng['IMPORT_DESCRIPTION'] = 'Import exported sets';
+$lang_ger['IMPORT_DESCRIPTION'] = 'Importieren von exportierten Sets';
+
 $lang_eng['IS_TIME'] = 'Is';
 $lang_ger['IS_TIME'] = 'Ist';
 
@@ -800,6 +835,9 @@ $lang_ger['LEADER'] = 'Verantwortlicher Mitarbeiter';
 $lang_eng['LEADER_REPLACEMENT'] = 'Leader Replacement';
 $lang_ger['LEADER_REPLACEMENT'] = 'Stellvertretender Mitarbeiter';
 
+$lang_eng['LIFETIME_COUNTER'] = 'Seconds until logout';
+$lang_ger['LIFETIME_COUNTER'] = 'Sekunden bis Logout';
+
 $lang_eng['LOCK_BOOKING_MONTH'] = 'Lock booking months';
 $lang_ger['LOCK_BOOKING_MONTH'] = 'Buchungsmonat sperren';
 
@@ -808,6 +846,9 @@ $lang_ger['LOCALE'] = 'de';
 
 $lang_eng['LOGOUT_MESSAGE'] = 'An Update Attempt has been sent. You will now be logged out';
 $lang_ger['LOGOUT_MESSAGE'] = 'Ein Update wurde angesetzt. Sie werden nun ausgeloggt.';
+
+$lang_eng['LONG_DESCRIPTION'] = 'Long description';
+$lang_ger['LONG_DESCRIPTION'] = 'Lange Beschreibung';
 
 $lang_eng['LUNCHBREAK'] = 'Lunchbreak';
 $lang_ger['LUNCHBREAK'] = 'Mittagspause';
@@ -867,6 +908,9 @@ $lang_ger['POST_TO'] = 'An';
 $lang_eng['POST'] = 'Post message';
 $lang_ger['POST'] = 'Nachricht verschicken';
 
+$lang_eng['POSTPONE_ONE_DAY'] = 'Postpone by one day';
+$lang_ger['POSTPONE_ONE_DAY'] = 'Um einen Tag aufschieben';
+
 $lang_eng['MESSAGE'] = 'Message';
 $lang_ger['MESSAGE'] = 'Nachricht';
 
@@ -909,6 +953,12 @@ $lang_ger['NEW_CLIENT_CREATE'] = 'Neuer Kunde';
 $lang_eng['NEW_CONFIRMATION'] = 'New Order Confrimation';
 $lang_ger['NEW_CONFIRMATION'] = 'Neue Auftragsbestätigung';
 
+$lang_eng['NEW_DATA_CATEGORY'] = 'New data category';
+$lang_ger['NEW_DATA_CATEGORY'] = 'Neue Datenkategorie';
+
+$lang_eng['NEW_GROUP'] = 'New group';
+$lang_ger['NEW_GROUP'] = 'Neue gruppe';
+
 $lang_eng['NEW_OFFER'] = 'New Offer';
 $lang_ger['NEW_OFFER'] = 'Neues Angebot';
 
@@ -930,6 +980,12 @@ $lang_ger['NEW_PROPOSAL'] = 'Neues Angebot';
 $lang_eng['NEW_RECEIPT'] = 'New Receipt';
 $lang_ger['NEW_RECEIPT'] = 'Neue Rechnung';
 
+$lang_eng['NEW_SET'] = 'New set';
+$lang_ger['NEW_SET'] = 'Neues Set';
+
+$lang_eng['NEW_SET_DESCRIPTION'] = 'Add a new set (Container for modules)';
+$lang_ger['NEW_SET_DESCRIPTION'] = 'Hinzufügen eines neuen Sets (Container für Module)';
+
 $lang_eng['NEW_TEMPLATE'] = 'New Template';
 $lang_ger['NEW_TEMPLATE'] = 'Neue Vorlage';
 
@@ -950,6 +1006,9 @@ $lang_ger['NOT_CHARGEABLE'] = 'Erlassen';
 
 $lang_eng['NUMBER'] = 'Number';
 $lang_ger['NUMBER'] = 'Nummer';
+
+$lang_eng['NUMBER_OF_LOGS'] = 'Showing %s of %s entries';
+$lang_ger['NUMBER_OF_LOGS'] = 'Zeige %s Einträge von %s Logeinträgen';
 
 $lang_eng['OFFER'] = 'Offer';
 $lang_ger['OFFER'] = 'Angebot';
@@ -1043,6 +1102,9 @@ $lang_ger['PER_YEAR'] = ' pro Jahr';
 
 $lang_eng['PHONE_NUMBER'] = 'Telephone Number';
 $lang_ger['PHONE_NUMBER'] = 'Telefonnummer';
+
+$lang_eng['PLEASE_ANSWER_QUESTIONS'] = 'Please answer the following questions';
+$lang_ger['PLEASE_ANSWER_QUESTIONS'] = 'Bitte beantworten Sie folgende Fragen';
 
 $lang_eng['PLZ'] = 'Postal Code';
 $lang_ger['PLZ'] = 'PLZ';
@@ -1212,6 +1274,12 @@ $lang_ger['SEARCH'] = 'Suche';
 $lang_eng['SEARCH_OPTIONS'] = 'Search Options';
 $lang_ger['SEARCH_OPTIONS'] = 'Suchoptionen';
 
+$lang_eng['SECONDS'] = 'Seconds';
+$lang_ger['SECONDS'] = 'Sekunden';
+
+$lang_eng['SECTION'] = 'Section';
+$lang_ger['SECTION'] = 'Bereich';
+
 $lang_eng['SEND_ACCESS'] = 'Send Access';
 $lang_ger['SEND_ACCESS'] = 'Zugang Senden';
 
@@ -1323,6 +1391,9 @@ $lang_ger['TAXES'] = 'Steuern';
 $lang_eng['TAX_RATES'] = 'Tax Rates';
 $lang_ger['TAX_RATES'] = 'Steuersätze';
 
+$lang_eng['TEMPLATE'] = 'Template';
+$lang_ger['TEMPLATE'] = 'Vorlage';
+
 $lang_eng['TEMPLATES'] = 'Templates';
 $lang_ger['TEMPLATES'] = 'Vorlagen';
 
@@ -1334,6 +1405,12 @@ $lang_ger['TIME'] = 'Von - Bis';
 
 $lang_eng['TIME_CALCULATION_TABLE'] = 'Time calculation Table';
 $lang_ger['TIME_CALCULATION_TABLE'] = 'Stundenplan';
+
+$lang_eng['TIME_ON_PAGE'] = 'Time on page';
+$lang_ger['TIME_ON_PAGE'] = 'Zeit auf der Seite';
+
+$lang_eng['TIME_PER_QUESTION'] = 'Time per question';
+$lang_ger['TIME_PER_QUESTION'] = 'Zeit pro Frage';
 
 $lang_eng['TIMES'] = 'Time';
 $lang_ger['TIMES'] = 'Zeit';
@@ -1353,8 +1430,22 @@ $lang_ger['TO'] = 'Bis';
 $lang_eng['TOTAL_PRICE'] = 'Total price';
 $lang_ger['TOTAL_PRICE'] = 'Gesamtpreis';
 
+$lang_eng['TOTAL_TIME'] = 'Total time';
+$lang_ger['TOTAL_TIME'] = 'Gesamtzeit';
+
 $lang_eng['TODAY'] = 'Today';
 $lang_ger['TODAY'] = 'Heute';
+
+$lang_eng['TRAINING'] = 'Training';
+$lang_ger['TRAINING'] = 'Schulung';
+
+$lang_eng['TRAINING_HELP'] = 'Every question not marked with (Required) is optional and can be skipped. You can answer optional questions any time.
+<br/><br/>Every question can be repeated but the administrator can decide whether previous answers can be overwritten.
+<br/><br/>You will see your score at the end of the survey.';
+$lang_ger['TRAINING_HELP'] = 'Jede dieser Seiten stellt ein Set von Fragen dar.
+Jede Frage, die nicht mit (Pflichtfeld) markiert ist, ist optional und kann einfach übersprungen werden. Übersprungene Fragen können später jederzeit nachgeholt werden.
+<br/><br/>Fragen können beliebig oft wiederholt werden, aber der Administrator kann auswählen, ob diese den vorhergehenden Versuch überschreiben.
+<br/><br/>Die Auswertung der Fragen erfolgt am Schluss, wobei die Anzahl der richtigen und falschen Fragen ersichtlich ist.';
 
 $lang_eng['TRANSITION'] = 'Transition';
 $lang_ger['TRANSITION'] = 'Überleitung';
@@ -1400,6 +1491,9 @@ $lang_ger['USED_DAYS'] ='Verbrauchte Tage';
 
 $lang_eng['USERS'] = 'Users';
 $lang_ger['USERS'] = 'Benutzer';
+
+$lang_eng['USER'] = 'User';
+$lang_ger['USER'] = 'Benutzer';
 
 $lang_eng['USER_INACTIVE'] = 'Deactivated Users';
 $lang_ger['USER_INACTIVE'] = 'Deaktivierte Benutzer';
@@ -1502,6 +1596,12 @@ $lang_ger['ACTIVITY_TOSTRING'] = array("-1" => "Abwesend","0" => "Dienst","1" =>
 $lang_eng['DSGVO_CATEGORY_TOSTRING'] = array('heading1' => 'Transmission', 'heading2' => 'Processing', 'heading3' => 'Transmission non-EU country', 'heading4' => 'Processing Application');
 $lang_ger['DSGVO_CATEGORY_TOSTRING'] = array('heading1' => 'Übermittlung', 'heading2' => 'Verarbeitung', 'heading3' => 'Übermittlung in nicht-EU Ausland', 'heading4' => 'Verarbeitung Applikation');
 
+$lang_eng['DSGVO_LOG_EVENT_TYPES'] = array('INSERT' => 'Insert', 'UPDATE' => 'Update', 'DELETE' => 'Delete', 'CLONE' => 'Clone', 'IMPORT' => 'Import');
+$lang_ger['DSGVO_LOG_EVENT_TYPES'] = array('INSERT' => 'Einfügen', 'UPDATE' => 'Ändern', 'DELETE' => 'Löschen', 'CLONE' => 'Duplizieren', 'IMPORT' => 'Importieren');
+
+$lang_eng['DSGVO_LOG_EVENT_DESCRIPTION'] = array('INSERT' => 'A new entry was added', 'UPDATE' => 'An entry was changed', 'DELETE' => 'An antry was removed', 'CLONE' => 'An entry was duplicated', 'IMPORT' => 'An entry was imported');
+$lang_ger['DSGVO_LOG_EVENT_DESCRIPTION'] = array('INSERT' => 'Ein neuer Eintrag wurde hinzugefügt', 'UPDATE' => 'Ein bestehender Eintrag wurde verändert', 'DELETE' => 'Ein bestehender Eintrag wurde entfernt', 'CLONE' => 'Ein bestehender Eintrag wurde dupliziert', 'IMPORT' => 'Ein Eintrag wurde importiert');
+
 $lang_eng['EMOJI_TOSTRING'] = array("-", "Terrible", "Disappointing", "Neutral", "Good", "Excellent");
 $lang_ger['EMOJI_TOSTRING'] = array("-", "Schrecklich", "Enttäuschend", "Neutral", "Gut", "Ausgezeichnet");
 
@@ -1539,6 +1639,64 @@ $lang_ger['TIME_UNIT_TOSTRING'] = array('', 'Tag(e)', 'Woche(n)', 'Monat(e)', 'J
 
 $lang_eng['TRAINING_QUESTION_CORRECT'] = array('TRUE' => 'Right', 'FALSE' => 'Wrong', 'UNANSWERED' => 'Unanswered');
 $lang_ger['TRAINING_QUESTION_CORRECT'] = array('TRUE' => 'Richtig', 'FALSE' => 'Falsch', 'UNANSWERED' => 'Nicht beantwortet');
+
+$lang_eng['TRAINING_BUTTON_DESCRIPTIONS'] = array(
+  'NEW_MODULE' => 'Create a new module', 
+  'EDIT_SET' => 'Edit set', 
+  'EXPORT_SET' => 'Export this set', 
+  'DELETE_SET' => 'Delete set with all modules and questions', 
+  'DELETE_MODULE' => 'Delete module with all questions',
+  'DELETE_QUESTION' => 'Delete question',
+  'EDIT_QUESTION' => 'Edit question',
+  'QUESTION_STATS' => 'Stats for this question',
+  'ADD_QUESTION' => 'Add a question',
+  'STATS_GRAPH' => 'Module stats as graph',
+  'STATS_TABLE' => 'Module stats as table',
+  'TRY' => 'Try from a user\'s perspective',
+  'EDIT_MODULE' => 'Edit module',
+);
+$lang_ger['TRAINING_BUTTON_DESCRIPTIONS'] = array(
+  'NEW_MODULE' => 'Hinzufügen eines neuen Moduls', 
+  'EDIT_SET' => 'Set bearbeiten', 
+  'EXPORT_SET' => 'Exportieren eines einzelnen Sets', 
+  'DELETE_SET' => 'Gesamtes Set mit allen Modulen und Fragen löschen', 
+  'DELETE_MODULE' => 'Gesamtes Modul mit allen Fragen löschen',
+  'DELETE_QUESTION' => 'Frage löschen',
+  'EDIT_QUESTION' => 'Frage bearbeiten',
+  'QUESTION_STATS' => 'Einzelauswertung der Frage',
+  'ADD_QUESTION' => 'Frage hinzufügen',
+  'STATS_GRAPH' => 'Auswertung des Moduls als Graph',
+  'STATS_TABLE' => 'Auswertung des Moduls als Tabelle',
+  'TRY' => 'Modul aus der Sicht des Benutzers abspielen',
+  'EDIT_MODULE' => 'Modul bearbeiten',
+);
+
+$lang_eng['TRAINING_SETTINGS'] = array(
+  'ANSWER_TYPE' => 'Answer type', 
+  'OVERWRITE_ANSWERS' => 'Overwriting answers', 
+  'ANSWER_ORDER' => 'Answer order', 
+  'REPEAT_DAYS' => 'Repeat interval (days)', 
+  'ANSWER_LOGIN' => 'After login', 
+  'ANSWER_OPTIONAL' => 'Optional', 
+  'OVERWRITE' => 'Allow users to overwrite old answers', 
+  'NO_OVERWRITE' => 'Keep first answer (users can still repeat the training)', 
+  'RANDOM_ORDER' => 'Random order', 
+  'PRESERVE_ORDER' => 'Preserve answer order', 
+  'REPEAT_DAYS_NOTE' => 'Only active if overwriting answers and answer on login is selected',
+);
+$lang_ger['TRAINING_SETTINGS'] = array(
+  'ANSWER_TYPE' => 'Beantwortungsart', 
+  'OVERWRITE_ANSWERS' => 'Überschreiben von Antworten', 
+  'ANSWER_ORDER' => 'Anordnung der Antworten', 
+  'REPEAT_DAYS' => 'Wiederholungsintervall in Tagen', 
+  'ANSWER_LOGIN' => 'Beantwortung bei Login', 
+  'ANSWER_OPTIONAL' => 'Beantwortung freiwillig', 
+  'OVERWRITE' => 'Alte Antworten werden durch das erneute Beantworten überschrieben', 
+  'NO_OVERWRITE' => 'User können das Training wiederholen, aber es bleiben die alten Antworten bestehen', 
+  'RANDOM_ORDER' => 'Antwortmöglichkeiten zufällig anordnen', 
+  'PRESERVE_ORDER' => 'Antwortmöglichkeiten wie in der Frage belassen', 
+  'REPEAT_DAYS_NOTE' => 'Kann nur aktiviert werden, wenn das Überschreiben von Antworten erlaubt ist und die Beantwortung bei Login erfolgt',
+);
 
 $lang_eng['TRAINING_RESULT'] = array('RIGHT' => 'Right','RIGHT_NO_UPDATE' => 'Right, but not updated', 'WRONG' => 'Wrong', 'WRONG_NO_UPDATE' => 'Wrong, but not updated');
 $lang_ger['TRAINING_RESULT'] = array('RIGHT' => 'Richtig','RIGHT_NO_UPDATE' => 'Right, aber nicht gespeichert', 'WRONG' => 'Falsch', 'WRONG_NO_UPDATE' => 'Falsch, aber nicht gespeichert');

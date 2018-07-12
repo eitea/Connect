@@ -1,4 +1,5 @@
 <?php 
+session_start();
 if (!isset($_REQUEST["moduleID"])){
     echo "error";
     die();
@@ -13,14 +14,14 @@ $name = $row["name"];
  <form method="POST">
  <div class="modal fade">
       <div class="modal-dialog modal-content modal-md">
-        <div class="modal-header"><i class="fa fa-cubes"></i> Set bearbeiten </div>
+        <div class="modal-header"><i class="fa fa-cubes"></i> <?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['EDIT_SET'] ?> </div>
         <div class="modal-body">
             <label>Name*</label>
             <input type="text" class="form-control" name="name" placeholder="Name des Sets" required value="<?php echo $name ?>"/>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
-          <button type="submit" class="btn btn-warning" name="editModule" value="<?php echo $moduleID; ?>">Set bearbeiten</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
+          <button type="submit" class="btn btn-warning" name="editModule" value="<?php echo $moduleID; ?>"><?php echo $lang['EDIT'] ?></button>
         </div>
       </div>
     </div>

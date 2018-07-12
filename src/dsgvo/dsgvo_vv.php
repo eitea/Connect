@@ -142,10 +142,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <div class="page-header-fixed">
     <div class="page-header"><h3><?php echo $lang['PROCEDURE_DIRECTORY']; ?>
         <div class="page-header-button-group">
-            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-app">+ neuer Vorgang</button>
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-app">+ <?php echo $lang['NEW_PROCESS'] ?></button>
             <button type="button" class="btn btn-default" data-toggle="modal" data-target="#list-templates"><?php echo $lang['MANAGE_TEMPLATES']; ?></button>
             <a href="data-matrix?n=<?php echo $cmpID; //5acb74765fddc ?>" class="btn btn-default" ><?php echo $lang['DATA_MATRIX'] ?></a>
-			<button type="button" class="btn btn-default" data-toggle="modal" data-target="#list-default-folders">Archivstruktur</button>
+			<button type="button" class="btn btn-default" data-toggle="modal" data-target="#list-default-folders"><?php echo $lang['ARCHIVE_STRUCTURE'] ?></button>
 			<form method="POST" target="_blank" action="pdfDownload" style="display: inline;">
 				<button type="submit" name="downloadVVs" value="<?php echo $cmpID; ?>" class="btn btn-default" title="Startet Download"><i class="fa fa-download"></i> PDF Download</button>
 			</form>
@@ -159,7 +159,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     ?>
         <form method="POST">
             <div class="row">
-                <div class="panel panel-default col-sm-6"><a href="vDetail?v=<?php echo $row['id']; ?>&n=<?php echo $cmpID; ?>" class="btn btn-link"> Stammblatt </a></div>
+                <div class="panel panel-default col-sm-6"><a href="vDetail?v=<?php echo $row['id']; ?>&n=<?php echo $cmpID; ?>" class="btn btn-link"> <?php echo "Stammblatt" ?> </a></div>
                 <div class="col-sm-5">
                     <select name="change_basic_template" class="js-example-basic-single">
                         <?php
@@ -216,13 +216,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <div id="add-app" class="modal fade">
     <div class="modal-dialog modal-content modal-sm">
         <form method="POST">
-            <div class="modal-header h4">Vorgang Hinzufügen</div>
+            <div class="modal-header h4"><?php echo $lang['NEW_PROCESS'] ?></div>
             <div class="modal-body">
                 <div class="row">
                     <label>Name</label>
                     <input type="text" name="add_app_name" class="form-control" />
                     <br>
-                    <label>Template</label>
+                    <label><?php echo $lang['TEMPLATE'] ?></label>
                     <select name="add_app_template" class="js-example-basic-single">
                         <?php
                         $res = $conn->query("SELECT id, name FROM dsgvo_vv_templates WHERE companyID = $cmpID AND type = 'app' ");
@@ -234,7 +234,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL'] ?></button>
                 <button type="submit" class="btn btn-warning" name="add_app"><?php echo $lang['SAVE']; ?></button>
             </div>
         </form>
@@ -244,7 +244,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 <div id="edit-app" class="modal fade">
     <div class="modal-dialog modal-content modal-sm">
         <form method="POST">
-            <div class="modal-header h4">Vorgang Editieren</div>
+            <div class="modal-header h4"><?php echo $lang['EDIT_PROCESS'] ?></div>
             <div class="modal-body">
                 <div class="row">
                     <label>Name</label>
@@ -252,7 +252,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
                 <button type="submit" class="btn btn-warning" name="edit_app"><?php echo $lang['SAVE']; ?></button>
             </div>
         </form>
@@ -262,7 +262,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 	<div id="list-default-folders" class="modal fade">
 		<div class="modal-dialog modal-content modal-md">
 			<form method="POST">
-				<div class="modal-header h4">Default Ordner
+				<div class="modal-header h4"><?php echo $lang['DEFAULT_FOLDERS'] ?>
 					<div class="page-header-button-group">
 						<button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-folder" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
 					</div>

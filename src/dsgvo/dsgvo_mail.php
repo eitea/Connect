@@ -8,7 +8,7 @@ if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventual
     die();
 }?>
 <div class="page-header-fixed">
-<div class="page-header"><h4>E-Mail Vorlagen
+<div class="page-header"><h4><?php echo $lang["EMAIL_TEMPLATES"] ?>
  <div class="page-header-button-group"><form method="POST" style="display:inline"><button type="submit" name="create_report" class="btn btn-default"><i class="fa fa-plus"></i></button></form>
 </h4></div>
 </div>
@@ -63,8 +63,8 @@ if($action && !empty($_POST['report_content']) && !empty($_POST['report_name']))
         echo '<tr>';
         echo '<td>'.$row['name'].'</td>';
         echo '<td>';
-        echo '<button type="submit" name="delete_report" value="'.$row['id'].'" class="btn btn-default" title="Delete"><i class="fa fa-trash-o"></i></button> ';
-        echo '<button type="submit" name="edit_report" value="'.$row['id'].'" class="btn btn-default" title="Edit" ><i class="fa fa-pencil"></i></button>';
+        echo '<button type="submit" name="delete_report" value="'.$row['id'].'" class="btn btn-default" title="'.$lang['DELETE'].'"><i class="fa fa-trash-o"></i></button> ';
+        echo '<button type="submit" name="edit_report" value="'.$row['id'].'" class="btn btn-default" title="'.$lang['EDIT'].'" ><i class="fa fa-pencil"></i></button>';
         echo '</td>';
         echo '</tr>';
     }
@@ -90,12 +90,12 @@ if($action == 'edit'){
 ?>
 <div class="row">
     <div class="col-xs-6"><label>Name</label><input type="text" class="form-control" placeholder="Name of Template (Required)" name="report_name" value="<?php echo $templateName; ?>" /></div>
-    <div class="col-xs-3"><label>Speichern</label><br><button type="submit" class="btn btn-warning"><i class="fa fa-floppy-o"></i></button></div>
+    <div class="col-xs-3"><label><?php echo $lang["SAVE"] ?></label><br><button type="submit" class="btn btn-warning"><i class="fa fa-floppy-o"></i></button></div>
 </div>
 <div class="row">
     <div class="col-sm-9" style="max-width:790px;"><textarea name="report_content"><?php echo $templateContent; ?></textarea></div>
     <div class="col-sm-2">
-      <br>Click to Insert: <br><br>
+      <br><?php echo $lang['CLICK_TO_INSERT'] ?>: <br><br>
       <button type="button" class="btn btn-warning btn-block btn-insert-text" value='[LINK]' >URL</button>
       <button type="button" class="btn btn-warning btn-block btn-insert-text" value='[FIRSTNAME]' ><?php echo $lang['FIRSTNAME']; ?></button>
       <button type="button" class="btn btn-warning btn-block btn-insert-text" value='[LASTNAME]' ><?php echo $lang['LASTNAME']; ?></button>

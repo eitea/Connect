@@ -1,4 +1,5 @@
 <?php
+session_start();
 if (!isset($_REQUEST["operation"])) {
     echo "error (no operation)";
     die();
@@ -81,7 +82,7 @@ $("#copyToClipboardBtn").click(function(){
         <br><div id="jsonError"></div>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
         <input type="submit" class="btn btn-primary" id="importSubmit" name="import" value="Import"/>
     </div>
     </div>
