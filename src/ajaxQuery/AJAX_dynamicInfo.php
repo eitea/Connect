@@ -111,7 +111,7 @@ if ($showMissingBookings) {
         //   if($request_addendum) break;
         if($row['timeEnd'] == '0000-00-00 00:00:00'){
             $B = date('Y-m-d H:i:s');
-        }else{
+        } else {
             $B = $row['timeEnd'];
         }
         if ($has_bookings && timeDiff_Hours($A, $B) > $bookingTimeBuffer / 60) { //also check end
