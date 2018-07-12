@@ -80,6 +80,12 @@ $lang_ger['ADVANCED_SEARCH'] = 'Erweiterte Suche';
 $lang_eng['AFFECTED_MONTH'] = 'Affected Month';
 $lang_ger['AFFECTED_MONTH'] = 'Betroffener Monat';
 
+$lang_eng['ALL_SECTIONS'] = 'All sections';
+$lang_ger['ALL_SECTIONS'] = 'Alle Bereiche';
+
+$lang_eng['ALL_EVENTS'] = 'All events';
+$lang_ger['ALL_EVENTS'] = 'Alle Ereignisse';
+
 $lang_eng['ALLOW_PRJBKING_ACCESS'] = 'Allow Project-Bookin Access';
 $lang_ger['ALLOW_PRJBKING_ACCESS'] = 'Projektbuchung erlauben';
 
@@ -809,6 +815,9 @@ $lang_ger['LOCALE'] = 'de';
 $lang_eng['LOGOUT_MESSAGE'] = 'An Update Attempt has been sent. You will now be logged out';
 $lang_ger['LOGOUT_MESSAGE'] = 'Ein Update wurde angesetzt. Sie werden nun ausgeloggt.';
 
+$lang_eng['LONG_DESCRIPTION'] = 'Long description';
+$lang_ger['LONG_DESCRIPTION'] = 'Lange Beschreibung';
+
 $lang_eng['LUNCHBREAK'] = 'Lunchbreak';
 $lang_ger['LUNCHBREAK'] = 'Mittagspause';
 
@@ -950,6 +959,9 @@ $lang_ger['NOT_CHARGEABLE'] = 'Erlassen';
 
 $lang_eng['NUMBER'] = 'Number';
 $lang_ger['NUMBER'] = 'Nummer';
+
+$lang_eng['NUMBER_OF_LOGS'] = 'Showing %s of %s entries';
+$lang_ger['NUMBER_OF_LOGS'] = 'Zeige %s Einträge von %s Logeinträgen';
 
 $lang_eng['OFFER'] = 'Offer';
 $lang_ger['OFFER'] = 'Angebot';
@@ -1212,6 +1224,9 @@ $lang_ger['SEARCH'] = 'Suche';
 $lang_eng['SEARCH_OPTIONS'] = 'Search Options';
 $lang_ger['SEARCH_OPTIONS'] = 'Suchoptionen';
 
+$lang_eng['SECTION'] = 'Section';
+$lang_ger['SECTION'] = 'Bereich';
+
 $lang_eng['SEND_ACCESS'] = 'Send Access';
 $lang_ger['SEND_ACCESS'] = 'Zugang Senden';
 
@@ -1356,6 +1371,9 @@ $lang_ger['TOTAL_PRICE'] = 'Gesamtpreis';
 $lang_eng['TODAY'] = 'Today';
 $lang_ger['TODAY'] = 'Heute';
 
+$lang_eng['TRAINING'] = 'Training';
+$lang_ger['TRAINING'] = 'Schulung';
+
 $lang_eng['TRANSITION'] = 'Transition';
 $lang_ger['TRANSITION'] = 'Überleitung';
 
@@ -1400,6 +1418,9 @@ $lang_ger['USED_DAYS'] ='Verbrauchte Tage';
 
 $lang_eng['USERS'] = 'Users';
 $lang_ger['USERS'] = 'Benutzer';
+
+$lang_eng['USER'] = 'User';
+$lang_ger['USER'] = 'Benutzer';
 
 $lang_eng['USER_INACTIVE'] = 'Deactivated Users';
 $lang_ger['USER_INACTIVE'] = 'Deaktivierte Benutzer';
@@ -1501,6 +1522,12 @@ $lang_ger['ACTIVITY_TOSTRING'] = array("-1" => "Abwesend","0" => "Dienst","1" =>
 
 $lang_eng['DSGVO_CATEGORY_TOSTRING'] = array('heading1' => 'Transmission', 'heading2' => 'Processing', 'heading3' => 'Transmission non-EU country', 'heading4' => 'Processing Application');
 $lang_ger['DSGVO_CATEGORY_TOSTRING'] = array('heading1' => 'Übermittlung', 'heading2' => 'Verarbeitung', 'heading3' => 'Übermittlung in nicht-EU Ausland', 'heading4' => 'Verarbeitung Applikation');
+
+$lang_eng['DSGVO_LOG_EVENT_TYPES'] = array('INSERT' => 'Insert', 'UPDATE' => 'Update', 'DELETE' => 'Delete', 'CLONE' => 'Clone', 'IMPORT' => 'Import');
+$lang_ger['DSGVO_LOG_EVENT_TYPES'] = array('INSERT' => 'Einfügen', 'UPDATE' => 'Ändern', 'DELETE' => 'Löschen', 'CLONE' => 'Duplizieren', 'IMPORT' => 'Importieren');
+
+$lang_eng['DSGVO_LOG_EVENT_DESCRIPTION'] = array('INSERT' => 'A new entry was added', 'UPDATE' => 'An entry was changed', 'DELETE' => 'An antry was removed', 'CLONE' => 'An entry was duplicated', 'IMPORT' => 'An entry was imported');
+$lang_ger['DSGVO_LOG_EVENT_DESCRIPTION'] = array('INSERT' => 'Ein neuer Eintrag wurde hinzugefügt', 'UPDATE' => 'Ein bestehender Eintrag wurde verändert', 'DELETE' => 'Ein bestehender Eintrag wurde entfernt', 'CLONE' => 'Ein bestehender Eintrag wurde dupliziert', 'IMPORT' => 'Ein Eintrag wurde importiert');
 
 $lang_eng['EMOJI_TOSTRING'] = array("-", "Terrible", "Disappointing", "Neutral", "Good", "Excellent");
 $lang_ger['EMOJI_TOSTRING'] = array("-", "Schrecklich", "Enttäuschend", "Neutral", "Gut", "Ausgezeichnet");

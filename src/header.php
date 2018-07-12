@@ -1111,7 +1111,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   $isActive = ($isActivePanel && $this_page == 'dsgvo_mail.php') ? $setActiveLink : "";
                   echo '<li><a '.$isActive.' href="../dsgvo/templates?n='.$available_companies[1].'">E-Mail Templates</a></li>';
                   $isActive = ($isActivePanel && $this_page == 'dsgvo_training.php') ? $setActiveLink : "";
-                  echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$available_companies[1].'" >Schulung</a></li>';
+                  echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$available_companies[1].'" >' .$lang["TRAINING"]. '</a></li>';
                   $isActive = ($isActivePanel && $this_page == 'dsgvo_log.php') ? $setActiveLink : "";
                   echo '<li><a '.$isActive.' href="../dsgvo/log?n='.$row['id'].'" >Logs</a></li>';
                 } else {
@@ -1129,7 +1129,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     $isActive = ($isActivePanel && $this_page == 'dsgvo_mail.php') ? $setActiveLink : "";
                     echo '<li><a '.$isActive.' href="../dsgvo/templates?n='.$row['id'].'">E-Mail Templates</a></li>';
                     $isActive = ($isActivePanel && $this_page == 'dsgvo_training.php') ? $setActiveLink : "";
-                    echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$row['id'].'" >Schulung</a></li>';
+                    echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$row['id'].'" >' .$lang['TRAINING']. '</a></li>';
                     $isActive = ($isActivePanel && $this_page == 'dsgvo_log.php') ? $setActiveLink : "";
                     echo '<li><a '.$isActive.' href="../dsgvo/log?n='.$row['id'].'" >Logs</a></li>';
                     echo '</ul></div></li>';
