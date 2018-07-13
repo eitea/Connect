@@ -80,7 +80,7 @@ foreach ($userArray as $user) {
  <form method="POST">
  <div class="modal fade">
       <div class="modal-dialog modal-content modal-lg">
-        <div class="modal-header">Auswertung von <?php echo $name ?></div>
+        <div class="modal-header"><?php echo $lang['RESULT_OF'] ?> <?php echo $name ?></div>
         <div class="modal-body">
 
         <canvas id="myChart" width="600" height="300"></canvas>

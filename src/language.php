@@ -14,6 +14,15 @@ $lang_ger['ACTIVITY'] = 'Aktivität';
 $lang_eng['ACTIVE'] = 'Active';
 $lang_ger['ACTIVE'] = 'Aktiv';
 
+$lang_eng['ACTIONS_TO_PROTECT_DATA'] = 'General organizational and technical measures for the protection of personal data';
+$lang_ger['ACTIONS_TO_PROTECT_DATA'] = 'Generelle organisatorische und technische Maßnahmen zum Schutz der personenbezogenen Daten';
+
+$lang_eng['ABSOLVED'] = 'Absolved';
+$lang_ger['ABSOLVED'] = 'Absolviert';
+
+$lang_eng['ACCEPT'] = 'Accept';
+$lang_ger['ACCEPT'] = 'Akzeptieren';
+
 $lang_eng['ACCUMULATED'] = 'Accumulated';
 $lang_ger['ACCUMULATED'] = 'Akkumuliert';
 
@@ -22,9 +31,6 @@ $lang_ger['ACCUMULATED_HOURS'] = 'Akkumulierte Stunden';
 
 $lang_eng['ACCUMULATED_DAYS'] = 'Accumulated Days';
 $lang_ger['ACCUMULATED_DAYS'] = 'Akkumulierte Tage';
-
-$lang_eng['ABSOLVED'] = 'Absolved';
-$lang_ger['ABSOLVED'] = 'Absolviert';
 
 $lang_eng['ACCOUNT'] = 'Account';
 $lang_ger['ACCOUNT'] = 'Konto';
@@ -94,6 +100,9 @@ $lang_ger['AMOUNT'] = 'Betrag';
 
 $lang_eng['AMOUNT_VACATION_DAYS'] = 'Amount of Vacation Days';
 $lang_ger['AMOUNT_VACATION_DAYS'] = 'Gesammelte Urlaubstage';
+
+$lang_eng['AND'] = 'and';
+$lang_ger['AND'] = 'und';
 
 $lang_eng['ANSWER'] = 'Answer';
 $lang_ger['ANSWER'] = 'Antwort';
@@ -215,6 +224,9 @@ $lang_ger['CASH_EXPENSE'] = 'Barauslage';
 $lang_eng['CATEGORY'] = 'Category';
 $lang_ger['CATEGORY'] = 'Kategorie';
 
+$lang_eng['CATEGORIES'] = 'Categories';
+$lang_ger['CATEGORIES'] = 'Kategorien';
+
 $lang_eng['CHARGED'] = 'Charged';
 $lang_ger['CHARGED'] = 'Verrechnet';
 
@@ -232,6 +244,9 @@ $lang_ger['CHOOSE_ARTICLE'] = 'Aritkel Wählen';
 
 $lang_eng['CHOOSE_PROCESS'] = 'Choose Process';
 $lang_ger['CHOOSE_PROCESS'] = 'Vorgang Wählen';
+
+$lang_eng['CHOOSE_FILE'] = 'Choose file';
+$lang_ger['CHOOSE_FILE'] = 'Datei Auswählen';
 
 $lang_eng['CITY'] = 'City';
 $lang_ger['CITY'] = 'Ort';
@@ -257,6 +272,9 @@ $lang_ger['CLOSE'] = 'Schließen';
 $lang_eng['CLOSE_INTERVAL'] = 'Close Interval';
 $lang_ger['CLOSE_INTERVAL'] = 'Intervall Schließen';
 
+$lang_eng['CLONE'] = 'Clone';
+$lang_ger['CLONE'] = 'Klonen';
+
 $lang_eng['CONTACT_PERSON'] = 'Contact Person';
 $lang_ger['CONTACT_PERSON'] = 'Ansprechpartner';
 
@@ -265,6 +283,9 @@ $lang_ger['CONTINUE'] = 'Weiter';
 
 $lang_eng['CONTRACT'] = 'Contract';
 $lang_ger['CONTRACT'] = 'Vertrag';
+
+$lang_eng['CONTRACTUAL_PARTNER'] = 'Contractual partner';
+$lang_ger['CONTRACTUAL_PARTNER'] = 'Vertragspartner';
 
 $lang_eng['COMPANIES'] = 'Companies';
 $lang_ger['COMPANIES'] = 'Mandanten';
@@ -277,6 +298,12 @@ $lang_ger['COMPANY_NAME'] = 'Firmenbezeichnung';
 
 $lang_eng['COMPANY_2'] = 'Company';
 $lang_ger['COMPANY_2'] = 'Firma';
+
+$lang_eng['COMPANY_DATA'] = 'Company data';
+$lang_ger['COMPANY_DATA'] = 'Firmendaten';
+
+$lang_eng['COMPANY_Name'] = 'Company name';
+$lang_ger['COMPANY_NAME'] = 'Name der Firma';
 
 $lang_eng['COMPENSATORY_TIME'] = 'Compensatory time';
 $lang_ger['COMPENSATORY_TIME'] = 'Zeitausgleich';
@@ -338,11 +365,14 @@ $lang_ger['DATATABLES_LANG_OPTIONS'] = '
         "previous":   "Vorherige"
     }';
 
+$lang_eng['DATA_CATEGORIES'] = 'Data categories of collected personal data';
+$lang_ger['DATA_CATEGORIES'] = 'Datenkategorien der gesammelten personenbezogenen Daten';
+
 $lang_eng['DATA_MATRIX'] = 'Data Matrix';
 $lang_ger['DATA_MATRIX'] = 'Datenmatrix';
 
-$lang_eng['DATA_MATRIX_SUBHEADING'] = 'List of processed data fields and their transmission';
-$lang_ger['DATA_MATRIX_SUBHEADING'] = 'Auflistung der verarbeiteten Datenfelder und deren Übermittlung';
+$lang_eng['DATA_MATRIX_DATA_CATEGORIES_TRANSMISSION'] = 'List of processed data fields and their transmission';
+$lang_ger['DATA_MATRIX_DATA_CATEGORIES_TRANSMISSION'] = 'Auflistung der verarbeiteten Datenfelder und deren Übermittlung';
 
 $lang_eng['DATA_MATRIX_GROUP_SUBHEADING'] = 'Data categories of collected personal data with deletion periods';
 $lang_ger['DATA_MATRIX_GROUP_SUBHEADING'] = 'Datenkategorien der gesammelten personenbezogenen Daten mit Löschfristen';
@@ -358,6 +388,9 @@ $lang_ger['DAY'] = 'Tag';
 
 $lang_eng['DAYS'] = 'Days';
 $lang_ger['DAYS'] = 'Tage';
+
+$lang_eng['DELETION_PERIOD'] = 'Deletion period';
+$lang_ger['DELETION_PERIOD'] = 'Löschfrist';
 
 $lang_eng['DB_BACKUP'] = 'DB Backup';
 $lang_ger['DB_BACKUP'] = 'DB Sichern';
@@ -385,6 +418,9 @@ $lang_ger['DELETE_COMPANY'] = 'Mandant Löschen';
 
 $lang_eng['DELIVERY_NOTE'] = 'Delivery Note';
 $lang_ger['DELIVERY_NOTE'] = 'Lieferschein';
+
+$lang_eng['DESCRIBED_IN_PROCESS'] = 'described in progress';
+$lang_ger['DESCRIBED_IN_PROCESS'] = 'im Vorgang beschrieben';
 
 $lang_eng['DESCRIPTION'] = 'Description';
 $lang_ger['DESCRIPTION'] = 'Beschreibung';
@@ -433,9 +469,6 @@ $lang_ger['DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES'] = 'Optionale Mitarbeite
 
 $lang_eng['DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT'] = 'Edit Task';
 $lang_ger['DYNAMIC_PROJECTS_EDIT_DYNAMIC_PROJECT'] = 'Task bearbeiten';
-
-$lang_eng['DYNAMIC_PROJECTS_NOTES'] = 'Notes';
-$lang_ger['DYNAMIC_PROJECTS_NOTES'] = 'Notizen';
 
 $lang_eng['DYNAMIC_PROJECTS_DEFAULT_DESCRIPTION'] = 'No description given';
 $lang_ger['DYNAMIC_PROJECTS_DEFAULT_DESCRIPTION'] = 'Keine Beschreibung gegeben';
@@ -512,6 +545,9 @@ $lang_ger['ENTRANCE_DATE'] = 'Eintrittsdatum';
 $lang_eng['EMAIL_TASK'] = 'Automatic Task Builder';
 $lang_ger['EMAIL_TASK'] = 'Automatischer Task Builder';
 
+$lang_eng['EMAIL_TEMPLATE'] = 'E-Mail Template';
+$lang_ger['EMAIL_TEMPLATE'] = 'E-Mail Vorlage';
+
 $lang_eng['EMAIL_TEMPLATES'] = 'E-Mail Templates';
 $lang_ger['EMAIL_TEMPLATES'] = 'E-Mail Vorlagen';
 
@@ -542,6 +578,12 @@ $lang_ger['ERROR_INVALID_UPLOAD'] = 'Das hochgeladene File war nicht gültig. Bi
 $lang_eng['ERROR_INVALID_DATA'] = 'Entered Information was invalid. Please try again with valid data.';
 $lang_ger['ERROR_INVALID_DATA'] = 'Eingegebene Information war ungültig. Bitte mit gültigen Daten nochmals versuchen.';
 
+$lang_eng['ERROR_INVALID_EXTENSION'] = 'Invalid file extension';
+$lang_ger['ERROR_INVALID_EXTENSION'] = 'Ungültige Dateiendung';
+
+$lang_eng['ERROR_INVALID_FILE_TYPE'] = 'Invalid file type';
+$lang_ger['ERROR_INVALID_FILE_TYPE'] = 'Ungültiger Dateityp';
+
 $lang_eng['ERROR_MISSING_DATA'] = 'More Data required. Please fill out missing data in the settings.';
 $lang_ger['ERROR_MISSING_DATA'] = 'Fehlende Daten. Bitte die benötigten Daten unter den Einstellung nachtragen.';
 
@@ -554,6 +596,9 @@ $lang_ger['ERROR_MISSING_SELECTION'] = 'Fehlende Auswahl. Bitte überprüfen sie
 $lang_eng['ERROR_MISSING_TIMESTAMP'] = 'No Timestamp found for that date and user, please create a <a href="getTimestamps.php">check-in timestamp</a> first.';
 $lang_ger['ERROR_MISSING_TIMESTAMP'] = 'Es wurde kein Zeitstempel für diesen Tag und Benutzer gefunden. Bitte erstellen Sie zuerst einen <a href="getTimestamps.php">gültigen Zeitstempel</a>.';
 
+$lang_eng['ERROR_NO_S3_CONNECTION'] = 'Could not connect to S3. Make sure that a valid connection has been saved under the archive options.';
+$lang_ger['ERROR_NO_S3_CONNECTION'] = 'Es konnte keine S3 Verbindung hergestellt werden. Stellen Sie sicher, dass unter den Archiv Optionen eine gültige Verbindung gespeichert wurde.';
+
 $lang_eng['ERROR_STRIKE'] = 'Code-manipulation detected, penalty point was added.';
 $lang_ger['ERROR_STRIKE'] = 'Code-Manipulation entdeckt, penalty Punkt wurde addiert.';
 
@@ -562,6 +607,9 @@ $lang_ger['ERROR_TIMES_INVALID'] = 'Ungültige Zeitangaben.';
 
 $lang_eng['ERROR_UNEXPECTED'] = 'An unexpected error has occured. Please try again. If this message continues to be displayed, please contact support.'; //we dont have a support.
 $lang_ger['ERROR_UNEXPECTED'] = 'Ein unerwarteter Fehler ist aufgetaucht. Bitte versuchen Sie es erneut. Wird diese Nachricht weiterhin angezeigt, wenden Sie sich an den Support.';
+
+$lang_eng['ESTIMATED_TIME_SECONDS'] = 'Estimated time (in seconds)'; 
+$lang_ger['ESTIMATED_TIME_SECONDS'] = 'Geschätzte zeit (in Sekunden)';
 
 $lang_eng['EVALUATION'] = 'Evaluation';
 $lang_ger['EVALUATION'] = 'Bewertung';
@@ -622,6 +670,9 @@ $lang_ger['FIELDS_REQUIRED'] = 'Felder werden benötigt';
 
 $lang_eng['FILE'] = 'File';
 $lang_ger['FILE'] = 'Datei';
+
+$lang_eng['FILE_UPLOAD_ARCHIVE'] = 'File upload (Archive)';
+$lang_ger['FILE_UPLOAD_ARCHIVE'] = 'Datei Upload (Archiv)';
 
 $lang_eng['FINANCES'] = 'Finances';
 $lang_ger['FINANCES'] = 'Finanzen';
@@ -808,6 +859,12 @@ $lang_ger['INFO_REQUIRE_USER'] = 'Benutzer auswählen um Fortzufahren';
 $lang_eng['INFO_SELECT_CLIENT'] = 'Select a Client to Continue.';
 $lang_ger['INFO_SELECT_CLIENT'] = 'Wähle einen Kunden um fortzufahren.';
 
+$lang_eng['INSERT_QUESTION'] = 'Insert question';
+$lang_ger['INSERT_QUESTION'] = 'Frage einfügen';
+
+$lang_eng['INSERT_CUSTOM_QUESTION'] = 'Insert custom question';
+$lang_ger['INSERT_CUSTOM_QUESTION'] = 'Benutzerdefinierte Frage einfügen';
+
 $lang_eng['INTERVAL'] = 'Interval';
 $lang_ger['INTERVAL'] = 'Intervall';
 
@@ -826,7 +883,13 @@ $lang_ger['LANGUAGE_SETTING'] = 'Sprache';
 $lang_eng['LAST_BOOKING'] = 'Last Booking'; //I gave u my heaaart
 $lang_ger['LAST_BOOKING'] = 'Letzte Buchung';
 
-$lang_eng['LASTNAME'] = 'Lastname';
+$lang_eng['LAST_ANSWERED'] = 'Last answered'; 
+$lang_ger['LAST_ANSWERED'] = 'Zuletzt beantwortet';
+
+$lang_eng['LAST_EDITED'] = 'Last edited'; 
+$lang_ger['LAST_EDITED'] = 'Zuletzt bearbeitet';
+
+$lang_eng['LASTNAME'] = 'Last Name';
 $lang_ger['LASTNAME'] = 'Nachname';
 
 $lang_eng['LEADER'] = 'Leader';
@@ -899,8 +962,20 @@ $lang_ger['MESSAGING'] = 'Post ';
 $lang_eng['SUBJECT'] = 'Subject';
 $lang_ger['SUBJECT'] = 'Betreff';
 
+$lang_eng['SUBCATEGORIES'] = 'Subcategories';
+$lang_ger['SUBCATEGORIES'] = 'Subkategorien';
+
+$lang_eng['SUBCATEGORIES_EDIT'] = 'Edit subcategories';
+$lang_ger['SUBCATEGORIES_EDIT'] = 'Subkategorien bearbeiten';
+
+$lang_eng['SUBCATEGORIES_MANAGE'] = 'Manage subcategories';
+$lang_ger['SUBCATEGORIES_MANAGE'] = 'Subkategorien Verwalten';
+
 $lang_eng['SEND'] = 'Send';
 $lang_ger['SEND'] = 'Senden';
+
+$lang_eng['SEND_DOCUMENT'] = 'Send document';
+$lang_ger['SEND_DOCUMENT'] = 'Dokument senden';
 
 $lang_eng['POST_TO'] = 'To';
 $lang_ger['POST_TO'] = 'An';
@@ -947,6 +1022,9 @@ $lang_ger['TYPE_A_MESSAGE'] = 'Gib eine Nachricht ein';
 $lang_eng['NEW'] = 'New';
 $lang_ger['NEW'] = 'Neu';
 
+$lang_eng['NEW_CATEGORY'] = 'New category';
+$lang_ger['NEW_CATEGORY'] = 'Neue Kategorie';
+
 $lang_eng['NEW_CLIENT_CREATE'] = 'Create a new Client';
 $lang_ger['NEW_CLIENT_CREATE'] = 'Neuer Kunde';
 
@@ -955,6 +1033,9 @@ $lang_ger['NEW_CONFIRMATION'] = 'Neue Auftragsbestätigung';
 
 $lang_eng['NEW_DATA_CATEGORY'] = 'New data category';
 $lang_ger['NEW_DATA_CATEGORY'] = 'Neue Datenkategorie';
+
+$lang_eng['NEW_FOLDER'] = 'New folder';
+$lang_ger['NEW_FOLDER'] = 'Neuer Ordner';
 
 $lang_eng['NEW_GROUP'] = 'New group';
 $lang_ger['NEW_GROUP'] = 'Neue gruppe';
@@ -995,6 +1076,9 @@ $lang_ger['NEWEST_AGREEMENTS_FROM_CONSULIO'] = 'Neueste Dokumente von Consulio l
 $lang_eng['NO'] = 'No';
 $lang_ger['NO'] = 'Nein';
 
+$lang_eng['NO_MATRIX'] = 'This company does not have a matrix. Click <a href="../dsgvo/data-matrix?n=%s">here</a> to create one.';
+$lang_ger['NO_MATRIX'] = 'Diese Firma hat keine Matrix in den Einstellungen. Zum Erstellen <a href="../dsgvo/data-matrix?n=%s">hier klicken</a>.';
+
 $lang_eng['NOTES'] = 'Notes';
 $lang_ger['NOTES'] = 'Notizen';
 
@@ -1006,6 +1090,9 @@ $lang_ger['NOT_CHARGEABLE'] = 'Erlassen';
 
 $lang_eng['NUMBER'] = 'Number';
 $lang_ger['NUMBER'] = 'Nummer';
+
+$lang_eng['NUMBER_SHORT'] = 'No.';
+$lang_ger['NUMBER_SHORT'] = 'Nr.';
 
 $lang_eng['NUMBER_OF_LOGS'] = 'Showing %s of %s entries';
 $lang_ger['NUMBER_OF_LOGS'] = 'Zeige %s Einträge von %s Logeinträgen';
@@ -1124,6 +1211,9 @@ $lang_ger['PRIVATE'] = 'Persönlich';
 $lang_eng['PROCEDURE_DIRECTORY'] = 'Procedure Directory';
 $lang_ger['PROCEDURE_DIRECTORY'] = 'Verfahrensverzeichnis';
 
+$lang_eng['PROCEDURE_DESCRIPTION'] = 'Short description of the process or the purpose of this process';
+$lang_ger['PROCEDURE_DESCRIPTION'] = 'Kurze Beschreibung des Vorgangs, bzw. den Zweck dieses Vorgangs';
+
 $lang_eng['PROCESS'] = 'Process';
 $lang_ger['PROCESS'] = 'Vorgang';
 
@@ -1183,6 +1273,9 @@ $lang_ger['QUANTITY'] = 'Menge';
 
 $lang_eng['READY_STATUS'] = 'Present';
 $lang_ger['READY_STATUS'] = 'Anwesend';
+
+$lang_eng['READ'] = 'Read';
+$lang_ger['READ'] = 'Lesen';
 
 $lang_eng['REASON'] = 'Reason';
 $lang_ger['REASON'] = 'Grund';
@@ -1250,6 +1343,9 @@ $lang_ger['REQUIRED_FIELD'] = 'Pflichtfeld';
 $lang_eng['RESULT'] = 'Result';
 $lang_ger['RESULT'] = 'Ergebnis';
 
+$lang_eng['RESULT_OF'] = 'Result of';
+$lang_ger['RESULT_OF'] = 'Ergebnis von';
+
 $lang_eng['RULES'] = 'Rules';
 $lang_ger['RULES'] = 'Regeln';
 
@@ -1280,6 +1376,9 @@ $lang_ger['SECONDS'] = 'Sekunden';
 $lang_eng['SECTION'] = 'Section';
 $lang_ger['SECTION'] = 'Bereich';
 
+$lang_eng['SECURE_WITH_PASSWORD'] = 'Protect access with password';
+$lang_ger['SECURE_WITH_PASSWORD'] = 'Zugang mit Passwort schützen';
+
 $lang_eng['SEND_ACCESS'] = 'Send Access';
 $lang_ger['SEND_ACCESS'] = 'Zugang Senden';
 
@@ -1297,6 +1396,9 @@ $lang_ger['SHOULD_TIME'] = 'Soll';
 
 $lang_eng['SICK_LEAVE'] = 'Sick Leave';
 $lang_ger['SICK_LEAVE'] = 'Krankenstand';
+
+$lang_eng['SIGN'] = 'Sign';
+$lang_ger['SIGN'] = 'Unterschreiben';
 
 $lang_eng['SOCIAL_MEDIA_HEADING'] = 'Social Media';
 $lang_ger['SOCIAL_MEDIA_HEADING'] = 'Soziales Medium';
@@ -1357,6 +1459,9 @@ $lang_ger['SOCIAL_EDIT_GROUP'] = 'Gruppe bearbeiten';
 
 $lang_eng['SOCIAL_NO_GROUPS'] = 'You are not member in any group';
 $lang_ger['SOCIAL_NO_GROUPS'] = 'Sie gehören keinen Gruppen an';
+
+$lang_eng['SPECIAL_DATA_CATEGORY'] = 'Special data category iSd Art 9 DSGVO';
+$lang_ger['SPECIAL_DATA_CATEGORY'] = 'Besondere Datenkategorie iSd Art 9 DSGVO';
 
 $lang_eng['SPECIAL_LEAVE'] = 'Special Leave';
 $lang_ger['SPECIAL_LEAVE'] = 'Sonderurlaub';
@@ -1424,6 +1529,9 @@ $lang_ger['TIMESTAMPS'] = 'Zeitstempel';
 $lang_eng['TIMEZONE'] = 'Timezone';
 $lang_ger['TIMEZONE'] = 'Zeitzone';
 
+$lang_eng['TITLE'] = 'Title';
+$lang_ger['TITLE'] = 'Titel';
+
 $lang_eng['TO'] = 'To';
 $lang_ger['TO'] = 'Bis';
 
@@ -1468,13 +1576,13 @@ $lang_ger['UNDO'] = 'Rückgängig';
 $lang_eng['UNDEFINED_S3'] ='S3 Interface is not defined!';
 $lang_ger['UNDEFINED_S3'] = 'S3 Schnittstelle nicht definiert!';
 
-$lang_eng['UNANSWERED_REQUESTS'] ='Unanswered Requests';
-$lang_ger['UNANSWERED_REQUESTS'] ='Unbeantwortete Anträge';
+$lang_eng['UNANSWERED_REQUESTS'] = 'Unanswered Requests';
+$lang_ger['UNANSWERED_REQUESTS'] = 'Unbeantwortete Anträge';
 
-$lang_eng['UNIT'] ='Unit';
+$lang_eng['UNIT'] = 'Unit';
 $lang_ger['UNIT'] = 'Einheit';
 
-$lang_eng['UNITS'] ='Units';
+$lang_eng['UNITS'] = 'Units';
 $lang_ger['UNITS'] = 'Einheiten';
 
 $lang_eng['UPDATE_REQUIRED'] = 'Update required. ';
@@ -1483,8 +1591,14 @@ $lang_ger['UPDATE_REQUIRED'] = 'Update benötigt. ';
 $lang_eng['UPTODATE'] = 'Version is up tp date. ';
 $lang_ger['UPTODATE'] = 'Version ist aktuell. ';
 
-$lang_eng['UPLOAD'] ='Upload';
+$lang_eng['UPLOAD'] = 'Upload';
 $lang_ger['UPLOAD'] = 'Hochladen';
+
+$lang_eng['UPLOAD_DATE'] = 'Upload date';
+$lang_ger['UPLOAD_DATE'] = 'Upload Datum';
+
+$lang_eng['UPLOAD_FILE'] = 'Upload file';
+$lang_ger['UPLOAD_FILE'] = 'Datei Hochladen';
 
 $lang_eng['USED_DAYS'] ='Used Days';
 $lang_ger['USED_DAYS'] ='Verbrauchte Tage';

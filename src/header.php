@@ -247,7 +247,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 		  $indexIM = $row['indexIM'];
 		  $start = $row['time'];
-		  if($row['emoji']) $emoji = ($emoji + $row['emoji']) / 2;
+		  if($row['emoji'] && $emoji != 0) $emoji = ($emoji + $row['emoji']) / 2; // normal checkOut should not affect initial rating (when checking out multiple times a day)
 		  if(rand(1,2) == 1) { $emoji = floor($emoji); } else { $emoji = ceil($emoji); }
 
 		  $sql = "UPDATE logs SET timeEnd = UTC_TIMESTAMP, emoji = $emoji WHERE indexIM = $indexIM;";

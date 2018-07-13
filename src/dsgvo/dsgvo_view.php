@@ -316,13 +316,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <div class="page-header"><h3><?php echo $lang['DOCUMENTS']; ?>
     <div class="page-header-button-group">
         <button type="button" data-toggle="modal" data-target="#pdf-upload" class="btn btn-default" title="Upload PDF File"><i class="fa fa-upload"></i> PDF Upload</button>
-		<a data-toggle="collapse" href="#show-categories" class="btn btn-default" title="Subkategorien Bearbeiten">Kategorien</a>
+		<a data-toggle="collapse" href="#show-categories" class="btn btn-default" title="<?php echo $lang['SUBCATEGORIES_EDIT'] ?>"><?php echo $lang['CATEGORIES'] ?></a>
     </div>
 </h3></div>
 
 <div class="collapse" id="show-categories">
 	<form method="POST">
-	<h4>Subkategorien Verwalten
+	<h4><?php echo $lang['SUBCATEGORIES_MANAGE'] ?>
 		<div class="page-header-button-group">
 	        <button type="button" data-toggle="modal" data-target="#edit-categories" class="btn btn-default" title="Neue Subkategorie Hinzufügen"><i class="fa fa-plus"></i></button>
 	    </div>
@@ -330,7 +330,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	<table class="table datatable">
 		<thead>
 			<tr>
-				<th>Kategorie</th>
+				<th><?php echo $lang['CATEGORY'] ?></th>
 				<th>Name</th>
 				<th></th>
 			</tr>
@@ -340,11 +340,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$catresult = $conn->query("SELECT id, name FROM dsgvo_categories");
 			while($cats = $catresult->fetch_assoc()){
 				echo '<tr>';
-				echo '<td>Vertrag</td>';
+				echo '<td>'.$lang['CONTRACT'].'</td>';
 				echo '<td>'.$cats['name'].'</td>';
 				echo '<td>';
 				if($conn->query("SELECT id FROM archive_meta WHERE category = ".$cats['id'])->num_rows < 1){
-					echo '<button type="submit" name="deletecat" value="'.$cats['id'].'" class="btn btn-default" title="Löschen"><i class="fa fa-trash-o"></i></button> ';
+					echo '<button type="submit" name="deletecat" value="'.$cats['id'].'" class="btn btn-default" title="'.$lang['DELETE'].'"><i class="fa fa-trash-o"></i></button> ';
 				}
 				echo '<a data-toggle="modal" href="#edit-categories" data-name="'.$cats['name'].'" data-catid="'.$cats['id'].'" data- class="btn btn-default"><i class="fa fa-pencil"></i></a></td>';
 				echo '</tr>';
@@ -360,7 +360,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		<tr>
 			<th><?php echo $lang['CATEGORY']; //5b055b4696156 ?></th>
 			<th>Name</th>
-			<th>Vertragspartner</th>
+			<th><?php echo $lang['CONTRACTUAL_PARTNER'] ?></th>
 			<th><?php echo $lang['VALID_PERIOD']; ?></th>
 			<th>Status</th>
 			<th></th>
@@ -448,9 +448,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             echo '<td>' . $row['version'] . '</td>';
             echo '<td><form method="POST">';
             echo '<a href="edit?d=' . $row['id'] . '" title="'.$lang['EDIT'].'" class="btn btn-default"><i class="fa fa-pencil"></i></a> ';
-            echo '<button type="submit" name="clone" value="' . $row['id'] . '" title="Klonen" class="btn btn-default" ><i class="fa fa-files-o"></i></button> ';
-            echo '<button type="submit" name="delete" value="' . $row['id'] . '" title="Löschen" class="btn btn-default" ><i class="fa fa-trash-o"></i></button> ';
-            echo '<button type="button" name="setSelect" value="' . $row['id'] . '" data-toggle="modal" data-target="#send-as-mail" class="btn btn-default" title="Senden.."><i class="fa fa-envelope-o"></i></button>';
+            echo '<button type="submit" name="clone" value="' . $row['id'] . '" title="'.$lang['CLONE'].'" class="btn btn-default" ><i class="fa fa-files-o"></i></button> ';
+            echo '<button type="submit" name="delete" value="' . $row['id'] . '" title="'.$lang['DELETE'].'" class="btn btn-default" ><i class="fa fa-trash-o"></i></button> ';
+            echo '<button type="button" name="setSelect" value="' . $row['id'] . '" data-toggle="modal" data-target="#send-as-mail" class="btn btn-default" title="'.$lang['SEND'].'"><i class="fa fa-envelope-o"></i></button>';
             echo '</form></td>';
             echo '</tr>';
 			//5ae9c3361c57c
@@ -462,7 +462,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <form method="POST">
     <div id="send-as-mail" class="modal fade">
-        <div class="modal-dialog modal-content modal-md"><div class="modal-header h4">Dokument Senden</div>
+        <div class="modal-dialog modal-content modal-md"><div class="modal-header h4"><?php echo $lang['SEND_DOCUMENT'] ?></div>
 	        <div class="modal-body">
 	            <div class="container-fluid">
 	                <label><?php echo $lang['DOCUMENTS']; ?></label>
@@ -470,15 +470,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	                <br><br>
 	                <?php include dirname(__DIR__).'/misc/select_contact.php'; ?>
 	                <div class="row form-group checkbox">
-	                    <div class="col-sm-4"><label><input type="checkbox" name="send_andRead" /> + Lesen</label></div>
-	                    <div class="col-sm-4"><label><input type="checkbox" name="send_andAccept" /> + Akzeptieren</label></div>
-	                    <div class="col-sm-4"><label><input type="checkbox" name="send_andSign" /> + Unterschreiben</label></div>
+	                    <div class="col-sm-4"><label><input type="checkbox" name="send_andRead" /> + <?php echo $lang['READ'] ?></label></div>
+	                    <div class="col-sm-4"><label><input type="checkbox" name="send_andAccept" /> + <?php echo $lang['ACCEPT'] ?></label></div>
+	                    <div class="col-sm-4"><label><input type="checkbox" name="send_andSign" /> + <?php echo $lang['SIGN'] ?></label></div>
 	                </div>
 	                <br>
 	                <div class="row">
-	                    <div class="col-sm-6"><label>Zugang mit Passwort schützen</label><input type="text" name="send_andPassword" placeholder="Password" class="form-control" /></div>
+	                    <div class="col-sm-6"><label><?php echo $lang['SECURE_WITH_PASSWORD'] ?></label><input type="text" name="send_andPassword" placeholder="Password" class="form-control" /></div>
 	                    <div class="col-sm-6">
-	                        <label>E-Mail Vorlage</label>
+	                        <label><?php echo $lang['EMAIL_TEMPLATE'] ?></label>
 	                        <select class="js-example-basic-single" name="send_template">
 	                            <option value="0"><?php echo $lang['DEFAULT']; ?></option>
 	                            <?php
@@ -493,7 +493,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	            </div>
 	        </div>
 	        <div class="modal-footer">
-	            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+	            <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
 	            <button type="submit" class="btn btn-warning" name="sendAccess">Dokument Senden</button>
 	        </div>
 	    </div>
@@ -509,7 +509,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <input type="text" class="form-control" name="add_docName" />
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
                 <button type="submit" class="btn btn-warning" name="addDocument"><?php echo $lang['ADD']; ?></button>
             </div>
         </div>
@@ -528,7 +528,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <small>Max. 8MB</small>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
                 <button type="submit" class="btn btn-warning"><?php echo $lang['UPLOAD']; ?></button>
             </div>
         </div>
@@ -547,7 +547,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <small>Max. 8MB</small>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
                 <button type="submit" class="btn btn-warning"><?php echo $lang['UPLOAD']; ?></button>
             </div>
         </div>
@@ -568,7 +568,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				<input type="text" class="form-control" name="editcat_name" id="editcat_name" value="">
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
                 <button type="submit" class="btn btn-warning" name="editcat_save" id="editcat_save"><?php echo $lang['SAVE']; ?></button>
             </div>
         </div>
@@ -749,7 +749,7 @@ if($result && ($row = $result->fetch_assoc())):
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
 				<button type="submit" class="btn btn-warning" name="save-meta" value="<?php echo $openUpload; ?>"><?php echo $lang['SAVE']; ?></button>
 			</div>
 		</form>

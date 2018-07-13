@@ -170,7 +170,7 @@ $("#company_chooser").change(function () {
 		<?php if (isset($matrixID)): ?>
 			<div class="col-md-12">
 				<div class="panel panel-default">
-					<div class="panel-heading"><?php echo $lang['DATA_MATRIX_SUBHEADING'] ?></div>
+					<div class="panel-heading"><?php echo $lang['DATA_MATRIX_DATA_CATEGORIES_TRANSMISSION'] ?></div>
 					<div class="panel-body">
 						<?php
 						$i = 1;
@@ -225,7 +225,7 @@ $("#company_chooser").change(function () {
 										</div>
 										<div class="col-md-3">
 											<select class="form-control duration-number-select" name="<?php echo $cat_row['opt_name']; ?>_NUMBER" >
-												<option value="default">Löschfrist - im Vorgang beschrieben</option>
+												<option value="default"><?php echo $lang['DELETION_PERIOD'] ?> - <?php echo $lang['DESCRIBED_IN_PROCESS'] ?></option>
 												<?php
 												for ($k = 1;$k<=30;++$k) {
 													$selected = (intval($cat_row['opt_duration']) === $k)?"selected":"";
@@ -236,7 +236,7 @@ $("#company_chooser").change(function () {
 										</div>
 										<div class="col-md-3">
 											<select class="form-control duration-unit-select" name="<?php echo $cat_row['opt_name']; ?>_UNIT" >
-												<option value="default">Löschfrist - im Vorgang beschrieben</option>
+												<option value="default"><?php echo $lang['DELETION_PERIOD'] ?> - <?php echo $lang['DESCRIBED_IN_PROCESS'] ?></option>
 												<option value="1" <?php echo (intval($cat_row['opt_unit']) === 1)?"selected":""; echo '>'; echo $lang['TIME_UNIT_TOSTRING'][1]; ?></option>
 												<option value="2" <?php echo (intval($cat_row['opt_unit']) === 2)?"selected":""; echo '>'; echo $lang['TIME_UNIT_TOSTRING'][2]; ?></option>
 												<option value="3" <?php echo (intval($cat_row['opt_unit']) === 3)?"selected":""; echo '>'; echo $lang['TIME_UNIT_TOSTRING'][3]; ?></option>
@@ -244,7 +244,7 @@ $("#company_chooser").change(function () {
 											</select>
 										</div>
 										<div class="col-sm-2">
-											<label title="Besondere Datenkategorie iSd Art 9 DSGVO">
+											<label title="<?php echo $lang['SPECIAL_DATA_CATEGORY'] ?>">
 												<input type="checkbox" <?php if($cat_row['opt_status'] == 'ART9') echo 'checked'; ?>  name="<?php echo $cat_row['opt_name']; ?>_SETTING" value="1" /> Art9
 											</label>
 										</div>

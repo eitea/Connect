@@ -67,22 +67,22 @@ if(!function_exists('drawFolder')){
 <div class="row">
 	<div class="col-md-12">
 		<div class="panel panel-default">
-			<div class="panel-heading"><?php echo mc_status($upload_viewer['accessKey']); ?>Datei Upload (Archiv)
+			<div class="panel-heading"><?php echo mc_status($upload_viewer['accessKey']); ?><?php echo $lang['FILE_UPLOAD_ARCHIVE'] ?>
 				<div class="page-header-button-group">
 					<div class="btn-group"><a class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" title="Hochladen..."><i class="fa fa-upload"></i></a>
 						<ul class="dropdown-menu">
-							<li><a data-toggle="modal" data-target="#modal-new-folder-<?php echo $upload_viewer['categoryID']; ?>"><i class="fa fa-folder-open-o"></i> Neuer Ordner</a></li>
+							<li><a data-toggle="modal" data-target="#modal-new-folder-<?php echo $upload_viewer['categoryID']; ?>"><i class="fa fa-folder-open-o"></i> <?php echo $lang['NEW_FOLDER'] ?></a></li>
 							<li class="divider"></li>
-							<li><a data-toggle="modal" data-target="#modal-new-file-<?php echo $upload_viewer['categoryID']; ?>"><i class="fa fa-file-o"></i> Datei Hochladen</a></li>
+							<li><a data-toggle="modal" data-target="#modal-new-file-<?php echo $upload_viewer['categoryID']; ?>"><i class="fa fa-file-o"></i> <?php echo $lang['UPLOAD_FILE'] ?></a></li>
 						</ul>
 					</div>
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-xs-1 bold">Type</div>
+				<div class="col-xs-1 bold"><?php echo $lang['TYPE'] ?></div>
 				<div class="col-xs-3 bold">Name</div>
-				<div class="col-xs-3 bold">Upload Datum</div>
-				<div class="col-xs-2 bold">Benutzer</div>
+				<div class="col-xs-3 bold"><?php echo $lang['UPLOAD_DATE'] ?></div>
+				<div class="col-xs-2 bold"><?php echo $lang['USER'] ?></div>
 				<!-- div class="col-xs-3">Operations</div-->
 			</div>
 			<?php echo drawFolder('ROOT', $upload_viewer['category'], $upload_viewer['categoryID']); ?>
@@ -94,13 +94,13 @@ if(!function_exists('drawFolder')){
 	<div class="modal-dialog modal-content modal-sm">
 		<form method="POST">
 			<input type="hidden" name="saveThisProject" value="<?php echo $upload_viewer['categoryID']; ?>" />
-			<div class="modal-header h4">Neuer Ordner</div>
+			<div class="modal-header h4"><?php echo $lang['NEW_FOLDER'] ?></div>
 			<div class="modal-body">
 				<label>Name</label>
 				<input type="text" name="new-folder-name" class="form-control" />
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL'] ?></button>
 				<button type="submit" class="btn btn-warning modal-new-<?php echo $upload_viewer['categoryID']; ?>" name="add-new-folder" value="ROOT"><?php echo $lang['ADD']; ?></button>
 			</div>
 		</form>
@@ -110,16 +110,16 @@ if(!function_exists('drawFolder')){
 	<div class="modal-dialog modal-content modal-sm">
 		<form method="POST" enctype="multipart/form-data">
 			<input type="hidden" name="saveThisProject" value="<?php echo $upload_viewer['categoryID']; ?>" />
-			<div class="modal-header h4">File Hochladen</div>
+			<div class="modal-header h4"><?php echo $lang['UPLOAD_FILE'] ?></div>
 			<div class="modal-body">
 				<label class="btn btn-default">
-					Datei Auswählen
+					<?php echo $lang['CHOOSE_FILE'] ?>
 					<input type="file" name="new-file-upload"  accept="application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint, text/plain, application/pdf,.doc, .docx" style="display:none" >
 				</label>
-				<small>Max. 15MB<br>Text, PDF, .Zip und Office</small>
+				<small>Max. 15MB<br>Text, PDF, .Zip <?php echo $lang['AND'] ?> Office</small>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL'] ?></button>
 				<button type="submit" class="btn btn-warning modal-new-<?php echo $upload_viewer['categoryID']; ?>" name="add-new-file" value="ROOT"><?php echo $lang['ADD']; ?></button>
 			</div>
 		</form>

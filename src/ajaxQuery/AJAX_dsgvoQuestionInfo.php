@@ -27,7 +27,7 @@ $timesColorsArray = array();
 <form method="POST">
 <div class="modal fade">
     <div class="modal-dialog modal-content modal-md">
-    <div class="modal-header">Auswertung von <?php echo $title ?></div>
+    <div class="modal-header"><?php echo $lang['RESULT_OF'] ?> <?php echo $title ?></div>
     <div class="modal-body" style="overflow:scroll;">
         <?php
         if(!$result || $result->num_rows == 0){
@@ -41,7 +41,7 @@ $timesColorsArray = array();
                     <th><?php echo $lang['ANSWER']?></th>
                     <th>Version</th>
                     <th><?php echo $lang['TRIES']?></th>
-                    <th>Zuletzt beantwortet</th>
+                    <th><?php echo $lang['LAST_ANSWERED'] ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -167,7 +167,7 @@ var triesChart = new Chart(ctx, {
             backgroundColor: <?php echo json_encode($triesColorsArray) ?>,
             yAxisID: 'first-y-axis'
         },{
-            label: "Geschätzte Zeit in Sekunden",
+            label: "<?php echo $lang['ESTIMATED_TIME_SECONDS'] ?>",
             data: <?php echo json_encode($timesArray) ?>,
             backgroundColor: <?php echo json_encode($timesColorsArray) ?>,
             yAxisID: 'second-y-axis'

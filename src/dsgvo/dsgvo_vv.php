@@ -287,7 +287,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 					</table>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
 					<button type="submit" class="btn btn-warning"><?php echo $lang['SAVE']; ?></button>
 				</div>
 			</form>
@@ -297,13 +297,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 	<div id="add-folder" class="modal fade">
 		<div class="modal-dialog modal-content modal-sm">
 			<form method="POST">
-				<div class="modal-header h4">Neuer Ordner</div>
+				<div class="modal-header h4"><?php echo $lang['NEW_FOLDER']; ?></div>
 				<div class="modal-body">
 					<label>Name</label>
 					<input type="text" name="add_folder_name" class="form-control" placeholder="Name..."/>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
 					<button type="submit" class="btn btn-warning"><?php echo $lang['ADD']; ?></button>
 				</div>
 			</form>
@@ -347,7 +347,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                             <div class="modal-header h4">'.$row['name'].' Duplizieren</div>
                             <div class="modal-body"><label>Duplizieren Als</label><input type="text" name="duplicate_template_name" class="form-control" value="'.$row['name'].' Clone" /></div>
                             <div class="modal-footer">
-                            <button type="button" class="btn btn-default" onClick="$(\'#clone-temp-'.$row['id'].'\').modal(\'hide\')">Cancel</button>
+                            <button type="button" class="btn btn-default" onClick="$(\'#clone-temp-'.$row['id'].'\').modal(\'hide\')">'.$lang['CANCEL'].'</button>
                             <button type="submit" name="duplicate_template" value="'.$row['id'].'" class="btn btn-warning">Duplizieren</button>
                             </div></form></div></div>';
                         }
@@ -377,7 +377,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
                             <button type="submit" class="btn btn-warning" name="add_template"><?php echo $lang['SAVE']; ?></button>
                         </div>
                     </form>
@@ -385,7 +385,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             </div>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Schließen</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CLOSE']; ?></button>
         </div>
     </div>
 </div>

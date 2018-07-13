@@ -18,9 +18,9 @@ $version = $row["version"];
 <form method="POST">
 <div class="modal fade">
     <div class="modal-dialog modal-content modal-lg">
-    <div class="modal-header">Frage beantworten</div>
+    <div class="modal-header"><?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['EDIT_QUESTION'] ?></div>
     <div class="modal-body">
-        <label for="title">Titel</label>
+        <label for="title"><?php echo $lang['TITLE'] ?></label>
         <input type="text" name="title" class="form-control" placeholder="Title" value="<?php echo $title; ?>"></input><br />
         <label for="version">Version</label>
         <input type="number" min="<?php echo $version; ?>" step="1" placeholder="Version" name="version" value="<?php echo $version; ?>" class="form-control" /><br />
