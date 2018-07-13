@@ -1181,6 +1181,25 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 </div>
 <!-- /side menu -->
 
+ <script>
+     // notify the user of a session timeout
+    sessionIsAlive = true;
+    sessionAliveInterval = setInterval(function(){
+        $.ajax({
+            url: 'ajaxQuery/AJAX_db_utility.php',
+            type: 'POST',
+            data: {function: 'isSessionAlive'},
+            success: function (response) {
+                if(response == "false"){ 
+                    showInfo('Your session expired. <a href="../login/auth">Login</a>',1000*60*60*24 /* 1 day should be enough */);
+                    sessionIsAlive = false;
+                    clearInterval(sessionAliveInterval)
+                }
+            }
+        });
+    }, 1000*200); // 200 seconds, should not cause request overflow
+</script>
+
 <div id="bodyContent" style="display:none;" >
   <div class="affix-content">
     <div class="container-fluid">

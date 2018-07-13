@@ -1,4 +1,5 @@
 <?php
+session_start();
 require dirname(__DIR__)."/connection.php";
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
@@ -36,6 +37,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 		if($result && ($row = $result->fetch_assoc()) && $row['unreadMessages'] > 0){
 			echo $row['unreadMessages'];
 		}
-	}
+    }
+    
+    if($_POST['function'] == 'isSessionAlive'){
+        if(!$_SESSION || !isset($_SESSION['userid'])){
+            echo "false";
+        }else{
+            echo "true";
+        }
+    }
 }
 ?>
