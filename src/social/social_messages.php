@@ -54,6 +54,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 				$status = 'sender';
 				$stmt_participant->execute();
 				$options['teamid'] = $partID;
+			} else {
+				$options['userid'] = $userID;
 			}
 			if(!empty($_POST['new_message_cc_contacts'])){
 				foreach($_POST['new_message_cc_contacts'] as $val){
@@ -145,69 +147,64 @@ while($row = $result->fetch_assoc()){
     <div class="page-header-button-group"><a data-toggle="modal" href="#new-message-modal" class="btn btn-default"><i class="fa fa-plus"></i></a></div>
 </div>
 
-<div class="row">
-	<div class="col-md-5">
-		<table class="table table-hover">
-			<thead>
-				<tr>
-					<th>Betreff</th>
-					<th></th>
-					<th>Teilnehmer</th>
-					<th></th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				<?php
-				$stmt = $conn->prepare("SELECT partType, partID FROM relationship_conversation_participant
-					WHERE conversationID = ? AND status != 'exited' AND (partType != 'USER' OR partID != '$userID')"); echo $conn->error;
-				$stmt->bind_param('i', $conversationID);
-				$result = $conn->query("SELECT c.id, subject, rcp.lastCheck, rcp.id AS participantID, tbl.unreadMessages FROM messenger_conversations c
-					INNER JOIN relationship_conversation_participant rcp
-					ON (rcp.status != 'exited' AND rcp.conversationID = c.id AND rcp.partType = 'USER' AND rcp.partID = '$userID')
-					LEFT JOIN (SELECT COUNT(*) AS unreadMessages, rcp1.conversationID FROM messenger_messages m
-						INNER JOIN relationship_conversation_participant rcp1 ON (rcp1.id = m.participantID AND (partType != 'USER' OR partID != '$userID'))
-						WHERE m.sentTime >= (SELECT lastCheck FROM relationship_conversation_participant rcp2 WHERE rcp2.conversationID = rcp1.conversationID
-						AND rcp2.status != 'exited' AND rcp2.partType = 'USER' AND rcp2.partID = '$userID')
-						GROUP BY conversationID) tbl
-					ON tbl.conversationID = c.id ORDER BY c.id DESC");
-				echo $conn->error;
-				while($result && ($row = $result->fetch_assoc())){
-					$conversationID = $row['id'];
-					echo '<tr>';
-					echo '<td>', $row['subject'], '</td>';
-					echo '<td>', $row['unreadMessages'] ? '<span class="badge badge-alert" title="Ungelesene Nachrichten">'.$row['unreadMessages'] .'</span>' : '', '</td>';
-					echo '<td>';
-					$participantID = $row['participantID'];
-					$stmt->execute();
-					$partres = $stmt->get_result();
-					if($partres->num_rows < 1) echo '<b style="color:red">- Niemand mehr da -</b>';
-					while($partrow = $partres->fetch_assoc()){
-						if($partrow['partType'] == 'USER'){
-							echo $userID_toName[$partrow['partID']];
-						} elseif($partrow['partType'] == 'team') {
-							echo $teamID_toName[$partrow['partID']];
-						} else { //show client and contact with email
-							echo $partrow['partID'];
-						}
-						echo '<br>';
+<div class="col-md-8 col-md-offset-2">
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>Betreff</th>
+				<th></th>
+				<th>Teilnehmer</th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php
+			$stmt = $conn->prepare("SELECT partType, partID FROM relationship_conversation_participant
+				WHERE conversationID = ? AND status != 'exited' AND (partType != 'USER' OR partID != '$userID')"); echo $conn->error;
+			$stmt->bind_param('i', $conversationID);
+			$result = $conn->query("SELECT c.id, subject, rcp.lastCheck, rcp.id AS participantID, tbl.unreadMessages FROM messenger_conversations c
+				INNER JOIN relationship_conversation_participant rcp
+				ON (rcp.status != 'exited' AND rcp.conversationID = c.id AND rcp.partType = 'USER' AND rcp.partID = '$userID')
+				LEFT JOIN (SELECT COUNT(*) AS unreadMessages, rcp1.conversationID FROM messenger_messages m
+					INNER JOIN relationship_conversation_participant rcp1 ON (rcp1.id = m.participantID AND (partType != 'USER' OR partID != '$userID'))
+					WHERE m.sentTime >= (SELECT lastCheck FROM relationship_conversation_participant rcp2 WHERE rcp2.conversationID = rcp1.conversationID
+					AND rcp2.status != 'exited' AND rcp2.partType = 'USER' AND rcp2.partID = '$userID')
+					GROUP BY conversationID) tbl
+				ON tbl.conversationID = c.id ORDER BY c.id DESC");
+			echo $conn->error;
+			while($result && ($row = $result->fetch_assoc())){
+				$conversationID = $row['id'];
+				echo '<tr class="clicker" data-val="'.$conversationID.'">';
+				echo '<td>', $row['subject'], '</td>';
+				echo '<td>', $row['unreadMessages'] ? '<span class="badge badge-alert" title="Ungelesene Nachrichten">'.$row['unreadMessages'] .'</span>' : '', '</td>';
+				echo '<td>';
+				echo '<form method="POST" id="openChat_',$row['id'],'"><input type="hidden" name="openChat" value="', $row['id'], '" ></form>';
+				$participantID = $row['participantID'];
+				$stmt->execute();
+				$partres = $stmt->get_result();
+				if($partres->num_rows < 1) echo '<b style="color:red">- Niemand mehr da -</b>';
+				while($partrow = $partres->fetch_assoc()){
+					if($partrow['partType'] == 'USER'){
+						echo $userID_toName[$partrow['partID']];
+					} elseif($partrow['partType'] == 'team') {
+						echo $teamID_toName[$partrow['partID']];
+					} else { //show client and contact with email
+						echo $partrow['partID'];
 					}
-					echo '</td>';
-					echo '<td><div class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown"> <i class="fa fa-ellipsis-v"></i></a>
-					<ul class="dropdown-menu">
-					<form method="POST"><button type="submit" name="leave_conversation" class="btn btn-link" value="', $row['id'], '">Konversation Verlassen</button></form>
-					</ul></div> </td>';
-					echo '<td><form method="POST"><button type="submit" name="openChat" value="', $row['id'], '" class="btn btn-default"><i class="fa fa-arrow-right"></i></button></form></td>';
-					echo '</tr>';
+					echo '<br>';
 				}
-				$stmt->close();
-				?>
-			</tbody>
-		</table>
-	</div>
-	<div class="col-md-7"><br><br>
-		<?php require __DIR__.'/chatwindow.php'; ?>
-	</div>
+				echo '</td>';
+				echo '</tr> ';
+				if($openChatID == $conversationID){
+					echo '<td colspan="3" style="padding:0">';
+					require __DIR__.'/chatwindow.php';
+					echo '</td>';
+				}
+				echo '</tr>';
+			}
+			$stmt->close();
+			?>
+		</tbody>
+	</table>
 </div>
 
 
@@ -314,13 +311,10 @@ while($row = $result->fetch_assoc()){
 			$('#sender_team_box').hide();
 		}
 	});
-	$('.table').DataTable({
-    ordering: false,
-    language: {
-      <?php echo $lang['DATATABLES_LANG_OPTIONS']; ?>
-    },
-    dom: 'ftipr',
-    autoWidth: false
+
+  $('.clicker').click(function(){
+	  var index = $(this).data('val');
+	  $("#openChat_"+index).submit();
   });
 </script>
 <?php require dirname(__DIR__) . '/footer.php'; ?>

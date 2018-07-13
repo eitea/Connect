@@ -797,7 +797,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             </form>
         </div>
     </div>
-    <?php endif; //endif occupation ?>
+<?php endif; //endif occupation ?>
 </div>
 
 <?php if(isset($setEdit) && !$setEdit && isset($_POST['description'])): //5ae9e4ee9e35f ?>

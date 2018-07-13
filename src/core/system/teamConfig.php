@@ -8,9 +8,10 @@ if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
 	$emailName = test_input($_POST['createTeam_emailName']); //5b34d75a75691
     $leader = intval($_POST['leader']);
     $replacement = intval($_POST['replacement']);
+	$signature = test_input($_POST['createTeam_signature']);
     $isDepartment = empty($_POST['create_department']) ? 'FALSE' : 'TRUE';
-    $conn->query("INSERT INTO teamData (name, leader, leaderreplacement, isDepartment, email, emailName)
-	VALUES('$name', '$leader', '$replacement', '$isDepartment', '$email', '$emailName')");
+    $conn->query("INSERT INTO teamData (name, leader, leaderreplacement, isDepartment, email, emailName, emailSignature)
+	VALUES('$name', '$leader', '$replacement', '$isDepartment', '$email', '$emailName', '$signature')");
     $teamID = mysqli_insert_id($conn);
 	if(isset($_POST['createTeam_members'])){
 		foreach($_POST['createTeam_members'] AS $user){
@@ -48,6 +49,10 @@ if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
     if(!$conn->error){
         echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
     }
+	$val = intval($_POST['teamCompany']);
+	$leader = intval($_POST['teamLeader']);
+	$replacement = intval($_POST['teamReplacement']);
+	$conn->query("UPDATE teamData SET companyID = $val, leader = $leader, leaderreplacement = $replacement WHERE id = $teamID");
 } elseif(isset($_POST['hire']) && !empty($_POST['userIDs'])){
     $teamID = intval($_POST['hire']);
     foreach($_POST['userIDs'] as $user){
@@ -61,21 +66,22 @@ if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
 } elseif(isset($_POST['changeTeamName']) && !empty($_POST['teamName'])){
     $teamID = intval($_POST['changeTeamName']);
     $name = test_input($_POST['teamName']);
-	$companyID = intval($_POST['teamCompany']);
 	$email = test_input($_POST['teamMail']); //5b28952ad8a9a
 	$emailName = test_input($_POST['teamMailName']); //5b34d75a75691
-    $conn->query("UPDATE teamData SET name = '$name', email='$email', emailName='$emailName', companyID = $companyID WHERE id = $teamID");
+	$signature = test_input($_POST['changeTeam_signature']);
+    $conn->query("UPDATE teamData SET name = '$name', email='$email', emailName='$emailName', emailSignature = '$signature' WHERE id = $teamID");
 	if(empty($_POST['isDepartment'])){
 	    $conn->query("UPDATE teamData SET isDepartment = 'FALSE' WHERE id = $teamID");
 	    if(!$conn->error){
 	        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
 	    }
-	} else{
+	} else {
 	    $result = $conn->query("SELECT userID FROM relationship_team_user WHERE teamID = $teamID AND userID IN
-	        (SELECT userID FROM relationship_team_user, teamData WHERE teamData.id = teamID AND teamData.isDepartment = 'TRUE')");
+	        (SELECT userID FROM relationship_team_user, teamData WHERE teamData.id = teamID AND teamData.id != $teamID AND teamData.isDepartment = 'TRUE')");
 	    if($result && $result->num_rows > 0){
 	        $row = $result->fetch_assoc();
-	        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$userID_toName[$row['userID']].' befindet sich bereits in einer anderen Abteilung.</div>';
+	        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.
+				$userID_toName[$row['userID']].' befindet sich bereits in einer anderen Abteilung.</div>';
 	        $result->free();
 	    } elseif($result) {
 	        $conn->query("UPDATE teamData SET isDepartment = 'TRUE' WHERE id = $teamID");
@@ -104,7 +110,7 @@ for($i = 0; $i < 11; $i++){
 
 <div class="container-fluid">
     <?php
-    $result = $conn->query("SELECT id, name, isDepartment, email, emailName, leader, leaderreplacement, companyID FROM teamData");
+    $result = $conn->query("SELECT id, name, isDepartment, email, emailName, leader, leaderreplacement, companyID, emailSignature FROM teamData");
     while($result && ($row = $result->fetch_assoc())):
         $teamID = $row['id'];
         ?>
@@ -128,21 +134,67 @@ for($i = 0; $i < 11; $i++){
 				</div>
                 <div class="collapse <?php if($teamID == $activeTab) echo 'in'; ?>" id="teamCollapse-<?php echo $teamID; ?>">
                     <div class="panel-body container-fluid">
+						<!-- GENERAL OPTIONS -->
+						<?php $result_fc = mysqli_query($conn, "SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
+						if($result_fc && $result_fc->num_rows > 1): ?>
+							<div class="row">
+								<div class="col-md-3">
+									<label>Mandant</label>
+									<select class="js-example-basic-single" name="teamCompany">
+										<?php
+									      while($result_fc && ($row_fc = $result_fc->fetch_assoc())){
+									        $checked = $row['companyID'] == $row_fc['id'] ? 'selected' : '';
+									        echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
+									      }
+									      echo '</select>';
+
+										?>
+									</select>
+								</div>
+								<div class="col-md-3">
+									<label><?php echo $lang['LEADER'] ?></label>
+									<select name="teamLeader" class="js-example-basic-single">
+										<option value="">...</option>
+										<?php
+										foreach($userID_toName as $id=>$name){
+											$selected = $id == $row['leader'] ? 'selected' : '';
+											echo "<option $selected value='$id'>$name</option>";
+										}
+										?>
+									</select><br>
+								</div>
+								<div class="col-md-3">
+									<label><?php echo $lang['LEADER_REPLACEMENT'] ?></label>
+									<select name="teamReplacement" class="js-example-basic-single">
+										<option value="">...</option>
+										<?php
+										foreach($userID_toName as $id=>$name){
+											$selected = $id == $row['leaderreplacement'] ? 'selected' : '';
+											echo "<option $selected value='$id'>$name</option>";
+										}
+										?>
+									</select><br>
+								</div>
+							</div>
+						<?php endif; ?>
+						<br> <!-- MEMBERS -->
                         <?php
                         $userResult = $conn->query("SELECT userID, skill FROM relationship_team_user WHERE teamID = $teamID");
                         while($userResult && ($userRow = $userResult->fetch_assoc())){
-                            echo '<div class="col-xs-8 col-md-3">';
+                            echo '<div class="col-xs-8 col-md-2">';
                             echo '<input type="hidden" name="saveTeam_users[]" value="'.$userRow['userID'].'">';
                             echo '<button type="submit" style="background:none;border:none" name="removeMember" value="'.$userRow['userID'].'"><i style="color:red" class="fa fa-times"></i></button>';
                             echo $userID_toName[$userRow['userID']];
-                            echo '</div><div class="col-xs-4 col-md-1">';
-                            echo '<select name="saveTeam_skill_'.$userRow['userID'].'" style="max-width:75px;display:inline;">'.
+                            echo '</div><div class="col-xs-4 col-md-2">';
+                            echo '<select name="saveTeam_skill_'.$userRow['userID'].'" class="form-control">'.
                             str_replace('value="'.$userRow['skill'].'">', 'value="'.$userRow['skill'].'" selected>', $percentage_select).'</select>';
                             echo '</div>';
                         }
                         echo mysqli_error($conn);
                         ?>
-                        <div class="col-md-12 text-right"><br><a class="btn btn-default" data-toggle="modal" data-target=".addTeamMember_<?php echo $teamID; ?>" title="Add Team Member">Mitglied Hinzufügen</a></div>
+                        <div class="col-md-12 text-right"><br>
+							<a class="btn btn-default" data-toggle="modal" data-target=".addTeamMember_<?php echo $teamID; ?>" title="Add Team Member">Mitglied Hinzufügen</a>
+						</div>
                     </div>
                 </div>
             </div>
@@ -204,24 +256,7 @@ for($i = 0; $i < 11; $i++){
 								</label>
 							</div>
 						</div>
-						<?php $result_fc = mysqli_query($conn, "SELECT * FROM companyData WHERE id IN (".implode(', ', $available_companies).")");
-						if($result_fc && $result_fc->num_rows > 1): ?>
-							<div class="row">
-								<div class="col-md-6">
-									<label>Mandant</label>
-									<select class="js-example-basic-single" name="teamCompany">
-										<?php
-									      while($result_fc && ($row_fc = $result_fc->fetch_assoc())){
-									        $checked = $row['companyID'] == $row_fc['id'] ? 'selected' : '';
-									        echo "<option $checked value='".$row_fc['id']."' >".$row_fc['name']."</option>";
-									      }
-									      echo '</select>';
 
-										?>
-									</select>
-								</div>
-							</div>
-							<?php endif; ?>
 						<div class="row">
 							<div class="col-md-6">
 								<label>E-Mail</label>
@@ -232,31 +267,9 @@ for($i = 0; $i < 11; $i++){
 								<input type="text" class="form-control" name="teamMailName" value="<?php echo $row['emailName']; ?>" maxlength="45"/>
 							</div>
 						</div>
-						<div class="row">
-							<div class="col-md-6">
-								<label><?php echo $lang['LEADER'] ?></label>
-								<select name="leader" class="js-example-basic-single">
-									<option value="">...</option>
-									<?php
-									foreach($userID_toName as $id=>$name){
-										$selected = $id == $row['leader'] ? 'selected' : '';
-										echo "<option $selected value='$id'>$name</option>";
-									}
-									?>
-								</select><br>
-							</div>
-							<div class="col-md-6">
-								<label><?php echo $lang['LEADER_REPLACEMENT'] ?></label>
-								<select name="replacement" class="js-example-basic-single">
-									<option value="">...</option>
-									<?php
-									foreach($userID_toName as $id=>$name){
-										$selected = $id == $row['leaderreplacement'] ? 'selected' : '';
-										echo "<option $selected value='$id'>$name</option>";
-									}
-									?>
-								</select><br>
-							</div>
+						<div class="col-md-12"><br>
+							<label>E-Mail Signature</label>
+							<textarea name="changeTeam_signature" rows="4" class="form-control"><?php echo $row['emailSignature']; ?></textarea>
 						</div>
                     </div>
                     <div class="modal-footer">
@@ -336,6 +349,10 @@ for($i = 0; $i < 11; $i++){
                     Wird ein Task mit Skill Level 50% ersetellt und ein Team zugewiesen, so wird dieser Task nur den Team-Mitgliedern angezeigt,
                     die ebenfalls einen Skill Level von 50% oder höher besitzen.</small>
                 </div>
+				<div class="col-md-12"><br>
+					<label>E-Mail Signatur</label>
+					<textarea name="createTeam_signature" rows="4" class="form-control"></textarea>
+				</div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
