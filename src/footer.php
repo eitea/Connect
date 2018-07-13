@@ -41,7 +41,8 @@ $("#feedback_form").submit(function(event){
     var postData =  {
         location:window.location.href,
         message: $("#feedback_message").val(),
-        type:$('input[name=feedback_type]:checked').val()
+        type: $('input[name=feedback_type]:checked').val(),
+        title: $('#feedback_title').val()
     };
     if(document.getElementById("feedback_includeScreenshot").checked){
         postData.screenshot = img;
@@ -55,6 +56,7 @@ $("#feedback_form").submit(function(event){
             alert(response.responseText);
             //clear form
             $("#feedback_message").val("");
+            $("#feedback_title").val("");
             $('#feedbackModal').modal('hide');
         }
     });

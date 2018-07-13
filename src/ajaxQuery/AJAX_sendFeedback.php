@@ -44,8 +44,12 @@ $userName = $conn->query("SELECT id, CONCAT(firstname,' ', lastname) as name FRO
 $connectID = $conn->query("SELECT id FROM identification")->fetch_assoc()["id"];
 $message = test_input($_POST["message"]);
 $type = test_input($_POST["type"]);
+$title = test_input($_POST["title"]);
+$subject = strlen($title) == 0 ? $type : ("$title ($type)");
+
 $content = "<h1>Feedback</h1>";
 $content .= "<p><b>Type: </b>$type</p>";
+$content .= "<p><b>Title: </b>$title</p>";
 $content .= "<p><b>User ID: </b>$userID</p>";
 $content .= "<p><b>Location: </b>$user_location</p>";
 $content .= "<p><b>Connect ID: </b>$connectID</p>";
@@ -89,7 +93,7 @@ $mail->addAddress($recipient); // Add recipient
 
 #region mail_content
 $mail->isHTML(true); // Set email format to HTML
-$mail->Subject = "Feedback Feedback / $type";
+$mail->Subject = "Feedback Feedback: $subject";
 $mail->Body    = $content;
 $mail->AltBody = "Your e-mail provider does not support HTML. To apply formatting, use an html viewer." . $content;
 

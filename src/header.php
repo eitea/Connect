@@ -623,9 +623,13 @@ if ($_SESSION['color'] == 'light') {
                     <div class="radio">
                         <label><input type="radio" name="feedback_type" value="Positive Feedback"><?php echo $lang['FEEDBACK_POSITIVE']; ?></label>
                     </div>
+                    <br />
+                    <label for="feedback_title"><?php echo $lang['TITLE'] ?></label>
+                    <input class="form-control" type="text" name="feedback_title" id="feedback_title" placeholder="Optional">
+                    <br />
                     <label for="description"> <?php echo $lang['DESCRIPTION'] ?>
                     </label>
-                    <textarea required name="description" id="feedback_message" class="form-control"></textarea>
+                    <textarea required name="description" id="feedback_message" class="form-control" style="min-width:100%;max-width:100%"></textarea>
                     <div class="checkbox">
                         <label><input type="checkbox" name="includeScreenshot" id="feedback_includeScreenshot" checked><?php echo $lang['INCLUDE_SCREENSHOT']; ?></label>
                         <br>

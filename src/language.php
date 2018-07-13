@@ -638,16 +638,16 @@ $lang_ger['EXPIRED'] = 'Abgelaufen';
 $lang_eng['EXPORT_ALL_SETS'] = 'Export all sets';
 $lang_ger['EXPORT_ALL_SETS'] = 'Exportieren aller Sets';
 
-$lang_eng['FEEDBACK_PROBLEM'] = 'Expiration Date';
+$lang_eng['FEEDBACK_PROBLEM'] = 'I have a problem';
 $lang_ger['FEEDBACK_PROBLEM'] = 'Ich habe ein Problem';
 
-$lang_eng['FEEDBACK_BUG'] = 'Expiration Date';
+$lang_eng['FEEDBACK_BUG'] = 'I found a bug';
 $lang_ger['FEEDBACK_BUG'] = 'Ich habe einen Bug gefunden';
 
-$lang_eng['FEEDBACK_FEATURES'] = 'Expiration Date';
+$lang_eng['FEEDBACK_FEATURES'] = 'I want to suggest a new feature';
 $lang_ger['FEEDBACK_FEATURES'] = 'Ich will ein neues Feature vorschlagen';
 
-$lang_eng['FEEDBACK_POSITIVE'] = 'Expiration Date';
+$lang_eng['FEEDBACK_POSITIVE'] = 'I have something positive to report';
 $lang_ger['FEEDBACK_POSITIVE'] = 'Ich habe etwas positives zu berichten';
 
 $lang_eng['FOR'] = 'for';
