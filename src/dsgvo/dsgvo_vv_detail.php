@@ -22,7 +22,7 @@ $company = $vv_row['companyID'];
 $matrix_result = $conn->query("SELECT id FROM dsgvo_vv_data_matrix WHERE companyID = $company");
 if($matrix_result){
     if($matrix_result->num_rows === 0){
-        showError("Diese Firma hat keine Matrix in den Einstellungen. Zum Erstellen <a href='data-matrix'>hier klicken</a>.");
+        showError(sprintf($lang['NO_MATRIX'], $company));
     }
     $matrixID = $matrix_result->fetch_assoc()["id"];
 } else {
@@ -79,7 +79,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 			echo $e->getMessage();
 		}
 	} else {
-		showError("Keine S3 Schnittstelle gefunden ".$conn->error);
+		showError($lang['UNDEFINED_S3'].' '.$conn->error);
 	}
 	if(!empty($_POST['add-new-file']) && isset($_FILES['new-file-upload'])){
 		//decrypt the symmetric key
@@ -110,13 +110,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 			'application/x-zip-compressed', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'multipart/x-zip',
 			'application/x-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 			if (!in_array($ext, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'zip'])){
-				showError('Ungültige Dateiendung: '.$ext);
+				showError($lang['ERROR_INVALID_EXTENSION'].': '.$ext);
 			} elseif(!in_array($filetype, $accepted_types)) {
-				showError('Ungültiger Dateityp: '.$filetype);
+				showError($lang['ERROR_INVALID_FILE_TYPE'].': '.$filetype);
 			} elseif ($_FILES['new-file-upload']['size'] > 15000000) { //15mb max
 				showError('Die maximale Dateigröße wurde überschritten (15 MB)');
 			} elseif(empty($s3)) {
-				showError("Es konnte keine S3 Verbindung hergestellt werden. Stellen Sie sicher, dass unter den Archiv Optionen eine gültige Verbindung gespeichert wurde.");
+				showError($lang['ERROR_NO_S3_CONNECTION']);
 			} else {
 				$parent = test_input($_POST['add-new-file']);
 				try{
@@ -259,17 +259,17 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	            $result = $conn->query("SELECT name, address, phone, mail, companyPostal, companyCity FROM companyData WHERE id = ".$vv_row['companyID']);
 	            $row = $result->fetch_assoc();
 	            ?>
-	            <div class="panel-heading">Firmendaten</div>
+	            <div class="panel-heading"><?php echo $lang['COMPANY_DATA'] ?></div>
 	            <div class="panel-body">
-	                <div class="col-sm-6 bold">Name der Firma</div><div class="col-sm-6 grey"><?php echo $row['name']; ?><br></div>
-	                <div class="col-sm-6 bold">Straße</div><div class="col-sm-6 grey"><?php echo $row['address']; ?><br></div>
-	                <div class="col-sm-6 bold">Ort</div><div class="col-sm-6 grey"><?php echo $row['companyCity']; ?><br></div>
-	                <div class="col-sm-6 bold">PLZ</div><div class="col-sm-6 grey"><?php echo $row['companyPostal']; ?><br></div>
-	                <div class="col-sm-6 bold">Telefon</div><div class="col-sm-6 grey"><?php echo $row['phone']; ?><br></div>
+	                <div class="col-sm-6 bold"><?php echo $lang['COMPANY_NAME'] ?></div><div class="col-sm-6 grey"><?php echo $row['name']; ?><br></div>
+	                <div class="col-sm-6 bold"><?php echo $lang['STREET'] ?></div><div class="col-sm-6 grey"><?php echo $row['address']; ?><br></div>
+	                <div class="col-sm-6 bold"><?php echo $lang['CITY'] ?></div><div class="col-sm-6 grey"><?php echo $row['companyCity']; ?><br></div>
+	                <div class="col-sm-6 bold"><?php echo $lang['PLZ'] ?></div><div class="col-sm-6 grey"><?php echo $row['companyPostal']; ?><br></div>
+	                <div class="col-sm-6 bold"><?php echo $lang['PHONE_NUMBER'] ?></div><div class="col-sm-6 grey"><?php echo $row['phone']; ?><br></div>
 	                <div class="col-sm-6 bold">E-Mail</div><div class="col-sm-6 grey"><?php echo $row['mail']; ?><br></div>
 	            </div>
 	            <?php else: ?>
-	            <div class="panel-heading"><?php echo mc_status('DSGVO'); ?>Kurze Beschreibung des Vorgangs, bzw. den Zweck dieses Vorgangs</div>
+	            <div class="panel-heading"><?php echo mc_status('DSGVO'); ?><?php echo $lang['PROCEDURE_DESCRIPTION'] ?></div>
 	            <div class="panel-body">
 	                <textarea name="DESCRIPTION" style='resize:none' class="form-control" rows="5"><?php echo $settings['DESCRIPTION']['setting']; ?></textarea>
 	            </div>
@@ -313,9 +313,9 @@ function getSettings($like, $mults = false, $from_matrix = false){
 
 	<div class="col-md-12">
 	    <div class="panel panel-default">
-	        <div class="panel-heading">Generelle organisatorische und technische Maßnahmen zum Schutz der personenbezogenen Daten</div>
+	        <div class="panel-heading"><?php echo $lang['ACTIONS_TO_PROTECT_DATA'] ?></div>
 			<br>
-			<p class="text-center"><label for="#matrice-area"><?php echo mc_status('DSGVO'); ?>Notizen</label></p>
+			<p class="text-center"><label for="#matrice-area"><?php echo mc_status('DSGVO'); ?><?php echo $lang['NOTES'] ?></label></p>
 			<?php
 			$key = 'GRET_TEXTAREA';
 	        $settings = getSettings($key);
@@ -484,7 +484,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	<?php if($doc_type == 'APP'): ?>
 	<div class="col-md-12">
 	    <div class="panel panel-default">
-	        <div class="panel-heading">Auflistung der verarbeiteten Datenfelder und deren Übermittlung</div>
+	        <div class="panel-heading"><?php echo $lang['DATA_MATRIX_DATA_CATEGORIES_TRANSMISSION'] ?></div>
 	        <div class="panel-body" style="overflow-x: auto;">
 	            <?php
 	            $str_heads = $space = $space_key = '';
@@ -567,10 +567,10 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	            <?php  if($matrixID): ?>
 	            <table class="table table-condensed">
 	            <thead><tr>
-	            <th style="width:15%">Gruppierung</th>
-	            <th>Nr.</th>
-	            <th style="width:15%">Datenkategorien der gesammelten personenbezogenen Daten</th>
-				<th>Löschfrist</th>
+	            <th style="width:15%"><?php echo $lang['GROUP'] ?></th>
+	            <th><?php echo $lang['NUMBER_SHORT'] ?></th>
+	            <th style="width:15%"><?php echo $lang['DATA_CATEGORIES'] ?></th>
+				<th><?php echo $lang['DELETION_PERIOD'] ?></th>
 	            <?php echo $str_heads; ?>
 	            <th><a data-toggle="modal" data-target="#add-cate" title="Neue Kategorie..." class="btn btn-warning" ><i class="fa fa-plus"></i></a></th>
 	            </tr></thead>
@@ -612,7 +612,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                            }
 	                        }
 	                        $fieldID ++;
-							$isArt9 = $catVal['status'] == 'ART9' ? 'style="color:red" title="Besondere Datenkategorie iSd Art 9 DSGVO"' : '';
+							$isArt9 = $catVal['status'] == 'ART9' ? 'style="color:red" title="'.$lang['SPECIAL_DATA_CATEGORY'].'"' : '';
 
 	                        echo '<tr>';
 	                        echo '<td>'.$fieldID.'</td>';
@@ -664,7 +664,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                ?>
 	                 </table>
 	            <?php else: ?>
-	                Diese Firma hat keine Matrix in den Einstellungen. Zum Erstellen <a href='../dsgvo/data-matrix'>hier klicken</a>.
+	                <?php echo sprintf($lang['NO_MATRIX'], $company) ?>
 				<?php endif; ?>
 	        </div>
 	    </div>
@@ -673,7 +673,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 
 	<div id="add-cate" class="modal fade">
 	  <div class="modal-dialog modal-content modal-md">
-		<div class="modal-header h4">Neue Kategorie Option</div>
+		<div class="modal-header h4"><?php echo $lang['NEW_CATEGORY'] ?></div>
 		<div class="modal-body">
 	        <div class="row">
 	            <div class="col-sm-12">
@@ -714,14 +714,14 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                        ?>
 	                    </select>
 	                    <div class="input-group-btn">
-	                        <a class="btn btn-default" href="../system/clients?t=1"><i class="fa fa-external-link text-muted"></i>Neu</a>
+	                        <a class="btn btn-default" href="../system/clients?t=1"><i class="fa fa-external-link text-muted"></i><?php echo $lang['NEW'] ?></a>
 	                    </div>
 	                </div>
 	            </div>
 	        </div>
 	    </div>
 		<div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+	        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL'] ?></button>
 	        <button type="submit" class="btn btn-warning" name="add_category"><?php echo $lang['SAVE']; ?></button>
 		</div>
 	  </div>
@@ -734,7 +734,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 //5af9b976aa8a6
 $result = $conn->query("SELECT user_id, log_time FROM dsgvo_vv_logs WHERE vvID = '$vvID' ORDER BY log_time DESC LIMIT 1");
 if($result && ($row = $result->fetch_assoc())){
-	echo '<small><i>Zuletzt bearbeitet: '.$userID_toName[$row['user_id']].' - '.$row['log_time'].'</i></small>';
+	echo '<small><i>'.$lang['LAST_EDITED'].': '.$userID_toName[$row['user_id']].' - '.$row['log_time'].'</i></small>';
 }
 ?>
 

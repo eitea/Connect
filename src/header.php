@@ -247,7 +247,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 		  $indexIM = $row['indexIM'];
 		  $start = $row['time'];
-		  if($row['emoji']) $emoji = ($emoji + $row['emoji']) / 2;
+		  if($row['emoji'] && $emoji != 0) $emoji = ($emoji + $row['emoji']) / 2; // normal checkOut should not affect initial rating (when checking out multiple times a day)
 		  if(rand(1,2) == 1) { $emoji = floor($emoji); } else { $emoji = ceil($emoji); }
 
 		  $sql = "UPDATE logs SET timeEnd = UTC_TIMESTAMP, emoji = $emoji WHERE indexIM = $indexIM;";
@@ -623,9 +623,13 @@ if ($_SESSION['color'] == 'light') {
                     <div class="radio">
                         <label><input type="radio" name="feedback_type" value="Positive Feedback"><?php echo $lang['FEEDBACK_POSITIVE']; ?></label>
                     </div>
+                    <br />
+                    <label for="feedback_title"><?php echo $lang['TITLE'] ?></label>
+                    <input class="form-control" type="text" name="feedback_title" id="feedback_title" placeholder="Optional">
+                    <br />
                     <label for="description"> <?php echo $lang['DESCRIPTION'] ?>
                     </label>
-                    <textarea required name="description" id="feedback_message" class="form-control"></textarea>
+                    <textarea required name="description" id="feedback_message" class="form-control" style="min-width:100%;max-width:100%"></textarea>
                     <div class="checkbox">
                         <label><input type="checkbox" name="includeScreenshot" id="feedback_includeScreenshot" checked><?php echo $lang['INCLUDE_SCREENSHOT']; ?></label>
                         <br>
@@ -1180,6 +1184,25 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
   </div>
 </div>
 <!-- /side menu -->
+
+ <script>
+     // notify the user of a session timeout
+    sessionIsAlive = true;
+    sessionAliveInterval = setInterval(function(){
+        $.ajax({
+            url: 'ajaxQuery/AJAX_db_utility.php',
+            type: 'POST',
+            data: {function: 'isSessionAlive'},
+            success: function (response) {
+                if(response == "false"){ 
+                    showInfo('Your session expired. <a href="../login/auth">Login</a>',1000*60*60*24 /* 1 day should be enough */);
+                    sessionIsAlive = false;
+                    clearInterval(sessionAliveInterval)
+                }
+            }
+        });
+    }, 1000*200); // 200 seconds, should not cause request overflow
+</script>
 
 <div id="bodyContent" style="display:none;" >
   <div class="affix-content">

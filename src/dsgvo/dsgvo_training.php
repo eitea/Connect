@@ -570,7 +570,7 @@ function onModalLoad(){
             }
 
             editor.addButton("insertquestion",{
-                tooltip: "Benutzerdefinierte Frage einfügen",
+                tooltip: "<?php echo $lang['INSERT_CUSTOM_QUESTION'] ?>",
                 icon: "template",
                 onclick: insertQuestion,
             });
@@ -580,7 +580,7 @@ function onModalLoad(){
             }
 
             editor.addButton("insertquestion2",{
-                tooltip: "Frage einfügen",
+                tooltip: "<?php echo $lang['INSERT_QUESTION'] ?>",
                 icon: "template",
                 onclick: insertQuestion2,
             });

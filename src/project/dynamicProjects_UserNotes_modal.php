@@ -34,7 +34,7 @@ if (!function_exists('stripSymbols')) {
                     <!-- tab buttons -->
                     <ul class="nav nav-tabs">
                         <li class="active">
-                            <a data-toggle="tab" href="#dynamicCommentsNotes<?php echo stripSymbols($modal_id) ?>"><?php echo $lang["DYNAMIC_PROJECTS_NOTES"]; ?></a>
+                            <a data-toggle="tab" href="#dynamicCommentsNotes<?php echo stripSymbols($modal_id) ?>"><?php echo $lang["NOTES"]; ?></a>
                         </li>
                         <li>
                             <a data-toggle="tab" href="#dynamicCommentsPictures<?php echo stripSymbols($modal_id) ?>"><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_PICTURES"]; ?></a>

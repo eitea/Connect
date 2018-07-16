@@ -60,12 +60,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <br><br>Click to Insert: <br><br>
             <button type="button" class="btn btn-warning btn-block btn-insert" value='[LINK]'>URL</button>
             <!--button type="button" class="btn btn-warning btn-block btn-insert" value='[ANREDE]'>Herr/ Frau</button-->
-            <button type="button" class="btn btn-warning btn-block btn-insert" value='[FIRSTNAME]'>Vorname</button>
-            <button type="button" class="btn btn-warning btn-block btn-insert" value='[LASTNAME]'>Nachname</button>
-            <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companyname]'>Firmenname</button>
-            <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companystreet]'>Straße</button>
-            <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companyplace]'>Ort</button>
-            <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companypostcode]'>PLZ</button>
+            <button type="button" class="btn btn-warning btn-block btn-insert" value='[FIRSTNAME]'><?php echo $lang['FIRSTNAME'] ?></button>
+            <button type="button" class="btn btn-warning btn-block btn-insert" value='[LASTNAME]'><?php echo $lang['LASTNAME'] ?></button>
+            <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companyname]'><?php echo $lang['COMPANY_NAME'] ?></button>
+            <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companystreet]'><?php echo $lang['STREET'] ?></button>
+            <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companyplace]'><?php echo $lang['CITY'] ?></button>
+            <button type="button" class="btn btn-warning btn-block btn-insert" value='[Companypostcode]'><?php echo $lang['PLZ'] ?></button>
         </div>
         <?php elseif(preg_match_all("/\[CUSTOMTEXT_\d+\]/", $documentContent, $matches)): ?>
         <div class="col-md-10 col-md-offset-1">
