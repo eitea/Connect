@@ -1,4 +1,16 @@
 <?php
+if(!empty($_POST['leave_conversation'])){
+	$conversationID = intval($_POST['leave_conversation']);
+	$conn->query("UPDATE relationship_conversation_participant SET status = 'exited' WHERE partType='USER' AND partID = $userID AND conversationID = $conversationID");
+	if($conn->error) showError($conn->error.__LINE__);
+	//delete conversations which have no participants
+	$conn->query("DELETE FROM messenger_conversations WHERE NOT EXISTS(SELECT id FROM relationship_conversation_participant WHERE conversationID = messenger_conversations.id)");
+	if($conn->error){
+		showError($conn->error);
+	} else {
+		showSuccess("Sie haben diese Konversation verlassen.");
+	}
+}
 if(!empty($_POST['openChat'])){
 	$openChatID = intval($_POST['openChat']);
 	if(isset($_POST['chat_join_conversation'])){
@@ -15,7 +27,7 @@ if(!empty($_POST['openChat'])){
 			if($conn->error) showError($conn->error.__LINE__);
 
 			//TODO: how do i reply from team, when sent from team and not as user?
-			// $result = $conn->query("SELECT partID FROM relationship_conversation_participant WHERE conversationID = $openChatID AND partType = 'contact' OR partType = 'client'");
+			// $result = $conn->query("SELECT partID FROM relationship_conversation_participant WHERE status != 'exited' AND conversationID = $openChatID AND partType = 'contact' OR partType = 'client'");
 			// if($result && $result->num_rows){
 			// 	$result_temp = $conn->query("SELECT subject, identifier FROM messenger_conversations WHERE id = $openChatID LIMIT 1");
 			// 	$row = $result_temp->fetch_assoc();

@@ -10,15 +10,21 @@
 
 		if($participantID) $conn->query("UPDATE relationship_conversation_participant SET lastCheck = UTC_TIMESTAMP WHERE id = $participantID");
 		?>
-		<div class="panel-heading"><?php echo $messenger_row['subject']; ?></div>
+		<div class="panel-heading"><?php echo $messenger_row['subject']; ?>
+			<div class="dropdown pull-right"><a class="dropdown-toggle" data-toggle="dropdown"> <i class="fa fa-ellipsis-v"></i></a>
+				<ul class="dropdown-menu">
+				<form method="POST"><button type="submit" name="leave_conversation" class="btn btn-link" value="<?php echo $openChatID; ?>">Konversation Verlassen</button></form>
+				</ul>
+			</div>
+		</div>
 		<div class="panel-body scrollDown" style="height:40vh; overflow-y:auto;">
 			<?php
 			$date = '';
-			$result_cw = $conn->query("SELECT message, vKey, sentTime, m.type, rcp.partType, rcp.partID, rcp.status, rcp.lastCheck,
+			$result_cw = $conn->query("SELECT * FROM (SELECT message, vKey, sentTime, m.type, rcp.partType, rcp.partID, rcp.status, rcp.lastCheck,
 				archive.name AS fileName, archive.type AS fileType, m.id AS messageID
 				FROM messenger_messages m LEFT JOIN relationship_conversation_participant rcp ON rcp.id = m.participantID
 				LEFT JOIN archive ON m.message = archive.uniqID
-				WHERE rcp.conversationID = $openChatID ORDER BY m.sentTime ASC LIMIT 20");
+				WHERE rcp.conversationID = $openChatID ORDER BY m.sentTime DESC LIMIT 20) AS tbl ORDER BY tbl.sentTime ASC");
 			echo $conn->error;
 			if($result_cw->num_rows == 20) echo '<a>Ältere Nachricten laden</a>';
 			while($result_cw && ($row_temp = $result_cw->fetch_assoc())){
@@ -65,7 +71,7 @@
 	<form method="POST" enctype="multipart/form-data">
 		<input type="hidden" readonly value="<?php echo $openChatID; ?>" name="openChat" />
 		<?php if($participantID): ?>
-				<textarea id="chat_message_<?php echo $openChatID; ?>" name="chat_message" rows="3" class="form-control"  placeholder="Deine Nachricht... " style="resize:none"></textarea>
+				<textarea id="chat_message_<?php echo $openChatID; ?>" autofocus name="chat_message" rows="3" class="form-control"  placeholder="Deine Nachricht... " style="resize:none"></textarea>
 				<div style="border:1px solid #cccccc;background-color: #eaeaea">
 					<label class="btn btn-empty">
 						<i class="fa fa-paperclip"></i>

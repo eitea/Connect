@@ -4,19 +4,6 @@ $openChatID = 0;
 $bucket = $identifier .'-uploads'; //no uppercase, no underscores, no ending dashes, no adjacent special chars
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	require __DIR__.'/chatwindow_backend.php'; //sets openChatID and takes care of chatwindow.php default operations
-
-	if(!empty($_POST['leave_conversation'])){
-		$conversationID = intval($_POST['leave_conversation']);
-		$conn->query("UPDATE relationship_conversation_participant SET status = 'exited' WHERE partType='USER' AND partID = $userID AND conversationID = $conversationID");
-		if($conn->error) showError($conn->error.__LINE__);
-		//delete conversations which have no participants
-		$conn->query("DELETE FROM messenger_conversations WHERE NOT EXISTS(SELECT id FROM relationship_conversation_participant WHERE conversationID = messenger_conversations.id)");
-		if($conn->error){
-			showError($conn->error);
-		} else {
-			showSuccess("Sie haben diese Konversation verlassen.");
-		}
-	}
 	if(isset($_POST['send_new_message']) && !empty($_POST['new_message_subject']) && !empty($_POST['new_message_body'])){
 		$subject = test_input($_POST['new_message_subject']);
 		$message =  test_input($_POST['new_message_body']);
@@ -68,6 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 						$partType = 'contact';
 						$result = $conn->query("SELECT email, firstname, lastname FROM contactPersons WHERE id = $val LIMIT 1");
 					}
+					echo $conn->error;
 					if($result && ($row = $result->fetch_assoc())){
 						$options['cc'][$row['email']] = $row['firstname'].' '.$row['lastname'];
 					}
@@ -84,6 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 						$partType = 'contact';
 						$result = $conn->query("SELECT email, firstname, lastname FROM contactPersons WHERE id = $val LIMIT 1");
 					}
+					echo $conn->error;
 					if($result && ($row = $result->fetch_assoc())){
 						$options['bcc'][$row['email']] = $row['firstname'].' '.$row['lastname'];
 					}
