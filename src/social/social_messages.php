@@ -44,69 +44,72 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			} else {
 				$options['userid'] = $userID;
 			}
-			if(!empty($_POST['new_message_cc_contacts'])){
-				foreach($_POST['new_message_cc_contacts'] as $val){
-					$arr = explode('_', $val);
-					$val = intval($arr[1]);
-					if($arr[0] == 'client'){
-						$partType = 'client';
-						$result = $conn->query("SELECT name AS lastname, firstname, mail AS email FROM clientInfoData WHERE clientID = $val LIMIT 1");
-					} else {
-						$partType = 'contact';
-						$result = $conn->query("SELECT email, firstname, lastname FROM contactPersons WHERE id = $val LIMIT 1");
-					}
-					echo $conn->error;
-					if($result && ($row = $result->fetch_assoc())){
-						$options['cc'][$row['email']] = $row['firstname'].' '.$row['lastname'];
-					}
-				}
-			}
-			if(!empty($_POST['new_message_bcc_contacts'])){
-				foreach($_POST['new_message_bcc_contacts'] as $val){
-					$arr = explode('_', $val);
-					$val = intval($arr[1]);
-					if($arr[0] == 'client'){
-						$partType = 'client';
-						$result = $conn->query("SELECT name AS lastname, firstname, mail AS email FROM clientInfoData WHERE clientID = $val LIMIT 1");
-					} else {
-						$partType = 'contact';
-						$result = $conn->query("SELECT email, firstname, lastname FROM contactPersons WHERE id = $val LIMIT 1");
-					}
-					echo $conn->error;
-					if($result && ($row = $result->fetch_assoc())){
-						$options['bcc'][$row['email']] = $row['firstname'].' '.$row['lastname'];
-					}
-				}
-			}
-			if(!empty($_POST['new_message_contacts'])){
-				$val = $_POST['new_message_contacts'][$i];
-				$arr = explode('_', $val);
-				$val = intval($arr[1]);
-				$status = 'normal';
-
-				if($arr[0] == 'client'){
-					$partType = 'client';
-					$result = $conn->query("SELECT mail AS email, name AS lastname, firstname, title, gender FROM clientInfoData WHERE clientID = $val LIMIT 1");
-
-				} else {
-					$partType = 'contact';
-					$result = $conn->query("SELECT email, firstname, lastname, gender, title FROM contactPersons WHERE id = $val LIMIT 1");
-				}
-				if($result && ($row = $result->fetch_assoc())){
-					$partID = $row['email'];
-					$stmt_participant->execute();
-
-					if(strpos($message, '[ANREDE]') !== false){
-						$intro = 'Sehr geehrter ';
-						if($row['gender'] == 'male'){
-							$intro .= 'Herr ';
+			if($user_roles['canSendToExtern'] == 'TRUE'){
+				if(!empty($_POST['new_message_cc_contacts'])){
+					foreach($_POST['new_message_cc_contacts'] as $val){
+						$arr = explode('_', $val);
+						$val = intval($arr[1]);
+						if($arr[0] == 'client'){
+							$partType = 'client';
+							$result = $conn->query("SELECT name AS lastname, firstname, mail AS email FROM clientInfoData WHERE clientID = $val LIMIT 1");
 						} else {
-							$intro .= 'Frau ';
+							$partType = 'contact';
+							$result = $conn->query("SELECT email, firstname, lastname FROM contactPersons WHERE id = $val LIMIT 1");
 						}
-						$intro .= $row['title'].' '.$row['firstname'].' '.$row['lastname'];
-						$message = str_replace('[ANREDE]', $intro, $message);
+						echo $conn->error;
+						if($result && ($row = $result->fetch_assoc())){
+							$options['cc'][$row['email']] = $row['firstname'].' '.$row['lastname'];
+						}
 					}
-					echo send_standard_email($partID, $message, $options);
+				}
+				if(!empty($_POST['new_message_bcc_contacts'])){
+					foreach($_POST['new_message_bcc_contacts'] as $val){
+						$arr = explode('_', $val);
+						$val = intval($arr[1]);
+						if($arr[0] == 'client'){
+							$partType = 'client';
+							$result = $conn->query("SELECT name AS lastname, firstname, mail AS email FROM clientInfoData WHERE clientID = $val LIMIT 1");
+						} else {
+							$partType = 'contact';
+							$result = $conn->query("SELECT email, firstname, lastname FROM contactPersons WHERE id = $val LIMIT 1");
+						}
+						if($result && ($row = $result->fetch_assoc())){
+							$options['bcc'][$row['email']] = $row['firstname'].' '.$row['lastname'];
+						} else {
+							echo $conn->error.'SOC-ME-ln79';
+						}
+					}
+				}
+				if(!empty($_POST['new_message_contacts'])){
+					$val = $_POST['new_message_contacts'][$i];
+					$arr = explode('_', $val);
+					$val = intval($arr[1]);
+					$status = 'normal';
+
+					if($arr[0] == 'client'){
+						$partType = 'client';
+						$result = $conn->query("SELECT mail AS email, name AS lastname, firstname, title, gender FROM clientInfoData WHERE clientID = $val LIMIT 1");
+
+					} else {
+						$partType = 'contact';
+						$result = $conn->query("SELECT email, firstname, lastname, gender, title FROM contactPersons WHERE id = $val LIMIT 1");
+					}
+					if($result && ($row = $result->fetch_assoc())){
+						$partID = $row['email'];
+						$stmt_participant->execute();
+
+						if(strpos($message, '[ANREDE]') !== false){
+							$intro = 'Sehr geehrter ';
+							if($row['gender'] == 'male'){
+								$intro .= 'Herr ';
+							} else {
+								$intro .= 'Frau ';
+							}
+							$intro .= $row['title'].' '.$row['firstname'].' '.$row['lastname'];
+							$message = str_replace('[ANREDE]', $intro, $message);
+						}
+						echo send_standard_email($partID, $message, $options);
+					}
 				}
 			}
 			$message_encrypt = asymmetric_encryption('CHAT', $message, $userID, $privateKey, 'encrypt', $err);
@@ -137,7 +140,7 @@ while($row = $result->fetch_assoc()){
 </div>
 
 <div class="col-md-8 col-md-offset-2">
-	<table class="table table-striped">
+	<table class="table table-hover">
 		<thead>
 			<tr>
 				<th>Betreff</th>
@@ -207,7 +210,7 @@ while($row = $result->fetch_assoc()){
 						<a title="Die Absender Einstellungen werden unter den Team Einstellungen gesetzt"><i class="fa fa-info-circle"></i></a>
 					</label></div>
 
-					<div class="col-sm-6"><label><input type="radio" name="new_message_sender" value="1"> Von Persönlich
+					<div class="col-sm-6"><label><input type="radio" name="new_message_sender" value="1" id="sender_personal_radio"> Von Persönlich
 						<a title="Die Absender Einstellungen werden unter Allgemein/ E-mail Optionen gesetzt.
 						Diese Nachrichten sind nur für einen selbst ersichtlich."><i class="fa fa-info-circle"></i>
 					</a></label>
@@ -232,7 +235,7 @@ while($row = $result->fetch_assoc()){
 						?>
 					</select>
 				</div>
-				<div class="col-md-6">
+				<div class="col-md-6 enable-personal-role">
 					<label>An externen Kontakt <a title="Öffnet für jeden Kontakt eine eigene Konversation"><i class="fa fa-info-circle"></i></a></label>
 					<select class="js-example-basic-single" name="new_message_contacts[]" multiple>
 						<?php
@@ -240,21 +243,21 @@ while($row = $result->fetch_assoc()){
 						$result = $conn->query("SELECT cp.id, cp.firstname, cp.lastname, cp.email, clientData.name AS clientName, companyData.name AS companyName
 							FROM contactPersons cp INNER JOIN clientData ON clientData.id = clientID INNER JOIN companyData ON companyData.id = companyID
 							WHERE cp.email IS NOT NULL AND clientData.companyID IN (".implode(', ', $available_companies).")");
-							while($result && ( $row = $result->fetch_assoc())){
-								$options_message_contacts .= '<option value="contact_'.$row['id'].'">'. $row['companyName'].' - '.$row ['clientName'].' - '.
-								$row['firstname'].' '.$row['lastname']. ' ('.$row['email']. ')</option>';
-							}
+						while($result && ( $row = $result->fetch_assoc())){
+							$options_message_contacts .= '<option value="contact_'.$row['id'].'">'. $row['companyName'].' - '.$row ['clientName'].' - '.
+							$row['firstname'].' '.$row['lastname']. ' ('.$row['email']. ')</option>';
+						}
 
-							$result = $conn->query("SELECT clientID, clientInfoData.mail, clientData.name AS clientName, companyData.name AS companyName
-								FROM clientInfoData INNER JOIN clientData ON clientData.id = clientID INNER JOIN companyData ON companyData.id = companyID
-								WHERE clientInfoData.mail IS NOT NULL AND clientData.companyID IN (".implode(', ', $available_companies).")");
-								while($result && ( $row = $result->fetch_assoc())){
-									$options_message_contacts .=  '<option value="client_'.$row['clientID'].'">'.$row['companyName'].' - '.$row ['clientName'].' ('.$row['mail'].')</option>';
-								}
-								echo $options_message_contacts;
-								?>
-							</select>
-						</div>
+						$result = $conn->query("SELECT clientID, clientInfoData.mail, clientData.name AS clientName, companyData.name AS companyName
+							FROM clientInfoData INNER JOIN clientData ON clientData.id = clientID INNER JOIN companyData ON companyData.id = companyID
+							WHERE clientInfoData.mail IS NOT NULL AND clientData.companyID IN (".implode(', ', $available_companies).")");
+							while($result && ( $row = $result->fetch_assoc())){
+								$options_message_contacts .=  '<option value="client_'.$row['clientID'].'">'.$row['companyName'].' - '.$row ['clientName'].' ('.$row['mail'].')</option>';
+							}
+							echo $options_message_contacts;
+							?>
+						</select>
+					</div>
 					</div>
 					<div class="row">
 						<div class="col-md-12">
@@ -269,7 +272,7 @@ while($row = $result->fetch_assoc()){
 							<small>*Felder werden benötigt</small>
 						</div>
 					</div>
-					<div class="row">
+					<div class="row enable-personal-role">
 						<div class="col-md-6">
 							<label>CC externen Kontakt</label>
 							<select class="js-example-basic-single" name="new_message_cc_contacts[]" multiple>
@@ -291,8 +294,16 @@ while($row = $result->fetch_assoc()){
 		</div>
 	</div>
 </form>
-
 <script type="text/javascript">
+<?php if($user_roles['canSendToExtern'] == 'FALSE'): ?>
+	$("input[name='new_message_sender']").change(function(){
+		if($('#sender_personal_radio').is(':checked')){
+			$('.enable-personal-role').hide();
+		} else {
+			$('.enable-personal-role').show();
+		}
+	});
+<?php endif; ?>
 	$('input[name="new_message_sender"]').on('click', function(){
 		if($('#sender_team_radio').is(':checked')){
 			$('#sender_team_box').show();

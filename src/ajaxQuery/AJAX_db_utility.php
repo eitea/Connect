@@ -38,9 +38,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 			echo $row['unreadMessages'];
 		}
     }
-    
+
     if($_POST['function'] == 'isSessionAlive'){
-        if(!$_SESSION || !isset($_SESSION['userid'])){
+        if(!isset($_SESSION['userid'])){
             echo "false";
         }else{
             echo "true";

@@ -5,9 +5,11 @@
 		$messenger_row = $result_cw->fetch_assoc();
 
 		$participantID = false;
-		$result_cw = $conn->query("SELECT id FROM relationship_conversation_participant WHERE conversationID = $openChatID AND partType='USER' AND partID='$userID'");
-		if($result_cw && $result_cw->num_rows > 0) $participantID = $result_cw->fetch_assoc()['id'];
-
+		$participants = array();
+		$result_cw = $conn->query("SELECT id FROM relationship_conversation_participant WHERE conversationID=$openChatID AND partType='USER' AND partID='$userID'");
+		while($result_cw && ($row_cw = $result_cw->fetch_assoc())){
+			$participantID = $row_cw['id'];
+		}
 		if($participantID) $conn->query("UPDATE relationship_conversation_participant SET lastCheck = UTC_TIMESTAMP WHERE id = $participantID");
 		?>
 		<div class="panel-heading"><?php echo $messenger_row['subject']; ?>
@@ -27,39 +29,38 @@
 				WHERE rcp.conversationID = $openChatID ORDER BY m.sentTime DESC LIMIT 20) AS tbl ORDER BY tbl.sentTime ASC");
 			echo $conn->error;
 			if($result_cw->num_rows == 20) echo '<a>Ältere Nachricten laden</a>';
-			while($result_cw && ($row_temp = $result_cw->fetch_assoc())){
-				$row = $row_temp; //so we save the last row for read/unread
-				if($date != substr($row['sentTime'],0, 10)){
-					$date = substr($row['sentTime'],0, 10);
+			while($result_cw && ($row_cw = $result_cw->fetch_assoc())){
+				if($date != substr($row_cw['sentTime'],0, 10)){
+					$date = substr($row_cw['sentTime'],0, 10);
 					echo '<p class="text-center" style="color:grey;font-size:8pt;">- ',$date,' -</p>';
 				}
 				echo '<div style="display:table;width:100%;">';
-				if($row['partType'] == 'USER' && $row['partID'] == $userID){
+				if($row_cw['partType'] == 'USER' && $row_cw['partID'] == $userID){
 					$style = 'background-color:#caf9b3; float:right;';
-				} elseif($row['partType'] == 'USER'){
-					echo '<p style="font-size:75%;">',$userID_toName[$row['partID']],' - ', substr(carryOverAdder_Hours($row['sentTime'], $timeToUTC),11,5), '</p>';
+				} elseif($row_cw['partType'] == 'USER'){
+					echo '<p style="font-size:75%;">',$userID_toName[$row_cw['partID']],' - ', substr(carryOverAdder_Hours($row_cw['sentTime'], $timeToUTC),11,5), '</p>';
 					$style = 'float:left;';
 				}
 				echo '<div class="well" style="width:70%;margin-bottom:10px;',$style,'" >';
-				if($row['type'] == 'text') echo asymmetric_encryption('CHAT', $row['message'], $userID, $privateKey, $row['vKey']);
-				if($row['type'] == 'file' && $row['fileName']) {
+				if($row_cw['type'] == 'text') echo asymmetric_encryption('CHAT', $row_cw['message'], $userID, $privateKey, $row_cw['vKey']);
+				if($row_cw['type'] == 'file' && $row_cw['fileName']) {
 					echo '<form method="POST" action="../project/detailDownload" target="_blank">
-					<input type="hidden" name="keyReference" value="CHAT_',$row['messageID'],'" />
-					<button type="submit" class="btn btn-link" name="download-file" value="',$row['message'],'"><i class="fa fa-file-text-o"></i> ',$row['fileName'],'.',$row['fileType'],'</form>';
-				} elseif($row['type'] == 'file'){
-					$conn->query("DELETE FROM messenger_messages WHERE id = ".$row['messageID']); //remove this after the update.
+					<input type="hidden" name="keyReference" value="CHAT_',$row_cw['messageID'],'" />
+					<button type="submit" class="btn btn-link" name="download-file" value="',$row_cw['message'],'"><i class="fa fa-file-text-o"></i> ',$row_cw['fileName'],'.',$row_cw['fileType'],'</form>';
+				} elseif($row_cw['type'] == 'file'){
+					$conn->query("DELETE FROM messenger_messages WHERE id = ".$row_cw['messageID']); //remove this after the update.
 				}
 				echo '</div>';
 				echo '</div>';
 			}
-			if($row['partType'] == 'USER' && $row['partID'] == $userID){
+			if($row_cw['partType'] == 'USER' && $row_cw['partID'] == $userID){
 				$result_cw = $conn->query("SELECT partType, partID FROM relationship_conversation_participant WHERE conversationID = $openChatID
-					AND lastCheck > '{$row['sentTime']}' AND (partType != 'USER' OR partID != $userID)");
+					AND lastCheck > '{$row_cw['sentTime']}' AND (partType != 'USER' OR partID != $userID)");
 				if($result_cw && $result_cw->num_rows > 0){
 					echo '<p style="font-size:75%;width:100%;text-align:right;">Gesehen: ';
 					while($row = $result_cw->fetch_assoc()){
-						if($row['partType'] == 'USER')
-						echo $userID_toName[$row['partID']], '; ';
+						if($row_cw['partType'] == 'USER')
+						echo $userID_toName[$row_cw['partID']], '; ';
 					}
 					echo '</p>';
 				}

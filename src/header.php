@@ -159,9 +159,9 @@ if($userHasUnansweredSurveys){ /* Test if user has unanswered questions that sho
     if(!$surveysAreSuspended){
         $result = $conn->query(
             "SELECT count(*) count FROM (
-                SELECT userID FROM dsgvo_training_user_relations tur 
-                INNER JOIN dsgvo_training t ON t.id = tur.trainingID 
-                LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID 
+                SELECT userID FROM dsgvo_training_user_relations tur
+                INNER JOIN dsgvo_training t ON t.id = tur.trainingID
+                LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID
                 WHERE userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
                     SELECT userID
                     FROM dsgvo_training_completed_questions
@@ -170,10 +170,10 @@ if($userHasUnansweredSurveys){ /* Test if user has unanswered questions that sho
                     WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
                  )
                 UNION
-                SELECT tr.userID userID FROM dsgvo_training_team_relations dtr 
-                INNER JOIN relationship_team_user tr ON tr.teamID = dtr.teamID 
-                INNER JOIN dsgvo_training t ON t.id = dtr.trainingID 
-                LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID 
+                SELECT tr.userID userID FROM dsgvo_training_team_relations dtr
+                INNER JOIN relationship_team_user tr ON tr.teamID = dtr.teamID
+                INNER JOIN dsgvo_training t ON t.id = dtr.trainingID
+                LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID
                 WHERE tr.userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
                     SELECT userID
                     FROM dsgvo_training_completed_questions
@@ -437,7 +437,7 @@ if ($_SESSION['color'] == 'light') {
         $(document).ready(function(){
             $(".openSearchModal").click(function(){
                 openSearchModal()
-            })
+            });
             $(document).on("keydown",function(event){
                if (event.ctrlKey && event.shiftKey && event.keyCode == 70 /* f */) {
                    openSearchModal()
@@ -449,7 +449,7 @@ if ($_SESSION['color'] == 'light') {
                    event.preventDefault();
                    openSearchModal()
                }
-            })
+		   });
         });
         const openSearchModal = _.throttle(function() {
             $.ajax({
@@ -1186,6 +1186,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 <!-- /side menu -->
 
  <script>
+ //note: this will never return false. it will keep the session alive unless user logged out manually or closed his browser (look up usage of session_start())
      // notify the user of a session timeout
     sessionIsAlive = true;
     sessionAliveInterval = setInterval(function(){
@@ -1194,7 +1195,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
             type: 'POST',
             data: {function: 'isSessionAlive'},
             success: function (response) {
-                if(response == "false"){ 
+                if(response == "false"){
                     showInfo('Your session expired. <a href="../login/auth">Login</a>',1000*60*60*24 /* 1 day should be enough */);
                     sessionIsAlive = false;
                     clearInterval(sessionAliveInterval)
