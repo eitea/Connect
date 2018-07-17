@@ -720,11 +720,11 @@ function send_standard_email($recipient, $content, Array $options = ['subject' =
 	$mail->Port       = $row['port'];
 	if(isset($options['teamid'])){
 		$result = $conn->query("SELECT emailName, email, emailSignature, companyID FROM teamData WHERE id = ".$options['teamid']." LIMIT 1");
-		if($teamRow = $result->fetch_assoc()){
+		if($result && ($teamRow = $result->fetch_assoc())){
 			$mail->setFrom($teamRow['email'], $teamRow['emailName']);
 			$signature = $teamRow['emailSignature'];
 			$companyID = $teamRow['companyID'];
-		} else{
+		} else {
 			echo 'Could not find teamid ', $conn->error;
 		}
 	} elseif(isset($options['senderid'])){
@@ -748,12 +748,12 @@ function send_standard_email($recipient, $content, Array $options = ['subject' =
 	}
 	if(isset($options['reply'])) $mail->addReplyTo($options['reply']);
 	if(!empty($options['bcc'])){
-		foreach($options['bcc'] as $email -> $name){
+		foreach($options['bcc'] as $email => $name){
 			$mail->AddBCC($email, $name);
 		}
 	}
 	if(!empty($options['cc'])){
-		foreach($options['cc'] as $email -> $name){
+		foreach($options['cc'] as $email => $name){
 			$mail->AddCC($email, $name);
 		}
 	}
