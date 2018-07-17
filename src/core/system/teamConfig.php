@@ -72,16 +72,12 @@ if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
     $conn->query("UPDATE teamData SET name = '$name', email='$email', emailName='$emailName', emailSignature = '$signature' WHERE id = $teamID");
 	if(empty($_POST['isDepartment'])){
 	    $conn->query("UPDATE teamData SET isDepartment = 'FALSE' WHERE id = $teamID");
-	    if(!$conn->error){
-	        echo '<div class="alert alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>';
-	    }
 	} else {
 	    $result = $conn->query("SELECT userID FROM relationship_team_user WHERE teamID = $teamID AND userID IN
 	        (SELECT userID FROM relationship_team_user, teamData WHERE teamData.id = teamID AND teamData.id != $teamID AND teamData.isDepartment = 'TRUE')");
 	    if($result && $result->num_rows > 0){
 	        $row = $result->fetch_assoc();
-	        echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.
-				$userID_toName[$row['userID']].' befindet sich bereits in einer anderen Abteilung.</div>';
+	        echo showError($userID_toName[$row['userID']].' befindet sich bereits in einer anderen Abteilung.');
 	        $result->free();
 	    } elseif($result) {
 	        $conn->query("UPDATE teamData SET isDepartment = 'TRUE' WHERE id = $teamID");
@@ -92,10 +88,9 @@ if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
     }
 }
 
+if($conn->error){ showError($conn->error.__LINE__); }
+
 $activeTab = $teamID;
-if($conn->error){
-	echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
-}
 $percentage_select = '';
 for($i = 0; $i < 11; $i++){
     $percentage_select .= '<option value="'.($i*10).'">'.($i*10).'%</option>';
