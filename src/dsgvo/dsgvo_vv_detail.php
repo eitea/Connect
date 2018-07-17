@@ -52,16 +52,18 @@ function insertVVLog($short,$long){
 }
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    $stmt_update_setting = $conn->prepare("UPDATE dsgvo_vv_settings SET setting = ? WHERE id = ?");
-    $stmt_update_setting->bind_param("si", $setting_encrypt, $valID);
-    $stmt_insert_setting = $conn->prepare("INSERT INTO dsgvo_vv_settings(vv_id, setting_id, setting, category) VALUES($vvID, ?, ?, ?)");
-    $stmt_insert_setting->bind_param("iss", $setID, $setting_encrypt, $cat);
+	if(isset($_POST['dsgvo_vv_detail_save'])){
+		$stmt_update_setting = $conn->prepare("UPDATE dsgvo_vv_settings SET setting = ? WHERE id = ?");
+		$stmt_update_setting->bind_param("si", $setting_encrypt, $valID);
+		$stmt_insert_setting = $conn->prepare("INSERT INTO dsgvo_vv_settings(vv_id, setting_id, setting, category) VALUES($vvID, ?, ?, ?)");
+		$stmt_insert_setting->bind_param("iss", $setID, $setting_encrypt, $cat);
 
-    $stmt_insert_setting_client = $conn->prepare("INSERT INTO dsgvo_vv_settings(vv_id, setting_id, setting, category, clientID) VALUES($vvID, ?, ?, ?, ?)");
-    $stmt_insert_setting_client->bind_param("issi", $setID, $setting_encrypt, $cat, $clientID);
+		$stmt_insert_setting_client = $conn->prepare("INSERT INTO dsgvo_vv_settings(vv_id, setting_id, setting, category, clientID) VALUES($vvID, ?, ?, ?, ?)");
+		$stmt_insert_setting_client->bind_param("issi", $setID, $setting_encrypt, $cat, $clientID);
 
-    $stmt_insert_setting_matrix = $conn->prepare("INSERT INTO dsgvo_vv_settings(vv_id, matrix_setting_id, setting, category) VALUES($vvID, ?, ?, ?)");
-    $stmt_insert_setting_matrix->bind_param("iss", $setID, $setting_encrypt, $cat);
+		$stmt_insert_setting_matrix = $conn->prepare("INSERT INTO dsgvo_vv_settings(vv_id, matrix_setting_id, setting, category) VALUES($vvID, ?, ?, ?)");
+		$stmt_insert_setting_matrix->bind_param("iss", $setID, $setting_encrypt, $cat);
+	}
 
 	$bucket = $identifier .'-uploads'; //no uppercase, no underscores, no ending dashes, no adjacent special chars
 	require dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.'aws'.DIRECTORY_SEPARATOR.'autoload.php';
@@ -224,6 +226,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 </div>
 
 <form id="mainForm" method="POST">
+	<input type="hidden" name="dsgvo_vv_detail_save" value="1"/>
 	<div class="page-content-fixed-100">
 	<?php
 	$settings = getSettings('DESCRIPTION');
@@ -583,7 +586,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                    $cats = getSettings('APP_CAT_'.util_strip_prefix($key, 'APP_GROUP_').'_%', false, true);
 	                    echo '<tr><td rowspan="'.(count($cats) +1).'" >'.$val['descr'].'</td></tr>';
 	                    foreach($cats as $catKey => $catVal){
-	                        if($_SERVER['REQUEST_METHOD'] == 'POST'){
+	                        if(isset($_POST['dsgvo_vv_detail_save'])){ //5b4dc21e82dbf
 	                            $valID = $catVal['valID'];
 	                            if(!empty($_POST[$catKey])){
 	                                $catVal['setting'] = $setting = '1';
@@ -623,7 +626,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                        foreach($heading as $headKey => $headVal){
 	                            $j = array_search($catKey, $headVal['category']); //$j = numeric index
 	                            $checked = ($j && $headVal['setting'][$j]) ? 'checked' : '';
-	                            if($_SERVER['REQUEST_METHOD'] == 'POST'){
+	                            if(isset($_POST['dsgvo_vv_detail_save'])){ //5b4dc21e82dbf
 	                                if(!empty($_POST[$headKey.'_'.$catKey])){
 	                                    $setting = '1';
 	                                    $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
