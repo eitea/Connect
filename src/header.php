@@ -1186,6 +1186,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 <!-- /side menu -->
 
  <script>
+ //5b3f2f5618fd2
  //note: this will never return false. it will keep the session alive unless user logged out manually or closed his browser (look up usage of session_start())
      // notify the user of a session timeout
     sessionIsAlive = true;
