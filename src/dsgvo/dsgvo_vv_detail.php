@@ -426,7 +426,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                $escaped_setting = test_input($setting);
 	                insertVVLog("UPDATE","Update '$name' for Procedure Directory $vvID to '$escaped_setting'");
 	            }
-	        }else{
+	        } else {
 	            $setID = $settings[$name]['id'];
 	            $stmt_insert_setting->execute();
 	            $escaped_setting = test_input($setting);
@@ -434,7 +434,6 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	        }
 	    }
 	}
-
 	if(isset($settings['EXTRA_DVR'])){
 	    update_or_insert_extra($settings, "EXTRA_DVR");
 	    update_or_insert_extra($settings, "EXTRA_DAN");

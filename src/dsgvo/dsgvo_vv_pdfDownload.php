@@ -128,16 +128,19 @@ while($result && ($vv_row = $result->fetch_assoc())){
 		$pdf->SetFont('Helvetica','B', 10);
 		$pdf->MultiCell(0, 5, iconv('UTF-8', 'windows-1252', $settings['EXTRA_DVR']['descr']), 0, 1);
 		$pdf->SetFont('Helvetica','',8);
-		$pdf->MultiCell(0, 5, iconv('UTF-8', 'windows-1252', 'DVR-Nummer: '.$settings['EXTRA_DVR']['setting']."\n".'DAN-Nummer: '.$settings['EXTRA_DAN']['setting']));
+		$pdf->MultiCell(0, 5, iconv('UTF-8', 'windows-1252', 'DVR-Nummer: '.$settings['EXTRA_DVR']['setting']));
+		if(isset($settings['EXTRA_DAN'])){
+			$pdf->MultiCell(0, 5, iconv('UTF-8', 'windows-1252', "\n".'DAN-Nummer: '.$settings['EXTRA_DAN']['setting']));
+		}
 	}
 	if(!empty($settings['EXTRA_FOLGE'])){
 		$pdf->SetFont('Helvetica','B', 10);
 		$pdf->MultiCell(0, 5, iconv('UTF-8', 'windows-1252', $settings['EXTRA_FOLGE']['descr']), 0, 1);
 		$pdf->SetFont('Helvetica','',8);
-		if(intval($settings['EXTRA_FOLGE_CHOICE']['setting']) === 1){
+		if(isset($settings['EXTRA_FOLGE_CHOICE']) && intval($settings['EXTRA_FOLGE_CHOICE']['setting']) === 1){
 			$pdf->Cell(0, 5, 'Ja', 0, 1);
 			if($settings['EXTRA_FOLGE_DATE']['setting']) $pdf->Cell(0, 5, $settings['EXTRA_FOLGE_DATE']['setting'], 0, 1);
-		} elseif(intval($settings['EXTRA_FOLGE_CHOICE']['setting']) === 0){
+		} elseif(isset($settings['EXTRA_FOLGE_CHOICE']) && intval($settings['EXTRA_FOLGE_CHOICE']['setting']) === 0){
 			$pdf->Cell(0, 5, 'Nein', 0, 1);
 			if($settings['EXTRA_FOLGE_REASON']['setting']) $pdf->Cell(0, 5, iconv('UTF-8', 'windows-1252', $settings['EXTRA_FOLGE_REASON']['setting']), 0, 1);
 		}
