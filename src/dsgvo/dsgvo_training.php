@@ -96,11 +96,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         showError($conn->error);
         $stmt->bind_param("s", $text);
         $stmt->execute();
-        $conn->query("SELECT trainingID FROM dsgvo_training_questions WHERE id = $questionID");
         if ($stmt->error) {
             showError($stmt->error);
         } else {
             showSuccess($lang["OK_SAVE"]);
+        }
+        $result = $conn->query("SELECT trainingID FROM dsgvo_training_questions WHERE id = $questionID");
+        if($result && ($row = $result->fetch_assoc())){
+            $trainingID = $row["trainingID"];
         }
         insertVVLog("UPDATE", "Edit question with id '$questionID'");
     } elseif (isset($_POST["editTraining"])) {
