@@ -200,40 +200,48 @@ function user_has_unanswered_on_login_surveys_query($userID) : array
 $default_answer_choices = array(array("value" => 0, "text" => "Ich habe den Text gelesen"));
 $question_regex = '/\{.*?\}/s';
 $html_regex = '/\<\/*.+?\/*\>/s';
+$question_inner_regex = '/\[([\S+])\]([^\[\}]+)/s';
 
 /**
  * Removes questions (enclosed in '{}') from html.
  */
 function strip_questions(string $html)
 {
-    $regexp = '/\{.*?\}/s';
-    return preg_replace($regexp, "", $html);
+    return preg_replace('/\{.*?\}/s', "", $html);
 }
 
 /**
- * Removes html and returns an array of answers for survey.js
+ * Removes html and returns information needed for survey.js
  */
-function parse_question_answers(string $html, bool $survey) : array
+function parse_question(string $html, bool $survey) : array
 {
     global $default_answer_choices;
     global $question_regex;
     global $html_regex;
+    global $question_inner_regex;
+    $title = $survey ? "Auswählen" : "Welche dieser Antworten ist richtig?";
     $html = preg_replace($html_regex, "", $html); // strip all html tags
     preg_match($question_regex, $html, $matches);
     // only parse the first question
-    if (sizeof($matches) == 0) return [$default_answer_choices, "boolean", "Ich habe den Text gelesen"];
+    if (sizeof($matches) == 0) return [$default_answer_choices, "boolean", "Ich habe den Text gelesen", $title];
     $question = $matches[0]; // eg "{[-]wrong answer[+]right answer}"
-    $answer_regex = '/\[([+-])\]([^\[\}]+)/s';
-    preg_match_all($answer_regex, $question, $matches);
-    if (sizeof($matches) == 0) return [$default_answer_choices, "boolean", "Ich habe den Text gelesen"];
+    preg_match_all($question_inner_regex, $question, $matches);
+    if (sizeof($matches) == 0) return [$default_answer_choices, "boolean", "Ich habe den Text gelesen", $title];
     $ret_array = array();
-    foreach ($matches[2] as $key => $value) {
-        $ret_array[] = array("value" => $key, "text" => html_entity_decode($value));
+    for ($i = 0; $i < count($matches[0]); $i++) {
+        $operator = $matches[1][$i]; // + ... right, - ... wrong, ? ... question, ...
+        $value = $matches[2][$i];
+        if ($operator == "-" || $operator == "+") {
+            $ret_array[] = array("value" => $i, "text" => html_entity_decode($value));
+        }
+        if ($operator == "?") {
+            $title = html_entity_decode($value);
+        }
     }
     if (sizeof($ret_array) == 0) {
-        return [$default_answer_choices, "boolean", "Ich habe den Text gelesen"];
+        return [$default_answer_choices, "boolean", "Ich habe den Text gelesen", $title];
     }
-    return [$ret_array, "radiogroup"];
+    return [$ret_array, "radiogroup", "", $title];
 }
 
 /**
@@ -241,21 +249,7 @@ function parse_question_answers(string $html, bool $survey) : array
  */
 function parse_question_title(string $html, bool $survey) : string
 {
-    global $question_regex;
-    global $html_regex;
-    $defaultTitle = $survey ? "Auswählen" : "Welche dieser Antworten ist richtig?";
-    $html = preg_replace($html_regex, "", $html); // strip all html tags
-    preg_match($question_regex, $html, $matches);
-    // only parse the first question
-    if (sizeof($matches) == 0) return $defaultTitle;
-    $question = $matches[0]; // eg "{[-]wrong answer[+]right answer}"
-    $answer_regex = '/\[([\?])\]([^\[\}]+)/s';
-    preg_match_all($answer_regex, $question, $matches);
-    if (sizeof($matches) == 0) return $defaultTitle;
-    foreach ($matches[2] as $key => $value) {
-        return html_entity_decode($value);
-    }
-    return $defaultTitle;
+    return "$.defaultTitle";
 }
 
 /**
@@ -265,9 +259,7 @@ function parse_question_title(string $html, bool $survey) : string
  */
 function generate_survey_page(array $options) : array
 {
-    list($choices, $question_type, $label) = parse_question_answers($options["text"], $options["survey"]);
-    $title = parse_question_title($options["text"], $options["survey"]);
-    var_dump($question_type);
+    list($choices, $question_type, $label, $title) = parse_question($options["text"], $options["survey"]);
     $question = [
         "type" => $question_type,
         "name" => $options["id"],
@@ -296,13 +288,13 @@ function validate_question($html, $answer) : bool
 {
     global $question_regex;
     global $html_regex;
+    global $question_inner_regex;
     $html = preg_replace($html_regex, "", $html); // strip all html tags
     preg_match($question_regex, $html, $matches);
     // only parse the first question
     if (sizeof($matches) == 0) return $answer == true;
     $question = $matches[0]; // eg "{[-]wrong answer[+]right answer}"
-    $answer_regex = '/\[([+-])\]([^\[\}]+)/s';
-    preg_match_all($answer_regex, $question, $matches);
+    preg_match_all($question_inner_regex, $question, $matches);
     if (sizeof($matches) == 0) return $answer == true;
     if (!isset($matches[1][$answer])) return false;
     if ($matches[1][$answer] == "+") return true;
