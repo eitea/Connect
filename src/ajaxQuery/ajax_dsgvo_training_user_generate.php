@@ -7,10 +7,10 @@ require dirname(__DIR__) . DIRECTORY_SEPARATOR . "utilities.php";
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "dsgvo" . DIRECTORY_SEPARATOR . "dsgvo_training_common.php";
 $onLogin = false;
 $doneSurveys = false;
-if(isset($_REQUEST["onLogin"])){
+if (isset($_REQUEST["onLogin"])) {
     $onLogin = true;
 }
-if(isset($_REQUEST["done"])){
+if (isset($_REQUEST["done"])) {
     $doneSurveys = true;
 }
 
@@ -20,7 +20,7 @@ $allowSuspension = !$result || $result->num_rows == 0;
 list($sql_error, $userHasUnansweredSurveys) = user_has_unanswered_surveys_query($userID);
 $error_output .= showError($sql_error);
 
-if(!$userHasUnansweredSurveys && !$doneSurveys){
+if (!$userHasUnansweredSurveys && !$doneSurveys) {
     ?>
         <div class="modal fade survey-modal">
             <div class="modal-dialog modal-content modal-md">
@@ -59,12 +59,12 @@ $result = $conn->query( // this gets all trainings the user can complete
 );
 showError($conn->error);
 $trainingArray = array(); // those are the survey pages
-while ($row = $result->fetch_assoc()){
+while ($row = $result->fetch_assoc()) {
     $questionArray = array();
     $trainingID = $row["id"];
     $random = $row["random"];
     $result_question = false;
-    if(!$doneSurveys){
+    if (!$doneSurveys) {
         $result_question = $conn->query(
             "SELECT tq.id, tq.text, t.onLogin FROM dsgvo_training_questions tq
             INNER JOIN dsgvo_training t ON t.id = tq.trainingID
@@ -77,9 +77,9 @@ while ($row = $result->fetch_assoc()){
                 WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
             )"
         ); // only select not completed questions
-    }else{
+    } else {
         $result_question = $conn->query(
-            "SELECT tq.id, tq.text, t.onLogin FROM dsgvo_training_questions tq
+            "SELECT tq.id, tq.text, t.onLogin, tq.title, tq.survey FROM dsgvo_training_questions tq
             INNER JOIN dsgvo_training t ON t.id = tq.trainingID
             WHERE tq.trainingID = $trainingID AND
             EXISTS (
@@ -92,27 +92,19 @@ while ($row = $result->fetch_assoc()){
         ); //only select completed questions
     }
     showError($conn->error);
-    while($row_question = $result_question->fetch_assoc()){
-        $questionArray = array();
-        $questionArray[] = array(
-            "type"=>"html",
-            "name"=>"question",
-            "html"=>strip_questions($row_question["text"])
-        );
-        $choices = parse_question_answers($row_question["text"]);
-        $questionArray[] = array(
-            "type"=>"radiogroup",
-            "name"=>$row_question["id"],
-            "title"=>parse_question_title($row_question["text"]),
-            "isRequired"=>($row_question["onLogin"] == 'TRUE' && !$doneSurveys),
-            "colCount"=>1,
-            "choicesOrder"=>$random == 'TRUE'?"random":"none",
-            "choices"=>$choices
-        );
+    while ($row_question = $result_question->fetch_assoc()) {
         $trainingArray[] = array(
-            "name"=>$trainingID,
-            "title"=>$row["name"],
-            "elements"=>$questionArray,
+            "name" => $trainingID,
+            "title" => $row["name"] . " - " . $row_question["title"],
+            "elements" => generate_survey_page(
+                [
+                    "text" => $row_question["text"],
+                    "id" => $row_question["id"],
+                    "required" => $row_question["onLogin"] == 'TRUE' && !$doneSurveys,
+                    "random" => $random,
+                    "survey" => $row_question["survey"] == 'TRUE'
+                ]
+            ),
         );
     }
 }
@@ -131,10 +123,10 @@ while ($row = $result->fetch_assoc()){
             </div>
             <div class="modal-footer">
                 <button data-toggle="modal" data-target="#explain-surveys" class="btn btn-default" type="button"><?php echo $lang['HELP'] ?></a>
-                <?php if($onLogin && $allowSuspension): ?>
+                <?php if ($onLogin && $allowSuspension) : ?>
                   <button type="button" class="btn btn-warning" id="suspend_trainings_btn"><?php echo $lang['POSTPONE_ONE_DAY'] ?></button>
                 <?php endif; ?>
-                <?php if(!$onLogin): ?>  <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button> <?php endif; ?>
+                <?php if (!$onLogin) : ?>  <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button> <?php endif; ?>
             </div>
         </div>
     </div>
@@ -143,12 +135,13 @@ while ($row = $result->fetch_assoc()){
         Survey.Survey.cssType = "bootstrap";
         Survey.defaultBootstrapCss.navigationButton = "btn btn-warning";
         var json = <?php echo json_encode(array(
-            "pages"=> $trainingArray,
-            "showProgressBar"=>"top",
-            "requiredText"=>"(".$lang['REQUIRED_FIELD'].") ",
-            "showPageNumbers"=>true,
-            "locale"=>$lang['LOCALE']
-        )) ?>;
+                        "pages" => $trainingArray,
+                        "showProgressBar" => "top",
+                        "requiredText" => "(" . $lang['REQUIRED_FIELD'] . ") ",
+                        "showPageNumbers" => true,
+                        "showQuestionNumbers" => "off",
+                        "locale" => $lang['LOCALE']
+                    )) ?>;
         window.survey = new Survey.Model(json);
         survey
             .onComplete

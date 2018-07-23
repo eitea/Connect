@@ -6,6 +6,7 @@ $userID = $_SESSION['userid'];
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "connection.php";
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "language.php";
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "utilities.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "dsgvo" . DIRECTORY_SEPARATOR . "dsgvo_training_common.php";
 
 if (isset($_POST["suspend"])) {
     $result = $conn->query("SELECT suspension_count FROM dsgvo_training_user_suspension WHERE userID = $userID");
@@ -47,23 +48,6 @@ if (isset($_POST["test"]) && $_POST["test"] == true) {
     $test = true;
 }
 
-function validate_questions($html, $answer)
-{ // this will true or false (will work with multiple right questions)
-    $answer = intval($answer);
-    $questionRegex = '/\{.*?\}/s';
-    $htmlRegex = '/<\/*\w+\/*>/s';
-    $html = preg_replace($htmlRegex, "", $html); // strip all html tags
-    preg_match($questionRegex, $html, $matches);
-    // I only parse the first question for now
-    if (sizeof($matches) == 0) return $answer == 0;
-    $question = $matches[0]; // eg "{[-]wrong answer[+]right answer}"
-    $answerRegex = '/\[([+-])\]([^\[\}]+)/s';
-    preg_match_all($answerRegex, $question, $matches);
-    if (sizeof($matches) == 0) return $answer == 0;
-    if (!isset($matches[1][$answer])) return false;
-    if ($matches[1][$answer] == "+") return true;
-    return false;
-}
 $times = array();
 $numberOfAnsweredQuestions = array(); // per set (for average time)
 foreach ($result as $formVal => $time) {
@@ -93,10 +77,12 @@ foreach ($result as $formVal => $answer) {
     $question_row = $question_result->fetch_assoc();
     $html = $question_row["text"];
     $trainingID = $question_row["trainingID"];
-    $training_row = $conn->query("SELECT version,allowOverwrite FROM dsgvo_training WHERE id = $trainingID")->fetch_assoc();
+    $training_row_result = $conn->query("SELECT version,allowOverwrite FROM dsgvo_training WHERE id = $trainingID");
+    showError($conn->error);
+    $training_row = $training_row_result->fetch_assoc();
     $version = $question_row["version"];
     $allowOverwrite = $training_row["allowOverwrite"] === "TRUE";
-    $questionRight = validate_questions($html, $answer);
+    $questionRight = validate_question($html, $answer);
     $questionExists = $conn->query("SELECT questionID FROM dsgvo_training_completed_questions WHERE questionID = $questionID AND userID = $userID")->num_rows > 0;
     $time = 0;
     if (isset($times[$trainingID], $numberOfAnsweredQuestions[$trainingID])) {

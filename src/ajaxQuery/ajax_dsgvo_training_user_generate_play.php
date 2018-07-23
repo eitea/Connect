@@ -15,28 +15,20 @@ $row = $result->fetch_assoc();
 $questionArray = array();
 $random = $row["random"];
 $onLogin = $row["onLogin"];
-$result_questions = $conn->query("SELECT id, text FROM dsgvo_training_questions WHERE trainingID = $trainingID"); 
-while($row_question = $result_questions->fetch_assoc()){
-    $questionArray = array();
-    $questionArray[] = array(
-        "type"=>"html",
-        "name"=>"question",
-        "html"=>strip_questions($row_question["text"])
-    );
-    $choices = parse_question_answers($row_question["text"]);
-    $questionArray[] = array(
-        "type"=>"radiogroup",
-        "name"=>$row_question["id"],
-        "title"=>parse_question_title($row_question["text"]),
-        "isRequired"=>$onLogin == 'TRUE',
-        "colCount"=>1,
-        "choicesOrder"=>$random == 'TRUE'?"random":"none",
-        "choices"=>$choices
-    );
+$result_questions = $conn->query("SELECT id, text, title, survey FROM dsgvo_training_questions WHERE trainingID = $trainingID");
+while ($row_question = $result_questions->fetch_assoc()) {
     $trainingArray[] = array(
-        "name"=>$trainingID,
-        "title"=>$row["name"],
-        "elements"=>$questionArray,
+        "name" => $trainingID,
+        "title" => $row["name"] . " - " . $row_question["title"],
+        "elements" => generate_survey_page(
+            [
+                "text" => $row_question["text"],
+                "id" => $row_question["id"],
+                "required" => $onLogin == 'TRUE',
+                "random" => $random,
+                "survey" => $row_question["survey"] == 'TRUE'
+            ]
+        ),
     );
 }
 
@@ -62,12 +54,13 @@ while($row_question = $result_questions->fetch_assoc()){
         Survey.Survey.cssType = "bootstrap";
         Survey.defaultBootstrapCss.navigationButton = "btn btn-warning";
         var json = <?php echo json_encode(array(
-            "pages"=> $trainingArray,
-            "showProgressBar"=>"top",
-            "requiredText"=>"(".$lang['REQUIRED_FIELD'].") ",
-            "showPageNumbers"=>true,
-            "locale"=>$lang['LOCALE']
-        )) ?>;
+                        "pages" => $trainingArray,
+                        "showProgressBar" => "top",
+                        "requiredText" => "(" . $lang['REQUIRED_FIELD'] . ") ",
+                        "showPageNumbers" => true,
+                        "showQuestionNumbers" => "off",
+                        "locale" => $lang['LOCALE']
+                    )) ?>;
         window.survey = new Survey.Model(json);
         survey
             .onComplete

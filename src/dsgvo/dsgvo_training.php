@@ -65,9 +65,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif (isset($_POST['addQuestion']) && !empty($_POST['question']) && !empty($_POST["title"])) {
         $trainingID = intval($_POST['addQuestion']);
         $title = test_input($_POST["title"]);
+        $survey = isset($_POST["survey"])?'TRUE':'FALSE';
         $text = $_POST["question"]; // todo: test input
         $version = 1;
-        $stmt = $conn->prepare("INSERT INTO dsgvo_training_questions (trainingID, text, title, version) VALUES ($trainingID, ?, '$title', $version)");
+        $stmt = $conn->prepare("INSERT INTO dsgvo_training_questions (trainingID, text, title, version, survey) VALUES ($trainingID, ?, '$title', $version, '$survey')");
         if ($conn->error) {
             showError($conn->error);
         } else {
@@ -92,7 +93,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $title = test_input($_POST["title"]);
         $text = $_POST["question"]; //todo: test input
         $version = intval($_POST["version"]);
-        $stmt = $conn->prepare("UPDATE dsgvo_training_questions SET text = ?, title = '$title', version = $version WHERE id = $questionID");
+        $survey = isset($_POST["survey"])?'TRUE':'FALSE';
+        $stmt = $conn->prepare("UPDATE dsgvo_training_questions SET text = ?, title = '$title', version = $version, survey = '$survey' WHERE id = $questionID");
         showError($conn->error);
         $stmt->bind_param("s", $text);
         $stmt->execute();
@@ -102,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             showSuccess($lang["OK_SAVE"]);
         }
         $result = $conn->query("SELECT trainingID FROM dsgvo_training_questions WHERE id = $questionID");
-        if($result && ($row = $result->fetch_assoc())){
+        if ($result && ($row = $result->fetch_assoc())) {
             $trainingID = $row["trainingID"];
         }
         insertVVLog("UPDATE", "Edit question with id '$questionID'");
@@ -198,9 +200,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $insert_module_stmt->bind_param("s", $name);
         $insert_training_stmt = $conn->prepare("INSERT INTO dsgvo_training (name,companyID,moduleID,version,onLogin,allowOverwrite,random) VALUES(?, ?, ?, ?, ?, ?, ?)");
         $insert_training_stmt->bind_param("siiisss", $name, $companyID, $moduleID, $version, $onLogin, $allowOverwrite, $random);
-        $update_question_stmt = $conn->prepare("UPDATE dsgvo_training_questions SET text = ? WHERE id = ?");
+        $update_question_stmt = $conn->prepare("UPDATE dsgvo_training_questions SET text = ? WHERE id = ?"); // TODO: add support for survey
         $update_question_stmt->bind_param("si", $text, $questionID);
-        $insert_question_stmt = $conn->prepare("INSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES(?, ?, ?)");
+        $insert_question_stmt = $conn->prepare("INSERT INTO dsgvo_training_questions (trainingID, text, title) VALUES(?, ?, ?)"); // TODO: add support for survey
         $insert_question_stmt->bind_param("iss", $trainingID, $text, $title);
         if ($json) {
             foreach ($json as $module) {
@@ -425,7 +427,12 @@ showError($conn->error);
         <div class="modal-dialog modal-content modal-lg">
         <div class="modal-header"><?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['ADD_QUESTION'] ?></div>
         <div class="modal-body">
-            <input type="text" name="title" class="form-control" placeholder="Title"></input><br/>
+            <input type="text" name="title" class="form-control" placeholder="Title"></input>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="survey" value="TRUE"> Umfrage
+                </label>
+            </div>
             <textarea name="question" class="form-control tinymce" placeholder="Question"></textarea>
         </div>
         <div class="modal-footer">

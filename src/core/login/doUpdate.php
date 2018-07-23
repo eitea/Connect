@@ -3257,10 +3257,16 @@ if($row['version'] < 165){
 if($row['version'] < 166){
     $conn->query("ALTER TABLE socialprofile ADD COLUMN new_message_notification ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
     echo $conn->error;
+
+    $conn->query("ALTER TABLE dsgvo_training_questions ADD COLUMN survey ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+    echo $conn->error;
 }
+
 // if($row['version'] < 167){}
 // if($row['version'] < 168){}
 // if($row['version'] < 169){}
+// if($row['version'] < 170){}
+// if($row['version'] < 171){}
 
 //cleanups for maintainable db sizes
 $conn->query("DELETE FROM `checkinLogs` WHERE id <= ( SELECT id FROM ( SELECT id FROM `checkinLogs` ORDER BY id DESC LIMIT 1 OFFSET 100 ) foo )");echo $conn->error;

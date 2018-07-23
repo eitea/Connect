@@ -14,6 +14,7 @@ showError($conn->error);
 $title = $row["title"];
 $text = $row["text"];
 $version = $row["version"];
+$survey = $row["survey"];
 ?>
 <form method="POST">
 <div class="modal fade">
@@ -23,7 +24,12 @@ $version = $row["version"];
         <label for="title"><?php echo $lang['TITLE'] ?></label>
         <input type="text" name="title" class="form-control" placeholder="Title" value="<?php echo $title; ?>"></input><br />
         <label for="version">Version</label>
-        <input type="number" min="<?php echo $version; ?>" step="1" placeholder="Version" name="version" value="<?php echo $version; ?>" class="form-control" /><br />
+        <input type="number" min="<?php echo $version; ?>" step="1" placeholder="Version" name="version" value="<?php echo $version; ?>" class="form-control" />
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" name="survey" value="TRUE" <?php if($survey =='TRUE') {echo "checked"; } ?>> Umfrage
+            </label>
+        </div>
         <textarea name="question" class="form-control tinymce" placeholder="Question"><?php echo $text; ?></textarea>
     </div>
     <div class="modal-footer">

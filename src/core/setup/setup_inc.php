@@ -1387,6 +1387,7 @@ function create_tables($conn) {
         text MEDIUMTEXT,
         trainingID INT(6),
         version INT(6) DEFAULT 1,
+        survey ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         PRIMARY KEY (id),
         FOREIGN KEY (trainingID) REFERENCES dsgvo_training(id) ON UPDATE CASCADE ON DELETE CASCADE
     )";
