@@ -845,6 +845,7 @@ function create_tables($conn) {
         status varchar(150) DEFAULT '-',
         picture MEDIUMBLOB,
         new_message_email ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        new_message_notification ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
 		emailSignature TEXT,
         FOREIGN KEY (userID) REFERENCES UserData(id)
         ON UPDATE CASCADE

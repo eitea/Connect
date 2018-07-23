@@ -257,6 +257,9 @@ $lang_ger['CLASS'] = 'Klasse';
 $lang_eng['CLICK_TO_INSERT'] = 'Click to insert';
 $lang_ger['CLICK_TO_INSERT'] = 'Klicken zum Einfügen';
 
+$lang_eng['CLICK_TO_ACTIVATE'] = 'Click to activate';
+$lang_ger['CLICK_TO_ACTIVATE'] = 'Klicken zum Aktivieren';
+
 $lang_eng['CLIENT'] = 'Client';
 $lang_ger['CLIENT'] = 'Kunde';
 
@@ -1040,6 +1043,12 @@ $lang_ger['NEW_FOLDER'] = 'Neuer Ordner';
 $lang_eng['NEW_GROUP'] = 'New group';
 $lang_ger['NEW_GROUP'] = 'Neue gruppe';
 
+$lang_eng['NEW_MESSAGE_EMAIL'] = 'E-Mail for new chat messages';
+$lang_ger['NEW_MESSAGE_EMAIL'] = 'E-Mail bei neuer Chat Nachricht';
+
+$lang_eng['NEW_MESSAGE_NOTIFICATION'] = 'Web Notification for new chat messages';
+$lang_ger['NEW_MESSAGE_NOTIFICATION'] = 'Web Notification bei neuer Chat Nachricht';
+
 $lang_eng['NEW_OFFER'] = 'New Offer';
 $lang_ger['NEW_OFFER'] = 'Neues Angebot';
 
@@ -1087,6 +1096,9 @@ $lang_ger['NOT_CHARGED'] = 'Nicht Verrechnet';
 
 $lang_eng['NOT_CHARGEABLE'] = 'Don`t charge';
 $lang_ger['NOT_CHARGEABLE'] = 'Erlassen';
+
+$lang_eng['NOT_SUPPORTED_BROWSER'] = 'Not supported by your Browser';
+$lang_ger['NOT_SUPPORTED_BROWSER'] = 'Vom Browser nicht unterstützt';
 
 $lang_eng['NUMBER'] = 'Number';
 $lang_ger['NUMBER'] = 'Nummer';

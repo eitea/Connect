@@ -759,7 +759,16 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 					  </a>
 					  <script>
 					  var firstTime = true;
-					  setInterval(function(){
+                      function displayNotificationIfEnabled(title, body){
+                        var notificationEnabled = <?php $result = $conn->query("SELECT new_message_notification FROM socialprofile WHERE userID = $userID AND new_message_notification = 'TRUE'"); echo $result && $result->num_rows > 0?"true":"false" ?>;
+                        if(notificationEnabled && window.Notification){
+                            var unreadMessageNotification = new Notification(title,{
+                                body: body,
+                                requireInteraction: true
+                            })
+                        }
+                      }
+                      setInterval(function(){
 						  $.ajax({
 							  url: 'ajaxQuery/AJAX_db_utility.php',
 							  type: 'POST',
@@ -773,7 +782,8 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 									  audioElement.play();
 								  }
 								  if(response && firstTime){
-									  firstTime = false;
+                                      displayNotificationIfEnabled("Sie haben eine neue Nachricht erhalten","Sie finden Sie in Ihrer Post")
+                                      firstTime = false;
 									  var newTitle = 'Ungelese Nachricht';
 									  setInterval(function(){
 										  var oldTitle = $(document).find('title').text();

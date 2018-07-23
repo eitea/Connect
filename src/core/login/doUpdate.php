@@ -3255,7 +3255,8 @@ if($row['version'] < 165){
 
 
 if($row['version'] < 166){
-
+    $conn->query("ALTER TABLE socialprofile ADD COLUMN new_message_notification ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+    echo $conn->error;
 }
 // if($row['version'] < 167){}
 // if($row['version'] < 168){}

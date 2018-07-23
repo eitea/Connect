@@ -23,13 +23,14 @@ if (isset($_POST['saveSocial']) && !empty($_POST['social_realemail'])) {
 	}
 	// other settings
 	$signature = $status = '';
-	$notification = $available = 'FALSE';
+	$newMessageNotification = $newMessageEmail = $available = 'FALSE';
 	if (!empty($_POST['social_status'])) { $status = test_input($_POST['social_status']); }
 	if (isset($_POST['social_isAvailable'])) { $available = 'TRUE'; }
-	if (isset($_POST['social_newMessageEmail'])) { $notification = 'TRUE'; }
+	if (isset($_POST['social_newMessageEmail'])) { $newMessageEmail = 'TRUE'; }
+	if (isset($_POST['social_newMessageNotification'])) { $newMessageNotification = 'TRUE'; }
 	if (isset($_POST['social_useEmailSignature']) && !empty($_POST['social_emailSignature'])){ $signature = test_input($_POST['social_emailSignature']); }
-	$conn->query("UPDATE socialprofile SET isAvailable = '$available', emailSignature = '$signature', new_message_email = '$notification',
-		status = '$status' WHERE userID = '$userID'");
+	$conn->query("UPDATE socialprofile SET isAvailable = '$available', emailSignature = '$signature', new_message_email = '$newMessageEmail',
+		status = '$status', new_message_notification = '$newMessageNotification' WHERE userID = '$userID'");
 
 	//5ab7bd3310438
 	if(!empty($_POST['social_birthday']) && test_Date($_POST['social_birthday'], 'Y-m-d')){
@@ -45,7 +46,7 @@ if (isset($_POST['saveSocial']) && !empty($_POST['social_realemail'])) {
 } elseif(isset($_POST['saveSocial'])){
 	showError("Es wurde keine E-Mail Adresse angegeben");
 }
-$result = $conn->query("SELECT picture, status, new_message_email, isAvailable, emailSignature FROM socialprofile WHERE userID = $userID"); echo $conn->error;
+$result = $conn->query("SELECT picture, status, new_message_email, new_message_notification, isAvailable, emailSignature FROM socialprofile WHERE userID = $userID"); echo $conn->error;
 $social_profile = $result->fetch_assoc();
  ?>
 
@@ -81,8 +82,12 @@ $social_profile = $result->fetch_assoc();
 			<input type="email" required name="social_realemail" value="<?php echo $userdata['real_email']; ?>" class="form-control required-field">
 			<label>
 				<input type="checkbox" name="social_newMessageEmail" <?php if($social_profile['new_message_email'] == 'TRUE') {echo 'checked';} ?> >
-				Bei neuer Chat Nachricht per E-Mail informieren
+				<?php echo $lang['NEW_MESSAGE_EMAIL'] ?> 
 			</label>
+			<label>
+				<input type="checkbox" id="social_newMessageNotification" name="social_newMessageNotification" <?php if($social_profile['new_message_notification'] == 'TRUE') {echo 'checked';} ?> >
+				<?php echo $lang['NEW_MESSAGE_NOTIFICATION'] ?> 
+			</label> <span id="notificationState" style="cursor: pointer; user-select: none;-moz-user-select: none;-webkit-user-select: none;-ms-user-select: none;" class="label"></span>
 		</div>
 	</div><hr>
 	<ul class="nav nav-tabs">
@@ -101,4 +106,37 @@ $social_profile = $result->fetch_assoc();
 		<!--div id="template" class="tab-pane fade"></div-->
 	</div>
 </form>
+<script>
+	function requestPermission(){
+		Notification.requestPermission().then(function(result) {
+			console.log(result);
+			updateNotificationBadge()
+		});
+	}
+	function updateNotificationBadge(){
+		if(Notification.permission != "granted"){
+			$badge.html("<?php echo $lang['CLICK_TO_ACTIVATE'] ?>")
+			$badge.removeClass("label-success").addClass("label-warning")		
+		}else{
+			$badge.html("<?php echo $lang['ACTIVE'] ?>")
+			$badge.removeClass("label-warning").addClass("label-success")
+		}
+	}
+	$(document).ready(function(){
+		$badge = $("#notificationState");
+		if(window.Notification){
+			$badge.click(requestPermission);
+			updateNotificationBadge();
+			$("#social_newMessageNotification").change(function(event){
+				var newMessageNotificationChecked = $('input[name="social_newMessageNotification"]:checked').length > 0;
+				if(newMessageNotificationChecked){
+					requestPermission()
+				}
+			})
+		}else{
+			$badge.html("<?php echo $lang['NOT_SUPPORTED_BROWSER'] ?>")
+			$badge.addClass("label-danger")
+		}
+	})
+</script>
 <?php require dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php'; ?>
