@@ -4,56 +4,10 @@ $userID = $_SESSION['userid'] or die("no user signed in");
 $trainingID = isset($_POST["trainingID"]) or die("no training id");
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "connection.php";
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "language.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "dsgvo" . DIRECTORY_SEPARATOR . "dsgvo_training_common.php";
 $trainingID = intval($_POST["trainingID"]);
 $onLogin = false;
 $doneSurveys = false;
-// $hasQuestions = false; // some questions are not valid (invalid syntax)
-
-function strip_questions($html){ // this will be the question
-    $regexp = '/\{.*?\}/s';
-    return preg_replace($regexp, "", $html);
-}
-
-function parse_questions($html){ // this will return an array of questions
-    $questionRegex = '/\{.*?\}/s';
-    $htmlRegex = '/\<\/*.+?\/*\>/s';
-    global $hasQuestions;
-    $html = preg_replace($htmlRegex,"",$html); // strip all html tags
-    preg_match($questionRegex,$html,$matches);
-    // I only parse the first question for now
-    if(sizeof($matches)==0) return array();
-    $question = $matches[0]; // eg "{[-]wrong answer[+]right answer}"
-    $answerRegex = '/\[([+-])\]([^\[\}]+)/s';
-    preg_match_all($answerRegex,$question,$matches);
-    if(sizeof($matches)==0) return array();
-    $ret_array = array();
-    foreach ($matches[2] as $key => $value) {
-        $ret_array[] = array("value"=>$key,"text"=>html_entity_decode($value));
-    }
-    if(sizeof($ret_array) > 0){
-        $hasQuestions = true;
-    }
-    return $ret_array;
-}
-
-function parse_question($html){
-    $questionRegex = '/\{.*?\}/s';
-    $htmlRegex = '/\<\/*.+?\/*\>/s';
-    global $hasQuestions;
-    $html = preg_replace($htmlRegex,"",$html); // strip all html tags
-    preg_match($questionRegex,$html,$matches);
-    // I only parse the first question for now
-    if(sizeof($matches)==0) return "Welche dieser Antworten ist richtig?";
-    $question = $matches[0];
-    $answerRegex = '/\[([\?])\]([^\[\}]+)/s';
-    preg_match_all($answerRegex,$question,$matches);
-    // var_dump($answerRegex);
-    if(sizeof($matches)==0) return "Welche dieser Antworten ist richtig?";
-    foreach ($matches[2] as $key => $value) {
-        return html_entity_decode($value);
-    }
-    return "Welche dieser Antworten ist richtig?";
-}
 
 $trainingArray = array();
 $result = $conn->query("SELECT * FROM dsgvo_training WHERE id = $trainingID");
@@ -69,14 +23,11 @@ while($row_question = $result_questions->fetch_assoc()){
         "name"=>"question",
         "html"=>strip_questions($row_question["text"])
     );
-    $choices = parse_questions($row_question["text"]);
-    if(sizeof($choices) == 0){
-        $choices =  array(array("value"=>0,"text"=>"Ich habe den Text gelesen"));
-    }
+    $choices = parse_question_answers($row_question["text"]);
     $questionArray[] = array(
         "type"=>"radiogroup",
         "name"=>$row_question["id"],
-        "title"=>parse_question($row_question["text"]),
+        "title"=>parse_question_title($row_question["text"]),
         "isRequired"=>$onLogin == 'TRUE',
         "colCount"=>1,
         "choicesOrder"=>$random == 'TRUE'?"random":"none",

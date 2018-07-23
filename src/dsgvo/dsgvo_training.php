@@ -524,13 +524,13 @@ $("button[name=editTraining]").click(function(){
     setCurrentModal({trainingID: $(this).val()},'get', 'ajaxQuery/ajax_dsgvo_training_edit.php')
 })
 $("button[name=infoQuestion]").click(function(){
-    setCurrentModal({questionID: $(this).val()},'get', 'ajaxQuery/AJAX_dsgvoQuestionInfo.php')
+    setCurrentModal({questionID: $(this).val()},'get', 'ajaxQuery/ajax_dsgvo_training_question_info.php')
 })
 $("button[name=infoTraining]").click(function(){
-    setCurrentModal({trainingID: $(this).val()},'get', 'ajaxQuery/AJAX_dsgvoTrainingInfo.php')
+    setCurrentModal({trainingID: $(this).val()},'get', 'ajaxQuery/ajax_dsgvo_training_training_info_chart.php')
 })
 $("button[name=detailedInfoTraining]").click(function(){
-    setCurrentModal({trainingID: $(this).val()},'get', 'ajaxQuery/ajax_dsgvo_training_detailed_training_info.php')
+    setCurrentModal({trainingID: $(this).val()},'get', 'ajaxQuery/ajax_dsgvo_training_training_info_table.php')
 })
 $("button[name=importExport]").click(function(){
     setCurrentModal({operation: $(this).val()}, 'post', 'ajaxQuery/ajax_dsgvo_training_import_export.php')
@@ -542,7 +542,7 @@ $("button[name=testTraining]").click(function(){
     setCurrentModal({trainingID: $(this).val()}, 'post', 'ajaxQuery/ajax_dsgvo_training_user_generate_play.php')
 })
 $("button[name=editModule]").click(function(){
-    setCurrentModal({moduleID: $(this).val()},'get', 'ajaxQuery/AJAX_dsgvoModuleEdit.php')
+    setCurrentModal({moduleID: $(this).val()},'get', 'ajaxQuery/ajax_dsgvo_training_module_edit.php')
 })
 $("button[name=addTraining]").click(function(){
     setCurrentModal({moduleID: $(this).val()},'get', 'ajaxQuery/ajax_dsgvo_training_training_add.php')
@@ -564,25 +564,21 @@ function onModalLoad(){
         file_picker_types: 'image',
             toolbar: 'undo redo | cut copy paste | styleselect numlist bullist forecolor backcolor | link image emoticons charmap | visualblocks | insertquestion insertquestion2',
         setup: function(editor){
-            function insertQuestion(){
-                var html = "<p>{ </p><p>[?] Welche dieser Antworten ist richtig? </p><p>[-] Eine falsche Antwort </p><p>[+] Eine richtige Antwort </p><p> }</p>";
-                editor.insertContent(html);
-            }
-
             editor.addButton("insertquestion",{
                 tooltip: "<?php echo $lang['INSERT_CUSTOM_QUESTION'] ?>",
                 icon: "template",
-                onclick: insertQuestion,
+                onclick: function(){
+                    var html = "<p>{ </p><p>[?] Welche dieser Antworten ist richtig? </p><p>[-] Eine falsche Antwort </p><p>[+] Eine richtige Antwort </p><p> }</p>";
+                    editor.insertContent(html);
+                },
             });
-            function insertQuestion2(){
-                var html = "<p>{ </p><p>[-] Eine falsche Antwort </p><p>[+] Eine richtige Antwort </p><p> }</p>";
-                editor.insertContent(html);
-            }
-
             editor.addButton("insertquestion2",{
                 tooltip: "<?php echo $lang['INSERT_QUESTION'] ?>",
                 icon: "template",
-                onclick: insertQuestion2,
+                onclick: function(){
+                    var html = "<p>{ </p><p>[-] Eine falsche Antwort </p><p>[+] Eine richtige Antwort </p><p> }</p>";
+                    editor.insertContent(html);
+                },
             });
         },
         height : "480",
