@@ -1763,8 +1763,8 @@ $lang_ger['SCHEDULE_TOSTRING'] = array('-1' => 'Inaktiv', '0' => 'Einmalig', '1'
 $lang_eng['TIME_UNIT_TOSTRING'] = array('', 'Day(s)', 'Week(s)', 'Month(s)', 'Year(s)');
 $lang_ger['TIME_UNIT_TOSTRING'] = array('', 'Tag(e)', 'Woche(n)', 'Monat(e)', 'Jahr(e)');
 
-$lang_eng['TRAINING_QUESTION_CORRECT'] = array('TRUE' => 'Right', 'FALSE' => 'Wrong', 'UNANSWERED' => 'Unanswered');
-$lang_ger['TRAINING_QUESTION_CORRECT'] = array('TRUE' => 'Richtig', 'FALSE' => 'Falsch', 'UNANSWERED' => 'Nicht beantwortet');
+$lang_eng['TRAINING_QUESTION_CORRECT'] = array('TRUE' => 'Right', 'FALSE' => 'Wrong', 'UNANSWERED' => 'Unanswered', 'SURVEY' => 'Survey');
+$lang_ger['TRAINING_QUESTION_CORRECT'] = array('TRUE' => 'Richtig', 'FALSE' => 'Falsch', 'UNANSWERED' => 'Nicht beantwortet', 'SURVEY' => 'Umfrage');
 
 $lang_eng['TRAINING_BUTTON_DESCRIPTIONS'] = array(
   'NEW_MODULE' => 'Create a new module', 

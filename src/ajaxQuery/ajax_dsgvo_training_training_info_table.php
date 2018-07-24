@@ -15,38 +15,17 @@ function formatPercent($num)
 function formatTime($num, $noAnswers = false)
 {
     global $lang;
-    if($noAnswers) return "N/A";
-    return "$num ".$lang['SECONDS'];
+    if ($noAnswers) return "N/A";
+    return "$num " . $lang['SECONDS'];
 }
 function getColor($percent, $inverse = false, $noAnswers = false)
 {
-    if($noAnswers) return "#e2e2e2";
-    switch (($inverse ? 10 - round($percent * 10) : round($percent * 10))) {
-        case 10:
-            return "#00FF00";
-        case 9:
-            return "#66FF00";
-        case 8:
-            return "#3FFF00";
-        case 7:
-            return "#7FFF00";
-        case 6:
-            return "#BFFF00";
-        case 5:
-            return "#FFF700";
-        case 4:
-            return "#FFBF00";
-        case 3:
-            return "#FFA500";
-        case 2:
-            return "#FF4500";
-        case 1:
-            return "#FF2400";
-        case 0:
-            return "#FF0000";
-        default:
-            return "#FF0000";
-    }
+    if ($noAnswers) return "#e2e2e2";
+    if ($inverse) $percent = 1 - $percent;
+    $hue = $percent * 120;
+    // hue 0 ... red
+    // hue 120 ... green
+    return "hsl($hue, 75%, 50%)";
 }
 
 $trainingID = $_REQUEST["trainingID"];
@@ -81,13 +60,18 @@ FROM dsgvo_training_questions
 WHERE dsgvo_training_questions.trainingID = $trainingID");
 $total = intval($result->fetch_assoc()["count"]);
 ?>
+<style>
+.vertical-align *{
+    vertical-align: middle; 
+}
+</style>
  <form method="POST">
  <div class="modal fade">
       <div class="modal-dialog modal-content modal-lg">
         <div class="modal-header"><?php echo $lang['RESULT_OF'] ?> <?php echo $name ?></div>
         <div class="modal-body">
             <?php if ($total != 0) : ?>
-            <table class="table table-hover">
+            <table class="table table-hover text-center vertical-align" >
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -98,57 +82,64 @@ $total = intval($result->fetch_assoc()["count"]);
                         <th>% <?php echo $lang['TRAINING_QUESTION_CORRECT']['FALSE'] ?></td>
                         <th><?php echo $lang['TRAINING_QUESTION_CORRECT']['UNANSWERED'] ?></td>
                         <th>% <?php echo $lang['TRAINING_QUESTION_CORRECT']['UNANSWERED'] ?></td>
+                        <th><?php echo $lang['TRAINING_QUESTION_CORRECT']['SURVEY'] ?></td>
                         <th><?php echo $lang['TOTAL_TIME'] ?></td>
                         <th><?php echo $lang['TIME_PER_QUESTION'] ?></td>
                     </tr>
                 </thead>
                 <tbody>
-<?php
-while ($row = $result_user->fetch_assoc()) {
-    $user = $row["userID"];
-    $name = $row["firstname"] . " " . $row["lastname"];
-    $result = $conn->query("SELECT count(*) count
-        FROM dsgvo_training_questions
-        INNER JOIN dsgvo_training_completed_questions ON dsgvo_training_completed_questions.questionID = dsgvo_training_questions.id
-        WHERE userID = $user AND correct = 'TRUE' AND dsgvo_training_questions.trainingID = $trainingID");
-    echo $conn->error;
-    $right = intval($result->fetch_assoc()["count"]);
-    $result = $conn->query("SELECT count(*) count
-        FROM dsgvo_training_questions
-        INNER JOIN dsgvo_training_completed_questions ON dsgvo_training_completed_questions.questionID = dsgvo_training_questions.id
-        WHERE userID = $user AND correct = 'FALSE' AND dsgvo_training_questions.trainingID = $trainingID");
-    $wrong = intval($result->fetch_assoc()["count"]);
-    $unanswered = $total - $right - $wrong;
-    $percentRight = ($right / $total);
-    $percentWrong = ($wrong / $total);
-    $percentUnanswered = ($unanswered / $total);
-    $result = $conn->query("SELECT sum(duration) duration
-    FROM dsgvo_training_questions
-    INNER JOIN dsgvo_training_completed_questions ON dsgvo_training_completed_questions.questionID = dsgvo_training_questions.id
-    WHERE userID = $user AND dsgvo_training_questions.trainingID = $trainingID");
-    echo $conn->error;
-    $time = intval($result->fetch_assoc()["duration"]);
-    if($total - $unanswered == 0){
-        $timePerQuestion = 0;
-        $noAnswers = true;
-    }else{
-        $timePerQuestion = round($time / ($total - $unanswered));
-        $noAnswers = false;
-    }
-    echo "<tr>";
-    echo "<td>$user</td>";
-    echo "<td>$name</td>";
-    echo "<td style='background-color:" . getColor($percentRight, false, $noAnswers) . ";'>$right</td>";
-    echo "<td style='background-color:" . getColor($percentRight, false, $noAnswers) . ";'>" . formatPercent($percentRight) . "</td>";
-    echo "<td style='background-color:" . getColor($percentWrong, true, $noAnswers) . ";'>$wrong</td>";
-    echo "<td style='background-color:" . getColor($percentWrong, true, $noAnswers) . ";'>" . formatPercent($percentWrong) . "</td>";
-    echo "<td style='background-color:" . getColor($percentUnanswered, true, $noAnswers) . ";'>$unanswered</td>";
-    echo "<td style='background-color:" . getColor($percentUnanswered, true, $noAnswers) . ";'>" . formatPercent($percentUnanswered) . "</td>";
-    echo "<td>" . formatTime($time, $noAnswers) . "</td>";
-    echo "<td>" . formatTime($timePerQuestion, $noAnswers) . "</td>";
-    echo "</tr>";
-}
-?>
+                    <?php
+                    while ($row = $result_user->fetch_assoc()) {
+                        $user = $row["userID"];
+                        $name = $row["firstname"] . " " . $row["lastname"];
+                        $result = $conn->query("SELECT count(*) count
+                            FROM dsgvo_training_questions
+                            INNER JOIN dsgvo_training_completed_questions ON dsgvo_training_completed_questions.questionID = dsgvo_training_questions.id
+                            WHERE userID = $user AND correct = 'TRUE' AND survey = 'FALSE' AND dsgvo_training_questions.trainingID = $trainingID");
+                        echo $conn->error;
+                        $right = intval($result->fetch_assoc()["count"]);
+                        $result = $conn->query("SELECT count(*) count
+                            FROM dsgvo_training_questions
+                            INNER JOIN dsgvo_training_completed_questions ON dsgvo_training_completed_questions.questionID = dsgvo_training_questions.id
+                            WHERE userID = $user AND correct = 'FALSE' AND survey = 'FALSE' AND dsgvo_training_questions.trainingID = $trainingID");
+                        $wrong = intval($result->fetch_assoc()["count"]);
+                        $result = $conn->query("SELECT count(*) count
+                            FROM dsgvo_training_questions
+                            INNER JOIN dsgvo_training_completed_questions ON dsgvo_training_completed_questions.questionID = dsgvo_training_questions.id
+                            WHERE userID = $user AND survey = 'TRUE' AND dsgvo_training_questions.trainingID = $trainingID");
+                        $survey = intval($result->fetch_assoc()["count"]);
+                        $unanswered = $total - $right - $wrong;
+                        $percentRight = ($right / $total);
+                        $percentWrong = ($wrong / $total);
+                        $percentUnanswered = ($unanswered / $total);
+                        $result = $conn->query("SELECT sum(duration) duration
+                        FROM dsgvo_training_questions
+                        INNER JOIN dsgvo_training_completed_questions ON dsgvo_training_completed_questions.questionID = dsgvo_training_questions.id
+                        WHERE userID = $user AND dsgvo_training_questions.trainingID = $trainingID");
+                        echo $conn->error;
+                        $time = intval($result->fetch_assoc()["duration"]);
+                        if ($total - $unanswered == 0) {
+                            $timePerQuestion = 0;
+                            $noAnswers = true;
+                        } else {
+                            $timePerQuestion = round($time / ($total - $unanswered));
+                            $noAnswers = false;
+                        }
+                        echo "<tr>";
+                        echo "<td>$user</td>";
+                        echo "<td>$name</td>";
+                        echo "<td style='background-color:" . getColor($percentRight, false, $noAnswers) . ";'>$right</td>";
+                        echo "<td style='background-color:" . getColor($percentRight, false, $noAnswers) . ";'>" . formatPercent($percentRight) . "</td>";
+                        echo "<td style='background-color:" . getColor($percentWrong, true, $noAnswers) . ";'>$wrong</td>";
+                        echo "<td style='background-color:" . getColor($percentWrong, true, $noAnswers) . ";'>" . formatPercent($percentWrong) . "</td>";
+                        echo "<td style='background-color:" . getColor($percentUnanswered, true, $noAnswers) . ";'>$unanswered</td>";
+                        echo "<td style='background-color:" . getColor($percentUnanswered, true, $noAnswers) . ";'>" . formatPercent($percentUnanswered) . "</td>";
+                        echo "<td style='background-color:#5086e5;'>" . $survey . "</td>";
+                        echo "<td>" . formatTime($time, $noAnswers) . "</td>";
+                        echo "<td>" . formatTime($timePerQuestion, $noAnswers) . "</td>";
+                        echo "</tr>";
+                    }
+                    ?>
                 </tbody>
             </table>
             <?php else : ?>

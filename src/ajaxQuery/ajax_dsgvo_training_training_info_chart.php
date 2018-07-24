@@ -42,38 +42,57 @@ foreach ($userArray as $user) {
     $nameArray[] = $user["name"];
 }
 $numberOfQuestions = $conn->query("SELECT count(*) count FROM dsgvo_training_questions WHERE trainingID = $trainingID")->fetch_assoc()["count"];
-$pointsRightArray = array();
-$pointsWrongArray = array();
-$pointsUnansweredArray = array();
-$rightColors = array();
-$wrongColors = array();
-$unansweredColors = array();
-$rightColorsOutline = array();
-$wrongColorsOutline = array();
-$unansweredColorsOutline = array();
+$dataSet = [
+    "count" => [
+        "right" => [],
+        "wrong" => [],
+        "unanswered" => [],
+        "survey" => []
+    ],
+    "color" => [
+        "right" => [],
+        "wrong" => [],
+        "unanswered" => [],
+        "survey" => []
+    ],
+    "outline" => [
+        "right" => [],
+        "wrong" => [],
+        "unanswered" => [],
+        "survey" => []
+    ]
+];
 foreach ($userArray as $user) {
     $user = $user["id"];
     $result = $conn->query("SELECT count(*) count
-    FROM dsgvo_training_questions
-    INNER JOIN dsgvo_training_completed_questions ON dsgvo_training_completed_questions.questionID = dsgvo_training_questions.id
-    WHERE userID = $user AND correct = 'TRUE' AND dsgvo_training_questions.trainingID = $trainingID");
+        FROM dsgvo_training_questions
+        INNER JOIN dsgvo_training_completed_questions ON dsgvo_training_completed_questions.questionID = dsgvo_training_questions.id
+        WHERE userID = $user AND correct = 'TRUE' AND survey = 'FALSE' AND dsgvo_training_questions.trainingID = $trainingID");
     echo $conn->error;
     $right = intval($result->fetch_assoc()["count"]);
     $result = $conn->query("SELECT count(*) count
-    FROM dsgvo_training_questions
-    INNER JOIN dsgvo_training_completed_questions ON dsgvo_training_completed_questions.questionID = dsgvo_training_questions.id
-    WHERE userID = $user AND correct = 'FALSE' AND dsgvo_training_questions.trainingID = $trainingID");
+        FROM dsgvo_training_questions
+        INNER JOIN dsgvo_training_completed_questions ON dsgvo_training_completed_questions.questionID = dsgvo_training_questions.id
+        WHERE userID = $user AND correct = 'FALSE' AND survey = 'FALSE' AND dsgvo_training_questions.trainingID = $trainingID");
     $wrong = intval($result->fetch_assoc()["count"]);
-    $unanswered = $numberOfQuestions - $right - $wrong;
-    $pointsRightArray[] = $right;
-    $pointsWrongArray[] = $wrong;
-    $pointsUnansweredArray[] = $unanswered;
-    $rightColorsOutline[] = "rgb(50, 173, 22)";
-    $wrongColorsOutline[] = "rgb(244, 92, 65)";
-    $unansweredColorsOutline[] = "rgb(153, 153, 153)";
-    $rightColors[] = "rgba(50, 173, 22, 0.2)";
-    $wrongColors[] = "rgba(244, 92, 65, 0.2)";
-    $unansweredColors[] = "rgba(153, 153, 153, 0.2)";
+    $result = $conn->query("SELECT count(*) count
+        FROM dsgvo_training_questions
+        INNER JOIN dsgvo_training_completed_questions ON dsgvo_training_completed_questions.questionID = dsgvo_training_questions.id
+        WHERE userID = $user AND survey = 'TRUE' AND dsgvo_training_questions.trainingID = $trainingID");
+    $survey = intval($result->fetch_assoc()["count"]);
+    $unanswered = $numberOfQuestions - $right - $wrong - $survey;
+    $dataSet["count"]["right"][] = $right;
+    $dataSet["count"]["wrong"][] = $wrong;
+    $dataSet["count"]["unanswered"][] = $unanswered;
+    $dataSet["count"]["survey"][] = $survey;
+    $dataSet["outline"]["right"][] ="rgb(50, 173, 22)";
+    $dataSet["outline"]["wrong"][] ="rgb(244, 92, 65)";
+    $dataSet["outline"]["unanswered"][] ="rgb(153, 153, 153)";
+    $dataSet["outline"]["survey"][] ="rgb(22, 77, 173)";
+    $dataSet["color"]["right"][] ="rgba(50, 173, 22, 0.2)";
+    $dataSet["color"]["wrong"][] ="rgba(244, 92, 65, 0.2)";
+    $dataSet["color"]["unanswered"][] ="rgba(153, 153, 153, 0.2)";
+    $dataSet["color"]["survey"][] ="rgba(22, 77, 173, 0.2)";
 }
 ?>
 <script src="plugins/chartsjs/Chart.min.js"></script>
@@ -92,21 +111,27 @@ var myChart = new Chart(ctx, {
         labels: <?php echo json_encode($nameArray) ?>,
         datasets: [{
             label: "<?=$lang['TRAINING_QUESTION_CORRECT']['TRUE']?>",
-            data: <?php echo json_encode($pointsRightArray) ?>,
-            backgroundColor: <?php echo json_encode($rightColors) ?>,
-            borderColor: <?php echo json_encode($rightColorsOutline) ?>,
+            data: <?php echo json_encode($dataSet["count"]["right"]) ?>,
+            backgroundColor: <?php echo json_encode($dataSet["color"]["right"]) ?>,
+            borderColor: <?php echo json_encode($dataSet["outline"]["right"]) ?>,
             borderWidth: 1
         },{
             label: "<?=$lang['TRAINING_QUESTION_CORRECT']['FALSE']?>",
-            data: <?php echo json_encode($pointsWrongArray) ?>,
-            backgroundColor: <?php echo json_encode($wrongColors) ?>,
-            borderColor: <?php echo json_encode($wrongColorsOutline) ?>,
+            data: <?php echo json_encode($dataSet["count"]["wrong"]) ?>,
+            backgroundColor: <?php echo json_encode($dataSet["color"]["wrong"]) ?>,
+            borderColor: <?php echo json_encode($dataSet["outline"]["wrong"]) ?>,
+            borderWidth: 1
+        },{
+            label: "<?=$lang['TRAINING_QUESTION_CORRECT']['SURVEY']?>",
+            data: <?php echo json_encode($dataSet["count"]["survey"]) ?>,
+            backgroundColor: <?php echo json_encode($dataSet["color"]["survey"]) ?>,
+            borderColor: <?php echo json_encode($dataSet["outline"]["survey"]) ?>,
             borderWidth: 1
         },{
             label: "<?=$lang['TRAINING_QUESTION_CORRECT']['UNANSWERED']?>",
-            data: <?php echo json_encode($pointsUnansweredArray) ?>,
-            backgroundColor: <?php echo json_encode($unansweredColors) ?>,
-            borderColor: <?php echo json_encode($unansweredColorsOutline) ?>,
+            data: <?php echo json_encode($dataSet["count"]["unanswered"]) ?>,
+            backgroundColor: <?php echo json_encode($dataSet["color"]["unanswered"]) ?>,
+            borderColor: <?php echo json_encode($dataSet["outline"]["unanswered"]) ?>,
             borderWidth: 1
         }]
     },

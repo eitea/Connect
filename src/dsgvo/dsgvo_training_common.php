@@ -298,10 +298,10 @@ function validate_question(string $html, $answer, bool $survey)
     $html = preg_replace($html_regex, "", $html); // strip all html tags
     preg_match($question_regex, $html, $matches);
     // only parse the first question
-    if (sizeof($matches) == 0) return $survey ? [$answer == true, []] : $answer == true;
+    if (sizeof($matches) == 0) return $survey ? ($answer?[true, ["read"]]:[false,[]]) : $answer == true;
     $question = $matches[0]; // eg "{[-]wrong answer[+]right answer}"
     preg_match_all($question_inner_regex, $question, $matches);
-    if (sizeof($matches) == 0) return $survey ? [$answer == true, []] : $answer == true;
+    if (sizeof($matches) == 0) return $survey ? ($answer?[true, ["read"]]:[false,[]]) : $answer == true;
     if ($survey) {
         $survey_answers = [];
         for ($i = 0; $i < count($matches[0]); $i++) {
@@ -322,11 +322,25 @@ function validate_question(string $html, $answer, bool $survey)
             }
         }
         // return that user has read the question and answers
+        if(!count($survey_answers)){
+            $survey_answers[] = "read";
+        }
         return [true, $survey_answers];
     } else {
         if (!isset($matches[1][$answer])) return false;
         if ($matches[1][$answer] == "+") return true;
     }
+}
+
+/**
+ * always returns the same color for the same string
+ */
+function str_to_hsl_color($str, $saturation = "75%", $luminosity = "50%")
+{
+    srand(crc32($str));
+    $num = rand(0, 359);
+    srand();
+    return "hsl($num, $saturation, $luminosity)";
 }
 
 ?>
