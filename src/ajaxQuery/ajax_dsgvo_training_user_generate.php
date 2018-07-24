@@ -66,7 +66,7 @@ while ($row = $result->fetch_assoc()) {
     $result_question = false;
     if (!$doneSurveys) {
         $result_question = $conn->query(
-            "SELECT tq.id, tq.text, t.onLogin FROM dsgvo_training_questions tq
+            "SELECT tq.id, tq.text, t.onLogin, tq.title, tq.survey FROM dsgvo_training_questions tq
             INNER JOIN dsgvo_training t ON t.id = tq.trainingID
             WHERE tq.trainingID = $trainingID AND
             NOT EXISTS (
@@ -93,6 +93,9 @@ while ($row = $result->fetch_assoc()) {
     }
     showError($conn->error);
     while ($row_question = $result_question->fetch_assoc()) {
+        // echo "<script>console.log(`";
+        // var_dump($row_question);
+        // echo "`);</script>";
         $trainingArray[] = array(
             "name" => $trainingID,
             "title" => $row["name"] . " - " . $row_question["title"],

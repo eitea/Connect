@@ -200,12 +200,12 @@ function user_has_unanswered_on_login_surveys_query($userID) : array
 $default_answer_choices = array(array("value" => 0, "text" => "Ich habe den Text gelesen"));
 $question_regex = '/\{.*?\}/s';
 $html_regex = '/\<\/*.+?\/*\>/s';
-$question_inner_regex = '/\[([\S+])\]([^\[\}]+)/s';
+$question_inner_regex = '/\[(\S+)\]([^\[\}]+)/s';
 
 /**
  * Removes questions (enclosed in '{}') from html.
  */
-function strip_questions(string $html)
+function strip_questions(string $html) : string
 {
     return preg_replace('/\{.*?\}/s', "", $html);
 }
@@ -221,35 +221,41 @@ function parse_question(string $html, bool $survey) : array
     global $question_inner_regex;
     $title = $survey ? "Auswählen" : "Welche dieser Antworten ist richtig?";
     $html = preg_replace($html_regex, "", $html); // strip all html tags
+    $question_type = "boolean";
     preg_match($question_regex, $html, $matches);
     // only parse the first question
-    if (sizeof($matches) == 0) return [$default_answer_choices, "boolean", "Ich habe den Text gelesen", $title];
+    if (sizeof($matches) == 0) return [$default_answer_choices, $question_type, "Ich habe den Text gelesen", $title];
     $question = $matches[0]; // eg "{[-]wrong answer[+]right answer}"
     preg_match_all($question_inner_regex, $question, $matches);
-    if (sizeof($matches) == 0) return [$default_answer_choices, "boolean", "Ich habe den Text gelesen", $title];
+    if (sizeof($matches) == 0) return [$default_answer_choices, $question_type, "Ich habe den Text gelesen", $title];
     $ret_array = array();
+    $question_type = "radiogroup";
     for ($i = 0; $i < count($matches[0]); $i++) {
-        $operator = $matches[1][$i]; // + ... right, - ... wrong, ? ... question, ...
-        $value = $matches[2][$i];
+        $operator = $matches[1][$i]; // + ... right, - ... wrong, ? ... question, # ... type, ...
+        $value = trim($matches[2][$i]);
         if ($operator == "-" || $operator == "+") {
             $ret_array[] = array("value" => $i, "text" => html_entity_decode($value));
-        }
-        if ($operator == "?") {
+        } else if ($operator == "?") {
             $title = html_entity_decode($value);
+        } else if ($operator == "#") {
+            if ($survey) {
+                if (in_array($value, ["radiogroup", "dropdown", "checkbox"])) {
+                    $question_type = $value;
+                }
+            } else {
+                if (in_array($value, ["radiogroup", "dropdown"])) { // checkbox is not allowed since it would allow multiple answers
+                    $question_type = $value;
+                }
+            }
+        } else if ($survey) { // either number or string (used to track changes when the text is modified)
+            $ret_array[] = array("value" => $i, "text" => html_entity_decode($value));
         }
     }
     if (sizeof($ret_array) == 0) {
-        return [$default_answer_choices, "boolean", "Ich habe den Text gelesen", $title];
+        $question_type = "boolean";
+        return [$default_answer_choices, $question_type, "Ich habe den Text gelesen", $title];
     }
-    return [$ret_array, "radiogroup", "", $title];
-}
-
-/**
- * Removes html and returns the question title for survey.js
- */
-function parse_question_title(string $html, bool $survey) : string
-{
-    return "$.defaultTitle";
+    return [$ret_array, $question_type, "", $title];
 }
 
 /**
@@ -284,7 +290,7 @@ function generate_survey_page(array $options) : array
 /**
  * Checks if the user answered right
  */
-function validate_question($html, $answer) : bool
+function validate_question(string $html, $answer, bool $survey)
 {
     global $question_regex;
     global $html_regex;
@@ -292,13 +298,35 @@ function validate_question($html, $answer) : bool
     $html = preg_replace($html_regex, "", $html); // strip all html tags
     preg_match($question_regex, $html, $matches);
     // only parse the first question
-    if (sizeof($matches) == 0) return $answer == true;
+    if (sizeof($matches) == 0) return $survey ? [$answer == true, []] : $answer == true;
     $question = $matches[0]; // eg "{[-]wrong answer[+]right answer}"
     preg_match_all($question_inner_regex, $question, $matches);
-    if (sizeof($matches) == 0) return $answer == true;
-    if (!isset($matches[1][$answer])) return false;
-    if ($matches[1][$answer] == "+") return true;
-    return false;
+    if (sizeof($matches) == 0) return $survey ? [$answer == true, []] : $answer == true;
+    if ($survey) {
+        $survey_answers = [];
+        for ($i = 0; $i < count($matches[0]); $i++) {
+            $operator = $matches[1][$i]; // + ... right, - ... wrong, ? ... question, # ... type, ...
+            if ($operator == "?" || $operator == "#" || $operator == "-" || $operator == "+") {
+                // will be ignored
+                continue;
+            } else { // answer identifier
+                if (is_array($answer)) { // checkboxes (multiple)
+                    if (in_array($i, $answer)) {
+                        $survey_answers[] = $operator;
+                    }
+                } else { // radiogroup, dropdown (single)
+                    if ($i === intval($answer)) {
+                        $survey_answers[] = $operator;
+                    }
+                }
+            }
+        }
+        // return that user has read the question and answers
+        return [true, $survey_answers];
+    } else {
+        if (!isset($matches[1][$answer])) return false;
+        if ($matches[1][$answer] == "+") return true;
+    }
 }
 
 ?>

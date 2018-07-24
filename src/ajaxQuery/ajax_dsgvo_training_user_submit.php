@@ -64,7 +64,7 @@ foreach ($result as $formVal => $time) {
 $select_question_stmt = $conn->prepare("SELECT version,text,trainingID from dsgvo_training_questions WHERE id = ?");
 $select_question_stmt->bind_param("i", $questionID);
 
-$right = $wrong = $rightNoOverwrite = $wrongNoOverwrite = 0;
+$right = $wrong = $rightNoOverwrite = $wrongNoOverwrite = $survey_data = $survey_data_no_overwrite = 0;
 foreach ($result as $formVal => $answer) {
     $arr = explode(";", $formVal);
     if (sizeof($arr) == 2) { //formVal can contain "training;<id>" (for time) or "<id>" (for answer)
@@ -77,19 +77,27 @@ foreach ($result as $formVal => $answer) {
     $question_row = $question_result->fetch_assoc();
     $html = $question_row["text"];
     $trainingID = $question_row["trainingID"];
-    $training_row_result = $conn->query("SELECT version,allowOverwrite FROM dsgvo_training WHERE id = $trainingID");
+    $training_row_result = $conn->query("SELECT version,allowOverwrite FROM dsgvo_training WHERE id = $trainingID"); //TODO: prepared statements
     showError($conn->error);
     $training_row = $training_row_result->fetch_assoc();
     $version = $question_row["version"];
     $allowOverwrite = $training_row["allowOverwrite"] === "TRUE";
-    $questionRight = validate_question($html, $answer);
+    $survey = $conn->query("SELECT survey FROM dsgvo_training_questions WHERE id = $questionID")->fetch_assoc()["survey"] == 'TRUE';
+    if($survey){
+        list($questionRight, $answers) = validate_question($html, $answer, $survey);
+        var_dump($answers);
+    }else{
+        $questionRight = validate_question($html, $answer, $survey);
+    }
     $questionExists = $conn->query("SELECT questionID FROM dsgvo_training_completed_questions WHERE questionID = $questionID AND userID = $userID")->num_rows > 0;
     $time = 0;
     if (isset($times[$trainingID], $numberOfAnsweredQuestions[$trainingID])) {
         $time = round($times[$trainingID] / $numberOfAnsweredQuestions[$trainingID]);
     }
     if ($allowOverwrite || !$questionExists || $test) {
-        if ($questionRight) {
+        if ($survey){
+            $survey_data++;
+        }else if($questionRight) {
             $right++;
         } else {
             $wrong++;
@@ -101,7 +109,9 @@ foreach ($result as $formVal => $answer) {
             echo $conn->error;
         }
     } else {
-        if ($questionRight) {
+        if($survey){
+            $survey_data_no_overwrite++;
+        }else if ($questionRight) {
             $rightNoOverwrite++;
         } else {
             $wrongNoOverwrite++;
@@ -126,17 +136,21 @@ var myChart = new Chart(ctx, {
                     <?php echo $right ?>,
                     <?php echo $rightNoOverwrite ?>,
                     <?php echo $wrong ?>,
-                    <?php echo $wrongNoOverwrite ?>
+                    <?php echo $wrongNoOverwrite ?>,
+                    <?php echo $survey_data ?>,
+                    <?php echo $survey_data_no_overwrite ?>
                 ],
                 backgroundColor: [
-                    "green","rgb(127, 198, 135)","red","rgb(173, 109, 109)"
+                    "green","rgb(127, 198, 135)","red","rgb(173, 109, 109)", "blue", "rgb(127, 164, 198)"
                 ],
             }],
             labels: [
                 "<?php echo $lang["TRAINING_RESULT"]["RIGHT"] ?>",
                 "<?php echo $lang["TRAINING_RESULT"]["RIGHT_NO_UPDATE"] ?>",
                 "<?php echo $lang["TRAINING_RESULT"]["WRONG"] ?>",
-                "<?php echo $lang["TRAINING_RESULT"]["WRONG_NO_UPDATE"] ?>"
+                "<?php echo $lang["TRAINING_RESULT"]["WRONG_NO_UPDATE"] ?>",
+                "<?php echo $lang["TRAINING_RESULT"]["SURVEY"] ?>",
+                "<?php echo $lang["TRAINING_RESULT"]["SURVEY_NO_UPDATE"] ?>"
             ]
         },
         options: {
