@@ -22,7 +22,7 @@ if (isset($_POST["suspend"])) {
         $suspensionLeft--;
         $conn->query("INSERT INTO dsgvo_training_user_suspension (suspension_count, userID) VALUES (1,$userID) ON DUPLICATE KEY UPDATE suspension_count = suspension_count + 1, last_suspension = CURRENT_TIMESTAMP");
         if ($conn->error) {
-            echo $conn->error;
+            echo $conn->error; // showError doesn't work here
         } else {
             switch ($suspensionLeft) {
                 case 0:
@@ -54,6 +54,12 @@ $select_training_stmt = $conn->prepare("SELECT version,allowOverwrite FROM dsgvo
 $select_training_stmt->bind_param("i", $trainingID);
 $select_question_stmt = $conn->prepare("SELECT version,text,trainingID,survey from dsgvo_training_questions WHERE id = ?");
 $select_question_stmt->bind_param("i", $questionID);
+$select_completed_question_stmt = $conn->prepare("SELECT questionID FROM dsgvo_training_completed_questions WHERE questionID = ? AND userID = ?");
+$select_completed_question_stmt->bind_param("ii", $questionID, $userID);
+$insert_survey_answers = $conn->prepare("INSERT INTO dsgvo_training_completed_questions_survey_answers (questionID, identifier, userID) VALUES(?, ?, $userID) ON DUPLICATE KEY UPDATE identifier = ?");
+$insert_survey_answers->bind_param("iss", $questionID, $identifier, $identifier);
+$delete_survey_answers = $conn->prepare("INSERT INTO dsgvo_training_completed_questions_survey_answers (questionID, identifier, userID) VALUES(?, ?, $userID) ON DUPLICATE KEY UPDATE identifier = ?");
+$delete_survey_answers->bind_param("iss", $questionID, $identifier, $identifier);
 
 $times = array();
 $numberOfAnsweredQuestions = array(); // per set (for average time)
@@ -96,12 +102,13 @@ foreach ($result as $formVal => $answer) {
     $allowOverwrite = $training_row["allowOverwrite"] === "TRUE";
     if ($survey) {
         list($questionRight, $answers) = validate_question($html, $answer, $survey);
-        var_dump($answers);
-        
     } else {
         $questionRight = validate_question($html, $answer, $survey);
     }
-    $questionExists = $conn->query("SELECT questionID FROM dsgvo_training_completed_questions WHERE questionID = $questionID AND userID = $userID")->num_rows > 0;
+    $select_completed_question_stmt->execute();
+    showError($select_completed_question_stmt->error);
+    $question_exists_result = $select_completed_question_stmt->get_result();
+    $questionExists = $result && $result->num_rows > 0;
     $time = 0;
     if (isset($times[$trainingID], $numberOfAnsweredQuestions[$trainingID])) {
         $time = round($times[$trainingID] / $numberOfAnsweredQuestions[$trainingID]);
@@ -118,7 +125,15 @@ foreach ($result as $formVal => $answer) {
             $questionRightQuery = $questionRight ? "TRUE" : "FALSE";
             $conn->query("INSERT INTO dsgvo_training_completed_questions (questionID,userID,correct,version,duration,lastAnswered) VALUES ($questionID, $userID, '$questionRightQuery', $version, $time, CURRENT_TIMESTAMP)
                 ON DUPLICATE KEY UPDATE correct = '$questionRightQuery', version = $version, tries = tries + 1, duration = $time, lastAnswered = CURRENT_TIMESTAMP");
-            echo $conn->error;
+            showError($conn->error);
+            if ($survey) {
+                foreach ($answers as $identifier) {
+                    $delete_survey_answers->execute();
+                    showError($delete_survey_answers->error);
+                    $insert_survey_answers->execute();
+                    showError($insert_survey_answers->error);
+                }
+            }
         }
     } else {
         if ($survey) {
@@ -131,6 +146,7 @@ foreach ($result as $formVal => $answer) {
     }
     $question_result->free();
     $training_row_result->free();
+    $question_exists_result->free();
 }
 
 // since the user answered the survey, suspension can be reset
