@@ -590,7 +590,7 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
     $diff = timeDiff_Hours($row['time'], getCurrentTimestamp());
     if($diff < $cd / 60) { $ckIn_disabled = 'disabled'; }
     //deny stampOut
-    $result = $conn->query("SELECT id FROM projectBookingData WHERE `end` = '0000-00-00 00:00:00' AND dynamicID IS NOT NULL AND timestampID = ".$row['indexIM']);
+    $result = $conn->query("SELECT id, dynamicID FROM projectBookingData WHERE `end` = '0000-00-00 00:00:00' AND dynamicID IS NOT NULL AND timestampID = ".$row['indexIM']);
     if($result && $result->num_rows > 0){ $ckIn_disabled = 'disabled'; }
     $buttonEmoji = '<div class="btn-group btn-group-xs btn-ckin" style="display:block;">
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji1" name="stampOut" value="1" title="'.$lang['EMOJI_TOSTRING'][1].'"></button>
@@ -599,7 +599,11 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji4" name="stampOut" value="4" title="'.$lang['EMOJI_TOSTRING'][4].'"></button>
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji5" name="stampOut" value="5" title="'.$lang['EMOJI_TOSTRING'][5].'"></button></div>
     <a data-toggle="modal" data-target="#explain-emji" style="position:relative;top:-7px;"><i class="fa fa-question-circle-o"></i></a>';
-    if($result && $result->num_rows > 0){ $buttonEmoji .= '<br><small class="clock-counter">Task läuft</small>'; }
+    if($result && $result->num_rows > 0){ 
+        $row_booking_data = $result->fetch_assoc();
+        $booking_data_id = $row_booking_data["dynamicID"];
+        $buttonEmoji .= '<br><small class="clock-counter"><a href="../dynamic-projects/view?open='.$booking_data_id.'">Task läuft</a></small>'; 
+    }
 } else {
     // only display surveys when user is stamped in
     $userHasUnansweredOnLoginSurveys = false;

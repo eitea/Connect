@@ -8,6 +8,8 @@ include dirname(__DIR__) . '/header.php';
 require dirname(__DIR__) . "/misc/helpcenter.php";
 require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
 
+$currently_open_project_description /* for search and when clicking on 'task läuft' */ = isset($_GET["open"])?test_input($_GET["open"]):false;
+
 //$referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
 function generate_progress_bar($current, $estimate, Array $options = ['referenceTime' => 8]){
     $allHours = 0;
@@ -972,8 +974,7 @@ var existingModals = new Array();
 appendModal('');
 
 var existingModals_info = new Array();
-$('.view-modal-open').click(function(){
-    var index = $(this).val();
+function openViewModal(index /*projectid*/){
   if(existingModals_info.indexOf(index) == -1){
       $.ajax({
       url:'ajaxQuery/AJAX_dynamicInfo.php',
@@ -992,10 +993,18 @@ $('.view-modal-open').click(function(){
           }
       }
      });
-     $(this).parent().parent().removeAttr('style');
   } else {
     $('#infoModal-'+index).modal('show');
   }
+};
+<?php if($currently_open_project_description): // 5b47043bac66a ?>
+$(document).ready(function(){
+   setTimeout(function(){ openViewModal("<?php echo $currently_open_project_description?>")},500);
+});
+<?php endif; ?>
+$('.view-modal-open').click(function(){
+    openViewModal($(this).val())
+     $(this).parent().parent().removeAttr('style');
 });
 function showClients(company, client, place){
     if(company != ""){
