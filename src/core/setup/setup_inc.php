@@ -1444,6 +1444,16 @@ function create_tables($conn) {
         echo $conn->error;
     }
 
+    $sql = "CREATE TABLE dsgvo_training_completed_questions_survey_answers (
+        questionID int(6),
+        identifier VARCHAR(30) NOT NULL,
+        PRIMARY KEY (questionID, identifier),
+        FOREIGN KEY (questionID) REFERENCES dsgvo_training_completed_questions(questionID) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+	if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
     $sql = "CREATE TABLE dsgvo_training_user_suspension (
         userID INT(6) UNSIGNED,
         last_suspension DATETIME DEFAULT CURRENT_TIMESTAMP,

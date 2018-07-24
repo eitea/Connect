@@ -3260,6 +3260,16 @@ if($row['version'] < 166){
 
     $conn->query("ALTER TABLE dsgvo_training_questions ADD COLUMN survey ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
     echo $conn->error;
+
+    $sql = "CREATE TABLE dsgvo_training_completed_questions_survey_answers (
+        questionID int(6),
+        identifier VARCHAR(30) NOT NULL,
+        PRIMARY KEY (questionID, identifier),
+        FOREIGN KEY (questionID) REFERENCES dsgvo_training_completed_questions(questionID) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+	if(!$conn->query($sql)){
+        echo $conn->error;
+    }
 }
 
 // if($row['version'] < 167){}
