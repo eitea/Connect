@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif (isset($_POST['addQuestion']) && !empty($_POST['question']) && !empty($_POST["title"])) {
         $trainingID = intval($_POST['addQuestion']);
         $title = test_input($_POST["title"]);
-        $survey = isset($_POST["survey"])?'TRUE':'FALSE';
+        $survey = isset($_POST["survey"]) ? 'TRUE' : 'FALSE';
         $text = $_POST["question"]; // todo: test input
         $version = 1;
         $stmt = $conn->prepare("INSERT INTO dsgvo_training_questions (trainingID, text, title, version, survey) VALUES ($trainingID, ?, '$title', $version, '$survey')");
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $title = test_input($_POST["title"]);
         $text = $_POST["question"]; //todo: test input
         $version = intval($_POST["version"]);
-        $survey = isset($_POST["survey"])?'TRUE':'FALSE';
+        $survey = isset($_POST["survey"]) ? 'TRUE' : 'FALSE';
         $stmt = $conn->prepare("UPDATE dsgvo_training_questions SET text = ?, title = '$title', version = $version, survey = '$survey' WHERE id = $questionID");
         showError($conn->error);
         $stmt->bind_param("s", $text);

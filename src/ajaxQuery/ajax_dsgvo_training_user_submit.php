@@ -48,6 +48,13 @@ if (isset($_POST["test"]) && $_POST["test"] == true) {
     $test = true;
 }
 
+$select_training_id_stmt = $conn->prepare("SELECT trainingID FROM dsgvo_training_questions WHERE id = ?");
+$select_training_id_stmt->bind_param("i", $questionID);
+$select_training_stmt = $conn->prepare("SELECT version,allowOverwrite FROM dsgvo_training WHERE id = ?");
+$select_training_stmt->bind_param("i", $trainingID);
+$select_question_stmt = $conn->prepare("SELECT version,text,trainingID,survey from dsgvo_training_questions WHERE id = ?");
+$select_question_stmt->bind_param("i", $questionID);
+
 $times = array();
 $numberOfAnsweredQuestions = array(); // per set (for average time)
 foreach ($result as $formVal => $time) {
@@ -56,13 +63,15 @@ foreach ($result as $formVal => $time) {
         $times[intval($arr[1])] = intval($time);
     } else {
         $questionID = intval($formVal);
-        $trainingID = $conn->query("SELECT trainingID FROM dsgvo_training_questions WHERE id = $questionID")->fetch_assoc()["trainingID"];
+        $select_training_id_stmt->execute();
+        showError($select_training_id_stmt->error);
+        $training_id_result = $select_training_id_stmt->get_result();
+        $training_id_row = $training_id_result->fetch_assoc();
+        $trainingID = $training_id_row["trainingID"];
+        $training_id_result->free();
         $numberOfAnsweredQuestions[$trainingID] = 1 + (isset($numberOfAnsweredQuestions[$trainingID]) ? $numberOfAnsweredQuestions[$trainingID] : 0);
     }
 }
-
-$select_question_stmt = $conn->prepare("SELECT version,text,trainingID from dsgvo_training_questions WHERE id = ?");
-$select_question_stmt->bind_param("i", $questionID);
 
 $right = $wrong = $rightNoOverwrite = $wrongNoOverwrite = $survey_data = $survey_data_no_overwrite = 0;
 foreach ($result as $formVal => $answer) {
@@ -77,16 +86,19 @@ foreach ($result as $formVal => $answer) {
     $question_row = $question_result->fetch_assoc();
     $html = $question_row["text"];
     $trainingID = $question_row["trainingID"];
-    $training_row_result = $conn->query("SELECT version,allowOverwrite FROM dsgvo_training WHERE id = $trainingID"); //TODO: prepared statements
-    showError($conn->error);
+    $select_training_stmt->execute();
+    showError($select_training_stmt->error);
+    $training_row_result = $select_training_stmt->get_result();
+    $training_row = $training_row_result->fetch_assoc();
     $training_row = $training_row_result->fetch_assoc();
     $version = $question_row["version"];
+    $survey = $question_row["survey"] == 'TRUE';
     $allowOverwrite = $training_row["allowOverwrite"] === "TRUE";
-    $survey = $conn->query("SELECT survey FROM dsgvo_training_questions WHERE id = $questionID")->fetch_assoc()["survey"] == 'TRUE';
-    if($survey){
+    if ($survey) {
         list($questionRight, $answers) = validate_question($html, $answer, $survey);
         var_dump($answers);
-    }else{
+        
+    } else {
         $questionRight = validate_question($html, $answer, $survey);
     }
     $questionExists = $conn->query("SELECT questionID FROM dsgvo_training_completed_questions WHERE questionID = $questionID AND userID = $userID")->num_rows > 0;
@@ -95,9 +107,9 @@ foreach ($result as $formVal => $answer) {
         $time = round($times[$trainingID] / $numberOfAnsweredQuestions[$trainingID]);
     }
     if ($allowOverwrite || !$questionExists || $test) {
-        if ($survey){
+        if ($survey) {
             $survey_data++;
-        }else if($questionRight) {
+        } else if ($questionRight) {
             $right++;
         } else {
             $wrong++;
@@ -109,15 +121,16 @@ foreach ($result as $formVal => $answer) {
             echo $conn->error;
         }
     } else {
-        if($survey){
+        if ($survey) {
             $survey_data_no_overwrite++;
-        }else if ($questionRight) {
+        } else if ($questionRight) {
             $rightNoOverwrite++;
         } else {
             $wrongNoOverwrite++;
         }
     }
     $question_result->free();
+    $training_row_result->free();
 }
 
 // since the user answered the survey, suspension can be reset
