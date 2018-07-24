@@ -287,8 +287,8 @@ if ($advanced && $enableToAdvancedSearch) { // todo: search should be done in th
         $name = $task["name"];
         $id = $task["id"];
         $description = strip_tags($task["description"]);
-        $routesENG[] = array("name" => "Task ($name)", "url" => "../dynamic-projects/view?id=$id", "tags" => array($description));
-        $routesGER[] = array("name" => "Task ($name)", "url" => "../dynamic-projects/view?id=$id", "tags" => array($description));
+        $routesENG[] = array("name" => "Task ($name)", "url" => "../dynamic-projects/view?open=$id", "tags" => array($description));
+        $routesGER[] = array("name" => "Task ($name)", "url" => "../dynamic-projects/view?open=$id", "tags" => array($description));
     }
 }
 
