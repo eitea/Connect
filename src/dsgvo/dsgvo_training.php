@@ -585,7 +585,7 @@ showError($conn->error);
     <!-- for question and training edit modals and question info -->
 
     <script>
-        function setCurrentModal(data, type, url) {
+        function setCurrentModal(data, type, url, complete) {
             $.ajax({
                 url: url,
                 data: data,
@@ -595,8 +595,9 @@ showError($conn->error);
                 },
                 error: function (resp) { console.error(resp) },
                 complete: function (resp) {
+                    if(complete) complete(resp);
+                    else $("#currentQuestionModal .modal").modal('show');
                     onModalLoad();
-                    $("#currentQuestionModal .modal").modal('show');
                 }
             });
         }
@@ -619,10 +620,15 @@ showError($conn->error);
             setCurrentModal({ operation: "export", module: $(this).val() }, 'post', 'ajaxQuery/ajax_dsgvo_training_import_export.php')
         })
         $("button[name=testTraining]").click(function () {
-            setCurrentModal({ trainingID: $(this).val() }, 'post', 'ajaxQuery/ajax_dsgvo_training_user_generate_play.php')
+            setCurrentModal({ trainingID: $(this).val(), test: true }, 'post', 'ajaxQuery/ajax_dsgvo_training_user_generate.php', function(){
+                $("#currentQuestionModal .survey-modal").modal();
+            })
+            
         })
         $("button[name=testQuestion]").click(function () {
-            setCurrentModal({ questionID: $(this).val() }, 'post', 'ajaxQuery/ajax_dsgvo_training_user_generate_play.php')
+            setCurrentModal({ questionID: $(this).val(), test: true }, 'post', 'ajaxQuery/ajax_dsgvo_training_user_generate.php', function(){
+                $("#currentQuestionModal .survey-modal").modal();
+            })
         })
         $("button[name=editModule]").click(function () {
             setCurrentModal({ moduleID: $(this).val() }, 'get', 'ajaxQuery/ajax_dsgvo_training_module_edit.php')
@@ -660,6 +666,7 @@ showError($conn->error);
                             { text: 'Schulung: mit Frage', value: '<p>{ </p><p>[?] Welche dieser Antworten ist richtig? </p><p>[-] Eine falsche Antwort </p><p>[+] Eine richtige Antwort </p><p> }</p>' },
                             { text: 'Schulung: mit Frage (Dropdown)', value: '<p>{ </p><p>[#]dropdown</p><p>[?] Welche dieser Antworten ist richtig? </p><p>[-] Eine falsche Antwort </p><p>[+] Eine richtige Antwort </p><p> }</p>' },
                             { text: 'Umfrage: nur Antwortmöglichkeiten', value: '<p>{ </p><p>[?] Wie ist ihre Meinung? </p><p>[ja] Das finde ich toll </p><p>[nein] Das ist keine gute Idee </p><p> }</p>' },
+                            { text: 'Umfrage: gleiche Antwortmöglichkeiten', value: '<p>{ </p><p>[?] Wie ist ihre Meinung? </p><p>[ja] Das finde ich toll </p><p>[ja] Das ist eine gute Idee </p><p>[nein] Das ist keine gute Idee </p><p>[nein] Das würde ich nicht machen </p><p> }</p>' },
                             { text: 'Umfrage: mit Frage (Dropdown)', value: '<p>{ </p><p>[#]dropdown</p><p>[?] Wie ist ihre Meinung? </p><p>[ja] Das finde ich toll </p><p>[nein] Das ist keine gute Idee </p><p>[unentschlossen] Keine Ahnung </p><p> }</p>' },
                             { text: 'Umfrage: mehrere Antwortmöglichkeiten', value: '<p>{ </p><p>[#]checkbox</p><p>[?] Wie ist ihre Meinung? </p><p>[1] Option 1 </p><p>[2] Option 2 </p><p>[3] Option 3 </p><p> }</p>' },
                         ],

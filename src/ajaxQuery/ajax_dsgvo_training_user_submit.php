@@ -46,13 +46,14 @@ $result = json_decode($_POST["result"]);
 $test = false; // test is true when a user submits a training with the play button
 if (isset($_POST["test"]) && $_POST["test"] == true) {
     $test = true;
+    $test_stats = [];
 }
 
 $select_training_id_stmt = $conn->prepare("SELECT trainingID FROM dsgvo_training_questions WHERE id = ?");
 $select_training_id_stmt->bind_param("i", $questionID);
 $select_training_stmt = $conn->prepare("SELECT version,allowOverwrite FROM dsgvo_training WHERE id = ?");
 $select_training_stmt->bind_param("i", $trainingID);
-$select_question_stmt = $conn->prepare("SELECT version,text,trainingID,survey from dsgvo_training_questions WHERE id = ?");
+$select_question_stmt = $conn->prepare("SELECT version,text,trainingID,survey,title from dsgvo_training_questions WHERE id = ?");
 $select_question_stmt->bind_param("i", $questionID);
 $select_completed_question_stmt = $conn->prepare("SELECT questionID FROM dsgvo_training_completed_questions WHERE questionID = ? AND userID = ?");
 $select_completed_question_stmt->bind_param("ii", $questionID, $userID);
@@ -102,8 +103,14 @@ foreach ($result as $formVal => $answer) {
     $allowOverwrite = $training_row["allowOverwrite"] === "TRUE";
     if ($survey) {
         list($questionRight, $answers) = validate_question($html, $answer, $survey);
+        if ($test) {
+            $test_stats[] = ["title" => $question_row["title"], "answers" => $answers, "color" => "#5086e5"];
+        }
     } else {
         $questionRight = validate_question($html, $answer, $survey);
+        if ($test) {
+            $test_stats[] = ["title" => $question_row["title"], "answers" => [$questionRight?"RIGHT":"WRONG"], "color" => percentage_to_color($questionRight?1:0)];
+        }
     }
     $select_completed_question_stmt->execute();
     showError($select_completed_question_stmt->error);
@@ -113,7 +120,7 @@ foreach ($result as $formVal => $answer) {
     if (isset($times[$trainingID], $numberOfAnsweredQuestions[$trainingID])) {
         $time = round($times[$trainingID] / $numberOfAnsweredQuestions[$trainingID]);
     }
-    if ($allowOverwrite || !$questionExists || $test) {
+    if (($allowOverwrite || !$questionExists) && !$test) {
         if ($survey) {
             $survey_data++;
         } else if ($questionRight) {
@@ -154,7 +161,41 @@ $conn->query("UPDATE dsgvo_training_user_suspension SET suspension_count = 0 WHE
 ?>
 
 <script src="plugins/chartsjs/Chart.min.js"></script>
-<canvas id="myChart" width="600" height="300"></canvas>
+<?php if ($test) : ?>
+ <ul class="nav nav-tabs nav-justified">
+   <li class="active"><a href="#survey-results" data-toggle="tab">Zusammenfassung</a></li>
+   <li><a href="#survey-answers" data-toggle="tab">Ihre Antworten</a></li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane fade in active" id="survey-results">
+<?php endif; ?>
+       <canvas id="myChart" width="600" height="300"></canvas>
+<?php if ($test) : ?>
+    </div>
+    <div class="tab-pane fade" id="survey-answers">
+        <table class="table table-hover vertical-align" >
+            <thead>
+                <tr>
+                    <th>Frage</th>
+                    <th>Antwort(en)</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php
+            foreach ($test_stats as $stat) {
+                $title = $stat["title"];
+                $answers = implode(", ", $stat["answers"]);
+                $color = $stat["color"];
+                echo "<tr style='background-color: $color'>";
+                echo "<td>$title</td>";
+                echo "<td>$answers</td>";
+                echo "</tr>";
+            }
+            ?>
+            </tbody>
+        </table>
+    </div>
+<?php endif; ?>
 <script>
 var ctx = document.getElementById("myChart").getContext('2d');
 var myChart = new Chart(ctx, {

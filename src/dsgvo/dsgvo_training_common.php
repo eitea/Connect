@@ -275,7 +275,8 @@ function generate_survey_page(array $options) : array
         "colCount" => 1,
         "choicesOrder" => $options["random"] == 'TRUE' ? "random" : "none",
         "choices" => $choices,
-        "defaultValue" => "indeterminate"
+        "defaultValue" => "indeterminate",
+        "category" => $options["category"]
     ];
     return [
         [
@@ -354,6 +355,20 @@ function str_to_hsl_color($str, $saturation = "75%", $luminosity = "50%")
     $num = rand(0, 359);
     srand();
     return "hsl($num, $saturation, $luminosity)";
+}
+
+/**
+ * get a color based on a percentage (0% ... red, 100% ... green)
+ * @param float $percent Number between 0 and 1
+ */
+function percentage_to_color($percent, $inverse = false, $gray = false): string
+{
+    if ($gray) return "#e2e2e2";
+    if ($inverse) $percent = 1 - $percent;
+    $hue = $percent * 120;
+    // hue 0 ... red
+    // hue 120 ... green
+    return "hsl($hue, 75%, 50%)";
 }
 
 ?>

@@ -1826,8 +1826,8 @@ $lang_ger['TRAINING_SETTINGS'] = array(
   'REPEAT_DAYS_NOTE' => 'Kann nur aktiviert werden, wenn das Überschreiben von Antworten erlaubt ist und die Beantwortung bei Login erfolgt',
 );
 
-$lang_eng['TRAINING_RESULT'] = array('SURVEY' => 'Survey','SURVEY_NO_UPDATE' => 'Survey, but not updated','RIGHT' => 'Right','RIGHT_NO_UPDATE' => 'Right, but not updated', 'WRONG' => 'Wrong', 'WRONG_NO_UPDATE' => 'Wrong, but not updated');
-$lang_ger['TRAINING_RESULT'] = array('SURVEY' => 'Umfrage','SURVEY_NO_UPDATE' => 'Umfrage, aber nicht gespeichert','RIGHT' => 'Richtig','RIGHT_NO_UPDATE' => 'Richtig, aber nicht gespeichert', 'WRONG' => 'Falsch', 'WRONG_NO_UPDATE' => 'Falsch, aber nicht gespeichert');
+$lang_eng['TRAINING_RESULT'] = array('SURVEY' => 'Survey','SURVEY_NO_UPDATE' => 'Survey (not updated)','RIGHT' => 'Right','RIGHT_NO_UPDATE' => 'Right (not updated)', 'WRONG' => 'Wrong', 'WRONG_NO_UPDATE' => 'Wrong (not updated)');
+$lang_ger['TRAINING_RESULT'] = array('SURVEY' => 'Umfrage','SURVEY_NO_UPDATE' => 'Umfrage (nicht gespeichert)','RIGHT' => 'Richtig','RIGHT_NO_UPDATE' => 'Richtig (nicht gespeichert)', 'WRONG' => 'Falsch', 'WRONG_NO_UPDATE' => 'Falsch (nicht gespeichert)');
 
 $lang_eng['WEEKDAY_TOSTRING'] = array("mon" => "Monday","tue" => "Tuesday","wed" => "Wednesday","thu" => "Thursday","fri" => "Friday","sat" => "Saturday","sun" => "Sunday");
 $lang_ger['WEEKDAY_TOSTRING'] = array("mon" => "Montag", "tue" => "Dienstag", "wed" => "Mittwoch", "thu" => "Donnerstag","fri" => "Freitag", "sat" => "Samstag", "sun" => "Sonntag");
