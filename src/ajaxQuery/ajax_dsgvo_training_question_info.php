@@ -43,7 +43,15 @@ $timesColorsArray = array();
             echo "Noch keine Daten vorhanden";
         } else {
             ?>
-        <table class="table">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+                <li role="presentation" class="active"><a href="#question-results" aria-controls="question-results" role="tab" data-toggle="tab">Zusammenfassung</a></li>
+                <li role="presentation"><a href="#question-table" aria-controls="question-table" role="tab" data-toggle="tab">Tabelle</a></li>
+                <li role="presentation"><a href="#question-time-and-tries" aria-controls="question-time-and-tries" role="tab" data-toggle="tab">Zeit und Versuche</a></li>
+            </ul>
+            <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade in active" id="question-results"><canvas id="myChart" width="600" height="300"></canvas></div>
+                <div role="tabpanel" class="tab-pane fade" id="question-table">
+                <table class="table">
             <thead>
                 <tr>
                     <th><?php echo $lang['USERS'] ?></th>
@@ -143,14 +151,19 @@ $timesColorsArray = array();
         ?>
             </tbody>
        </table>
+                </div>
+                <div role="tabpanel" class="tab-pane fade" id="question-time-and-tries"><canvas id="triesChart" width="600" height="300"></canvas></div>
+            </div>
+
 
 <script src="plugins/chartsjs/Chart.min.js"></script>
-<canvas id="myChart" width="600" height="300"></canvas>
+
 <?php 
 if ($survey) {
     $labels = [];
     $backgroundColors = [];
     $dataSet = [];
+    arsort($answer_count);
     foreach ($answer_count as $answer => $count) {
         $labels[] = $answer;
         $backgroundColors[] = str_to_hsl_color($answer);
@@ -183,7 +196,7 @@ var myChart = new Chart(ctx, {
             },
             title: {
                 display: true,
-                text: 'Results'
+                text: '<?php echo $lang['RESULT'] ?>'
             },
             animation: {
                 animateScale: true,
@@ -193,7 +206,6 @@ var myChart = new Chart(ctx, {
     }
 )
 </script>
-<canvas id="triesChart" width="600" height="300"></canvas>
 <script>
 var ctx = document.getElementById("triesChart").getContext('2d');
 var triesChart = new Chart(ctx, {

@@ -77,11 +77,8 @@ $total = intval($result->fetch_assoc()["count"]);
                         <th>ID</th>
                         <th>Name</th>
                         <th><?php echo $lang['TRAINING_QUESTION_CORRECT']['TRUE'] ?></th>
-                        <th>% <?php echo $lang['TRAINING_QUESTION_CORRECT']['TRUE'] ?></th>
                         <th><?php echo $lang['TRAINING_QUESTION_CORRECT']['FALSE'] ?></td>
-                        <th>% <?php echo $lang['TRAINING_QUESTION_CORRECT']['FALSE'] ?></td>
                         <th><?php echo $lang['TRAINING_QUESTION_CORRECT']['UNANSWERED'] ?></td>
-                        <th>% <?php echo $lang['TRAINING_QUESTION_CORRECT']['UNANSWERED'] ?></td>
                         <th><?php echo $lang['TRAINING_QUESTION_CORRECT']['SURVEY'] ?></td>
                         <th><?php echo $lang['TOTAL_TIME'] ?></td>
                         <th><?php echo $lang['TIME_PER_QUESTION'] ?></td>
@@ -108,9 +105,9 @@ $total = intval($result->fetch_assoc()["count"]);
                             INNER JOIN dsgvo_training_completed_questions ON dsgvo_training_completed_questions.questionID = dsgvo_training_questions.id
                             WHERE userID = $user AND survey = 'TRUE' AND dsgvo_training_questions.trainingID = $trainingID");
                         $survey = intval($result->fetch_assoc()["count"]);
-                        $unanswered = $total - $right - $wrong;
-                        $percentRight = ($right / $total);
-                        $percentWrong = ($wrong / $total);
+                        $unanswered = $total - $right - $wrong - $survey;
+                        $percentRight = ($right / ($total - $survey));
+                        $percentWrong = ($wrong / ($total - $survey));
                         $percentUnanswered = ($unanswered / $total);
                         $result = $conn->query("SELECT sum(duration) duration
                         FROM dsgvo_training_questions
@@ -128,12 +125,9 @@ $total = intval($result->fetch_assoc()["count"]);
                         echo "<tr>";
                         echo "<td>$user</td>";
                         echo "<td>$name</td>";
-                        echo "<td style='background-color:" . getColor($percentRight, false, $noAnswers) . ";'>$right</td>";
-                        echo "<td style='background-color:" . getColor($percentRight, false, $noAnswers) . ";'>" . formatPercent($percentRight) . "</td>";
-                        echo "<td style='background-color:" . getColor($percentWrong, true, $noAnswers) . ";'>$wrong</td>";
-                        echo "<td style='background-color:" . getColor($percentWrong, true, $noAnswers) . ";'>" . formatPercent($percentWrong) . "</td>";
-                        echo "<td style='background-color:" . getColor($percentUnanswered, true, $noAnswers) . ";'>$unanswered</td>";
-                        echo "<td style='background-color:" . getColor($percentUnanswered, true, $noAnswers) . ";'>" . formatPercent($percentUnanswered) . "</td>";
+                        echo "<td style='background-color:" . getColor($percentRight, false, $noAnswers) . ";'>$right (".formatPercent($percentRight). ")</td>";
+                        echo "<td style='background-color:" . getColor($percentWrong, true, $noAnswers) . ";'>$wrong (".formatPercent($percentWrong). ")</td>";
+                        echo "<td style='background-color:" . getColor($percentUnanswered, true, $noAnswers) . ";'>$unanswered (".formatPercent($percentUnanswered). ")</td>";
                         echo "<td style='background-color:#5086e5;'>" . $survey . "</td>";
                         echo "<td>" . formatTime($time, $noAnswers) . "</td>";
                         echo "<td>" . formatTime($timePerQuestion, $noAnswers) . "</td>";

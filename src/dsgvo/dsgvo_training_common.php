@@ -327,8 +327,21 @@ function validate_question(string $html, $answer, bool $survey)
         }
         return [true, $survey_answers];
     } else {
-        if (!isset($matches[1][$answer])) return false;
-        if ($matches[1][$answer] == "+") return true;
+        $has_answers = false;
+        for ($i = 0; $i < count($matches[0]); $i++) {
+            $operator = $matches[1][$i];
+            if ($operator == "-" || $operator == "+") {
+                $has_answers = true;
+                continue;
+            }
+        }
+        if($has_answers){
+            if (!isset($matches[1][$answer])) return false;
+            if ($matches[1][$answer] == "+") return true;
+        }else{
+            // 'I have read' checkbox
+            return true;
+        }
     }
 }
 

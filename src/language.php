@@ -1779,6 +1779,7 @@ $lang_eng['TRAINING_BUTTON_DESCRIPTIONS'] = array(
   'STATS_GRAPH' => 'Module stats as graph',
   'STATS_TABLE' => 'Module stats as table',
   'TRY' => 'Try from a user\'s perspective',
+  'TRY_QUESTION' => 'Try from a user\'s perspective',
   'EDIT_MODULE' => 'Edit module',
 );
 $lang_ger['TRAINING_BUTTON_DESCRIPTIONS'] = array(
@@ -1794,6 +1795,7 @@ $lang_ger['TRAINING_BUTTON_DESCRIPTIONS'] = array(
   'STATS_GRAPH' => 'Auswertung des Moduls als Graph',
   'STATS_TABLE' => 'Auswertung des Moduls als Tabelle',
   'TRY' => 'Modul aus der Sicht des Benutzers abspielen',
+  'TRY_QUESTION' => 'Frage aus der Sicht des Benutzers abspielen',
   'EDIT_MODULE' => 'Modul bearbeiten',
 );
 

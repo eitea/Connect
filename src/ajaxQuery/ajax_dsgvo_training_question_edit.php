@@ -39,3 +39,16 @@ $survey = $row["survey"];
     </div>
 </div>
 </form>
+<script>
+    // $(document).ready(function(){
+    //     $("input[name=survey]").change(function(event){
+    //         console.log(tinymce);
+    //         if(this.checked){
+    //             tinymce.activeEditor.ControlManager.get("insertquestion1").setDisabled(true);
+    //         }else{
+                
+    //             tinymce.activeEditor.ControlManager.get("insertquestion1").setDisabled(false);
+    //         }
+    //     })
+	// })
+</script>

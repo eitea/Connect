@@ -1,13 +1,27 @@
 <?php
 session_start();
 $userID = $_SESSION['userid'] or die("no user signed in");
-$trainingID = isset($_POST["trainingID"]) or die("no training id");
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "connection.php";
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "language.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "utilities.php";
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "dsgvo" . DIRECTORY_SEPARATOR . "dsgvo_training_common.php";
-$trainingID = intval($_POST["trainingID"]);
 $onLogin = false;
 $doneSurveys = false;
+if(isset($_POST["questionID"])){
+    $questionID = intval($_POST["questionID"]);
+}else if (isset($_POST["trainingID"])){
+    $trainingID = intval($_POST["trainingID"]);
+}else{
+    die("no training or question id");
+}
+if($questionID){
+    $result = $conn->query("SELECT trainingID FROM dsgvo_training_questions WHERE id = $questionID");
+    showError($conn->error);
+    $trainingID = $result->fetch_assoc()["trainingID"];
+    $extra = "AND id = $questionID";
+}else{
+    $extra = "";
+}
 
 $trainingArray = array();
 $result = $conn->query("SELECT * FROM dsgvo_training WHERE id = $trainingID");
@@ -15,10 +29,10 @@ $row = $result->fetch_assoc();
 $questionArray = array();
 $random = $row["random"];
 $onLogin = $row["onLogin"];
-$result_questions = $conn->query("SELECT id, text, title, survey FROM dsgvo_training_questions WHERE trainingID = $trainingID");
+$result_questions = $conn->query("SELECT id, text, title, survey FROM dsgvo_training_questions WHERE trainingID = $trainingID $extra");
 while ($row_question = $result_questions->fetch_assoc()) {
     $trainingArray[] = array(
-        "name" => $trainingID,
+        "name" => $trainingID, 
         "title" => $row["name"] . " - " . $row_question["title"],
         "elements" => generate_survey_page(
             [
