@@ -662,7 +662,7 @@ showError($conn->error);
                 selector: '.tinymce',
                 plugins: "image autolink emoticons lists advlist textcolor charmap colorpicker visualblocks",
                 file_picker_types: 'image',
-                toolbar: 'undo redo | cut copy paste | styleselect numlist bullist forecolor backcolor | link image emoticons charmap | visualblocks | mybutton',
+                toolbar: 'undo redo | cut copy paste | styleselect numlist bullist forecolor backcolor | link image emoticons charmap | visualblocks | --mybutton',
                 setup: function (editor) {
                     editor.addButton('mybutton', {
                         type: 'listbox',
