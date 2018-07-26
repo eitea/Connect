@@ -114,7 +114,7 @@ foreach ($userArray as $user) {
  <div class="modal fade">
       <div class="modal-dialog modal-content modal-lg">
         <div class="modal-header"><?php echo $lang['RESULT_OF'] ?> <?php echo $name ?></div>
-        <div class="modal-body" style="overflow:scroll;">
+        <div class="modal-body" style="">
         <ul class="nav nav-tabs nav-justified">
    <li class="active"><a href="#training-results" data-toggle="tab">Zusammenfassung</a></li>
    <li><a href="#training-table" data-toggle="tab">Tabelle</a></li>
@@ -159,8 +159,9 @@ foreach ($userArray as $user) {
                             WHERE userID = $id AND survey = 'TRUE' AND dsgvo_training_questions.trainingID = $trainingID");
                         $survey = intval($result->fetch_assoc()["count"]);
                         $unanswered = $numberOfQuestions - $right - $wrong - $survey;
-                        $percentRight = ($right / ($numberOfQuestions - $survey));
-                        $percentWrong = ($wrong / ($numberOfQuestions - $survey));
+                        $base = ($numberOfQuestions - $survey);
+                        $percentRight = ($right / ($base?$base:1));
+                        $percentWrong = ($wrong / ($base?$base:1));
                         $percentUnanswered = ($unanswered / $numberOfQuestions);
                         $result = $conn->query("SELECT sum(duration) duration
                         FROM dsgvo_training_questions
@@ -178,8 +179,8 @@ foreach ($userArray as $user) {
                         echo "<tr>";
                         echo "<td>$id</td>";
                         echo "<td>$name</td>";
-                        echo "<td style='background-color:" . percentage_to_color($percentRight, false, $noAnswers) . ";'>$right (".formatPercent($percentRight). ")</td>";
-                        echo "<td style='background-color:" . percentage_to_color($percentWrong, true, $noAnswers) . ";'>$wrong (".formatPercent($percentWrong). ")</td>";
+                        echo "<td style='background-color:" . percentage_to_color($percentRight, false, $noAnswers || $base == 0) . ";'>$right (".formatPercent($percentRight). ")</td>";
+                        echo "<td style='background-color:" . percentage_to_color($percentWrong, true, $noAnswers || $base == 0) . ";'>$wrong (".formatPercent($percentWrong). ")</td>";
                         echo "<td style='background-color:" . percentage_to_color($percentUnanswered, true, $noAnswers) . ";'>$unanswered (".formatPercent($percentUnanswered). ")</td>";
                         echo "<td style='background-color:#5086e5;'>" . $survey . "</td>";
                         echo "<td>" . formatTime($time, $noAnswers) . "</td>";
@@ -210,7 +211,7 @@ foreach ($userArray as $user) {
                                 <?php
                                 while($result && ($row = $result->fetch_assoc())){
                                     $title = $row["title"];
-                                    $survey = $row["survey"];
+                                    $survey = $lang[$row["survey"] == 'TRUE'?'YES':'NO'];
                                     $version = $row["version"];
                                     $questionID = $row["id"];
                                     $total = count($userArray);

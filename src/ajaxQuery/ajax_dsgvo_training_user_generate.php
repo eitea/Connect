@@ -122,7 +122,7 @@ $trainingArray = array(); // those are the survey pages
 while ($row_question = $result_question->fetch_assoc()) {
     $trainingArray[] = array(
         "name" => $trainingID,
-        "title" => $row_question["title"],
+        "title" => str_ellipsis($row_question["title"], 30) . ($row_question["survey"] == 'TRUE'?" (Umfrage)":""),
         "elements" => generate_survey_page(
             [
                 "text" => $row_question["text"],
@@ -130,7 +130,7 @@ while ($row_question = $result_question->fetch_assoc()) {
                 "required" => $test ? ($onLogin == 'TRUE') : ($row_question["onLogin"] == 'TRUE' && !$doneSurveys),
                 "random" => $random,
                 "survey" => $row_question["survey"] == 'TRUE',
-                "category" => $row_question["mname"]. " / ". $row_question["tname"]
+                "category" => str_ellipsis($row_question["mname"]. " / ". $row_question["tname"], 35)
             ]
         ),
     );

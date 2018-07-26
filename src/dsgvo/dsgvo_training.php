@@ -8,6 +8,11 @@ enableToDSGVO($userID); ?>
 // A training is a group of questions (set)         (renamed to Modul)
 // A question is a text with different answers      (renamed to Frage)
 
+if($userHasUnansweredOnLoginSurveys){
+    $userHasUnansweredOnLoginSurveys = false;// do not display surveys when editing them
+    showInfo("Da Sie gerade Schulungen bearbeiten, wurde eine fällige Schulung unterdrückt");
+}
+
 $trainingID = 0;
 if (isset($_REQUEST["trainingid"])) {
     $trainingID = intval($_REQUEST["trainingid"]);
@@ -41,6 +46,30 @@ function insertVVLog($short, $long)
     showError($stmt_insert_vv_log->error);
 }
 
+function parse_question_form()
+{
+    $text = "";
+    if (isset($_POST["question_type"]) && $_POST["question_type"] != "boolean") {
+        $text .= "{";
+        if (isset($_POST["question_type"])) {
+            $text .= " [#]" . test_input($_POST["question_type"]);
+        }
+        if (isset($_POST["question_text"])) {
+            if (strlen(trim(test_input($_POST["question_text"]))))
+                $text .= " [?]" . test_input($_POST["question_text"]);
+        }
+        if (isset($_POST["answer_operators"], $_POST["answer_values"]) && is_array($_POST["answer_operators"]) && is_array($_POST["answer_operators"])) {
+            foreach ($_POST["answer_operators"] as $index => $operator) {
+                $value = isset($_POST["answer_values"][$index]) ? test_input($_POST["answer_values"][$index]) : "";
+                $operator = test_input($operator);
+                $text .= " [" . $operator . "]" . $value;
+            }
+        }
+        $text .= "}";
+    }
+    return $text;
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['createTraining']) && !empty($_POST['name'])) {
         $name = test_input($_POST['name']);
@@ -68,6 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $survey = isset($_POST["survey"]) ? 'TRUE' : 'FALSE';
         $text = $_POST["question"]; // todo: test input
         $version = 1;
+        $text .= parse_question_form();
         $stmt = $conn->prepare("INSERT INTO dsgvo_training_questions (trainingID, text, title, version, survey) VALUES ($trainingID, ?, '$title', $version, '$survey')");
         if ($conn->error) {
             showError($conn->error);
@@ -92,6 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $questionID = intval($_POST["editQuestion"]);
         $title = test_input($_POST["title"]);
         $text = $_POST["question"]; //todo: test input
+        $text .= parse_question_form();
         $version = intval($_POST["version"]);
         $survey = isset($_POST["survey"]) ? 'TRUE' : 'FALSE';
         $stmt = $conn->prepare("UPDATE dsgvo_training_questions SET text = ?, title = '$title', version = $version, survey = '$survey' WHERE id = $questionID");
@@ -400,7 +431,7 @@ showError($conn->error);
                                         </button>
                                     </span>
                                     <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['ADD_QUESTION'] ?>">
-                                        <button type="button" style="background:none;border:none;" data-toggle="modal" data-target="#addQuestionModal_<?php echo $trainingID; ?>">
+                                        <button type="button" style="background:none;border:none;" name="addQuestion" value="<?php echo $trainingID; ?>">
                                             <i class="fa fa-fw fa-plus"></i>
                                         </button>
                                     </span>
@@ -422,11 +453,11 @@ showError($conn->error);
                                 <div class="panel-body container-fluid">
                                     <?php
 
-                                    $result_question = $conn->query("SELECT * FROM dsgvo_training_questions WHERE trainingID = $trainingID");
+                                    $result_question = $conn->query("SELECT id,title,survey FROM dsgvo_training_questions WHERE trainingID = $trainingID");
                                     while ($row_question = $result_question->fetch_assoc()) :
                                         $questionID = $row_question["id"];
                                     $title = $row_question["title"];
-                                    $text = $row_question["text"];
+                                    $isSurvey = $row_question["survey"] == 'TRUE';
                                     if ($trainingID == $activeTab) {
                                         echo "<script>$('#moduleCollapse-$moduleID').addClass('in')</script>";
                                     }
@@ -434,7 +465,10 @@ showError($conn->error);
                                     <div class="panel panel-default">
                                         <div class=" panel-heading clearfix">
 
-                                            <span class="text-left col-xs-6">
+                                            <span class="text-left col-xs-6" style="padding-left: 0">
+                                                <?php if ($isSurvey) : ?>
+                                                   <span class="label label-default">Umfrage</span>&nbsp;
+                                                <?php endif; ?>
                                                 <?php echo $title ?>
                                             </span>
                                             <div class="text-right col-xs-6" style="padding-right: 0px;">
@@ -474,34 +508,7 @@ showError($conn->error);
                                 </div>
                             </div>
                         </div>
-                        <!-- question add modal -->
-                        <div class="modal fade" id="addQuestionModal_<?php echo $trainingID; ?>">
-                            <div class="modal-dialog modal-content modal-lg">
-                                <div class="modal-header">
-                                    <?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['ADD_QUESTION'] ?>
-                                </div>
-                                <div class="modal-body">
-                                    <input type="text" name="title" class="form-control" placeholder="Title"></input>
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" name="survey" value="TRUE"> Umfrage
-                                        </label>
-                                    </div>
-                                    <textarea name="question" class="form-control tinymce" placeholder="Question"></textarea>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">
-                                        <?php echo $lang['CANCEL'] ?>
-                                    </button>
-                                    <button type="submit" class="btn btn-warning" name="addQuestion" value="<?php echo $trainingID; ?>">
-                                        <?php echo $lang['ADD'] ?>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- /question add modal -->
                     </form>
-
                     <?php endwhile; ?>
                 </div>
             </div>
@@ -609,6 +616,9 @@ showError($conn->error);
         })
         $("button[name=infoQuestion]").click(function () {
             setCurrentModal({ questionID: $(this).val() }, 'get', 'ajaxQuery/ajax_dsgvo_training_question_info.php')
+        }) 
+        $("button[name=addQuestion]").click(function () {
+            setCurrentModal({ new: true, trainingID: $(this).val() }, 'get', 'ajaxQuery/ajax_dsgvo_training_question_edit.php')
         })
         $("button[name=infoTraining]").click(function () {
             setCurrentModal({ trainingID: $(this).val() }, 'get', 'ajaxQuery/ajax_dsgvo_training_training_info.php')
@@ -675,7 +685,7 @@ showError($conn->error);
                         }
                     });
                 },
-                height: "480",
+                height: "200",
                 menubar: false,
                 statusbar: false,
                 file_picker_callback: function (cb, value, meta) {

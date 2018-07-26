@@ -224,15 +224,17 @@ function parse_question(string $html, bool $survey) : array
     $question_type = "boolean";
     preg_match($question_regex, $html, $matches);
     // only parse the first question
-    if (sizeof($matches) == 0) return [$default_answer_choices, $question_type, "Ich habe den Text gelesen", $title];
+    if (sizeof($matches) == 0) return [$default_answer_choices, $question_type, "Ich habe den Text gelesen", $title, []];
     $question = $matches[0]; // eg "{[-]wrong answer[+]right answer}"
     preg_match_all($question_inner_regex, $question, $matches);
-    if (sizeof($matches) == 0) return [$default_answer_choices, $question_type, "Ich habe den Text gelesen", $title];
+    if (sizeof($matches) == 0) return [$default_answer_choices, $question_type, "Ich habe den Text gelesen", $title, []];
     $ret_array = array();
     $question_type = "radiogroup";
+    $parsed = [];
     for ($i = 0; $i < count($matches[0]); $i++) {
         $operator = $matches[1][$i]; // + ... right, - ... wrong, ? ... question, # ... type, ...
         $value = trim($matches[2][$i]);
+        $parsed[] = ["operator" => $operator, "value" => $value];
         if ($operator == "-" || $operator == "+") {
             $ret_array[] = array("value" => $i, "text" => html_entity_decode($value));
         } else if ($operator == "?") {
@@ -253,9 +255,9 @@ function parse_question(string $html, bool $survey) : array
     }
     if (sizeof($ret_array) == 0) {
         $question_type = "boolean";
-        return [$default_answer_choices, $question_type, "Ich habe den Text gelesen", $title];
+        return [$default_answer_choices, $question_type, "Ich habe den Text gelesen", $title, $parsed];
     }
-    return [$ret_array, $question_type, "", $title];
+    return [$ret_array, $question_type, "", $title, $parsed];
 }
 
 /**
@@ -369,6 +371,13 @@ function percentage_to_color($percent, $inverse = false, $gray = false): string
     // hue 0 ... red
     // hue 120 ... green
     return "hsl($hue, 75%, 50%)";
+}
+
+/**
+ * adds ... if string is too long
+ */
+function str_ellipsis(string $str, $len = 50){
+   return strlen($str) > $len ? substr($str,0,$len)."..." : $str;
 }
 
 ?>
