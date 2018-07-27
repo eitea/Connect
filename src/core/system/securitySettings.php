@@ -26,6 +26,26 @@ while($row = $result->fetch_assoc()){
 	$grantable_modules[$row['module']]['public'] = $row['publicKey'];
 }
 
+if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['saveRoles']) && has_permission("WRITE","CORE","SECURITY")) {
+    $x = intval($_POST['saveRoles']);
+    if($x != 1){
+        $stmt_insert_permission_relationship = $conn->prepare("INSERT INTO relationship_access_permissions (userID, permissionID, type) VALUES (?, ?, ?)");
+        echo $conn->error;
+        $stmt_insert_permission_relationship->bind_param("iis", $x, $permissionID, $type);
+        $conn->query("DELETE FROM relationship_access_permissions WHERE userID = $x");
+        foreach ($_POST as $key => $type) {
+            if(str_starts_with("PERMISSION", $key)){
+                $arr = explode(";", $key);
+                // $groupID = intval($arr[1]);
+                $permissionID = intval($arr[2]);
+                $stmt_insert_permission_relationship->execute();
+                echo $stmt_insert_permission_relationship->error;
+            }        
+        }
+        $stmt_insert_permission_relationship->close();    
+    }
+}
+
 if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","CORE","SECURITY")){
     function secure_module($module, $symmetric, $decrypt = false){
         global $conn;
@@ -221,7 +241,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","CORE","SECURI
 
                     if($accept){ //access
                         secure_module($module, $symmetric);
-                        $result = $conn->query("SELECT s.publicKey, s.userID FROM security_users s LEFT JOIN roles ON s.userID = roles.userID WHERE publicKey IS NOT NULL AND ".$query_access_modules[$module]);
+                        $result = $conn->query("SELECT s.publicKey, s.userID FROM security_users s LEFT JOIN roles ON s.userID = roles.userID WHERE publicKey IS NOT NULL AND ".$query_access_modules[$module]); //TODO: rewrite for permissions
                         while($row = $result->fetch_assoc()){
                             $user_public = base64_decode($row['publicKey']);
                             $nonce = random_bytes(24);
@@ -331,9 +351,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","CORE","SECURI
 					$conn->query("INSERT INTO relationship_company_client (companyID, userID) VALUES (".$row['id'].", $x)");
 				}
 			}
-		}
-
-		if(isset($_POST['isDSGVOAdmin'])){
+        }
+        
+        if(isset($_POST['isDSGVOAdmin'])){
+		// if(has_permission("READ", "DSGVO",false,$x) /* test if the user has any DSGVO read or write permissions */){
 			$isDSGVOAdmin = grantAccess('DSGVO', $x);
 		} else {
 			$conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'DSGVO' AND userID = $x");

@@ -1,25 +1,5 @@
 <?php
 
-if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['saveRoles']) && has_permission("WRITE","CORE","SECURITY")) {
-    $x = intval($_POST['saveRoles']);
-    if($x != 1){
-        $stmt_insert_permission_relationship = $conn->prepare("INSERT INTO relationship_access_permissions (userID, permissionID, type) VALUES (?, ?, ?)");
-        echo $conn->error;
-        $stmt_insert_permission_relationship->bind_param("iis", $x, $permissionID, $type);
-        $conn->query("DELETE FROM relationship_access_permissions WHERE userID = $x");
-        foreach ($_POST as $key => $type) {
-            if(str_starts_with("PERMISSION", $key)){
-                $arr = explode(";", $key);
-                // $groupID = intval($arr[1]);
-                $permissionID = intval($arr[2]);
-                $stmt_insert_permission_relationship->execute();
-                echo $stmt_insert_permission_relationship->error;
-            }        
-        }
-        $stmt_insert_permission_relationship->close();    
-    }
-}
-
 $result = $conn->query("SELECT id,name FROM access_permission_groups ORDER BY id");
 $permission_groups = $result->fetch_all(MYSQLI_ASSOC);
 

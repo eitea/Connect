@@ -1021,7 +1021,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
         ?>
       <?php endif;?>
       <!-- Section Six: DSGVO -->
-      <?php if (has_permission("READ", "DSGVO") /* any read permission in dsgvo */): ?>
+      <?php if (has_permission("READ", "DSGVO") /* any read (or write) permission in dsgvo */): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading">
             <a data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-dsgvo"  id="adminOption_DSGVO"><i class="fa fa-caret-down pull-right"></i><strong style="padding: 0px 6px;"> § </strong>DSGVO</a>
