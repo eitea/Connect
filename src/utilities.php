@@ -838,3 +838,7 @@ function getUnreadMessages($conversationID = 0){
 	}
 	return '';
 }
+
+function str_starts_with($prefix, $subject){
+    return substr($subject, 0, strlen($prefix)) === $prefix;
+}

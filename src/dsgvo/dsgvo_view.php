@@ -1,5 +1,6 @@
 <?php
-include dirname(__DIR__) . '/header.php'; enableToDSGVO($userID);
+include dirname(__DIR__) . '/header.php'; 
+require_permission("READ","DSGVO","AGREEMENTS");
 require dirname(__DIR__) . "/misc/helpcenter.php";
 if (empty($_GET['n']) || !in_array($_GET['n'], $available_companies)) { //eventually STRIKE
     $conn->query("UPDATE UserData SET strikeCount = strikeCount + 1 WHERE id = $userID");
@@ -10,7 +11,7 @@ if (empty($_GET['n']) || !in_array($_GET['n'], $available_companies)) { //eventu
 
 $cmpID = intval($_GET['n']);
 $bucket = $identifier .'-uploads'; //no uppercase, no underscores, no ending dashes, no adjacent special chars
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","AGREEMENTS")) {
     if (!empty($_POST['delete'])){
         $val = intval($_POST['delete']);
         $conn->query("DELETE FROM documents WHERE id = $val AND companyID = $cmpID;");
@@ -315,7 +316,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <div class="page-header"><h3><?php echo $lang['DOCUMENTS']; ?>
     <div class="page-header-button-group">
+		<?php if(has_permission("WRITE","DSGVO","AGREEMENTS")): ?>
         <button type="button" data-toggle="modal" data-target="#pdf-upload" class="btn btn-default" title="Upload PDF File"><i class="fa fa-upload"></i> PDF Upload</button>
+		<?php endif ?>
 		<a data-toggle="collapse" href="#show-categories" class="btn btn-default" title="<?php echo $lang['SUBCATEGORIES_EDIT'] ?>"><?php echo $lang['CATEGORIES'] ?></a>
     </div>
 </h3></div>
@@ -324,8 +327,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	<form method="POST">
 	<h4><?php echo $lang['SUBCATEGORIES_MANAGE'] ?>
 		<div class="page-header-button-group">
+			<?php if(has_permission("WRITE","DSGVO","AGREEMENTS")): ?>
 	        <button type="button" data-toggle="modal" data-target="#edit-categories" class="btn btn-default" title="Neue Subkategorie Hinzufügen"><i class="fa fa-plus"></i></button>
-	    </div>
+	   		<?php endif ?>
+		</div>
 	</h4>
 	<table class="table datatable">
 		<thead>
@@ -343,10 +348,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 				echo '<td>'.$lang['CONTRACT'].'</td>';
 				echo '<td>'.$cats['name'].'</td>';
 				echo '<td>';
-				if($conn->query("SELECT id FROM archive_meta WHERE category = ".$cats['id'])->num_rows < 1){
-					echo '<button type="submit" name="deletecat" value="'.$cats['id'].'" class="btn btn-default" title="'.$lang['DELETE'].'"><i class="fa fa-trash-o"></i></button> ';
+				if(has_permission("WRITE","DSGVO","AGREEMENTS")){
+					if($conn->query("SELECT id FROM archive_meta WHERE category = ".$cats['id'])->num_rows < 1){
+						echo '<button type="submit" name="deletecat" value="'.$cats['id'].'" class="btn btn-default" title="'.$lang['DELETE'].'"><i class="fa fa-trash-o"></i></button> ';
+					}
+					echo '<a data-toggle="modal" href="#edit-categories" data-name="'.$cats['name'].'" data-catid="'.$cats['id'].'" data- class="btn btn-default"><i class="fa fa-pencil"></i></a></td>';
 				}
-				echo '<a data-toggle="modal" href="#edit-categories" data-name="'.$cats['name'].'" data-catid="'.$cats['id'].'" data- class="btn btn-default"><i class="fa fa-pencil"></i></a></td>';
 				echo '</tr>';
 			}
 			?>
@@ -422,8 +429,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <div class="page-header"><h3><?php echo $lang['TEMPLATES'].' '.$lang['FOR'].' '.$lang['DOCUMENTS']; ?>
     <div class="page-header-button-group">
+		<?php if(has_permission("WRITE","DSGVO","AGREEMENTS")): ?>
         <button type="button" data-toggle="modal" data-target="#new-document" class="btn btn-default" title="New..."><i class="fa fa-plus"></i></button>
-        <button type="button" data-toggle="modal" data-target="#zip-upload" class="btn btn-default" title="Upload Zip File"><i class="fa fa-upload"></i> ZIP Upload</button>
+		<button type="button" data-toggle="modal" data-target="#zip-upload" class="btn btn-default" title="Upload Zip File"><i class="fa fa-upload"></i> ZIP Upload</button>
+		<?php endif ?>
     </div>
     <span style="float:right" ><a href="https://consulio.at/dokumente" class="btn btn-sm btn-warning" target="_blank"><?php echo $lang['NEWEST_AGREEMENTS_FROM_CONSULIO']; ?></a></span>
 </h3></div>
@@ -446,13 +455,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             echo "<tr $style>";
             echo '<td>' .mc_status('DSGVO'). secure_data('DSGVO', $row['name'], 'decrypt', $userID, $privateKey) . '</td>';
             echo '<td>' . $row['version'] . '</td>';
-            echo '<td><form method="POST">';
-            echo '<a href="edit?d=' . $row['id'] . '" title="'.$lang['EDIT'].'" class="btn btn-default"><i class="fa fa-pencil"></i></a> ';
-            echo '<button type="submit" name="clone" value="' . $row['id'] . '" title="'.$lang['CLONE'].'" class="btn btn-default" ><i class="fa fa-files-o"></i></button> ';
-            echo '<button type="submit" name="delete" value="' . $row['id'] . '" title="'.$lang['DELETE'].'" class="btn btn-default" ><i class="fa fa-trash-o"></i></button> ';
-            echo '<button type="button" name="setSelect" value="' . $row['id'] . '" data-toggle="modal" data-target="#send-as-mail" class="btn btn-default" title="'.$lang['SEND'].'"><i class="fa fa-envelope-o"></i></button>';
-            echo '</form></td>';
-            echo '</tr>';
+			echo '<td><form method="POST">';
+			if(has_permission("WRITE","DSGVO","AGREEMENTS")){
+				echo '<a href="edit?d=' . $row['id'] . '" title="'.$lang['EDIT'].'" class="btn btn-default"><i class="fa fa-pencil"></i></a> ';
+				echo '<button type="submit" name="clone" value="' . $row['id'] . '" title="'.$lang['CLONE'].'" class="btn btn-default" ><i class="fa fa-files-o"></i></button> ';
+				echo '<button type="submit" name="delete" value="' . $row['id'] . '" title="'.$lang['DELETE'].'" class="btn btn-default" ><i class="fa fa-trash-o"></i></button> ';
+				echo '<button type="button" name="setSelect" value="' . $row['id'] . '" data-toggle="modal" data-target="#send-as-mail" class="btn btn-default" title="'.$lang['SEND'].'"><i class="fa fa-envelope-o"></i></button>';
+				echo '</form></td>';
+			}
+			echo '</tr>';
 			//5ae9c3361c57c
             $doc_selects .= '<option value="' . $row['id'] . '" >' . secure_data('DSGVO', $row['name'], 'decrypt')  .' - '. $row['version']. '</option>';
         }

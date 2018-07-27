@@ -1,7 +1,7 @@
 <?php
 include dirname(__DIR__) . '/header.php';
-enableToDSGVO($userID);
 require dirname(__DIR__) . "/misc/helpcenter.php";
+require_permission("READ","DSGVO","PROCEDURE_DIRECTORY");
 
 if (isset($_GET['n'])) {
 	$cmpID = intval($_GET['n']);
@@ -87,7 +87,7 @@ if (isset($cmpID)) {
 	showError($conn->error);
 }
 
-if (isset($_POST['add_setting']) && isset($matrixID)) {
+if (has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY") && isset($_POST['add_setting']) && isset($matrixID)) {
 	if (!empty($_POST['add_setting']) && !empty($_POST[test_input($_POST['add_setting'])])) {
 		$setting = test_input($_POST['add_setting']);
 		$descr = test_input($_POST[$setting]);
@@ -101,7 +101,7 @@ if (isset($_POST['add_setting']) && isset($matrixID)) {
 	}
 }
 
-if (isset($_POST['delete_setting']) && isset($matrixID)) {
+if (has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY") && isset($_POST['delete_setting']) && isset($matrixID)) {
 	if (!empty($_POST['delete_setting'])) {
 		$setting = test_input($_POST['delete_setting']);
 		$conn->query("DELETE FROM dsgvo_vv_data_matrix_settings WHERE matrixID = $matrixID AND opt_name = '$setting'");
@@ -114,7 +114,7 @@ if (isset($_POST['delete_setting']) && isset($matrixID)) {
 	}
 }
 
-if (isset($_POST['save_all']) && isset($matrixID)) {
+if (has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY") && isset($_POST['save_all']) && isset($matrixID)) {
 	$stmt = $conn->prepare("UPDATE dsgvo_vv_data_matrix_settings SET opt_descr = ?, opt_duration = ?, opt_unit = ?, opt_status = ? WHERE matrixID = $matrixID AND opt_name = ?"); echo $conn->error;
 	$stmt->bind_param("siiss", $descr, $duration, $unit, $status, $setting);
 	$affected_rows = 0;
@@ -150,7 +150,9 @@ if (isset($_POST['save_all']) && isset($matrixID)) {
 	<div class="page-header">
 		<h3><?php echo $lang['DATA_MATRIX']; ?>
 			<div class="page-header-button-group">
+				<?php if(has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY")): ?> 
 				<button type="submit" form="main-form" class="btn btn-default blinking" name="save_all" value="true"><i class="fa fa-floppy-o"></i></button>
+				<?php endif ?>
 			</div>
 		</h3>
 	</div>
@@ -331,5 +333,11 @@ function resetBothSelects(baseName){
 	$("[name="+baseName+"_UNIT]").val("default");
 }
 </script>
-
+<?php if(!has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY")): ?>
+<script>
+$('#bodyContent .affix-content input').prop("disabled", true); // disable all input on this page (not header)
+$('#bodyContent .affix-content select').prop("disabled", true); // disable all input on this page (not header)
+$('#bodyContent .affix-content button').prop("disabled", true); // disable all input on this page (not header)
+</script>
+<?php endif ?>
 <?php include dirname(__DIR__) . '/footer.php';?>

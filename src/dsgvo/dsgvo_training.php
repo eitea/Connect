@@ -1,6 +1,6 @@
-<?php require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'header.php';
-enableToDSGVO($userID); ?>
+<?php require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'header.php'; ?>
 <?php require dirname(__DIR__) . DIRECTORY_SEPARATOR . "misc" . DIRECTORY_SEPARATOR . "helpcenter.php"; ?>
+<?php require_permission("READ","DSGVO","TRAINING") ?>
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 
 <?php
@@ -70,7 +70,7 @@ function parse_question_form()
     return $text;
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","TRAINING")) {
     if (isset($_POST['createTraining']) && !empty($_POST['name'])) {
         $name = test_input($_POST['name']);
         $moduleID = intval($_POST["module"]);
@@ -338,6 +338,7 @@ showError($conn->error);
         <h3>
             <?php echo $lang['TRAINING'] ?>
             <div class="page-header-button-group">
+                <?php if(has_permission("WRITE","DSGVO","TRAINING")): ?>
                 <span data-container="body" data-toggle="tooltip" title="<?php echo $lang[" NEW_SET_DESCRIPTION "] ?>">
                     <button type="button" data-toggle="modal" data-target="#newModuleModal" class="btn btn-default">
                         <i class="fa fa-cubes"></i>
@@ -348,6 +349,7 @@ showError($conn->error);
                     <button type="button" name="importExport" value="import" class="btn btn-default">
                         <i class="fa fa-upload"></i> Import</button>
                 </span>
+                <?php endif ?>
                 <span data-container="body" data-toggle="tooltip" title="<?php echo $lang[" EXPORT_ALL_SETS "] ?>">
                     <button type="button" name="importExport" value="export" class="btn btn-default">
                         <i class="fa fa-download"></i> Export</button>
@@ -381,6 +383,7 @@ showError($conn->error);
                                 <i class="fa fa-fw fa-download"></i>
                             </button>
                         </span>
+                         <?php if(has_permission("WRITE","DSGVO","TRAINING")): ?>
                         <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['NEW_MODULE'] ?>">
                             <button type="button" style="background:none;border:none;" name="addTraining" value="<?php echo $moduleID; ?>">
                                 <i class="fa fa-fw fa-plus"></i>
@@ -396,6 +399,7 @@ showError($conn->error);
                                 <i class="fa fa-fw fa-trash-o"></i>
                             </button>
                         </span>
+                        <?php endif ?>
                     </form>
                 </div>
             </div>
@@ -430,6 +434,7 @@ showError($conn->error);
                                             <i class="fa fa-fw fa-play"></i>
                                         </button>
                                     </span>
+                                    <?php if(has_permission("WRITE","DSGVO","TRAINING")): ?>
                                     <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['ADD_QUESTION'] ?>">
                                         <button type="button" style="background:none;border:none;" name="addQuestion" value="<?php echo $trainingID; ?>">
                                             <i class="fa fa-fw fa-plus"></i>
@@ -445,6 +450,7 @@ showError($conn->error);
                                             <i class="fa fa-fw fa-trash-o"></i>
                                         </button>
                                     </span>
+                                    <?php endif ?>
                                 </div>
                             </div>
                             <div class="collapse <?php if ($trainingID == $activeTab) {
@@ -467,7 +473,7 @@ showError($conn->error);
 
                                             <span class="text-left col-xs-6" style="padding-left: 0">
                                                 <?php if ($isSurvey) : ?>
-                                                   <span class="label label-default">Umfrage</span>&nbsp;
+                                                <span class="label label-default">Umfrage</span>&nbsp;
                                                 <?php endif; ?>
                                                 <?php echo $title ?>
                                             </span>
@@ -476,12 +482,13 @@ showError($conn->error);
                                                     <button type="button" style="background:none;border:none" name="testQuestion" value="<?php echo $questionID; ?>">
                                                         <i class="fa fa-fw fa-play"></i>
                                                     </button>
-                                                </span> 
+                                                </span>
                                                 <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['QUESTION_STATS'] ?>">
                                                     <button type="button" style="background:none;border:none" name="infoQuestion" value="<?php echo $questionID; ?>">
                                                         <i class="fa fa-fw fa-pie-chart"></i>
                                                     </button>
                                                 </span>
+                                                <?php if(has_permission("WRITE","DSGVO","TRAINING")): ?>
                                                 <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['EDIT_QUESTION'] ?>">
                                                     <button type="button" style="background:none;border:none" name="editQuestion" value="<?php echo $questionID; ?>">
                                                         <i class="fa fa-fw fa-edit"></i>
@@ -492,6 +499,7 @@ showError($conn->error);
                                                         <i class="fa fa-fw fa-trash-o"></i>
                                                     </button>
                                                 </span>
+                                                <?php endif ?>
                                             </div>
                                         </div>
                                     </div>
@@ -602,7 +610,7 @@ showError($conn->error);
                 },
                 error: function (resp) { console.error(resp) },
                 complete: function (resp) {
-                    if(complete) complete(resp);
+                    if (complete) complete(resp);
                     else $("#currentQuestionModal .modal").modal('show');
                     onModalLoad();
                 }
@@ -616,7 +624,7 @@ showError($conn->error);
         })
         $("button[name=infoQuestion]").click(function () {
             setCurrentModal({ questionID: $(this).val() }, 'get', 'ajaxQuery/ajax_dsgvo_training_question_info.php')
-        }) 
+        })
         $("button[name=addQuestion]").click(function () {
             setCurrentModal({ new: true, trainingID: $(this).val() }, 'get', 'ajaxQuery/ajax_dsgvo_training_question_edit.php')
         })
@@ -630,13 +638,13 @@ showError($conn->error);
             setCurrentModal({ operation: "export", module: $(this).val() }, 'post', 'ajaxQuery/ajax_dsgvo_training_import_export.php')
         })
         $("button[name=testTraining]").click(function () {
-            setCurrentModal({ trainingID: $(this).val(), test: true }, 'post', 'ajaxQuery/ajax_dsgvo_training_user_generate.php', function(){
+            setCurrentModal({ trainingID: $(this).val(), test: true }, 'post', 'ajaxQuery/ajax_dsgvo_training_user_generate.php', function () {
                 $("#currentQuestionModal .survey-modal").modal();
             })
-            
+
         })
         $("button[name=testQuestion]").click(function () {
-            setCurrentModal({ questionID: $(this).val(), test: true }, 'post', 'ajaxQuery/ajax_dsgvo_training_user_generate.php', function(){
+            setCurrentModal({ questionID: $(this).val(), test: true }, 'post', 'ajaxQuery/ajax_dsgvo_training_user_generate.php', function () {
                 $("#currentQuestionModal .survey-modal").modal();
             })
         })

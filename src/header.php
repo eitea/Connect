@@ -757,7 +757,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           <div id="collapse-core" role="tabpanel" class="panel-collapse collapse">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                  <li><a <?php if ($this_page == 'securitySettings.php') {echo $setActiveLink;}?> href="../system/security">Security</a></li>
+              <?php if(has_permission("READ","CORE","SECURITY")): ?><li><a <?php if ($this_page == 'securitySettings.php') {echo $setActiveLink;}?> href="../system/security">Security</a></li><? endif ?>
                   <li>
                       <a id="coreUserToggle" href="#" data-toggle="collapse" data-target="#toggleUsers" data-parent="#sidenav01" class="collapse in">
                           <span><?php echo $lang['USERS']; ?></span> <i class="fa fa-caret-down"></i>
@@ -1021,7 +1021,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
         ?>
       <?php endif;?>
       <!-- Section Six: DSGVO -->
-      <?php if ($user_roles['isDSGVOAdmin'] == 'TRUE'): ?>
+      <?php if (has_permission("READ", "DSGVO") /* any read permission in dsgvo */): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading">
             <a data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-dsgvo"  id="adminOption_DSGVO"><i class="fa fa-caret-down pull-right"></i><strong style="padding: 0px 6px;"> § </strong>DSGVO</a>
@@ -1033,15 +1033,15 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                 if(count($available_companies) == 2){
                   $isActivePanel = true;
                   $isActive = ($isActivePanel && $this_page == 'dsgvo_view.php') ? $setActiveLink : "";
-                  echo '<li><a '.$isActive.' href="../dsgvo/documents?n='.$available_companies[1].'">'.$lang['DOCUMENTS'].'</a></li>';
+                  if(has_permission("READ","DSGVO","AGREEMENTS")) echo '<li><a '.$isActive.' href="../dsgvo/documents?n='.$available_companies[1].'">'.$lang['DOCUMENTS'].'</a></li>';
                   $isActive = ($isActivePanel && ($this_page == 'dsgvo_vv.php' || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php" || $this_page == 'dsgvo_data_matrix.php')) ? $setActiveLink : "";
-                  echo '<li><a '.$isActive.' href="../dsgvo/vv?n='.$available_companies[1].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
+                  if(has_permission("READ","DSGVO","PROCEDURE_DIRECTORY")) echo '<li><a '.$isActive.' href="../dsgvo/vv?n='.$available_companies[1].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
                   $isActive = ($isActivePanel && $this_page == 'dsgvo_mail.php') ? $setActiveLink : "";
-                  echo '<li><a '.$isActive.' href="../dsgvo/templates?n='.$available_companies[1].'">' .$lang['EMAIL_TEMPLATES']. '</a></li>';
+                  if(has_permission("READ","DSGVO","EMAIL_TEMPLATES")) echo '<li><a '.$isActive.' href="../dsgvo/templates?n='.$available_companies[1].'">' .$lang['EMAIL_TEMPLATES']. '</a></li>';
                   $isActive = ($isActivePanel && $this_page == 'dsgvo_training.php') ? $setActiveLink : "";
-                  echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$available_companies[1].'" >' .$lang["TRAINING"]. '</a></li>';
+                  if(has_permission("READ","DSGVO","TRAINING")) echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$available_companies[1].'" >' .$lang["TRAINING"]. '</a></li>';
                   $isActive = ($isActivePanel && $this_page == 'dsgvo_log.php') ? $setActiveLink : "";
-                  echo '<li><a '.$isActive.' href="../dsgvo/log?n='.$row['id'].'" >Logs</a></li>';
+                  if(has_permission("READ","DSGVO","LOGS")) echo '<li><a '.$isActive.' href="../dsgvo/log?n='.$row['id'].'" >Logs</a></li>';
                 } else {
                   $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
                   while($result && ($row = $result->fetch_assoc())){
@@ -1051,15 +1051,15 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     echo '<div class="collapse" id="tdsgvo-'.$row['id'].'" >';
                     echo '<ul class="nav nav-list">';
                     $isActive = ($isActivePanel && $this_page == 'dsgvo_view.php') ? $setActiveLink : "";
-                    echo '<li><a '.$isActive.' href="../dsgvo/documents?n='.$row['id'].'">'.$lang['DOCUMENTS'].'</a></li>';
+                    if(has_permission("READ","DSGVO","AGREEMENTS")) echo '<li><a '.$isActive.' href="../dsgvo/documents?n='.$row['id'].'">'.$lang['DOCUMENTS'].'</a></li>';
                     $isActive = ($isActivePanel && ($this_page == 'dsgvo_vv.php' || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php" || $this_page == 'dsgvo_data_matrix.php')) ? $setActiveLink : "";
-                    echo '<li><a '.$isActive.' href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
+                    if(has_permission("READ","DSGVO","PROCEDURE_DIRECTORY")) echo '<li><a '.$isActive.' href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
                     $isActive = ($isActivePanel && $this_page == 'dsgvo_mail.php') ? $setActiveLink : "";
-                    echo '<li><a '.$isActive.' href="../dsgvo/templates?n='.$row['id'].'">' .$lang['EMAIL_TEMPLATES']. '</a></li>';
+                    if(has_permission("READ","DSGVO","EMAIL_TEMPLATES")) echo '<li><a '.$isActive.' href="../dsgvo/templates?n='.$row['id'].'">' .$lang['EMAIL_TEMPLATES']. '</a></li>';
                     $isActive = ($isActivePanel && $this_page == 'dsgvo_training.php') ? $setActiveLink : "";
-                    echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$row['id'].'" >' .$lang['TRAINING']. '</a></li>';
+                    if(has_permission("READ","DSGVO","TRAINING")) echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$row['id'].'" >' .$lang['TRAINING']. '</a></li>';
                     $isActive = ($isActivePanel && $this_page == 'dsgvo_log.php') ? $setActiveLink : "";
-                    echo '<li><a '.$isActive.' href="../dsgvo/log?n='.$row['id'].'" >Logs</a></li>';
+                    if(has_permission("READ","DSGVO","LOGS")) echo '<li><a '.$isActive.' href="../dsgvo/log?n='.$row['id'].'" >Logs</a></li>';
                     echo '</ul></div></li>';
                   }
                 }

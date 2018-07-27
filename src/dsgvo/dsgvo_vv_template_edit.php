@@ -1,5 +1,6 @@
-<?php include dirname(__DIR__) . '/header.php'; enableToDSGVO($userID); ?>
-
+<?php include dirname(__DIR__) . '/header.php'; 
+require_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY"); 
+?>
 <div class="page-header-fixed">
 <div class="page-header"><h3>Template <?php echo $lang['EDIT']; ?> <div class="page-header-button-group">
 <button type="submit" form="main-form" class="btn btn-default" name="save_all"><i class="fa fa-floppy-o"></i></div></h3></div>

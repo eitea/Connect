@@ -1740,6 +1740,35 @@ function create_tables($conn) {
 	)");
 	if($conn->error){
 		echo $conn->error;
-	}
+    }
+    
+    $sql = "CREATE TABLE access_permission_groups (
+        id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(20) NOT NULL UNIQUE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
 
+    $sql = "CREATE TABLE access_permissions (
+        id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        groupID INT(10) UNSIGNED NOT NULL,
+        name VARCHAR(30) NOT NULL,
+        FOREIGN KEY (groupID) REFERENCES access_permission_groups(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
+
+    $sql = "CREATE TABLE relationship_access_permissions (
+        userID INT(6) UNSIGNED NOT NULL,
+        permissionID INT(10) UNSIGNED NOT NULL,
+        type ENUM('READ', 'WRITE') NOT NULL,
+        PRIMARY KEY (userID, permissionID),
+        FOREIGN KEY (permissionID) REFERENCES access_permissions(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
 }

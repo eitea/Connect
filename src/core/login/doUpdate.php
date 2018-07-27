@@ -3272,6 +3272,109 @@ if($row['version'] < 166){
 	if(!$conn->query($sql)){
         echo $conn->error;
     }
+
+    $sql = "CREATE TABLE access_permission_groups (
+        id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(20) NOT NULL UNIQUE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
+
+    $sql = "CREATE TABLE access_permissions (
+        id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        groupID INT(10) UNSIGNED NOT NULL,
+        name VARCHAR(30) NOT NULL,
+        FOREIGN KEY (groupID) REFERENCES access_permission_groups(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
+
+    $sql = "CREATE TABLE relationship_access_permissions (
+        userID INT(6) UNSIGNED NOT NULL,
+        permissionID INT(10) UNSIGNED NOT NULL,
+        type ENUM('READ', 'WRITE') NOT NULL,
+        PRIMARY KEY (userID, permissionID),
+        FOREIGN KEY (permissionID) REFERENCES access_permissions(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
+
+    $stmt_insert_groups = $conn->prepare("INSERT INTO access_permission_groups (name) VALUES (?)");
+    echo $conn->error;
+    $stmt_insert_groups->bind_param("s", $group);
+    $stmt_insert_permission = $conn->prepare("INSERT INTO access_permissions (groupID, name) VALUES (?, ?)");
+    echo $conn->error;
+    $stmt_insert_permission->bind_param("is", $groupID, $permission);
+    $stmt_insert_permission_relationship = $conn->prepare("INSERT INTO relationship_access_permissions (userID, permissionID, type) VALUES (?, ?, ?)");
+    echo $conn->error;
+    $stmt_insert_permission_relationship->bind_param("iis", $uid, $permissionID, $type);
+    $permission_groups = [
+      'CORE' => [
+        'SECURITY',
+        'USERS',
+        'COMPANIES',
+        'TEAMS',
+        'SETTINGS'
+      ],
+      'TIMES' => [
+        'OVERVIEW',
+        'CORRECTION_HOURS',
+        'TRAVELING_EXPENSES',
+        'VACATION',
+        'CHECKLIST'
+      ],
+      'PROJECTS' => [
+        'PROJECTS',
+        'WORKFLOW',
+        'LOGS'
+      ],
+      'ERP' => [
+        'PROCESS',
+        'CLIENTS',
+        'SUPPLIERS',
+        'ARTICLE',
+        'RECEIPT_BOOK',
+        'VACANT_POSITIONS',
+        'SETTINGS'
+      ],
+      'FINANCES' => [
+        'ACCOUNTING_PLAN',
+        'ACCOUNTING_JOURNAL',
+        'TAX_RATES'
+      ],
+      'DSGVO' => [
+        'AGREEMENTS',
+        'PROCEDURE_DIRECTORY',
+        'EMAIL_TEMPLATES',
+        'TRAINING',
+        'LOGS'
+      ],
+      'ARCHIVE' => [
+        'SHARE',
+        'PRIVATE'
+      ]
+    ];
+    foreach ($permission_groups as $group => $permissions) {
+      $stmt_insert_groups->execute();
+      echo $stmt_insert_groups->error;
+      $groupID = $stmt_insert_groups->insert_id;
+      foreach ($permissions as $permission) {
+        $stmt_insert_permission->execute();
+        echo $stmt_insert_permission->error;
+        $uid = 1; // admin has all permissions
+        $type = "WRITE";
+        $permissionID = $stmt_insert_permission->insert_id;
+        $stmt_insert_permission_relationship->execute();
+        echo $stmt_insert_permission_relationship->error;
+      }
+    }
+    $stmt_insert_permission_relationship->close();
+    $stmt_insert_groups->close();
+    $stmt_insert_permission->close();
 }
 
 // if($row['version'] < 167){}
