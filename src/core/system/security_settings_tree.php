@@ -40,7 +40,7 @@ $permission_groups = $result->fetch_all(MYSQLI_ASSOC);
 							?>
 							<div class="col-md-12"><small>*<?php echo $lang['INFO_COMPANYLESS_USERS']; ?></small></div>
                         </div>
-                        <h4>Berechtigungen </h4><small>Momentan funktioniert nur <b>CORE.SECURITY</b> und <b>DSGVO</b> (<b>CORE</b> und <b>ERP</b> modulweit). <span style="color:red" >Wenn man ein beliebiges Modul bei <b>ERP</b>(WRITE) und <b>CORE</b>(WRITE) hat, ist momentan der gesamte Bereich für den User freigeschaltet.</span></small>
+                        <h4>Berechtigungen </h4><small>Momentan funktioniert nur <b>CORE.SECURITY</b> und <b>DSGVO</b> (<b>CORE</b> und <b>ERP</b> modulweit). <span style="color:red" >Wenn man ein beliebiges Modul bei <b>ERP</b>(READ) oder <b>CORE</b>(READ) hat, ist momentan der gesamte Bereich für den User freigeschaltet.</span></small>
                         <?php 
                             foreach($permission_groups as $permission_group){
                                 $groupID = $permission_group["id"];
@@ -109,11 +109,6 @@ $permission_groups = $result->fetch_all(MYSQLI_ASSOC);
                             ?>
                         <h4><?php echo $lang['ADMIN_MODULES']; ?></h4>
                         <div class="row checkbox">
-                            <div class="col-md-3">
-                                <label>
-                                    <input type="checkbox" name="isCoreAdmin" <?php if($row['isCoreAdmin'] == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_CORE_OPTIONS']; ?>
-                                </label><br>
-                            </div>
                             <div class="col-md-3">
                                 <label>
                                     <input type="checkbox" name="isTimeAdmin" <?php if($row['isTimeAdmin'] == 'TRUE'){echo 'checked';} ?>><?php echo $lang['ADMIN_TIME_OPTIONS']; ?>

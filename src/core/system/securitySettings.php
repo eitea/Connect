@@ -320,7 +320,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","CORE","SECURI
 
     if(!empty($_POST['saveRoles'])){
         $activeTab = $x = intval($_POST['saveRoles']);
-        $isCoreAdmin = isset($_POST['isCoreAdmin']) ? 'TRUE' : 'FALSE';
         $isDynamicProjectsAdmin = isset($_POST['isDynamicProjectsAdmin']) ? 'TRUE' : 'FALSE';
 		$isTimeAdmin = isset($_POST['isTimeAdmin']) ? 'TRUE' : 'FALSE';
         $isProjectAdmin = isset($_POST['isProjectAdmin']) ? 'TRUE' : 'FALSE';
@@ -376,14 +375,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","CORE","SECURI
             }
 		} else {
 			$conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'ERP' AND userID = $x");
-		}
+        }
+        $isDSGVOAdmin = has_permission("READ", "DSGVO",false,$x) ? 'TRUE' : 'FALSE'; // remove when all permissions are updated
+        $isERPAdmin = has_permission("READ", "ERP",false,$x) ? 'TRUE' : 'FALSE'; // remove when all permissions are updated
+        $isCoreAdmin = has_permission("READ", "CORE",false,$x) ? 'TRUE' : 'FALSE'; // remove when all permissions are updated
 
-		$conn->query("UPDATE roles SET isCoreAdmin = '$isCoreAdmin', isDynamicProjectsAdmin = '$isDynamicProjectsAdmin',
-			isTimeAdmin = '$isTimeAdmin', isProjectAdmin = '$isProjectAdmin', isReportAdmin = '$isReportAdmin', canBook = '$canBook',
-			isFinanceAdmin = '$isFinanceAdmin', canStamp = '$canStamp', canEditTemplates = '$canEditTemplates', canEditClients = '$canEditClients',
-			canUseSocialMedia = '$canUseSocialMedia', canCreateTasks = '$canCreateTasks', canUseArchive = '$canUseArchive', canUseClients = '$canUseClients',
-			canUseSuppliers = '$canUseSuppliers', canEditSuppliers = '$canEditSuppliers', canUseWorkflow = '$canUseWorkflow', canSendToExtern = '$canSendToExtern'
-			WHERE userID = '$x'");
+		$conn->query("UPDATE roles SET isDSGVOAdmin = '$isDSGVOAdmin', isCoreAdmin = '$isCoreAdmin', isDynamicProjectsAdmin = '$isDynamicProjectsAdmin',
+        isTimeAdmin = '$isTimeAdmin', isProjectAdmin = '$isProjectAdmin', isReportAdmin = '$isReportAdmin', isERPAdmin = '$isERPAdmin', canBook = '$canBook',
+        isFinanceAdmin = '$isFinanceAdmin', canStamp = '$canStamp', canEditTemplates = '$canEditTemplates', canEditClients = '$canEditClients',
+        canUseSocialMedia = '$canUseSocialMedia', canCreateTasks = '$canCreateTasks', canUseArchive = '$canUseArchive', canUseClients = '$canUseClients',
+        canUseSuppliers = '$canUseSuppliers', canEditSuppliers = '$canEditSuppliers', canUseWorkflow = '$canUseWorkflow', canSendToExtern = '$canSendToExtern'
+        WHERE userID = '$x'");
 
 		if(isset($_POST['hasTaskAccess'])){
 			//TODO: see if user has access already, and if not, and you can grant it, grant it.
