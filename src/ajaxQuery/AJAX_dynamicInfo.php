@@ -14,14 +14,12 @@ if (($row = $result->fetch_assoc()) && $row['activity'] != 'VIEWED') {
     $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$x', 'VIEWED', $userID)");
 }
 
-$result = $conn->query("SELECT projectname, projectdescription, projectstart, projectstatus, projectleader,
-	projectmailheader, projectpercentage, v2, d.companyid, d.clientid, d.clientprojectid
+$result = $conn->query("SELECT projectname, projectdescription, projectstart, projectstatus, projectmailheader, projectpercentage, v2, d.companyid, d.clientid, d.clientprojectid
     FROM dynamicprojects d LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
     LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN relationship_team_user ON relationship_team_user.teamID = dynamicprojectsteams.teamid
-    WHERE (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (relationship_team_user.userID = $userID AND relationship_team_user.skill >= d.level))
+    WHERE (dynamicprojectsemployees.userid = $userID OR (relationship_team_user.userID = $userID AND relationship_team_user.skill >= d.level))
     AND d.projectstart <= UTC_TIMESTAMP and d.projectid = '$x'");
 $dynrow = $result->fetch_assoc();
-$projectleader = $dynrow['projectleader'];
 
 $showMissingBookings = true;
 $missingBookingsArray = array();
@@ -434,15 +432,8 @@ $messageResult = $conn->query("SELECT id FROM messenger_conversations WHERE cate
                 $hasActiveBooking = $result->num_rows;
                 $result = $conn->query("SELECT p.id FROM projectBookingData p WHERE `end` = '0000-00-00 00:00:00' AND dynamicID = '$x'");
                 if(strtotime($dynrow['projectstart']) < time() && $dynrow['projectstatus'] == 'ACTIVE' && $result->num_rows < 1 && !$hasActiveBooking){
-                    if(!$projectleader){
-                        echo "<button type='button' class='btn btn-default' title='Task starten' data-toggle='modal' data-valid='$x' data-target='#play-take'><i class='fa fa-play'></i></button>";
-                    } else {
-                        echo "<button type='submit' class='btn btn-default' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button>";
-                    }
+					echo "<button type='submit' class='btn btn-default' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button>";
                     echo "<button type='button' class='btn btn-default' title='Task Planen' data-toggle='modal' data-valid='$x' data-target='#task-plan'><i class='fa fa-clock-o'></i></button>";
-                }
-                if(!$projectleader){
-                    echo "<button class='btn btn-default' type='submit' title='Task übernehmen' name='take_task' value='$x'><i class='fa fa-address-card'></i></button>";
                 }
                 ?>
                 <button type="button" class="btn btn-default" data-dismiss="modal">O.K.</button>

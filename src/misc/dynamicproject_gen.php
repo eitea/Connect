@@ -56,12 +56,6 @@ if($x){
 		?>
 		<div class="row">
 			<div class="col-md-6">
-				<label><?php echo $lang["OWNER"]; ?>*</label>
-				<select class="select2-team-icons required-field" name="owner">
-					<?php echo str_replace('<option value="'.$dynrow['projectowner'].'" ', '<option selected value="'.$dynrow['projectowner'].'" ', $modal_options); ?>
-				</select><br>
-			</div>
-			<div class="col-md-6">
 				<label><?php echo $lang["EMPLOYEE"]; ?>/ Team*</label>
 				<select class="select2-team-icons required-field" name="employees[]" multiple="multiple">
 					<?php
@@ -86,6 +80,21 @@ if($x){
 						echo '<option value="team;'.$row['id'].'" data-icon="group" '.$selected.' >'.$row['name'].'</option>';
 						}
 					}
+					?>
+				</select><br>
+			</div>
+			<div class="col-md-6">
+				<label><?php echo $lang["LEADER"]; ?></label>
+				<select class="js-example-basic-single" name="leader">
+					<option value="">....</option>
+					<?php
+					$result = $modal_options;
+					for($i = 0; $i < count($dynrow_emps); $i++){
+						if($dynrow_emps[$i]['position'] == 'leader'){
+							$result = str_replace('<option value="'.$dynrow_emps[$i]['userid'].'" ', '<option selected value="'.$dynrow_emps[$i]['userid'].'" ', $result);
+						}
+					}
+					echo $result;
 					?>
 				</select><br>
 			</div>
