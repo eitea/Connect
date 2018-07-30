@@ -34,7 +34,7 @@ if (isset($_REQUEST["questionID"])) {
 
 ?>
 <form method="POST">
-<div class="modal fade">
+<div class="modal fade ajax-open-modal">
     <div class="modal-dialog modal-content modal-lg">
     <div class="modal-header"><?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS'][$edit ? 'EDIT_QUESTION' : 'ADD_QUESTION'] ?></div>
     <div class="modal-body">
@@ -55,7 +55,7 @@ if (isset($_REQUEST["questionID"])) {
         <textarea name="question" class="form-control tinymce" placeholder="Question"><?php echo $text; ?></textarea><br />
         <!-- question editor -->
         <div class="form-group">
-            <label for="question_type">Frage</label>
+            <label for="question_type">Frage <a data-toggle="modal" data-target="#question-edit-info"><i class="fa fa-question-circle-o"></i></a></label>
             <div class="input-group" style="width: 100%">
                 <select class="form-control" name="question_type" style="width: 30%">
                     <option>none</option>
@@ -107,7 +107,7 @@ if (isset($_REQUEST["questionID"])) {
                     if(operator == "#"){
                         continue;
                     }
-                    html += '<div class="input-group" style="width: 100%">';
+                    html += '<div class="input-group" style="width: 100%; margin-bottom:5px;">';
                     if(surveyOrTraining == "training"){
                         html += '<select onchange="updateQuestion('+i+',this, \'operator\')" class="form-control" name="answer_operators[]" style="width:30%">';
                         html += '<option value="-"' + (operator == "-"?' selected ':'') + '>Falsch</option>';
@@ -120,7 +120,7 @@ if (isset($_REQUEST["questionID"])) {
                     }
                     html += '<input type="text" onchange="updateQuestion('+i+',this, \'value\')" name="answer_values[]" class="form-control" placeholder="Antwort" value="' + value + '" style="width:70%">';
                     html += '<span class="input-group-btn"><button type="button" onclick="removeAnswer('+i+')" class="btn btn-danger">Entfernen</button></span>';
-                    html += '</div><br />';
+                    html += '</div>';
                 }
                 $("#question_answers").html(html);
             }
@@ -154,3 +154,36 @@ if (isset($_REQUEST["questionID"])) {
     </div>
 </div>
 </form>
+<div id="question-edit-info" class="modal fade">
+  <div class="modal-dialog modal-content modal-md">
+    <div class="modal-header">Fragentypen</div>
+    <div class="modal-body">
+        <h5>Schulung</h5>
+        <span>In der Auswertung des Moduls sind Schulungen eine Farbe zwischen rot und grün, an der man erkennen kann, ob der Benutzer die gestellte Frage richtig oder falsch beantwortet hat. </span>
+        <dl>
+            <dt>Gelesen</dt>
+            <dd>Die Frage wird als richtig beantwortet marktiert, wenn der User das ein Kontrollkästchen klickt.</dd>
+            <dt>Dropdown</dt>
+            <dd>Der User kann zwischen mehreren Auswahlmöglichkeiten entscheiden. Es kann mehrere richtige und falsche Antworten geben. Falls mehrere Antworten richtig sind, wird nicht angezeigt, welche Antwort der User ausgewählt hat. </dd>
+            <dt>Radio Group</dt>
+            <dd>Hier kann sich der User zwischen mehreren Auswahlmöglichkeiten entscheiden. In der Auswertung wird nur angezeigt, ob der User eine der richtigen Antwortmöglichkeiten ausgewählt hat. </dd>
+        </dl>
+        <hr>
+        <h5>Umfrage</h5>
+        <span>In der Auswertung des Moduls sind Umfragen blau. Man kann dabei nicht erkennen, welche Antworten der User gegeben hat. Genauere Auswertungen sind bei den Einzelauswertungen der Frage zu finden. </span>
+        <dl>
+            <dt>Gelesen</dt>
+            <dd>Hier kann der User wie bei der Schulung antworten, aber die Antworten werden nicht als richtig oder falsch marktiert</dd>
+            <dt>Dropdown</dt>
+            <dd>Der User kann zwischen mehreren Auswahlmöglichkeiten entscheiden. Dabei kann aber nur eine ausgewählt werden. In der Auswertung wird angezeigt, welche Antwort der User gegeben hat. </dd>
+            <dt>Radio Group</dt>
+            <dd>Hier hat der User mehrere Antwortmöglichkeiten, kann aber nur eine auswählen. In der Auswertung wird angezeigt, welche Antwort der User gegeben hat. </dd>
+            <dt>Kontrollkästchen</dt>
+            <dd>Der User kann beliebig viele der Auswahlmöglichkeiten auswählen. Es wird angezeigt, welche Antworten der User auf die Frage gegeben hat. </dd>
+        </dl>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+    </div>
+  </div>
+</div>

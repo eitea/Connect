@@ -59,8 +59,8 @@ $select_completed_question_stmt = $conn->prepare("SELECT questionID FROM dsgvo_t
 $select_completed_question_stmt->bind_param("ii", $questionID, $userID);
 $insert_survey_answers = $conn->prepare("INSERT INTO dsgvo_training_completed_questions_survey_answers (questionID, identifier, userID) VALUES(?, ?, $userID) ON DUPLICATE KEY UPDATE identifier = ?");
 $insert_survey_answers->bind_param("iss", $questionID, $identifier, $identifier);
-$delete_survey_answers = $conn->prepare("INSERT INTO dsgvo_training_completed_questions_survey_answers (questionID, identifier, userID) VALUES(?, ?, $userID) ON DUPLICATE KEY UPDATE identifier = ?");
-$delete_survey_answers->bind_param("iss", $questionID, $identifier, $identifier);
+$delete_survey_answers = $conn->prepare("DELETE FROM dsgvo_training_completed_questions_survey_answers WHERE questionID = ? AND userID = $userID");
+$delete_survey_answers->bind_param("i", $questionID);
 
 $times = array();
 $numberOfAnsweredQuestions = array(); // per set (for average time)

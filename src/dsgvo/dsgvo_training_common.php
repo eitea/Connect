@@ -301,10 +301,10 @@ function validate_question(string $html, $answer, bool $survey)
     $html = preg_replace($html_regex, "", $html); // strip all html tags
     preg_match($question_regex, $html, $matches);
     // only parse the first question
-    if (sizeof($matches) == 0) return $survey ? ($answer?[true, ["read"]]:[false,[]]) : $answer == true;
+    if (sizeof($matches) == 0) return $survey ? ($answer?[true, ["read"]]:[false,["not read"]]) : $answer == true;
     $question = $matches[0]; // eg "{[-]wrong answer[+]right answer}"
     preg_match_all($question_inner_regex, $question, $matches);
-    if (sizeof($matches) == 0) return $survey ? ($answer?[true, ["read"]]:[false,[]]) : $answer == true;
+    if (sizeof($matches) == 0) return $survey ? ($answer?[true, ["read"]]:[false,["not read"]]) : $answer == true;
     if ($survey) {
         $survey_answers = [];
         for ($i = 0; $i < count($matches[0]); $i++) {

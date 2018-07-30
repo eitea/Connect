@@ -122,6 +122,9 @@ $lang_ger['ARCHIVE'] = 'Archiv';
 $lang_eng['ARCHIVE_STRUCTURE'] = 'Archive structure';
 $lang_ger['ARCHIVE_STRUCTURE'] = 'Archivstruktur';
 
+$lang_eng['ARE_YOU_SURE'] = 'Are you sure?';
+$lang_ger['ARE_YOU_SURE'] = 'Sind Sie sicher?';
+
 $lang_eng['ASSIGNED'] = 'Assigned';
 $lang_ger['ASSIGNED'] = 'Zugewiesene';
 
@@ -1773,6 +1776,7 @@ $lang_eng['TRAINING_BUTTON_DESCRIPTIONS'] = array(
   'DELETE_SET' => 'Delete set with all modules and questions', 
   'DELETE_MODULE' => 'Delete module with all questions',
   'DELETE_QUESTION' => 'Delete question',
+  'DELETE_QUESTION_ANSWERS' => 'Delete question answers',
   'EDIT_QUESTION' => 'Edit question',
   'QUESTION_STATS' => 'Stats for this question',
   'ADD_QUESTION' => 'Add a question',
@@ -1789,6 +1793,7 @@ $lang_ger['TRAINING_BUTTON_DESCRIPTIONS'] = array(
   'DELETE_SET' => 'Gesamtes Set mit allen Modulen und Fragen löschen', 
   'DELETE_MODULE' => 'Gesamtes Modul mit allen Fragen löschen',
   'DELETE_QUESTION' => 'Frage löschen',
+  'DELETE_QUESTION_ANSWERS' => 'Antworten der Benutzer löschen',
   'EDIT_QUESTION' => 'Frage bearbeiten',
   'QUESTION_STATS' => 'Einzelauswertung der Frage',
   'ADD_QUESTION' => 'Frage hinzufügen',
