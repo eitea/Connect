@@ -401,7 +401,7 @@ showError($conn->error);
                         </span>
                         <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['EDIT_SET'] ?>">
                             <button type="button" style="background:none;border:none;" name="editModule" value="<?php echo $moduleID; ?>">
-                                <i class="fa fa-fw fa-pencil-square-o"></i>
+                                <i class="fa fa-fw fa-pencil"></i>
                             </button>
                         </span>
                         <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['DELETE_SET'] ?>">
@@ -452,7 +452,7 @@ showError($conn->error);
                                     </span>
                                     <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['EDIT_MODULE'] ?>">
                                         <button type="button" style="background:none;border:none;" name="editTraining" value="<?php echo $trainingID; ?>">
-                                            <i class="fa fa-fw fa-pencil-square-o"></i>
+                                            <i class="fa fa-fw fa-pencil"></i>
                                         </button>
                                     </span>
                                     <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['DELETE_MODULE'] ?>">
@@ -506,7 +506,7 @@ showError($conn->error);
                                                 <?php if (has_permission("WRITE", "DSGVO", "TRAINING")) : ?>
                                                 <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['EDIT_QUESTION'] ?>">
                                                     <button type="button" style="background:none;border:none" name="editQuestion" value="<?php echo $questionID; ?>">
-                                                        <i class="fa fa-fw fa-edit"></i>
+                                                        <i class="fa fa-fw fa-pencil"></i>
                                                     </button>
                                                 </span>
                                                 <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['DELETE_QUESTION'] ?>">

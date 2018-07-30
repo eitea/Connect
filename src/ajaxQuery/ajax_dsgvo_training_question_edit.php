@@ -55,7 +55,7 @@ if (isset($_REQUEST["questionID"])) {
         <textarea name="question" class="form-control tinymce" placeholder="Question"><?php echo $text; ?></textarea><br />
         <!-- question editor -->
         <div class="form-group">
-            <label for="question_type">Frage <a data-toggle="modal" data-target="#question-edit-info"><i class="fa fa-question-circle-o"></i></a></label>
+            <label for="question_type">Frage <a data-toggle="modal" data-target="#question-edit-info"><i data-container="body" data-toggle="tooltip" title="<?php echo $lang['HELP'] ?>" class="fa fa-question-circle-o"></i></a></label>
             <div class="input-group" style="width: 100%">
                 <select class="form-control" name="question_type" style="width: 30%">
                     <option>none</option>
@@ -159,7 +159,7 @@ if (isset($_REQUEST["questionID"])) {
     <div class="modal-header">Fragentypen</div>
     <div class="modal-body">
         <h5>Schulung</h5>
-        <span>In der Auswertung des Moduls sind Schulungen eine Farbe zwischen rot und grün, an der man erkennen kann, ob der Benutzer die gestellte Frage richtig oder falsch beantwortet hat. </span>
+        <div>In der Auswertung des Moduls sind Schulungen eine Farbe zwischen rot und grün, an der man erkennen kann, ob der Benutzer die gestellte Frage richtig oder falsch beantwortet hat. </div>
         <dl>
             <dt>Gelesen</dt>
             <dd>Die Frage wird als richtig beantwortet marktiert, wenn der User das ein Kontrollkästchen klickt.</dd>
@@ -170,7 +170,8 @@ if (isset($_REQUEST["questionID"])) {
         </dl>
         <hr>
         <h5>Umfrage</h5>
-        <span>In der Auswertung des Moduls sind Umfragen blau. Man kann dabei nicht erkennen, welche Antworten der User gegeben hat. Genauere Auswertungen sind bei den Einzelauswertungen der Frage zu finden. </span>
+        <div>Im Gegensatz zu Schulungen, bei denen eine Frage nur richtig oder falsch ist, kann man hier eigene Antworten definieren. </div>
+        <div>In der Auswertung des Moduls sind Umfragen blau. Man kann dabei nicht erkennen, welche Antworten der User gegeben hat. Genauere Auswertungen sind bei den Einzelauswertungen der Frage zu finden. </div>
         <dl>
             <dt>Gelesen</dt>
             <dd>Hier kann der User wie bei der Schulung antworten, aber die Antworten werden nicht als richtig oder falsch marktiert</dd>
