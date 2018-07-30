@@ -81,7 +81,7 @@ while($result && ($row = $result->fetch_assoc())){
     if($row['code'] == 19 || $row['code'] == 9){ $t *= -1; }
     //belegnr;     konto;    gkto;     belegdat;     text;    buchdat;     bucod;     betrag;     steuer;   steucod;
     $csv .= $row['docNum'].';'.$row['accNum'].';'.$row['offNum'].';'.date('Ymd', strtotime($row['payDate'])).';'.iconv('UTF-8','windows-1252',$row['info']).';'
-    .date('Ymd', strtotime($row['payDate'])).';'.$code.';'.number_format($val, 2, ',','.').';'.number_format($t, 2, ',','.').';'.$row['code'].';'.$row['percentage']
+    .date('Ymd', strtotime($row['payDate'])).';'.$code.';'.number_format($val, 2, ',','').';'.number_format($t, 2, ',','').';'.$row['code'].';'.$row['percentage']
     .";$sym;". date('n', strtotime($row['payDate'])).";E;A\n";
 }
 ?>
