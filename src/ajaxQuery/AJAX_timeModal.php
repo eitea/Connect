@@ -6,11 +6,10 @@ require dirname(__DIR__)."/language.php";
 $i = intval($_GET['timestampID']);
 $x = intval($_GET['userID']);
 
+session_start();
 if (empty($_SESSION['userid'])) {
     die('Please <a href="../login/auth">login</a> first.');
 }
-
-session_start();
 $timeToUTC = $_SESSION['timeToUTC'];
 
 $A = $B = $_GET['date'].' 08:00';

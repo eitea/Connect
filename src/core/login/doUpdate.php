@@ -2957,6 +2957,7 @@ if($row['version'] < 160){
 	$conn->query("UPDATE dynamicprojects SET projectleader = 1 WHERE projectleader = 2");
 	$conn->query("UPDATE dynamicprojects SET projectowner = 1 WHERE projectowner = 2");
 	$conn->query("UPDATE archive SET uploadUser = 1 WHERE uploadUser = 2");
+	$conn->query("UPDATE account_journal SET userID = 1 WHERE userID = 2");
 
 	//5b1f67f86c983
 	$sql = "CREATE TABLE workflowRules (
@@ -3391,6 +3392,36 @@ if($row['version'] < 166){
     $stmt_insert_permission_relationship->close();
     $stmt_insert_groups->close();
     $stmt_insert_permission->close();
+	//5b45d4ae6b4cc
+	$sql = "CREATE TABLE dynamicprojectsnotes(
+		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        taskID VARCHAR(100) NOT NULL,
+		userID INT(6) UNSIGNED,
+        notedate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        notetext VARCHAR(1000) NOT NULL,
+        FOREIGN KEY (taskID) REFERENCES dynamicprojects(projectid)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+		FOREIGN KEY (userID) REFERENCES UserData(id)
+		ON UPDATE CASCADE
+		ON DELETE SET NULL
+      );";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    } else {
+        echo '<br>Tasks: Notizen';
+    }
+
+	$conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) SELECT projectid, projectleader, 'leader'
+	FROM dynamicprojects WHERE projectleader <> 0 AND projectleader IS NOT NULL ON DUPLICATE KEY UPDATE position = 'leader'"); echo $conn->error;
+
+	$conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) SELECT projectid, projectowner, 'owner'
+	FROM dynamicprojects WHERE projectowner IS NOT NULL AND projectowner <> 0 ON DUPLICATE KEY UPDATE position = 'owner'");
+
+	$conn->query("ALTER TABLE dynamicprojects DROP FOREIGN KEY dynamicprojects_ibfk_2 ");
+
+	$conn->query("ALTER TABLE dynamicprojects DROP COLUMN projectowner");
+	$conn->query("ALTER TABLE dynamicprojects DROP COLUMN projectleader");
 }
 
 // if($row['version'] < 167){}
