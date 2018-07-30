@@ -89,6 +89,10 @@ $templateResult = $conn->query("SELECT projectname,projectid,v2 FROM dynamicproj
 	</div></h3></div>
 </div>
 
+//TODO: backend statusänderungen,
+ statusänderungen gehören noch geloggt 5b45937468480
+
+
 <?php include __DIR__.'/taskTemplateEditor.php'; ?>
 <div class="page-content-fixed-100">
 <?php
@@ -99,7 +103,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $x = test_input($_POST['play'], true);
         } else {
             $x = test_input($_POST['play-take'], true);
-            $conn->query("UPDATE dynamicprojects SET projectleader = $userID WHERE projectid = '$x'");
+            $conn->query("UPDATE dynamicprojectsemployees SET status='leader' WHERE userid = $userID AND status != 'owner' AND projectid = '$x'");
             $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$x', 'DUTY', $userID)");
         }
         $result = $conn->query("SELECT id FROM projectBookingData WHERE `end` = '0000-00-00 00:00:00' AND dynamicID = '$x'");
@@ -116,20 +120,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 } else {
                     showSuccess('Task wurde gestartet. Solange dieser läuft, ist Ausstempeln nicht möglich.');
                 }
-
             } else {
                 showError('<strong>Bitte einstempeln.</strong> Tasks können nur angenommen werden, sofern man eingestempelt ist.');
             }
         } else {
             showError('<strong>Task besetzt.</strong> Dieser Task gehört schon jemandem.');
         }
-    } elseif(!empty($_POST['task-plan-date']) && (!empty($_POST['task-plan']) || !empty($_POST['task-plan-take']))){
-        if(!empty($_POST['task-plan-take'])){
-            $x = test_input($_POST['task-plan-take'], 1);
-            $conn->query("UPDATE dynamicprojects SET projectleader = $userID WHERE projectid = '$x'");
-        } else {
-            $x = test_input($_POST['task-plan'], 1);
-        }
+    } elseif(!empty($_POST['task-plan-date']) && !empty($_POST['task-plan'])){
+		$x = test_input($_POST['task-plan'], 1);
+        $conn->query("UPDATE dynamicprojectsemployees SET position='leader' WHERE userid = $userID AND projectid = '$x' AND status != 'owner'");
+
         if(test_Date($_POST['task-plan-date'].':00')){
             $date = carryOverAdder_Hours($_POST['task-plan-date'].':00', $timeToUTC * -1);
             $conn->query("UPDATE dynamicprojects SET projectstart = '$date' WHERE projectid = '$x'");
@@ -141,9 +141,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         } else {
             showError('Datum ungültig. Format YYYY-MM-DD HH:mm');
         }
-    } elseif(!empty($_POST['take_task'])){
+    } elseif(!empty($_POST['add-note']) && !empty($_POST['add-note-text'])){
+		$x = test_input($_POST['note'], true);
+		$val = test_input($_POST['add-note-text']);
+		$conn->query("INSERT INTO dynamicprojectsnotes(taskID, userID, notetext) VALUES('$x', '$userID', '$val')");
+		if($conn->error){
+			showError($conn->error.__LINE__);
+		} else {
+			showSuccess($lang['OK_ADD']);
+		}
+	} elseif(!empty($_POST['take_task'])){
         $x = test_input($_POST['take_task'], true);
-        $conn->query("UPDATE dynamicprojects SET projectleader = $userID WHERE projectid = '$x'");
+        $conn->query("UPDATE dynamicprojectsemployees SET status = 'leader' WHERE userid = $userID AND projectid = '$x' AND status != 'owner'");
         if($conn->error){
             showError($conn->error);
         } else {
@@ -327,8 +336,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 				$end = '0000-00-00'; //temp fix for invalid end value (probs NULL)
 				$status = $_POST["status"];
 				$priority = intval($_POST["priority"]); //1-5
-				$owner = $_POST['owner'] ? intval($_POST["owner"]) : $userID;
-				$leader = isset($_POST['leader']) ? intval($_POST['leader']) : '';
 				$percentage = intval($_POST['completed']);
 				$estimate = test_input($_POST['estimatedHours']);
 				$isTemplate = isset($_POST['isTemplate']) ? 'TRUE' : 'FALSE';
@@ -347,9 +354,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 				}
 				// PROJECT
 				$stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart,
-					projectend, projectstatus, projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2)
-					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-				$stmt->bind_param("ssbiiissssisiisisiss", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $owner, $leader, $percentage, $estimate, $skill, $tags, $isTemplate, $v2Key);
+					projectend, projectstatus, projectpriority, projectparent, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2)
+					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+				$stmt->bind_param("ssbiiissssisiisisiss", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $percentage, $estimate, $skill, $tags, $isTemplate, $v2Key);
 				$stmt->send_long_data(2, $description);
 				$stmt->execute();
 				if(!$stmt->error){
@@ -358,6 +365,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 					//EMPLOYEES
 					$stmt = $conn->prepare("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES ('$id', ?, ?)"); echo $conn->error;
 					$stmt->bind_param("is", $employee, $position);
+
+					$position = 'owner';
+					$employee = $_POST['owner'] ? intval($_POST["owner"]) : $userID;
+					$stmt->execute();
+					$position = 'leader';
+					$employee = isset($_POST['leader']) ? intval($_POST['leader']) : '';
+					$stmt->execute();
+
 					$position = 'normal';
 					foreach ($_POST["employees"] as $employee) {
 						$emp_array = explode(";", $employee);
@@ -434,7 +449,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 <table class="table table-hover">
     <thead>
         <tr>
-            <th><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_NAME"]; ?></th>
+            <th style="width:250px;"><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_NAME"]; ?></th>
             <th><?php echo $lang["DESCRIPTION"]; ?></th>
             <th><?php echo $lang["COMPANY"].' - '.$lang["CLIENT"].' - '.$lang["PROJECT"]; ?></th>
             <th><?php echo $lang["BEGIN"]; ?></th>
@@ -448,7 +463,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
     </thead>
     <tbody>
         <?php
-        $modals = $occupation = $query_filter = '';
+        $occupation = $query_filter = '';
         $priority_color = ['', '#2a5da1', '#0c95d9', '#9d9c9c', '#ff7600', '#ff0000'];
         if($filterings['company']){ $query_filter .= "AND d.companyid = ".intval($filterings['company']); }
         if($filterings['client']){ $query_filter .= " AND d.clientid = ".intval($filterings['client']); }
@@ -472,7 +487,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 		$filter_emps = $filter_team = '0';
         foreach($filterings['employees'] as $val){
             $arr = explode(';', $val);
-            if($arr[0] == 'user') $filter_emps .= " OR conemployees LIKE '% {$arr[1]} %' OR d.projectowner = {$arr[1]} OR d.projectleader = {$arr[1]}";
+            if($arr[0] == 'user') $filter_emps .= " OR conemployees LIKE '% {$arr[1]} %'";
             if($arr[0] == 'team') $filter_team .= " OR conteamsids LIKE '% {$arr[1]} %'";
         }
 
@@ -484,11 +499,15 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 	    $nonAdminQuery = '';
         if($user_roles['isDynamicProjectsAdmin'] == 'FALSE'){
 			foreach($available_teams as $val) $nonAdminQuery .= " OR conteamsids LIKE '% $val %' ";
-			$nonAdminQuery = "AND (d.projectowner = $userID OR d.projectleader = $userID OR conemployees LIKE '% $userID %' $nonAdminQuery)";
+			$nonAdminQuery = "AND conemployees LIKE '% $userID %' $nonAdminQuery";
         }
+
+		$stmt_employees = $conn->prepare("SELECT userid, position FROM dynamicprojectsemployees WHERE projectid = ?");
+		$stmt_employees->bind_param('s', $x);
+
 		$sql = ("SELECT d.projectid, projectname, projectdescription, projectcolor, projectstart, projectend, projectseries, projectstatus,
-			projectpriority, projectowner, projectleader, projectpercentage, projecttags, v2, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
-			clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl.conemployees, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours,
+			projectpriority, projectpercentage, projecttags, v2, d.companyid, d.clientid, d.clientprojectid, companyData.name AS companyName,
+			clientData.name AS clientName, projectData.name AS projectDataName, needsreview, estimatedHours, tbl2.conteams, tbl2.conteamsids, tbl3.currentHours,
 			tbl5.userID AS workingUser, tbl5.start AS workStart, tbl5.id AS workingID, dpl.activity
 			FROM dynamicprojects d
 			LEFT JOIN ( SELECT projectid, CONCAT(' ',GROUP_CONCAT(userid SEPARATOR ' '),' ') AS conemployees FROM dynamicprojectsemployees GROUP BY projectid ) tbl ON tbl.projectid = d.projectid
@@ -509,6 +528,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
         echo $conn->error;
         while($result && ($row = $result->fetch_assoc())){
             $x = $row['projectid'];
+			$leader = $owner = '';
             $projectName = $row['projectname'];
             $rowStyle = (isset($row['activity']) && $row['activity'] != 'VIEWED') ? 'style="color:#1689e7; font-weight:bold;"' : '';
             echo "<tr $rowStyle>";
@@ -528,22 +548,38 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             echo '<td>'.$A.'</td>';
             echo '<td>'.$B.'</td>';
             echo '<td>';
+
             if($row['workingUser']){ echo 'WORKING<br><small>'.$userID_toName[$row['workingUser']].'</small>'; } else { echo $row['projectstatus']; }
             if($row['projectstatus'] != 'COMPLETED'){ echo ' ('.$row['projectpercentage'].'%)'; }
             echo '<br><small style="color:transparent;">'.$x.'</small>';
             echo '</td>';
             echo '<td style="color:white;"><span class="badge" style="background-color:'.$priority_color[$row['projectpriority']].'" title="'.$lang['PRIORITY_TOSTRING'][$row['projectpriority']].'">'.$row['projectpriority'].'</span></td>';
-            echo '<td>'; //employees
-            if($row['projectleader'] == $row['projectowner']){
-                echo '<u title="Besitzer und Verantwortlicher Mitarbeiter"><b>'. $userID_toName[$row['projectowner']].'</b></u>,<br>';
+            echo '<td>';
+			//employees
+			$stmt_employees->execute();
+			$res_emps = $stmt_employees->get_result();
+			$emps = '';
+			while($row_emps = $res_emps->fetch_assoc()){
+				if($row_emps['position'] == 'owner'){
+					$owner = $row_emps['userid'];
+				} elseif($row_emps['position'] == 'leader') {
+					$leader = $row_emps['userid'];
+				} else {
+					if(isset($userID_toName[$row_emps['userid']])) $emps .= $userID_toName[$row_emps['userid']].',<br>';
+				}
+			}
+			if(!$owner){ //has to always exist
+				$conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES('$x', 1, 'owner') ON DUPLICATE KEY UPDATE position = 'owner'");
+				$owner = 1;
+			}
+			if($leader && $user_roles['isDynamicProjectsAdmin'] == 'FALSE' && $leader != $userID) continue;
+            if($leader == $owner){
+                echo '<u title="Besitzer und Verantwortlicher Mitarbeiter"><b>'. $userID_toName[$leader].'</b></u>,<br>';
             } else {
-                echo '<b title="Besitzer">'. $userID_toName[$row['projectowner']].'</b>,<br>';
-                if($row['projectleader']) echo '<u title="Verantwortlicher Mitarbeiter">'.$userID_toName[$row['projectleader']].'</u>,<br>';
+                echo '<b title="Besitzer">'. $userID_toName[$owner].'</b>,<br>';
+                if($leader) echo '<u title="Verantwortlicher Mitarbeiter">'.$userID_toName[$leader].'</u>,<br>';
             }
-            echo implode(',<br>', array_map(function($val){ global $userID_toName; if(isset($userID_toName[$val])) return $userID_toName[$val]; }, explode(' ', trim($row['conemployees']))));
-            //foreach(explode(' ',$row['conemployees']) as $val){ if(isset($userID_toName[$val])) echo $userID_toName[$val].',<br>'; };
-            if($row['conemployees'] && $row['conteams']) echo ',<br>';
-            echo $row['conteams'];
+            echo $emps, $row['conteams'];
             echo '</td>';
             echo '<td>';
             if(($user_roles['isDynamicProjectsAdmin'] == 'TRUE' || $row['projectowner'] == $userID)){
@@ -553,58 +589,39 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             if(strpos($completed_tasks, $x) !== false) echo '<i class="fa fa-check" style="color:#00cf65" title="In aktueller Version vorhanden"></i>';
             echo '</td>';
             echo '<td>';
-            if($row['workingUser'] == $userID) {
+			if($row['workingUser'] == $userID) {
 				$occupation = array('bookingID' => $row['workingID'], 'dynamicID' => $x, 'companyid' => $row['companyid'], 'clientid' => $row['clientid'],
 				'projectid' => $row['clientprojectid'], 'percentage' => $row['projectpercentage'], 'noBooking' => ((time() - strtotime($row['workStart'])) < 60));
-                echo '<button class="btn btn-default" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal" name="pauseBtn"><i class="fa fa-pause"></i></button> ';
-            } elseif(strtotime($A) < time() && $row['projectstatus'] == 'ACTIVE' && !$row['workingUser'] && !$hasActiveBooking){
-                if(!$row['projectleader']){
-                    echo "<button class='btn btn-default' type='button' title='Task starten' data-toggle='modal' data-target='#play-take-$x'><i class='fa fa-play'></i></button> ";
-                } else {
-                    echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button> ";
-                }
-            }
+				echo '<button class="btn btn-default" type="button" value="" data-toggle="modal" data-target="#dynamic-booking-modal" name="pauseBtn"><i class="fa fa-pause"></i></button> ';
+			} elseif(strtotime($A) < time() && $row['projectstatus'] == 'ACTIVE' && !$row['workingUser'] && !$hasActiveBooking){
+				if(!$leader){
+					echo "<button class='btn btn-default' type='button' title='Task starten' data-toggle='modal' data-valid='$x' data-target='#play-take'><i class='fa fa-play'></i></button> ";
+				} else {
+					echo "<button class='btn btn-default' type='submit' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button> ";
+				}
+			}
+			echo '<div class="dropdown" style="display:inline">
+			<button class="btn btn-link dropdown-toggle" type="button" id="task-dropdown-'.$x.'" data-toggle="dropdown"> <i class="fa fa-ellipsis-v"></i> </button>
+			<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="task-dropdown-'.$x.'">';
             if(!$row['workingUser']){ //5acdfb19c0e84
-                //echo " <button type='button' class='btn btn-default' title='Task Planen' data-toggle='modal' data-target='#task-plan-$x'><i class='fa fa-clock-o'></i></button> ";
+                //echo " <button type='button' class='btn btn-default' title='Task Planen' data-toggle='modal' data-valid='$x' data-target='#task-plan'><i class='fa fa-clock-o'></i></button> ";
                 if($user_roles['isDynamicProjectsAdmin'] == 'TRUE' || $row['projectowner'] == $userID) { //don't show edit tools for trainings
-                    echo '<button type="submit" name="deleteProject" value="'.$x.'" class="btn btn-default" title="Löschen"><i class="fa fa-trash-o"></i></button> ';
-                    echo '<button type="button" name="editModal" value="'.$x.'" class="btn btn-default" title="Bearbeiten"><i class="fa fa-pencil"></i></button> ';
+                    echo '<li><button type="submit" name="deleteProject" value="'.$x.'" class="btn btn-link"><i class="fa fa-trash-o"></i> Löschen</button></li>';
+                    echo '<li><button type="button" name="editModal" value="'.$x.'" class="btn btn-link"><i class="fa fa-pencil"></i> Bearbeiten</button></li>';
                 }
             }
-            if($filterings['tasks'] == 'ACTIVE_PLANNED') echo '<label><input type="checkbox" name="icalID[]" value="'.$x.'" checked /> .ical</label>';
+			// always show the messages button (5ac63505c0ecd)
+			echo "<li><button type='button' data-toggle='modal' data-valid='$x' data-target='#task-plan' class='btn btn-link'><i class='fa fa-clock-o'></i> Task Planen</button></li>";
+			echo "<li><button type='button' data-toggle='modal' data-chatid='$x' data-target='#new-message-modal' class='btn btn-link'><i class='fa fa-commenting-o'></i> Nachricht Senden</button></li>";
+			//5b45d4ae6b4cc
+			echo "<li><button type='button' data-toggle='modal' data-chatid='$x' data-target='#add-note-modal' class='btn btn-link'><i class='fa fa-sticky-note-o'></i> Notiz anheften</button></li>";
+			//5b45cfa8a0bd0
+			echo "<li><button type='button' data-toggle='modal' data-chatid='$x' data-target='#change-status-modal' class='btn btn-link'><i class='fa fa-random'></i> Status Ändern</button></li>";
+			echo '</ul></div>';
 
-            // always show the messages button (5ac63505c0ecd)
-			echo "<a class='btn btn-default' title='Nachrichten' data-toggle='modal' data-chatid='$x' href='#new-message-modal'><i class='fa fa-commenting-o'></i></a>";
-
-            echo '</td>';
-            echo '</tr>';
-
-            if(!$row['projectleader']){
-                $modals .= '<div id="play-take-'.$x.'" class="modal fade" style="z-index:1500;">
-                <div class="modal-dialog modal-content modal-sm">
-                <div class="modal-header h4">Task Übernehmen</div>
-                <div class="modal-body">Wollen Sie den Task dabei auch gleichzeitig als verantwortlichen Mitarbeiter übernehmen?</div>
-                <div class="modal-footer"><form method="POST">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button class="btn btn-default" type="submit" title="Task normal starten" name="play" value="'.$x.'">Nein</button>
-                <button class="btn btn-warning" type="submit" title="Task als Verantwortlicher starten" name="play-take" value="'.$x.'">Ja</button>
-                </form></div></div></div>';
-            }
-            if(!$row['workingUser']){
-                $modals .= '<div id="task-plan-'.$x.'" class="modal fade" style="z-index:1500;">
-                <div class="modal-dialog modal-content modal-sm"><form method="POST">
-                <div class="modal-header h4">Task Planen</div>
-                <div class="modal-body"> Wollen Sie diesen Task auf ein anderes Datum verschieben? <br>
-                Geplante Tasks werden automatisch übernommen und kehren mit dem eingestellten Datum automatisch wieder.<br><br>
-                <input type="text" class="form-control datetimepicker" name="task-plan-date" value="'.$row['projectstart'].'" placeholder="z.B. 2018-12-24 10:30"/><br>
-                </div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>';
-                if($row['projectleader']){
-                    $modals .= '<button class="btn btn-warning" type="submit" title="Task Verschieben" name="task-plan" value="'.$x.'">Verschieben</button>';
-                } else {
-                    $modals .= '<button class="btn btn-warning" type="submit" title="Task Verschieben" name="task-plan-take" value="'.$x.'">Verschieben</button>';
-                }
-                $modals .= '</div></form></div></div>';
-            }
+			if($filterings['tasks'] == 'ACTIVE_PLANNED') echo '<label><input type="checkbox" name="icalID[]" value="'.$x.'" checked /> .ical</label>';
+			echo '</td>';
+			echo '</tr>';
         }
         ?>
         <!--training-->
@@ -663,8 +680,86 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 	</form>
 </div>
 
+<div id="add-note-modal" class="modal fade" tabindex="-1" role="dialog">
+	<form method="post">
+		<div class="modal-dialog modal-content modal-md">
+			<div class="modal-header h4">Notiz hinzufügen</div>
+			<div class="modal-body">
+				<textarea name="add-note-text" rows="8" style="resize:none" class="form-control"></textarea>
+				<br>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button type="submit" class="btn btn-warning" name="add-note">Senden</button>
+			</div>
+		</div>
+	</form>
+</div>
+
+<div id="change-status-modal" class="modal fade" tabindex="-1" role="dialog">
+	<form method="post">
+		<div class="modal-dialog modal-content modal-md">
+			<div class="modal-header h4">Statuswechsel</div>
+			<div class="modal-body">
+				<label>Status</label>
+				<select class="js-example-basic-single" name="change-status-status">
+					<option value="ASSIGNED">Assigned</option>
+					<option value="REVIEW">Review</option>
+					<option value="DELAY">Delay</option>
+					<option value="FINISHED">Finished</option>
+				</select><br>
+				<br>
+				<div id="change-status-assigned-user">
+					<label>Zugewiesener Benutzer</label>
+		 			<select class="js-example-basic-single" name="change-status-assigned-user">
+		 				<?php
+						foreach($userID_toName as $id => $name){
+							echo '<option value="',$id,'">',$name,'</option>';
+						}
+						?>
+		 			</select>
+				</div><br>
+				<label>Notiz</label>
+				<textarea name="change-status-note" rows="3" class="form-control"></textarea>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button type="submit" class="btn btn-warning" name="change-status">Senden</button>
+			</div>
+		</div>
+	</form>
+</div>
+
+
 <div id="editingModalDiv">
-    <?php echo $modals; ?>
+	<div id="play-take" class="modal fade" style="z-index:1500;">
+		<div class="modal-dialog modal-content modal-sm">
+			<div class="modal-header h4">Task Übernehmen</div>
+			<div class="modal-body">Wollen Sie den Task dabei auch gleichzeitig als verantwortlichen Mitarbeiter übernehmen?</div>
+			<div class="modal-footer">
+				<form method="POST">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button class="btn btn-default" type="submit" title="Task normal starten" name="play" value="">Nein</button>
+					<button class="btn btn-warning" type="submit" title="Task als Verantwortlicher starten" name="play-take">Ja</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div id="task-plan" class="modal fade" style="z-index:1500;">
+		<div class="modal-dialog modal-content modal-sm"><form method="POST">
+			<div class="modal-header h4">Task Planen</div>
+			<div class="modal-body"> Wollen Sie diesen Task auf ein anderes Datum verschieben? <br>
+				Geplante Tasks werden automatisch übernommen und kehren mit dem eingestellten Datum automatisch wieder.<br><br>
+				<input type="text" class="form-control datetimepicker" name="task-plan-date" value="" placeholder="z.B. 2018-12-24 10:30"/><br>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button class="btn btn-warning" type="submit" title="Task Verschieben" name="task-plan">Verschieben</button>
+			</div>
+		</form>
+	</div>
+</div>
+
     <div class="modal fade" id="template-list-modal">
         <div class="modal-dialog modal-content modal-md">
             <div class="modal-header h4"><button type="button" class="close"><span>&times;</span></button><?php echo "Templates" ?></div>
@@ -749,7 +844,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <input id="bookRanger" type="range" min="1" max="100" value="<?php echo $occupation['percentage']; ?>" oninput="document.getElementById('bookCompleted').value = this.value;"><br>
+                            <input id="bookRanger" step="25" type="range" min="1" max="100" value="<?php echo $occupation['percentage']; ?>" oninput="document.getElementById('bookCompleted').value = this.value;"><br>
                         </div>
                         <div class="col-md-3">
                             <div class="input-group">
@@ -1062,6 +1157,23 @@ $(document).ready(function() {
 	  var button = $(event.relatedTarget);
 	  $(this).find('button[name=send_new_message]').val(button.data('chatid'));
 	});
+	$('#play-take').on('show.bs.modal', function (event) {
+	  var index = $(event.relatedTarget).data('valid');
+	  $(this).find("button[name='play']").val(index);
+	  $(this).find('button[name="play-take"]').val(index);
+	});
+	$('#task-plan').on('show.bs.modal', function (event) {
+	  var index = $(event.relatedTarget).data('valid');
+	  $(this).find('button[name=task-plan]').val(index);
+	});
+	$('#change-status-modal').on('show.bs.modal', function (event) {
+	  var index = $(event.relatedTarget).data('chatid');
+	  $(this).find('button[name=change-status]').val(index);
+	});
+	$('#add-note-modal').on('show.bs.modal', function (event) {
+	  var index = $(event.relatedTarget).data('chatid');
+	  $(this).find('button[name=add-note]').val(index);
+	});
 	// setInterval(function(){
 	// 	if($('#progress-bar-green').width() > 0){
 	// 		$('#progress-bar-green').width($('#progress-bar-green').width()-1);
@@ -1090,7 +1202,6 @@ $(document).ready(function() {
         $('.table').trigger('column-reorder.dt');
     }, 500);
 });
-
 </script>
 </div>
 <?php include dirname(__DIR__) . '/footer.php'; ?>

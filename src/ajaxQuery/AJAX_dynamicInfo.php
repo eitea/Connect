@@ -435,11 +435,11 @@ $messageResult = $conn->query("SELECT id FROM messenger_conversations WHERE cate
                 $result = $conn->query("SELECT p.id FROM projectBookingData p WHERE `end` = '0000-00-00 00:00:00' AND dynamicID = '$x'");
                 if(strtotime($dynrow['projectstart']) < time() && $dynrow['projectstatus'] == 'ACTIVE' && $result->num_rows < 1 && !$hasActiveBooking){
                     if(!$projectleader){
-                        echo "<button type='button' class='btn btn-default' title='Task starten' data-toggle='modal' data-target='#play-take-$x'><i class='fa fa-play'></i></button>";
+                        echo "<button type='button' class='btn btn-default' title='Task starten' data-toggle='modal' data-valid='$x' data-target='#play-take'><i class='fa fa-play'></i></button>";
                     } else {
                         echo "<button type='submit' class='btn btn-default' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button>";
                     }
-                    echo "<button type='button' class='btn btn-default' title='Task Planen' data-toggle='modal' data-target='#task-plan-$x'><i class='fa fa-clock-o'></i></button>";
+                    echo "<button type='button' class='btn btn-default' title='Task Planen' data-toggle='modal' data-valid='$x' data-target='#task-plan'><i class='fa fa-clock-o'></i></button>";
                 }
                 if(!$projectleader){
                     echo "<button class='btn btn-default' type='submit' title='Task übernehmen' name='take_task' value='$x'><i class='fa fa-address-card'></i></button>";
