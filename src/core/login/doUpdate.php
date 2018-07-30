@@ -3256,6 +3256,142 @@ if($row['version'] < 165){
 
 
 if($row['version'] < 166){
+    $conn->query("ALTER TABLE socialprofile ADD COLUMN new_message_notification ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+    echo $conn->error;
+
+    $conn->query("ALTER TABLE dsgvo_training_questions ADD COLUMN survey ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'");
+    echo $conn->error;
+
+    $sql = "CREATE TABLE dsgvo_training_completed_questions_survey_answers (
+        questionID int(6),
+        userID INT(6) UNSIGNED,
+        identifier VARCHAR(30) NOT NULL,
+        PRIMARY KEY (questionID, userID, identifier),
+        FOREIGN KEY (questionID) REFERENCES dsgvo_training_completed_questions(questionID) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+	if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
+    $sql = "CREATE TABLE access_permission_groups (
+        id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(20) NOT NULL UNIQUE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
+
+    $sql = "CREATE TABLE access_permissions (
+        id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        groupID INT(10) UNSIGNED NOT NULL,
+        name VARCHAR(30) NOT NULL,
+        FOREIGN KEY (groupID) REFERENCES access_permission_groups(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
+
+    $sql = "CREATE TABLE relationship_access_permissions (
+        userID INT(6) UNSIGNED NOT NULL,
+        permissionID INT(10) UNSIGNED NOT NULL,
+        type ENUM('READ', 'WRITE') NOT NULL,
+        PRIMARY KEY (userID, permissionID),
+        FOREIGN KEY (permissionID) REFERENCES access_permissions(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
+
+    $stmt_insert_groups = $conn->prepare("INSERT INTO access_permission_groups (name) VALUES (?)");
+    echo $conn->error;
+    $stmt_insert_groups->bind_param("s", $group);
+    $stmt_insert_permission = $conn->prepare("INSERT INTO access_permissions (groupID, name) VALUES (?, ?)");
+    echo $conn->error;
+    $stmt_insert_permission->bind_param("is", $groupID, $permission);
+    $stmt_insert_permission_relationship = $conn->prepare("INSERT INTO relationship_access_permissions (userID, permissionID, type) VALUES (?, ?, ?)");
+    echo $conn->error;
+    $stmt_insert_permission_relationship->bind_param("iis", $uid, $permissionID, $type);
+    $user_result = $conn->query("SELECT userID, isERPAdmin, isDSGVOAdmin, isCoreAdmin FROM roles WHERE userID != 1");
+    echo $conn->error;
+    $user_roles = $user_result->fetch_all(MYSQLI_ASSOC);
+    $permission_groups = [
+      'CORE' => [
+        'SECURITY',
+        'USERS',
+        'COMPANIES',
+        'TEAMS',
+        'SETTINGS'
+      ],
+      'TIMES' => [
+        'OVERVIEW',
+        'CORRECTION_HOURS',
+        'TRAVELING_EXPENSES',
+        'VACATION',
+        'CHECKLIST'
+      ],
+      'PROJECTS' => [
+        'PROJECTS',
+        'WORKFLOW',
+        'LOGS'
+      ],
+      'ERP' => [
+        'PROCESS',
+        'CLIENTS',
+        'SUPPLIERS',
+        'ARTICLE',
+        'RECEIPT_BOOK',
+        'VACANT_POSITIONS',
+        'SETTINGS'
+      ],
+      'FINANCES' => [
+        'ACCOUNTING_PLAN',
+        'ACCOUNTING_JOURNAL',
+        'TAX_RATES'
+      ],
+      'DSGVO' => [
+        'AGREEMENTS',
+        'PROCEDURE_DIRECTORY',
+        'EMAIL_TEMPLATES',
+        'TRAINING',
+        'LOGS'
+      ],
+      'ARCHIVE' => [
+        'SHARE',
+        'PRIVATE'
+      ]
+    ];
+    foreach ($permission_groups as $group => $permissions) {
+      $stmt_insert_groups->execute();
+      echo $stmt_insert_groups->error;
+      $groupID = $stmt_insert_groups->insert_id;
+      foreach ($permissions as $permission) {
+        $stmt_insert_permission->execute();
+        echo $stmt_insert_permission->error;
+        $uid = 1; // admin has all permissions
+        $type = "WRITE";
+        $permissionID = $stmt_insert_permission->insert_id;
+        $stmt_insert_permission_relationship->execute();
+        echo $stmt_insert_permission_relationship->error;
+        foreach($user_roles as $row){
+            $uid = $row["userID"]; // permissionID and type stay the same
+            if($group == "DSGVO" && $row["isDSGVOAdmin"] == "TRUE"){
+                $stmt_insert_permission_relationship->execute();
+                echo $stmt_insert_permission_relationship->error;
+            }else if ($group == "ERP" && $row["isERPAdmin"] == "TRUE"){
+                $stmt_insert_permission_relationship->execute();
+                echo $stmt_insert_permission_relationship->error;
+            }else if ($group == "CORE" && $row["isCoreAdmin"] == "TRUE"){
+                $stmt_insert_permission_relationship->execute();
+                echo $stmt_insert_permission_relationship->error;
+            }
+        }
+      }
+    }
+    $stmt_insert_permission_relationship->close();
+    $stmt_insert_groups->close();
+    $stmt_insert_permission->close();
 	//5b45d4ae6b4cc
 	$sql = "CREATE TABLE dynamicprojectsnotes(
 		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -3287,9 +3423,12 @@ if($row['version'] < 166){
 	$conn->query("ALTER TABLE dynamicprojects DROP COLUMN projectowner");
 	$conn->query("ALTER TABLE dynamicprojects DROP COLUMN projectleader");
 }
+
 // if($row['version'] < 167){}
 // if($row['version'] < 168){}
 // if($row['version'] < 169){}
+// if($row['version'] < 170){}
+// if($row['version'] < 171){}
 
 //cleanups for maintainable db sizes
 $conn->query("DELETE FROM `checkinLogs` WHERE id <= ( SELECT id FROM ( SELECT id FROM `checkinLogs` ORDER BY id DESC LIMIT 1 OFFSET 100 ) foo )");echo $conn->error;

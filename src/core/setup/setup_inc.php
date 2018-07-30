@@ -845,6 +845,7 @@ function create_tables($conn) {
         status varchar(150) DEFAULT '-',
         picture MEDIUMBLOB,
         new_message_email ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
+        new_message_notification ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
 		emailSignature TEXT,
         FOREIGN KEY (userID) REFERENCES UserData(id)
         ON UPDATE CASCADE
@@ -1398,6 +1399,7 @@ function create_tables($conn) {
         text MEDIUMTEXT,
         trainingID INT(6),
         version INT(6) DEFAULT 1,
+        survey ENUM('TRUE', 'FALSE') DEFAULT 'FALSE',
         PRIMARY KEY (id),
         FOREIGN KEY (trainingID) REFERENCES dsgvo_training(id) ON UPDATE CASCADE ON DELETE CASCADE
     )";
@@ -1448,6 +1450,18 @@ function create_tables($conn) {
         lastAnswered DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (questionID, userID),
         FOREIGN KEY (questionID) REFERENCES dsgvo_training_questions(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+	if(!$conn->query($sql)){
+        echo $conn->error;
+    }
+
+    $sql = "CREATE TABLE dsgvo_training_completed_questions_survey_answers (
+        questionID int(6),
+        userID INT(6) UNSIGNED,
+        identifier VARCHAR(30) NOT NULL,
+        PRIMARY KEY (questionID, userID, identifier),
+        FOREIGN KEY (questionID) REFERENCES dsgvo_training_completed_questions(questionID) ON UPDATE CASCADE ON DELETE CASCADE,
         FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
     )";
 	if(!$conn->query($sql)){
@@ -1738,6 +1752,35 @@ function create_tables($conn) {
 	)");
 	if($conn->error){
 		echo $conn->error;
-	}
+    }
+    
+    $sql = "CREATE TABLE access_permission_groups (
+        id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(20) NOT NULL UNIQUE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
 
+    $sql = "CREATE TABLE access_permissions (
+        id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        groupID INT(10) UNSIGNED NOT NULL,
+        name VARCHAR(30) NOT NULL,
+        FOREIGN KEY (groupID) REFERENCES access_permission_groups(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
+
+    $sql = "CREATE TABLE relationship_access_permissions (
+        userID INT(6) UNSIGNED NOT NULL,
+        permissionID INT(10) UNSIGNED NOT NULL,
+        type ENUM('READ', 'WRITE') NOT NULL,
+        PRIMARY KEY (userID, permissionID),
+        FOREIGN KEY (permissionID) REFERENCES access_permissions(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
 }

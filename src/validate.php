@@ -1,15 +1,74 @@
 <?php
-function enableToCore($userID){
-  global $conn;
-  if(!$conn) require 'connection.php'; //5ab9e57714ff6
-  $sql = "SELECT isCoreAdmin FROM roles WHERE userID = $userID AND isCoreAdmin = 'TRUE'";
-  $result = $conn->query($sql);
-  if($userID != 1 && (!$result || $result->num_rows <= 0)){
+
+/**
+ * Does nothing when user has permission. When the user doesn't have permission, 
+ * a message and the footer are displayed and the script execution stops
+ * 
+ * @see has_permission, example: dsgvo_training.php, header.php
+ */
+function require_permission($type, $group_name, $permission_name = false, $userID = false)
+{
+  if (!has_permission($type, $group_name, $permission_name, $userID)) {
     echo 'Access denied. <a href="../user/logout"> logout</a>';
+    $type = strtolower($type);
+    showError("You don't have permission to ${type} $group_name $permission_name (<a href='#' onclick='window.history.back()'>go back</a> or <a href='../user/logout'>logout</a>)");
     include 'footer.php';
     die();
   }
 }
+
+/**
+ * Test if user has a specific permission.
+ * 
+ * @param string $type 'READ' or 'WRITE'
+ * @param string|false $permission_name Permission name. If false, has_permission returns true 
+ *                     when a user has ANY permission in that group
+ * @param int|false $userID User ID; uses $_SESSION if false
+ * 
+ * @see example: dsgvo_training.php, header.php
+ */
+function has_permission($type, $group_name, $permission_name = false, $userID = false) : bool
+{
+  if (!$userID) $userID = $_SESSION['userid'];
+  if ($userID == 1) return true; // admin
+  $group_only = $permission_name === false;
+  global $conn;
+  static $cache = [];
+  if(!$group_only && isset($cache[$group_name][$permission_name][$userID][$type])){
+    return $cache[$group_name][$permission_name][$userID][$type];
+  }
+  if (!isset($conn)) {
+    require 'connection.php';
+  }
+  if($group_only){
+    $additional = $type == "READ"?" AND (rel.type = 'READ' OR rel.type = 'WRITE')":" AND (rel.type = 'WRITE')";
+    $result = $conn->query("SELECT rel.type FROM access_permission_groups groups 
+                            INNER JOIN access_permissions perm ON perm.groupID = groups.id 
+                            INNER JOIN relationship_access_permissions rel ON rel.permissionID = perm.id
+                            WHERE groups.name = '$group_name'
+                            AND rel.userID = $userID $additional GROUP BY rel.type");
+  }else{
+    $result = $conn->query("SELECT rel.type FROM access_permission_groups groups 
+                            INNER JOIN access_permissions perm ON perm.groupID = groups.id 
+                            INNER JOIN relationship_access_permissions rel ON rel.permissionID = perm.id
+                            WHERE groups.name = '$group_name'
+                            AND perm.name = '$permission_name'
+                            AND rel.userID = $userID");
+  }
+  echo $conn->error;
+  $has_permission = false;
+  if ($result && $row = $result->fetch_assoc()) {
+    $has_permission = $row["type"] == $type || $row["type"] == 'WRITE'; // if user has WRITE, they can read too
+  }
+  if(!$group_only){
+    $cache[$group_name][$permission_name][$userID][$type] = $has_permission;
+  }
+  return $has_permission;
+}
+
+function enableToCore($userID){
+  require_permission("WRITE", "CORE");
+  }
 
 function enableToTime($userID){
   global $conn;
@@ -84,33 +143,13 @@ function enableToReport($userID){
 }
 
 function enableToERP($userID){
-  global $conn;
-  if(!$conn) require 'connection.php';
-  $sql = "SELECT isERPAdmin FROM roles WHERE userID = $userID AND isERPAdmin = 'TRUE'";
-  $result = $conn->query($sql);
-  if($userID != 1 && (!$result || $result->num_rows <= 0)){
-    echo 'Access denied. <a href="../user/logout"> logout</a>';
-    include 'footer.php';
-    die();
-  }
+  require_permission("WRITE", "ERP");
 }
 
 function enableToFinance($userID){
   global $conn;
   if(!$conn) require 'connection.php';
   $sql = "SELECT isFinanceAdmin FROM roles WHERE userID = $userID AND isFinanceAdmin = 'TRUE'";
-  $result = $conn->query($sql);
-  if($userID != 1 && (!$result || $result->num_rows <= 0)){
-    echo 'Access denied. <a href="../user/logout"> logout</a>';
-    include 'footer.php';
-    die();
-  }
-}
-
-function enableToDSGVO($userID){
-  global $conn;
-  if(!$conn) require 'connection.php';
-  $sql = "SELECT isFinanceAdmin FROM roles WHERE userID = $userID AND isDSGVOAdmin = 'TRUE'";
   $result = $conn->query($sql);
   if($userID != 1 && (!$result || $result->num_rows <= 0)){
     echo 'Access denied. <a href="../user/logout"> logout</a>';

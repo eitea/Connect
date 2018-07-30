@@ -125,10 +125,10 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
 		if(is_array($module)){
 			$optionalID = $module[1];
 			$module = $module[0];
-			$result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND module = '$module' AND optionalID = '$optionalID' AND outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
+			$result = $conn->query("SELECT privateKey FROM security_access a INNER JOIN security_modules m ON a.module = m.module AND m.outdated = 'FALSE'WHERE userID = $userID AND a.module = '$module' AND optionalID = '$optionalID' AND a.outDated = 'FALSE' ORDER BY a.recentDate LIMIT 1");
 		} else {
-			$result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND module = '$module' AND outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
-		}
+			$result = $conn->query("SELECT privateKey FROM security_access a INNER JOIN security_modules m ON a.module = m.module AND m.outdated = 'FALSE' WHERE userID = $userID AND a.module = '$module' AND a.outDated = 'FALSE' ORDER BY a.recentDate LIMIT 1");
+        }
         if($result && ( $row=$result->fetch_assoc() )){
 			//echo $row['privateKey'] .' --encrypted base64 private module key<br>';
             $cipher_private_module = base64_decode($row['privateKey']);
@@ -837,4 +837,8 @@ function getUnreadMessages($conversationID = 0){
 		echo $conn->error;
 	}
 	return '';
+}
+
+function str_starts_with($prefix, $subject){
+    return substr($subject, 0, strlen($prefix)) === $prefix;
 }

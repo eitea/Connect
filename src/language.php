@@ -122,6 +122,9 @@ $lang_ger['ARCHIVE'] = 'Archiv';
 $lang_eng['ARCHIVE_STRUCTURE'] = 'Archive structure';
 $lang_ger['ARCHIVE_STRUCTURE'] = 'Archivstruktur';
 
+$lang_eng['ARE_YOU_SURE'] = 'Are you sure?';
+$lang_ger['ARE_YOU_SURE'] = 'Sind Sie sicher?';
+
 $lang_eng['ASSIGNED'] = 'Assigned';
 $lang_ger['ASSIGNED'] = 'Zugewiesene';
 
@@ -256,6 +259,9 @@ $lang_ger['CLASS'] = 'Klasse';
 
 $lang_eng['CLICK_TO_INSERT'] = 'Click to insert';
 $lang_ger['CLICK_TO_INSERT'] = 'Klicken zum Einfügen';
+
+$lang_eng['CLICK_TO_ACTIVATE'] = 'Click to activate';
+$lang_ger['CLICK_TO_ACTIVATE'] = 'Klicken zum Aktivieren';
 
 $lang_eng['CLIENT'] = 'Client';
 $lang_ger['CLIENT'] = 'Kunde';
@@ -1040,6 +1046,12 @@ $lang_ger['NEW_FOLDER'] = 'Neuer Ordner';
 $lang_eng['NEW_GROUP'] = 'New group';
 $lang_ger['NEW_GROUP'] = 'Neue gruppe';
 
+$lang_eng['NEW_MESSAGE_EMAIL'] = 'E-Mail for new chat messages';
+$lang_ger['NEW_MESSAGE_EMAIL'] = 'E-Mail bei neuer Chat Nachricht';
+
+$lang_eng['NEW_MESSAGE_NOTIFICATION'] = 'Web Notification for new chat messages';
+$lang_ger['NEW_MESSAGE_NOTIFICATION'] = 'Web Notification bei neuer Chat Nachricht';
+
 $lang_eng['NEW_OFFER'] = 'New Offer';
 $lang_ger['NEW_OFFER'] = 'Neues Angebot';
 
@@ -1087,6 +1099,9 @@ $lang_ger['NOT_CHARGED'] = 'Nicht Verrechnet';
 
 $lang_eng['NOT_CHARGEABLE'] = 'Don`t charge';
 $lang_ger['NOT_CHARGEABLE'] = 'Erlassen';
+
+$lang_eng['NOT_SUPPORTED_BROWSER'] = 'Not supported by your Browser';
+$lang_ger['NOT_SUPPORTED_BROWSER'] = 'Vom Browser nicht unterstützt';
 
 $lang_eng['NUMBER'] = 'Number';
 $lang_ger['NUMBER'] = 'Nummer';
@@ -1751,8 +1766,8 @@ $lang_ger['SCHEDULE_TOSTRING'] = array('-1' => 'Inaktiv', '0' => 'Einmalig', '1'
 $lang_eng['TIME_UNIT_TOSTRING'] = array('', 'Day(s)', 'Week(s)', 'Month(s)', 'Year(s)');
 $lang_ger['TIME_UNIT_TOSTRING'] = array('', 'Tag(e)', 'Woche(n)', 'Monat(e)', 'Jahr(e)');
 
-$lang_eng['TRAINING_QUESTION_CORRECT'] = array('TRUE' => 'Right', 'FALSE' => 'Wrong', 'UNANSWERED' => 'Unanswered');
-$lang_ger['TRAINING_QUESTION_CORRECT'] = array('TRUE' => 'Richtig', 'FALSE' => 'Falsch', 'UNANSWERED' => 'Nicht beantwortet');
+$lang_eng['TRAINING_QUESTION_CORRECT'] = array('TRUE' => 'Right', 'FALSE' => 'Wrong', 'UNANSWERED' => 'Unanswered', 'SURVEY' => 'Survey');
+$lang_ger['TRAINING_QUESTION_CORRECT'] = array('TRUE' => 'Richtig', 'FALSE' => 'Falsch', 'UNANSWERED' => 'Nicht beantwortet', 'SURVEY' => 'Umfrage');
 
 $lang_eng['TRAINING_BUTTON_DESCRIPTIONS'] = array(
   'NEW_MODULE' => 'Create a new module', 
@@ -1761,12 +1776,14 @@ $lang_eng['TRAINING_BUTTON_DESCRIPTIONS'] = array(
   'DELETE_SET' => 'Delete set with all modules and questions', 
   'DELETE_MODULE' => 'Delete module with all questions',
   'DELETE_QUESTION' => 'Delete question',
+  'DELETE_QUESTION_ANSWERS' => 'Delete question answers',
   'EDIT_QUESTION' => 'Edit question',
   'QUESTION_STATS' => 'Stats for this question',
   'ADD_QUESTION' => 'Add a question',
   'STATS_GRAPH' => 'Module stats as graph',
   'STATS_TABLE' => 'Module stats as table',
   'TRY' => 'Try from a user\'s perspective',
+  'TRY_QUESTION' => 'Try from a user\'s perspective',
   'EDIT_MODULE' => 'Edit module',
 );
 $lang_ger['TRAINING_BUTTON_DESCRIPTIONS'] = array(
@@ -1776,12 +1793,14 @@ $lang_ger['TRAINING_BUTTON_DESCRIPTIONS'] = array(
   'DELETE_SET' => 'Gesamtes Set mit allen Modulen und Fragen löschen', 
   'DELETE_MODULE' => 'Gesamtes Modul mit allen Fragen löschen',
   'DELETE_QUESTION' => 'Frage löschen',
+  'DELETE_QUESTION_ANSWERS' => 'Antworten der Benutzer löschen',
   'EDIT_QUESTION' => 'Frage bearbeiten',
   'QUESTION_STATS' => 'Einzelauswertung der Frage',
   'ADD_QUESTION' => 'Frage hinzufügen',
   'STATS_GRAPH' => 'Auswertung des Moduls als Graph',
   'STATS_TABLE' => 'Auswertung des Moduls als Tabelle',
   'TRY' => 'Modul aus der Sicht des Benutzers abspielen',
+  'TRY_QUESTION' => 'Frage aus der Sicht des Benutzers abspielen',
   'EDIT_MODULE' => 'Modul bearbeiten',
 );
 
@@ -1812,8 +1831,8 @@ $lang_ger['TRAINING_SETTINGS'] = array(
   'REPEAT_DAYS_NOTE' => 'Kann nur aktiviert werden, wenn das Überschreiben von Antworten erlaubt ist und die Beantwortung bei Login erfolgt',
 );
 
-$lang_eng['TRAINING_RESULT'] = array('RIGHT' => 'Right','RIGHT_NO_UPDATE' => 'Right, but not updated', 'WRONG' => 'Wrong', 'WRONG_NO_UPDATE' => 'Wrong, but not updated');
-$lang_ger['TRAINING_RESULT'] = array('RIGHT' => 'Richtig','RIGHT_NO_UPDATE' => 'Right, aber nicht gespeichert', 'WRONG' => 'Falsch', 'WRONG_NO_UPDATE' => 'Falsch, aber nicht gespeichert');
+$lang_eng['TRAINING_RESULT'] = array('SURVEY' => 'Survey','SURVEY_NO_UPDATE' => 'Survey (not updated)','RIGHT' => 'Right','RIGHT_NO_UPDATE' => 'Right (not updated)', 'WRONG' => 'Wrong', 'WRONG_NO_UPDATE' => 'Wrong (not updated)');
+$lang_ger['TRAINING_RESULT'] = array('SURVEY' => 'Umfrage','SURVEY_NO_UPDATE' => 'Umfrage (nicht gespeichert)','RIGHT' => 'Richtig','RIGHT_NO_UPDATE' => 'Richtig (nicht gespeichert)', 'WRONG' => 'Falsch', 'WRONG_NO_UPDATE' => 'Falsch (nicht gespeichert)');
 
 $lang_eng['WEEKDAY_TOSTRING'] = array("mon" => "Monday","tue" => "Tuesday","wed" => "Wednesday","thu" => "Thursday","fri" => "Friday","sat" => "Saturday","sun" => "Sunday");
 $lang_ger['WEEKDAY_TOSTRING'] = array("mon" => "Montag", "tue" => "Dienstag", "wed" => "Mittwoch", "thu" => "Donnerstag","fri" => "Freitag", "sat" => "Samstag", "sun" => "Sonntag");

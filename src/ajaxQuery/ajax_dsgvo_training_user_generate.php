@@ -4,214 +4,140 @@ $userID = $_SESSION['userid'] or die("no user signed in");
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "connection.php";
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "language.php";
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "utilities.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "dsgvo" . DIRECTORY_SEPARATOR . "dsgvo_training_common.php";
 $onLogin = false;
 $doneSurveys = false;
-$hasQuestions = false; // some questions are not valid (invalid syntax)
-if(isset($_REQUEST["onLogin"])){
+if (isset($_REQUEST["onLogin"])) {
     $onLogin = true;
 }
-if(isset($_REQUEST["done"])){
+if (isset($_REQUEST["done"])) {
     $doneSurveys = true;
 }
-
-$result = $conn->query("SELECT userID FROM dsgvo_training_user_suspension WHERE userID = $userID AND suspension_count >= 3");
-$allowSuspension = !$result || $result->num_rows == 0;
-
-$result = $conn->query(
-    "SELECT count(*) count FROM (
-        SELECT userID FROM dsgvo_training_user_relations tur
-        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID
-        WHERE userID = $userID
-        AND NOT EXISTS (
-             SELECT userID
-             FROM dsgvo_training_completed_questions
-             LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
-             LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-             WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
-             )
-        UNION
-        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr
-        INNER JOIN relationship_team_user tr ON tr.teamID = dtr.teamID
-        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID
-        WHERE tr.userID = $userID
-        AND NOT EXISTS (
-             SELECT userID
-             FROM dsgvo_training_completed_questions
-             LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
-             LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-             WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
-             )
-        UNION
-        SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations
-        INNER JOIN relationship_company_client ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
-        INNER JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_company_relations.trainingID
-        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dsgvo_training_company_relations.trainingID
-        WHERE relationship_company_client.userID = $userID
-        AND dsgvo_training.onLogin = 'TRUE' AND NOT EXISTS (
-            SELECT userID
-            FROM dsgvo_training_completed_questions
-            LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
-            LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-            WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
-        )
-    ) temp"
-);
-showError($conn->error);
-$userHasUnansweredSurveys = intval($result->fetch_assoc()["count"]) !== 0;
-
-if(!$userHasUnansweredSurveys && !$doneSurveys){
-    ?>
-        <div class="modal fade survey-modal">
-            <div class="modal-dialog modal-content modal-md">
-                <div class="modal-header">Sie haben keine offenen Fragen mehr</div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+if (isset($_REQUEST["test"])) {
+    $test = true;
+}
+if ($test) {
+    if (isset($_POST["questionID"])) {
+        $questionID = intval($_POST["questionID"]);
+    } else if (isset($_POST["trainingID"])) {
+        $trainingID = intval($_POST["trainingID"]);
+    } else {
+        die("no training or question id");
+    }
+    if ($questionID) {
+        $result = $conn->query("SELECT trainingID FROM dsgvo_training_questions WHERE id = $questionID");
+        showError($conn->error);
+        $trainingID = $result->fetch_assoc()["trainingID"];
+        $extra = "AND dsgvo_training_questions.id = $questionID";
+    } else {
+        $extra = "";
+    }
+    $allowSuspension = false;
+    $result = $conn->query("SELECT * FROM dsgvo_training WHERE id = $trainingID");
+    $row = $result->fetch_assoc();
+    $questionArray = array();
+    $random = $row["random"];
+    $onLogin = $row["onLogin"];
+    $result_question = $conn->query("SELECT dsgvo_training_questions.id, text, title, survey, dsgvo_training.name tname, dsgvo_training_modules.name mname FROM dsgvo_training_questions INNER JOIN dsgvo_training ON dsgvo_training_questions.trainingID = dsgvo_training.id INNER JOIN dsgvo_training_modules ON dsgvo_training.moduleID = dsgvo_training_modules.id WHERE trainingID = $trainingID $extra");
+} else {
+    $result = $conn->query("SELECT userID FROM dsgvo_training_user_suspension WHERE userID = $userID AND suspension_count >= 3");
+    $allowSuspension = !$result || $result->num_rows == 0;
+    list($sql_error, $userHasUnansweredSurveys) = user_has_unanswered_surveys_query($userID);
+    $error_output .= showError($sql_error);
+    if (!$userHasUnansweredSurveys && !$doneSurveys) {
+        ?>
+            <div class="modal fade survey-modal">
+                <div class="modal-dialog modal-content modal-md">
+                    <div class="modal-header">Sie haben keine offenen Fragen mehr</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    <?php
-    die();
-}
-
-function strip_questions($html){ // this will be the question
-    $regexp = '/\{.*?\}/s';
-    return preg_replace($regexp, "", $html);
-}
-
-function parse_questions($html){ // this will return an array of questions
-    $questionRegex = '/\{.*?\}/s';
-    $htmlRegex = '/\<\/*.+?\/*\>/s';
-    global $hasQuestions;
-    $html = preg_replace($htmlRegex,"",$html); // strip all html tags
-    preg_match($questionRegex,$html,$matches);
-    // I only parse the first question for now
-    if(sizeof($matches)==0) return array();
-    $question = $matches[0]; // eg "{[-]wrong answer[+]right answer}"
-    $answerRegex = '/\[([+-])\]([^\[\}]+)/s';
-    preg_match_all($answerRegex,$question,$matches);
-    if(sizeof($matches)==0) return array();
-    $ret_array = array();
-    foreach ($matches[2] as $key => $value) {
-        $ret_array[] = array("value"=>$key,"text"=>html_entity_decode($value));
+        <?php
+        die();
     }
-    if(sizeof($ret_array) > 0){
-        $hasQuestions = true;
+    $result = $conn->query( // this gets all trainings the user can complete
+        "SELECT tur.trainingID id, tr.name, tr.random
+         FROM dsgvo_training_user_relations tur
+         INNER JOIN dsgvo_training tr
+         ON tr.id = tur.trainingID
+         WHERE tur.userID = $userID
+         UNION
+         SELECT ttr.trainingID id, tr.name, tr.random
+         FROM dsgvo_training_team_relations ttr
+         INNER JOIN relationship_team_user trd
+         ON trd.teamID = ttr.teamID
+         INNER JOIN dsgvo_training tr
+         ON tr.id = ttr.trainingID
+         WHERE trd.userID = $userID
+         UNION
+         SELECT ttr.trainingID id, tr.name, tr.random
+         FROM dsgvo_training_company_relations ttr
+         INNER JOIN relationship_company_client trd
+         ON trd.companyID = ttr.companyID
+         INNER JOIN dsgvo_training tr
+         ON tr.id = ttr.trainingID
+         WHERE trd.userID = $userID"
+    );
+    showError($conn->error);
+    while ($row = $result->fetch_assoc()) {
+        $questionArray = array();
+        $trainingID = $row["id"];
+        $random = $row["random"];
+        $result_question = false;
+        if (!$doneSurveys) {
+            $result_question = $conn->query(
+                "SELECT tq.id, tq.text, t.onLogin, tq.title, tq.survey, t.name tname, dsgvo_training_modules.name mname FROM dsgvo_training_questions tq
+                INNER JOIN dsgvo_training t ON t.id = tq.trainingID
+                INNER JOIN dsgvo_training_modules ON t.moduleID = dsgvo_training_modules.id
+                WHERE tq.trainingID = $trainingID AND
+                NOT EXISTS (
+                    SELECT userID
+                    FROM dsgvo_training_completed_questions
+                    LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
+                    LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
+                    WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
+                )"
+            ); // only select not completed questions
+        } else {
+            $result_question = $conn->query(
+                "SELECT tq.id, tq.text, t.onLogin, tq.title, tq.survey, t.name tname, dsgvo_training_modules.name mname FROM dsgvo_training_questions tq
+                INNER JOIN dsgvo_training t ON t.id = tq.trainingID
+                INNER JOIN dsgvo_training_modules ON t.moduleID = dsgvo_training_modules.id
+                WHERE tq.trainingID = $trainingID AND
+                EXISTS (
+                    SELECT userID
+                    FROM dsgvo_training_completed_questions
+                    LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
+                    LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
+                    WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
+                )"
+            ); //only select completed questions
+        }
     }
-    return $ret_array;
 }
-
-function parse_question($html){
-    $questionRegex = '/\{.*?\}/s';
-    $htmlRegex = '/\<\/*.+?\/*\>/s';
-    global $hasQuestions;
-    $html = preg_replace($htmlRegex,"",$html); // strip all html tags
-    preg_match($questionRegex,$html,$matches);
-    // I only parse the first question for now
-    if(sizeof($matches)==0) return "Welche dieser Antworten ist richtig?";
-    $question = $matches[0]; // eg "{[-]wrong answer[+]right answer}"
-    $answerRegex = '/\[([\?])\]([^\[\}]+)/s';
-    preg_match_all($answerRegex,$question,$matches);
-    // var_dump($answerRegex);
-    if(sizeof($matches)==0) return "Welche dieser Antworten ist richtig?";
-    foreach ($matches[2] as $key => $value) {
-        return html_entity_decode($value);
-    }
-    return "Welche dieser Antworten ist richtig?";
-}
-
-$result = $conn->query( // this gets all trainings the user can complete
-    "SELECT tur.trainingID id, tr.name, tr.random
-     FROM dsgvo_training_user_relations tur
-     INNER JOIN dsgvo_training tr
-     ON tr.id = tur.trainingID
-     WHERE tur.userID = $userID
-     UNION
-     SELECT ttr.trainingID id, tr.name, tr.random
-     FROM dsgvo_training_team_relations ttr
-     INNER JOIN relationship_team_user trd
-     ON trd.teamID = ttr.teamID
-     INNER JOIN dsgvo_training tr
-     ON tr.id = ttr.trainingID
-     WHERE trd.userID = $userID
-     UNION
-     SELECT ttr.trainingID id, tr.name, tr.random
-     FROM dsgvo_training_company_relations ttr
-     INNER JOIN relationship_company_client trd
-     ON trd.companyID = ttr.companyID
-     INNER JOIN dsgvo_training tr
-     ON tr.id = ttr.trainingID
-     WHERE trd.userID = $userID"
-);
 showError($conn->error);
 $trainingArray = array(); // those are the survey pages
-while ($row = $result->fetch_assoc()){
-    $questionArray = array();
-    $trainingID = $row["id"];
-    $random = $row["random"];
-    $result_question = false;
-    if(!$doneSurveys){
-        $result_question = $conn->query(
-            "SELECT tq.id, tq.text, t.onLogin FROM dsgvo_training_questions tq
-            INNER JOIN dsgvo_training t ON t.id = tq.trainingID
-            WHERE tq.trainingID = $trainingID AND
-            NOT EXISTS (
-                SELECT userID
-                FROM dsgvo_training_completed_questions
-                LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
-                LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-                WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
-            )"
-        ); // only select not completed questions
-    }else{
-        $result_question = $conn->query(
-            "SELECT tq.id, tq.text, t.onLogin FROM dsgvo_training_questions tq
-            INNER JOIN dsgvo_training t ON t.id = tq.trainingID
-            WHERE tq.trainingID = $trainingID AND
-            EXISTS (
-                SELECT userID
-                FROM dsgvo_training_completed_questions
-                LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
-                LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-                WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 )
-            )"
-        ); //only select completed questions
-    }
-    showError($conn->error);
-    while($row_question = $result_question->fetch_assoc()){
-        $questionArray = array();
-        $questionArray[] = array(
-            "type"=>"html",
-            "name"=>"question",
-            "html"=>strip_questions($row_question["text"])
-        );
-        $choices = parse_questions($row_question["text"]);
-        if(sizeof($choices) == 0){
-            $choices =  array(array("value"=>0,"text"=>"Ich habe den Text gelesen"));
-        }
-        $questionArray[] = array(
-            "type"=>"radiogroup",
-            "name"=>$row_question["id"],
-            "title"=>parse_question($row_question["text"]),
-            "isRequired"=>($row_question["onLogin"] == 'TRUE' && !$doneSurveys),
-            "colCount"=>1,
-            "choicesOrder"=>$random == 'TRUE'?"random":"none",
-            "choices"=>$choices
-        );
-        $trainingArray[] = array(
-            "name"=>$trainingID,
-            "title"=>$row["name"],
-            "elements"=>$questionArray,
-        );
-    }
-}
-
-if(!$hasQuestions){
-    return;
+while ($row_question = $result_question->fetch_assoc()) {
+    $trainingArray[] = array(
+        "name" => $trainingID,
+        "title" => str_ellipsis($row_question["title"], 30) . ($row_question["survey"] == 'TRUE'?" (Umfrage)":""),
+        "elements" => generate_survey_page(
+            [
+                "text" => $row_question["text"],
+                "id" => $row_question["id"],
+                "required" => $test ? ($onLogin == 'TRUE') : ($row_question["onLogin"] == 'TRUE' && !$doneSurveys),
+                "random" => $random,
+                "survey" => $row_question["survey"] == 'TRUE',
+                "category" => str_ellipsis($row_question["mname"]. " / ". $row_question["tname"], 35)
+            ]
+        ),
+    );
 }
 
 ?>
     <script src='../plugins/node_modules/survey-jquery/survey.jquery.min.js'></script>
-
     <div class="modal fade survey-modal">
         <div class="modal-dialog modal-content modal-md">
             <div class="modal-header"><?php echo $lang['PLEASE_ANSWER_QUESTIONS'] ?> 
@@ -223,10 +149,10 @@ if(!$hasQuestions){
             </div>
             <div class="modal-footer">
                 <button data-toggle="modal" data-target="#explain-surveys" class="btn btn-default" type="button"><?php echo $lang['HELP'] ?></a>
-                <?php if($onLogin && $allowSuspension): ?>
-                  <button type="button" class="btn btn-warning" id="suspend_trainings_btn"><?php echo $lang['POSTPONE_ONE_DAY'] ?></button>
+                <?php if ($onLogin && $allowSuspension) : ?>
+                  <button type="button" class="btn btn-default" id="suspend_trainings_btn"><?php echo $lang['POSTPONE_ONE_DAY'] ?></button>
                 <?php endif; ?>
-                <?php if(!$onLogin): ?>  <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button> <?php endif; ?>
+                <?php if (!$onLogin || $test) : ?>  <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button> <?php endif; ?>
             </div>
         </div>
     </div>
@@ -235,31 +161,38 @@ if(!$hasQuestions){
         Survey.Survey.cssType = "bootstrap";
         Survey.defaultBootstrapCss.navigationButton = "btn btn-warning";
         var json = <?php echo json_encode(array(
-            "pages"=> $trainingArray,
-            "showProgressBar"=>"top",
-            "requiredText"=>"(".$lang['REQUIRED_FIELD'].") ",
-            "showPageNumbers"=>true,
-            "locale"=>$lang['LOCALE']
-        )) ?>;
+                        "pages" => $trainingArray,
+                        "showTitle" => true,
+                        "title" => $trainingArray[0]["elements"][1]["category"],
+                        "showProgressBar" => "top",
+                        "requiredText" => "(" . $lang['REQUIRED_FIELD'] . ") ",
+                        "showPageNumbers" => true,
+                        "showQuestionNumbers" => "off",
+                        "locale" => $lang['LOCALE']
+                    )) ?>;
+        Survey.JsonObject.metaData.addProperty("questionbase", "category");
         window.survey = new Survey.Model(json);
         survey
             .onComplete
             .add(function (result) {
                 $("#timeElement").hide()
                 clearInterval(timerID);
+                <?php if ($test) : ?>
+                var data = { result: JSON.stringify(result.data), test: true };
+                <?php else : ?>
+                var data = { result: JSON.stringify(result.data) };
+                <?php endif; ?>
                 $.ajax({
                     url: 'ajaxQuery/ajax_dsgvo_training_user_submit.php',
-                    data: { result: JSON.stringify(result.data) },
+                    data: data,
                     type: 'post',
                     success: function (resp) {
                         $("#surveyElement").html(resp) //stats
                         $(".survey-modal .modal-footer").html('<button type="button" class="btn btn-default" data-dismiss="modal">OK</button>')
-                        // $(".survey-modal").modal("hide");
                     },
                     error: function (resp) {
                         $("#surveyElement").html(resp) //stats
                         $(".survey-modal .modal-footer").html('<button type="button" class="btn btn-default" data-dismiss="modal">OK</button>')
-                        // $(".survey-modal").modal("hide");
                     }
                 });
             });
@@ -286,6 +219,9 @@ if(!$hasQuestions){
                 survey.setValue(valueName, seconds);
                 renderTime(seconds)
             }
+            survey.onCurrentPageChanged.add(function(){
+                survey.title = survey.getCurrentPageQuestions()[1].category;
+            });
             survey.onCurrentPageChanged.add(timerCallback);
             clearInterval(timerID);
             timerID = window.setInterval(timerCallback, 1000);
@@ -305,6 +241,9 @@ if(!$hasQuestions){
                     }
                 });
             })
+            $(".sv_next_btn").addClass("pull-right");
+            $(".sv_complete_btn").addClass("pull-right");
+            $(".sv_next_btn").parent().addClass("clearfix");
     </script>
     <script>
         function setLinkTargets(){

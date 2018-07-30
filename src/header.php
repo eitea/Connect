@@ -10,10 +10,11 @@ $publicKey = $_SESSION['publicKey'];
 
 $setActiveLink = 'class="active-link"';
 
-require __DIR__ . "/connection.php";
-require __DIR__ . "/utilities.php";
-require __DIR__ . "/validate.php";
-require __DIR__ . "/language.php";
+require __DIR__ . DIRECTORY_SEPARATOR . "connection.php";
+require __DIR__ . DIRECTORY_SEPARATOR . "utilities.php";
+require __DIR__ . DIRECTORY_SEPARATOR . "validate.php";
+require __DIR__ . DIRECTORY_SEPARATOR . "language.php";
+require __DIR__ . DIRECTORY_SEPARATOR . "dsgvo" . DIRECTORY_SEPARATOR . "dsgvo_training_common.php";
 include 'version_number.php';
 
 if (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])){
@@ -95,112 +96,21 @@ while ($result && ($row = $result->fetch_assoc())) {
     $available_users[] = $row['userID'];
 }
 $validation_output = $error_output = '';
-$result = $conn->query( /* Test if user has any questions */
-    "SELECT count(*) count FROM (
-        SELECT userID FROM dsgvo_training_user_relations tur LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID WHERE userID = $userID
-        UNION
-        SELECT tr.userID userID FROM dsgvo_training_team_relations dtr INNER JOIN relationship_team_user tr ON tr.teamID = dtr.teamID
-        LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID WHERE tr.userID = $userID
-        UNION
-        SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations INNER JOIN relationship_company_client ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
-        LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.trainingID = dsgvo_training_company_relations.trainingID WHERE relationship_company_client.userID = $userID
-    ) temp"
-);
-$error_output .= showError($conn->error, 1);
-$userHasUnansweredSurveys = $userHasSurveys = 0;
-if($result) $userHasUnansweredSurveys = $userHasSurveys = intval($result->fetch_assoc()["count"]) !== 0;
-if(!$userHasSurveys){
-    $result = $conn->query( /* Test if user has unanswered questions to answer */
-        "SELECT count(*) count FROM (
-            SELECT userID FROM dsgvo_training_user_relations tur
-            LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID
-            WHERE userID = $userID
-            AND NOT EXISTS (
-                 SELECT userID
-                 FROM dsgvo_training_completed_questions
-                 LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
-                 LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-                 WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
-                 )
-            UNION
-            SELECT tr.userID userID FROM dsgvo_training_team_relations dtr
-            INNER JOIN relationship_team_user tr ON tr.teamID = dtr.teamID
-            LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID
-            WHERE tr.userID = $userID
-            AND NOT EXISTS (
-                 SELECT userID
-                 FROM dsgvo_training_completed_questions
-                 LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
-                 LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-                 WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
-                 )
-            UNION
-            SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations
-                INNER JOIN relationship_company_client ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
-                LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dsgvo_training_company_relations.trainingID
-                WHERE relationship_company_client.userID = $userID
-                AND NOT EXISTS (
-                    SELECT userID
-                    FROM dsgvo_training_completed_questions
-                    LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
-                    LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-                    WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
-                )
-        ) temp"
-    );
-    $error_output .= showError($conn->error, 1);
-    if($result) $userHasSurveys = intval($result->fetch_assoc()["count"]) !== 0;
-}
-$userHasUnansweredOnLoginSurveys = false;
-$surveysAreSuspended = false;
-if($userHasUnansweredSurveys){ /* Test if user has unanswered questions that should be shown after checkin */
-    $result = $conn->query("SELECT suspension_count FROM dsgvo_training_user_suspension WHERE userID = $userID AND TIMESTAMPDIFF(DAY, last_suspension, CURRENT_TIMESTAMP) = 0"); // test if user has suspended surveys for today
-    $surveysAreSuspended = $result && $result->num_rows != 0;
-    if(!$surveysAreSuspended){
-        $result = $conn->query(
-            "SELECT count(*) count FROM (
-                SELECT userID FROM dsgvo_training_user_relations tur
-                INNER JOIN dsgvo_training t ON t.id = tur.trainingID
-                LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = tur.trainingID
-                WHERE userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
-                    SELECT userID
-                    FROM dsgvo_training_completed_questions
-                    LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
-                    LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-                    WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
-                 )
-                UNION
-                SELECT tr.userID userID FROM dsgvo_training_team_relations dtr
-                INNER JOIN relationship_team_user tr ON tr.teamID = dtr.teamID
-                INNER JOIN dsgvo_training t ON t.id = dtr.trainingID
-                LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dtr.trainingID
-                WHERE tr.userID = $userID AND onLogin = 'TRUE' AND NOT EXISTS (
-                    SELECT userID
-                    FROM dsgvo_training_completed_questions
-                    LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
-                    LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-                    WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
-                 )
-                UNION
-                SELECT relationship_company_client.userID userID FROM dsgvo_training_company_relations
-                INNER JOIN relationship_company_client ON relationship_company_client.companyID = dsgvo_training_company_relations.companyID
-                INNER JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_company_relations.trainingID
-                LEFT JOIN dsgvo_training_questions tq ON tq.trainingID = dsgvo_training_company_relations.trainingID
-                WHERE relationship_company_client.userID = $userID
-                AND dsgvo_training.onLogin = 'TRUE' AND NOT EXISTS (
-                    SELECT userID
-                    FROM dsgvo_training_completed_questions
-                    LEFT JOIN dsgvo_training_questions ON dsgvo_training_questions.id = dsgvo_training_completed_questions.questionID
-                    LEFT JOIN dsgvo_training ON dsgvo_training.id = dsgvo_training_questions.trainingID
-                    WHERE questionID = tq.id AND userID = $userID AND ( CURRENT_TIMESTAMP < date_add(dsgvo_training_completed_questions.lastAnswered, interval dsgvo_training.answerEveryNDays day) OR dsgvo_training.answerEveryNDays = 0 ) AND (dsgvo_training.allowOverwrite = 'FALSE' OR dsgvo_training_completed_questions.version = dsgvo_training_questions.version)
-                )
-            ) temp"
-        );
-        $error_output .= showError($conn->error, 1);
-        $userHasUnansweredOnLoginSurveys = intval($result->fetch_assoc()["count"]) !== 0;
-    } else {
-        $userHasUnansweredOnLoginSurveys = false;
-    }
+
+list($sql_error, $userHasSurveys) = user_has_surveys_query($userID);
+$error_output .= showError($sql_error, 1);
+
+list($sql_error, $userHasUnansweredSurveys) = user_has_unanswered_surveys_query($userID);
+$error_output .= showError($sql_error, 1);
+
+list($sql_error, $surveysAreSuspended) = surveys_are_suspended_query($userID);
+$error_output .= showError($sql_error, 1);
+
+if($surveysAreSuspended){
+    $userHasUnansweredOnLoginSurveys = 0;
+}else{
+    list($sql_error, $userHasUnansweredOnLoginSurveys) = user_has_unanswered_on_login_surveys_query($userID);
+    $error_output .= showError($sql_error, 1);
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -680,7 +590,7 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
     $diff = timeDiff_Hours($row['time'], getCurrentTimestamp());
     if($diff < $cd / 60) { $ckIn_disabled = 'disabled'; }
     //deny stampOut
-    $result = $conn->query("SELECT id FROM projectBookingData WHERE `end` = '0000-00-00 00:00:00' AND dynamicID IS NOT NULL AND timestampID = ".$row['indexIM']);
+    $result = $conn->query("SELECT id, dynamicID FROM projectBookingData WHERE `end` = '0000-00-00 00:00:00' AND dynamicID IS NOT NULL AND timestampID = ".$row['indexIM']);
     if($result && $result->num_rows > 0){ $ckIn_disabled = 'disabled'; }
     $buttonEmoji = '<div class="btn-group btn-group-xs btn-ckin" style="display:block;">
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji1" name="stampOut" value="1" title="'.$lang['EMOJI_TOSTRING'][1].'"></button>
@@ -689,7 +599,11 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji4" name="stampOut" value="4" title="'.$lang['EMOJI_TOSTRING'][4].'"></button>
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji5" name="stampOut" value="5" title="'.$lang['EMOJI_TOSTRING'][5].'"></button></div>
     <a data-toggle="modal" data-target="#explain-emji" style="position:relative;top:-7px;"><i class="fa fa-question-circle-o"></i></a>';
-    if($result && $result->num_rows > 0){ $buttonEmoji .= '<br><small class="clock-counter">Task läuft</small>'; }
+    if($result && $result->num_rows > 0){ 
+        $row_booking_data = $result->fetch_assoc();
+        $booking_data_id = $row_booking_data["dynamicID"];
+        $buttonEmoji .= '<br><small class="clock-counter"><a href="../dynamic-projects/view?open='.$booking_data_id.'">Task läuft</a></small>'; 
+    }
 } else {
     // only display surveys when user is stamped in
     $userHasUnansweredOnLoginSurveys = false;
@@ -759,7 +673,16 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 					  </a>
 					  <script>
 					  var firstTime = true;
-					  setInterval(function(){
+                      function displayNotificationIfEnabled(title, body){
+                        var notificationEnabled = <?php $result = $conn->query("SELECT new_message_notification FROM socialprofile WHERE userID = $userID AND new_message_notification = 'TRUE'"); echo $result && $result->num_rows > 0?"true":"false" ?>;
+                        if(notificationEnabled && window.Notification){
+                            var unreadMessageNotification = new Notification(title,{
+                                body: body,
+                                requireInteraction: true
+                            })
+                        }
+                      }
+                      setInterval(function(){
 						  $.ajax({
 							  url: 'ajaxQuery/AJAX_db_utility.php',
 							  type: 'POST',
@@ -773,7 +696,8 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 									  audioElement.play();
 								  }
 								  if(response && firstTime){
-									  firstTime = false;
+                                      displayNotificationIfEnabled("Sie haben eine neue Nachricht erhalten","Sie finden Sie in Ihrer Post")
+                                      firstTime = false;
 									  var newTitle = 'Ungelese Nachricht';
 									  setInterval(function(){
 										  var oldTitle = $(document).find('title').text();
@@ -822,7 +746,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       </div>
     <div class="panel-group" id="sidebar-accordion">
       <!-- Section One: CORE -->
-      <?php if ($user_roles['isCoreAdmin'] == 'TRUE'): ?>
+      <?php if (has_permission("READ", "CORE")): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading" role="tab">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-core"  id="adminOption_CORE"><i class="fa fa-caret-down pull-right"></i>
@@ -832,7 +756,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           <div id="collapse-core" role="tabpanel" class="panel-collapse collapse">
             <div class="panel-body">
               <ul class="nav navbar-nav">
-                  <li><a <?php if ($this_page == 'securitySettings.php') {echo $setActiveLink;}?> href="../system/security">Security</a></li>
+              <?php if(has_permission("READ","CORE","SECURITY")): ?><li><a <?php if ($this_page == 'securitySettings.php') {echo $setActiveLink;}?> href="../system/security">Security</a></li><? endif ?>
                   <li>
                       <a id="coreUserToggle" href="#" data-toggle="collapse" data-target="#toggleUsers" data-parent="#sidenav01" class="collapse in">
                           <span><?php echo $lang['USERS']; ?></span> <i class="fa fa-caret-down"></i>
@@ -960,7 +884,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <!-- Section Four: REPORTS    !! REMOVED 5aa0dafd9fbf0 !! -->
 
       <!-- Section Five: ERP -->
-      <?php if ($user_roles['isERPAdmin'] == 'TRUE'): ?>
+      <?php if (has_permission("READ", "ERP")): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading" role="tab">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-erp"  id="adminOption_ERP"><i class="fa fa-caret-down pull-right"></i><i class="fa fa-file-text-o"></i> ERP</a>
@@ -1096,7 +1020,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
         ?>
       <?php endif;?>
       <!-- Section Six: DSGVO -->
-      <?php if ($user_roles['isDSGVOAdmin'] == 'TRUE'): ?>
+      <?php if (has_permission("READ", "DSGVO") /* any read (or write) permission in dsgvo */): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading">
             <a data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-dsgvo"  id="adminOption_DSGVO"><i class="fa fa-caret-down pull-right"></i><strong style="padding: 0px 6px;"> § </strong>DSGVO</a>
@@ -1108,15 +1032,15 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                 if(count($available_companies) == 2){
                   $isActivePanel = true;
                   $isActive = ($isActivePanel && $this_page == 'dsgvo_view.php') ? $setActiveLink : "";
-                  echo '<li><a '.$isActive.' href="../dsgvo/documents?n='.$available_companies[1].'">'.$lang['DOCUMENTS'].'</a></li>';
+                  if(has_permission("READ","DSGVO","AGREEMENTS")) echo '<li><a '.$isActive.' href="../dsgvo/documents?n='.$available_companies[1].'">'.$lang['DOCUMENTS'].'</a></li>';
                   $isActive = ($isActivePanel && ($this_page == 'dsgvo_vv.php' || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php" || $this_page == 'dsgvo_data_matrix.php')) ? $setActiveLink : "";
-                  echo '<li><a '.$isActive.' href="../dsgvo/vv?n='.$available_companies[1].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
+                  if(has_permission("READ","DSGVO","PROCEDURE_DIRECTORY")) echo '<li><a '.$isActive.' href="../dsgvo/vv?n='.$available_companies[1].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
                   $isActive = ($isActivePanel && $this_page == 'dsgvo_mail.php') ? $setActiveLink : "";
-                  echo '<li><a '.$isActive.' href="../dsgvo/templates?n='.$available_companies[1].'">' .$lang['EMAIL_TEMPLATES']. '</a></li>';
+                  if(has_permission("READ","DSGVO","EMAIL_TEMPLATES")) echo '<li><a '.$isActive.' href="../dsgvo/templates?n='.$available_companies[1].'">' .$lang['EMAIL_TEMPLATES']. '</a></li>';
                   $isActive = ($isActivePanel && $this_page == 'dsgvo_training.php') ? $setActiveLink : "";
-                  echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$available_companies[1].'" >' .$lang["TRAINING"]. '</a></li>';
+                  if(has_permission("READ","DSGVO","TRAINING")) echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$available_companies[1].'" >' .$lang["TRAINING"]. '</a></li>';
                   $isActive = ($isActivePanel && $this_page == 'dsgvo_log.php') ? $setActiveLink : "";
-                  echo '<li><a '.$isActive.' href="../dsgvo/log?n='.$row['id'].'" >Logs</a></li>';
+                  if(has_permission("READ","DSGVO","LOGS")) echo '<li><a '.$isActive.' href="../dsgvo/log?n='.$row['id'].'" >Logs</a></li>';
                 } else {
                   $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
                   while($result && ($row = $result->fetch_assoc())){
@@ -1126,15 +1050,15 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     echo '<div class="collapse" id="tdsgvo-'.$row['id'].'" >';
                     echo '<ul class="nav nav-list">';
                     $isActive = ($isActivePanel && $this_page == 'dsgvo_view.php') ? $setActiveLink : "";
-                    echo '<li><a '.$isActive.' href="../dsgvo/documents?n='.$row['id'].'">'.$lang['DOCUMENTS'].'</a></li>';
+                    if(has_permission("READ","DSGVO","AGREEMENTS")) echo '<li><a '.$isActive.' href="../dsgvo/documents?n='.$row['id'].'">'.$lang['DOCUMENTS'].'</a></li>';
                     $isActive = ($isActivePanel && ($this_page == 'dsgvo_vv.php' || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php" || $this_page == 'dsgvo_data_matrix.php')) ? $setActiveLink : "";
-                    echo '<li><a '.$isActive.' href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
+                    if(has_permission("READ","DSGVO","PROCEDURE_DIRECTORY")) echo '<li><a '.$isActive.' href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
                     $isActive = ($isActivePanel && $this_page == 'dsgvo_mail.php') ? $setActiveLink : "";
-                    echo '<li><a '.$isActive.' href="../dsgvo/templates?n='.$row['id'].'">' .$lang['EMAIL_TEMPLATES']. '</a></li>';
+                    if(has_permission("READ","DSGVO","EMAIL_TEMPLATES")) echo '<li><a '.$isActive.' href="../dsgvo/templates?n='.$row['id'].'">' .$lang['EMAIL_TEMPLATES']. '</a></li>';
                     $isActive = ($isActivePanel && $this_page == 'dsgvo_training.php') ? $setActiveLink : "";
-                    echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$row['id'].'" >' .$lang['TRAINING']. '</a></li>';
+                    if(has_permission("READ","DSGVO","TRAINING")) echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$row['id'].'" >' .$lang['TRAINING']. '</a></li>';
                     $isActive = ($isActivePanel && $this_page == 'dsgvo_log.php') ? $setActiveLink : "";
-                    echo '<li><a '.$isActive.' href="../dsgvo/log?n='.$row['id'].'" >Logs</a></li>';
+                    if(has_permission("READ","DSGVO","LOGS")) echo '<li><a '.$isActive.' href="../dsgvo/log?n='.$row['id'].'" >Logs</a></li>';
                     echo '</ul></div></li>';
                   }
                 }

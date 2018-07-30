@@ -1,7 +1,7 @@
 <?php
 include dirname(__DIR__) . DIRECTORY_SEPARATOR . 'header.php';
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "misc" . DIRECTORY_SEPARATOR . "helpcenter.php";
-enableToDSGVO($userID);
+require_permission("READ","DSGVO","LOGS");
 
 $current_filter_scope = "all";
 $current_filter_short_description = "all";
