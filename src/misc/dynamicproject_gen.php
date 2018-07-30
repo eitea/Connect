@@ -16,8 +16,6 @@ if($x){
     $dynrow['projectstart'] = date('Y-m-d');
     $dynrow['projectpriority'] = 3;
     $dynrow['projectstatus'] = 'ACTIVE';
-    $dynrow['projectowner'] = $userID;
-    $dynrow['projectleader'] = ($isDynamicProjectsAdmin == 'TRUE') ? 0 : $userID;
     $dynrow_teams = array('teamid' => '');
     $dynrow_emps = array('userid' => '', 'position' => '');
     $dynrow['companyid'] = $_SESSION['filterings']['company'] ?? 0; //isset, or 0
@@ -145,20 +143,16 @@ if($x){
 					<?php echo asymmetric_encryption('TASK', $dynrow['projectdescription'], $userID, $privateKey, $dynrow['v2']); ?>
 				</textarea>
 				<br>
+				<label class="btn btn-default"><input type="file" name="newTaskFiles[]" style="display:none" multiple />Dateien Hochladen</label>
+				<br>
 			</div>
 			<div class="row">
 				<?php
-				$count = 0;
 				$result = $conn->query("SELECT uniqID, name, type FROM archive WHERE category = 'TASK' AND categoryID = '$x' ");
 				while($row = $result->fetch_assoc()){
-					$count++;
 					echo '<div class="col-sm-6 checkbox">
 					<label title="Löschen" onclick="$(this).parent().hide();"><input type="checkbox" name="deleteTaskFile[]" value="'.$row['uniqID'].'" style="visibility:hidden"/><i style="color:red" class="fa fa-times"></i></label> '
 					.$row['name'].'.'.$row['type'].'</div>'; //if checked -> delete;
-				}
-				while($count < 5){
-					echo '<div class="col-sm-6"><label class="btn btn-default">'. ++$count
-					.'. Datei Hochladen<input type="file" name="newTaskFiles[]" style="display:none" /></label></div>';
 				}
 				?>
 			</div>
@@ -218,13 +212,6 @@ if($x){
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-6">
-				<label><?php echo $lang["LEADER"]; ?></label>
-				<select class="select2-team-icons" name="leader">
-					<?php if($isDynamicProjectsAdmin == 'TRUE') echo '<option value="">...</option>'; ?>
-					<?php echo str_replace('<option value="'.$dynrow['projectleader'].'" ', '<option selected value="'.$dynrow['projectleader'].'" ', $modal_options); ?>
-				</select><br>
-			</div>
 			<div class="col-md-6">
 			<?php  if($isDynamicProjectsAdmin == 'TRUE'): ?>
 				<label><?php echo $lang["DYNAMIC_PROJECTS_PROJECT_OPTIONAL_EMPLOYEES"]; ?></label>

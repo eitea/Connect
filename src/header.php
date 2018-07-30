@@ -726,15 +726,14 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   <?php endif;?>
                   <?php
                   $result = $conn->query("SELECT DISTINCT d.projectid FROM dynamicprojects d
-					  LEFT JOIN dynamicprojectsemployees de ON de.projectid = d.projectid AND de.userid = $userID
+					  LEFT JOIN dynamicprojectsemployees de ON de.projectid = d.projectid AND de.userid = $userID AND de.position != 'owner'
                       LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid
 					  LEFT JOIN relationship_team_user rtu ON rtu.teamID = dynamicprojectsteams.teamid AND rtu.userID = $userID
                       WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).")
-					  AND d.projectstatus = 'ACTIVE' AND (d.projectleader = $userID OR de.userid IS NOT NULL OR rtu.userID IS NOT NULL)");
-                      echo $conn->error;
+					  AND d.projectstatus = 'ACTIVE' AND (de.userid IS NOT NULL OR rtu.userID IS NOT NULL)");
                       if (($result && $result->num_rows > 0) || $userHasSurveys || $user_roles['isDynamicProjectsAdmin'] || $user_roles['canCreateTasks']): ?>
                       <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view">
-						  <?php if($result->num_rows > 0) echo '<span class="pull-right"><small>'.$result->num_rows.'</small></span>'; ?>
+						  <?php  echo $conn->error; if($result->num_rows > 0) echo '<span class="pull-right"><small>'.$result->num_rows.'</small></span>'; ?>
                           <i class="fa fa-tasks"></i><?php echo $lang['DYNAMIC_PROJECTS']; ?>
                           <span title="Unread messages" id="projectMessagingBadge" class="badge pull-right" style="display: none; margin-right: 15px;"></span> <!-- separate badge for unread messages -->
                       </a></li>

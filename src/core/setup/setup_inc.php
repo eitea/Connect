@@ -1216,8 +1216,6 @@ function create_tables($conn) {
         projectstatus ENUM('ACTIVE', 'DEACTIVATED', 'DRAFT', 'COMPLETED', 'REVIEW') DEFAULT 'ACTIVE' NOT NULL,
         projectpriority INT(6),
         projectparent VARCHAR(100),
-        projectowner INT(6) UNSIGNED,
-        projectleader INT(6) UNSIGNED,
         projectnextdate VARCHAR(12),
         projectseries MEDIUMBLOB,
         projectpercentage INT(3) DEFAULT 0 NOT NULL,
@@ -1229,9 +1227,6 @@ function create_tables($conn) {
 		projectmailheader TEXT NOT NULL DEFAULT '',
 		v2 VARCHAR(150) DEFAULT NULL,
         FOREIGN KEY (companyid) REFERENCES companyData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-        FOREIGN KEY (projectowner) REFERENCES UserData(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
     );";
@@ -1282,6 +1277,23 @@ function create_tables($conn) {
         ON UPDATE CASCADE
         ON DELETE CASCADE
     )");
+
+	$sql = "CREATE TABLE dynamicprojectsnotes(
+		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        taskID VARCHAR(100) NOT NULL,
+		userID INT(6) UNSIGNED,
+        notedate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        notetext VARCHAR(1000) NOT NULL,
+        FOREIGN KEY (taskID) REFERENCES dynamicprojects(projectid)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+		FOREIGN KEY (userID) REFERENCES UserData(id)
+		ON UPDATE CASCADE
+		ON DELETE SET NULL
+      );";
+    if (!$conn->query($sql)) {
+        echo $conn->error;
+    }
 
     $sql = "CREATE TABLE document_customs(
         id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
