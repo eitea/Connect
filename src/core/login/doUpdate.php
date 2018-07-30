@@ -3312,6 +3312,9 @@ if($row['version'] < 166){
     $stmt_insert_permission_relationship = $conn->prepare("INSERT INTO relationship_access_permissions (userID, permissionID, type) VALUES (?, ?, ?)");
     echo $conn->error;
     $stmt_insert_permission_relationship->bind_param("iis", $uid, $permissionID, $type);
+    $user_result = $conn->query("SELECT userID, isERPAdmin, isDSGVOAdmin, isCoreAdmin FROM roles WHERE userID != 1");
+    echo $conn->error;
+    $user_roles = $user_result->fetch_all(MYSQLI_ASSOC);
     $permission_groups = [
       'CORE' => [
         'SECURITY',
@@ -3370,6 +3373,19 @@ if($row['version'] < 166){
         $permissionID = $stmt_insert_permission->insert_id;
         $stmt_insert_permission_relationship->execute();
         echo $stmt_insert_permission_relationship->error;
+        foreach($user_roles as $row){
+            $uid = $row["userID"]; // permissionID and type stay the same
+            if($group == "DSGVO" && $row["isDSGVOAdmin"] == "TRUE"){
+                $stmt_insert_permission_relationship->execute();
+                echo $stmt_insert_permission_relationship->error;
+            }else if ($group == "ERP" && $row["isERPAdmin"] == "TRUE"){
+                $stmt_insert_permission_relationship->execute();
+                echo $stmt_insert_permission_relationship->error;
+            }else if ($group == "CORE" && $row["isCoreAdmin"] == "TRUE"){
+                $stmt_insert_permission_relationship->execute();
+                echo $stmt_insert_permission_relationship->error;
+            }
+        }
       }
     }
     $stmt_insert_permission_relationship->close();

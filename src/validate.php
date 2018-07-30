@@ -4,9 +4,9 @@
  * Does nothing when user has permission. When the user doesn't have permission, 
  * a message and the footer are displayed and the script execution stops
  * 
- * @see has_permission, example: dsgvo_training.php
+ * @see has_permission, example: dsgvo_training.php, header.php
  */
-function require_permission($type, $group_name, $permission_name, $userID = false)
+function require_permission($type, $group_name, $permission_name = false, $userID = false)
 {
   if (!has_permission($type, $group_name, $permission_name, $userID)) {
     echo 'Access denied. <a href="../user/logout"> logout</a>';
@@ -25,7 +25,7 @@ function require_permission($type, $group_name, $permission_name, $userID = fals
  *                     when a user has ANY permission in that group
  * @param int|false $userID User ID; uses $_SESSION if false
  * 
- * @see example: dsgvo_training.php
+ * @see example: dsgvo_training.php, header.php
  */
 function has_permission($type, $group_name, $permission_name = false, $userID = false) : bool
 {
@@ -66,18 +66,9 @@ function has_permission($type, $group_name, $permission_name = false, $userID = 
   return $has_permission;
 }
 
-
 function enableToCore($userID){
-  global $conn;
-  if(!$conn) require 'connection.php'; //5ab9e57714ff6
-  $sql = "SELECT isCoreAdmin FROM roles WHERE userID = $userID AND isCoreAdmin = 'TRUE'";
-  $result = $conn->query($sql);
-  if($userID != 1 && (!$result || $result->num_rows <= 0)){
-    echo 'Access denied. <a href="../user/logout"> logout</a>';
-    include 'footer.php';
-    die();
+  require_permission("WRITE", "CORE");
   }
-}
 
 function enableToTime($userID){
   global $conn;
@@ -152,15 +143,7 @@ function enableToReport($userID){
 }
 
 function enableToERP($userID){
-  global $conn;
-  if(!$conn) require 'connection.php';
-  $sql = "SELECT isERPAdmin FROM roles WHERE userID = $userID AND isERPAdmin = 'TRUE'";
-  $result = $conn->query($sql);
-  if($userID != 1 && (!$result || $result->num_rows <= 0)){
-    echo 'Access denied. <a href="../user/logout"> logout</a>';
-    include 'footer.php';
-    die();
-  }
+  require_permission("WRITE", "ERP");
 }
 
 function enableToFinance($userID){
@@ -174,18 +157,6 @@ function enableToFinance($userID){
     die();
   }
 }
-
-// function enableToDSGVO($userID){ // replaced by permissions
-//   global $conn;
-//   if(!$conn) require 'connection.php';
-//   $sql = "SELECT isFinanceAdmin FROM roles WHERE userID = $userID AND isDSGVOAdmin = 'TRUE'";
-//   $result = $conn->query($sql);
-//   if($userID != 1 && (!$result || $result->num_rows <= 0)){
-//     echo 'Access denied. <a href="../user/logout"> logout</a>';
-//     include 'footer.php';
-//     die();
-//   }
-// }
 
 function enableToClients($userID){
     global $conn;

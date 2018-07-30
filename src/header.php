@@ -747,7 +747,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       </div>
     <div class="panel-group" id="sidebar-accordion">
       <!-- Section One: CORE -->
-      <?php if ($user_roles['isCoreAdmin'] == 'TRUE'): ?>
+      <?php if (has_permission("READ", "CORE")): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading" role="tab">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-core"  id="adminOption_CORE"><i class="fa fa-caret-down pull-right"></i>
@@ -885,7 +885,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
       <!-- Section Four: REPORTS    !! REMOVED 5aa0dafd9fbf0 !! -->
 
       <!-- Section Five: ERP -->
-      <?php if ($user_roles['isERPAdmin'] == 'TRUE'): ?>
+      <?php if (has_permission("READ", "ERP")): ?>
         <div class="panel panel-default panel-borderless">
           <div class="panel-heading" role="tab">
             <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-erp"  id="adminOption_ERP"><i class="fa fa-caret-down pull-right"></i><i class="fa fa-file-text-o"></i> ERP</a>

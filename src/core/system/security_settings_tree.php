@@ -40,7 +40,7 @@ $permission_groups = $result->fetch_all(MYSQLI_ASSOC);
 							?>
 							<div class="col-md-12"><small>*<?php echo $lang['INFO_COMPANYLESS_USERS']; ?></small></div>
                         </div>
-                        <h4>Berechtigungen <small>Momentan funktioniert nur CORE.SECURITY und DSGVO (<b>DSGVO Admin Modul muss momentan noch aktiv sein (wegen Verschlüsselung)</b>)</small></h4>
+                        <h4>Berechtigungen </h4><small>Momentan funktioniert nur <b>CORE.SECURITY</b> und <b>DSGVO</b> (<b>CORE</b> und <b>ERP</b> modulweit). <span style="color:red" >Wenn man ein beliebiges Modul bei <b>ERP</b>(WRITE) und <b>CORE</b>(WRITE) hat, ist momentan der gesamte Bereich für den User freigeschaltet.</span></small>
                         <?php 
                             foreach($permission_groups as $permission_group){
                                 $groupID = $permission_group["id"];
@@ -58,6 +58,15 @@ $permission_groups = $result->fetch_all(MYSQLI_ASSOC);
                                     $permissionID = $permission_row["id"];
                                     $read_checked = ($permission_row["type"] === 'READ'||$permission_row["type"] === 'WRITE')?"checked":"";
                                     $write_checked = ($permission_row["type"] === 'WRITE')?"checked":"";
+                                    
+                                    if($group_name == "DSGVO" && /*array_key_exists('DSGVO', $encrypted_modules)&&*/ !array_key_exists('DSGVO', $grantable_modules)){ 
+                                        $read_checked .= ' disabled';
+                                        $write_checked .= ' disabled';
+                                    } else if($group_name == "ERP" && /*array_key_exists('ERP', $encrypted_modules)&&*/ !array_key_exists('ERP', $grantable_modules)){
+                                        $read_checked .= ' disabled';
+                                        $write_checked .= ' disabled';
+                                    } 
+                                    
                                     if ($x == 1){
                                         $read_checked = "disabled checked";
                                         $write_checked = "disabled checked";
@@ -67,13 +76,25 @@ $permission_groups = $result->fetch_all(MYSQLI_ASSOC);
                             
                              <div class="col-md-6">
                                  <!-- data attributes are used for (un)checking permissions -->
-                            <input type="checkbox" data-write="#<?php echo "${x}_WRITE_${groupID}_${permissionID}"; ?>" id="<?php echo "${x}_READ_${groupID}_${permissionID}"; ?>" name="<?php echo "PERMISSION;".$groupID.";".$permissionID ?>" value="READ" <?php echo $read_checked ?>>
+                            <input 
+                            type="checkbox"  
+                            data-write="#<?php echo "${x}_WRITE_${groupID}_${permissionID}_${x}"; ?>" 
+                            id="<?php echo "${x}_READ_${groupID}_${permissionID}_${x}"; ?>" 
+                            name="<?php echo "PERMISSION;" . $groupID . ";" . $permissionID ?>" 
+                            value="READ"
+                            <?php echo $read_checked ?>>
                             <label>
                                     READ <?php echo $permission_name ?>
                                 </label>
                                 </div>
                                 <div class="col-md-6">
-                                <input type="checkbox" data-read="#<?php echo "${x}_READ_${groupID}_${permissionID}"; ?>" id="<?php echo "${x}_WRITE_${groupID}_${permissionID}"; ?>" name="<?php echo "PERMISSION;".$groupID.";".$permissionID ?>" value="WRITE" <?php echo $write_checked ?>>
+                                <input 
+                                type="checkbox" 
+                                data-read="#<?php echo "${x}_READ_${groupID}_${permissionID}_${x}"; ?>" 
+                                id="<?php echo "${x}_WRITE_${groupID}_${permissionID}_${x}"; ?>" 
+                                name="<?php echo "PERMISSION;" . $groupID . ";" . $permissionID ?>" 
+                                value="WRITE" 
+                                <?php echo $write_checked ?>>
                             <label>
                                      WRITE <?php echo $permission_name ?>
                                 </label>
@@ -110,22 +131,12 @@ $permission_groups = $result->fetch_all(MYSQLI_ASSOC);
                             </div>
                             <div class="col-md-3">
                                 <label>
-                                    <input type="checkbox" name="isERPAdmin" <?php if(!array_key_exists('ERP', $grantable_modules) && $row['isERPAdmin'] == 'FALSE'){ echo 'disabled';} elseif($row['isERPAdmin'] == 'TRUE'){echo 'checked';} ?> />ERP
-                                </label><br>
-                            </div>
-                            <div class="col-md-3">
-                                <label>
                                     <input type="checkbox" name="isDynamicProjectsAdmin" <?php if($row['isDynamicProjectsAdmin'] == 'TRUE'){echo 'checked';} ?>><?php echo $lang['DYNAMIC_PROJECTS']; ?>
                                 </label><br>
                             </div>
                             <div class="col-md-3">
                                 <label>
                                     <input type="checkbox" name="isFinanceAdmin" <?php if($row['isFinanceAdmin'] == 'TRUE'){echo 'checked';} ?> /><?php echo $lang['FINANCES']; ?>
-                                </label><br>
-                            </div>
-                            <div class="col-md-3">
-                                <label>
-                                    <input type="checkbox" name="isDSGVOAdmin" <?php if(!array_key_exists('DSGVO', $grantable_modules) && $row['isDSGVOAdmin'] == 'FALSE'){ echo 'disabled';} elseif($row['isDSGVOAdmin'] == 'TRUE'){echo 'checked';} ?> />DSGVO
                                 </label><br>
                             </div>
                             <div class="col-md-3">

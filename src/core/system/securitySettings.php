@@ -4,8 +4,8 @@
 <?php
 $activeTab = 0;
 $query_access_modules = array(
-    'DSGVO' => "isDSGVOAdmin = 'TRUE'",
-    'ERP' => "isERPAdmin = 'TRUE'"
+    'DSGVO' => "groups.name = 'DSGVO' AND (r.type = 'READ' OR r.type = 'WRITE')",
+    'ERP' => "groups.name = 'ERP' AND (r.type = 'READ' OR r.type = 'WRITE')"
 );
 $result = $conn->query("SELECT activeEncryption FROM configurationData");
 if(!$result) die($lang['ERROR_UNEXPECTED']);
@@ -26,27 +26,28 @@ while($row = $result->fetch_assoc()){
 	$grantable_modules[$row['module']]['public'] = $row['publicKey'];
 }
 
-if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['saveRoles']) && has_permission("WRITE","CORE","SECURITY")) {
-    $x = intval($_POST['saveRoles']);
-    if($x != 1){
-        $stmt_insert_permission_relationship = $conn->prepare("INSERT INTO relationship_access_permissions (userID, permissionID, type) VALUES (?, ?, ?)");
-        echo $conn->error;
-        $stmt_insert_permission_relationship->bind_param("iis", $x, $permissionID, $type);
-        $conn->query("DELETE FROM relationship_access_permissions WHERE userID = $x");
-        foreach ($_POST as $key => $type) {
-            if(str_starts_with("PERMISSION", $key)){
-                $arr = explode(";", $key);
-                // $groupID = intval($arr[1]);
-                $permissionID = intval($arr[2]);
-                $stmt_insert_permission_relationship->execute();
-                echo $stmt_insert_permission_relationship->error;
-            }        
-        }
-        $stmt_insert_permission_relationship->close();    
-    }
-}
-
 if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","CORE","SECURITY")){
+
+    if(!empty($_POST['saveRoles'])) {
+        $x = intval($_POST['saveRoles']);
+        if($x != 1){
+            $stmt_insert_permission_relationship = $conn->prepare("INSERT INTO relationship_access_permissions (userID, permissionID, type) VALUES (?, ?, ?)");
+            echo $conn->error;
+            $stmt_insert_permission_relationship->bind_param("iis", $x, $permissionID, $type);
+            $conn->query("DELETE FROM relationship_access_permissions WHERE userID = $x");
+            foreach ($_POST as $key => $type) {
+                if(str_starts_with("PERMISSION", $key)){
+                    $arr = explode(";", $key);
+                    // $groupID = intval($arr[1]);
+                    $permissionID = intval($arr[2]);
+                    $stmt_insert_permission_relationship->execute();
+                    echo $stmt_insert_permission_relationship->error;
+                }        
+            }
+            $stmt_insert_permission_relationship->close();    
+        }
+    }
+
     function secure_module($module, $symmetric, $decrypt = false){
         global $conn;
         if($module == 'DSGVO'){
@@ -241,7 +242,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","CORE","SECURI
 
                     if($accept){ //access
                         secure_module($module, $symmetric);
-                        $result = $conn->query("SELECT s.publicKey, s.userID FROM security_users s LEFT JOIN roles ON s.userID = roles.userID WHERE publicKey IS NOT NULL AND ".$query_access_modules[$module]); //TODO: rewrite for permissions
+                        $result = $conn->query("SELECT s.publicKey, s.userID FROM security_users s LEFT JOIN relationship_access_permissions r ON s.userID = r.userID LEFT JOIN access_permissions access ON r.permissionID = access.id LEFT JOIN access_permission_groups groups ON access.groupID = groups.id WHERE publicKey IS NOT NULL AND ".$query_access_modules[$module]." GROUP BY s.userID");
                         while($row = $result->fetch_assoc()){
                             $user_public = base64_decode($row['publicKey']);
                             $nonce = random_bytes(24);
@@ -319,13 +320,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","CORE","SECURI
 
     if(!empty($_POST['saveRoles'])){
         $activeTab = $x = intval($_POST['saveRoles']);
-        $isDSGVOAdmin = 'FALSE';
         $isCoreAdmin = isset($_POST['isCoreAdmin']) ? 'TRUE' : 'FALSE';
         $isDynamicProjectsAdmin = isset($_POST['isDynamicProjectsAdmin']) ? 'TRUE' : 'FALSE';
 		$isTimeAdmin = isset($_POST['isTimeAdmin']) ? 'TRUE' : 'FALSE';
         $isProjectAdmin = isset($_POST['isProjectAdmin']) ? 'TRUE' : 'FALSE';
         $isReportAdmin = isset($_POST['isReportAdmin']) ? 'TRUE' : 'FALSE';
-        $isERPAdmin = 'FALSE';
         $isFinanceAdmin = isset($_POST['isFinanceAdmin']) ? 'TRUE' : 'FALSE';
         $canStamp = isset($_POST['canStamp']) ? 'TRUE' : 'FALSE';
 		$canBook = isset($_POST['canBook']) ? 'TRUE' : 'FALSE'; //5afc1e6e44373
@@ -352,21 +351,35 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","CORE","SECURI
 				}
 			}
         }
-        
-        if(isset($_POST['isDSGVOAdmin'])){
-		// if(has_permission("READ", "DSGVO",false,$x) /* test if the user has any DSGVO read or write permissions */){
-			$isDSGVOAdmin = grantAccess('DSGVO', $x);
+        $remove_permission_stmt = $conn->prepare("DELETE FROM relationship_access_permissions WHERE userID = $x AND permissionID IN (SELECT permission.id FROM access_permissions permission INNER JOIN access_permission_groups groups ON groups.id = permission.groupID WHERE groups.name = ?)");
+        echo $conn->error;
+        $remove_permission_stmt->bind_param('s', $group_to_remove);
+        // if(isset($_POST['isDSGVOAdmin'])){
+		if(has_permission("READ", "DSGVO",false,$x) /* test if the user has any DSGVO read or write permissions */){
+            if(grantAccess('DSGVO', $x) !== "TRUE"){
+                echo "test1";
+                // remove permission if user doesn't have a key
+                $group_to_remove = "DSGVO";
+                $remove_permission_stmt->execute();
+                showError($conn->error);
+            }
 		} else {
 			$conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'DSGVO' AND userID = $x");
 		}
-		if(isset($_POST['isERPAdmin'])){
-			$isERPAdmin = grantAccess('ERP', $x);
+		if(has_permission("READ", "ERP",false,$x)) {
+			if(grantAccess('ERP', $x) !== "TRUE"){
+                echo "test2";
+                // remove permission if user doesn't have a key
+                $group_to_remove = "ERP";
+                $remove_permission_stmt->execute();
+                showError($conn->error);
+            }
 		} else {
 			$conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'ERP' AND userID = $x");
 		}
 
-		$conn->query("UPDATE roles SET isDSGVOAdmin = '$isDSGVOAdmin', isCoreAdmin = '$isCoreAdmin', isDynamicProjectsAdmin = '$isDynamicProjectsAdmin',
-			isTimeAdmin = '$isTimeAdmin', isProjectAdmin = '$isProjectAdmin', isReportAdmin = '$isReportAdmin', isERPAdmin = '$isERPAdmin', canBook = '$canBook',
+		$conn->query("UPDATE roles SET isCoreAdmin = '$isCoreAdmin', isDynamicProjectsAdmin = '$isDynamicProjectsAdmin',
+			isTimeAdmin = '$isTimeAdmin', isProjectAdmin = '$isProjectAdmin', isReportAdmin = '$isReportAdmin', canBook = '$canBook',
 			isFinanceAdmin = '$isFinanceAdmin', canStamp = '$canStamp', canEditTemplates = '$canEditTemplates', canEditClients = '$canEditClients',
 			canUseSocialMedia = '$canUseSocialMedia', canCreateTasks = '$canCreateTasks', canUseArchive = '$canUseArchive', canUseClients = '$canUseClients',
 			canUseSuppliers = '$canUseSuppliers', canEditSuppliers = '$canEditSuppliers', canUseWorkflow = '$canUseWorkflow', canSendToExtern = '$canSendToExtern'
