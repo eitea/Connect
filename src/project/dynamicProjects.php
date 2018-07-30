@@ -503,7 +503,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 	    $nonAdminQuery = '';
         if($user_roles['isDynamicProjectsAdmin'] == 'FALSE'){
 			foreach($available_teams as $val) $nonAdminQuery .= " OR conteamsids LIKE '% $val %' ";
-			$nonAdminQuery = "AND conemployees LIKE '% $userID %' $nonAdminQuery";
+			$nonAdminQuery = "AND (conemployees LIKE '% $userID %' $nonAdminQuery)";
         }
 
 		$stmt_employees = $conn->prepare("SELECT userid, position FROM dynamicprojectsemployees WHERE projectid = ?");
@@ -528,7 +528,9 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 			WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).") $nonAdminQuery $query_filter
 			ORDER BY workingUser DESC, projectpriority DESC, projectstatus, projectstart");
 		$result = $conn->query($sql);
-		//echo $sql;
+
+
+		echo $sql;
         echo $conn->error;
         while($result && ($row = $result->fetch_assoc())){
             $x = $row['projectid'];
