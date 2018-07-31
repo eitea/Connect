@@ -19,7 +19,7 @@
 				</ul>
 			</div>
 		</div>
-		<div class="panel-body scrollDown" style="height:40vh; overflow-y:auto;">
+		<div id="panel_openChat_<?php echo $openChatID; ?>" class="panel-body scrollDown" style="height:40vh; overflow-y:auto;">
 			<?php
 			$date = '';
 			$result_cw = $conn->query("SELECT * FROM (SELECT message, vKey, sentTime, m.type, rcp.partType, rcp.partID, rcp.status, rcp.lastCheck,
@@ -88,10 +88,11 @@
 		<?php endif; ?>
 	</form>
 	<script type="text/javascript">
-	$("#chat_message_<?php echo $openChatID; ?>").keypress(function (e) {
+	var index = <?php echo $openChatID; ?>;
+	$("#chat_message_"+index).keypress(function (e) {
 		if(e.which == 13) {
 			e.preventDefault();
-			$("#chat_send_<?php echo $openChatID; ?>").click();
+			$("#chat_send_"+index).click();
 		}
 	});
 	</script>

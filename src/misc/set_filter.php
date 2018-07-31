@@ -12,6 +12,7 @@
 * acceptance => status
 * requestType => type
 * tasks => status
+* taskview => 'default'
 * priority => int
 * employees => array<string>()
 **/
@@ -98,6 +99,14 @@ if(isset($_POST['set_filter_apply'])){ //NONE of these if's may have an else! (T
     if(isset($_POST['searchTask'])){
         $filterings['tasks'] = test_input($_POST['searchTask']);
     }
+	if(isset($filterings['taskview'])){
+		if(isset($_POST['searchTaskView'])){
+	        $filterings['taskview'] = 'default';
+	    } else {
+            $filterings['taskview'] = 'all';
+        }
+    }
+
     if(isset($_POST['searchPriority'])){
         $filterings['priority'] = intval($_POST['searchPriority']);
     }
@@ -280,8 +289,14 @@ if($scale > 2){ //3 columns
                   <option value="REVIEW_2" <?php if($filterings['tasks'] == 'REVIEW_2') echo 'selected'; ?>>Review (Inaktiv)</option>
                   <option value="COMPLETED" <?php if($filterings['tasks'] == 'COMPLETED') echo 'selected'; ?>>Abgeschlossen</option>
               </select>
-              <br><br>
-          <?php endif; ?>
+			  <?php
+			  if(isset($filterings['taskview'])){
+				  $selected = $filterings['taskview'] == 'default' ? 'checked' : '';
+				  echo '<input type="checkbox" name="searchTaskView" ',$selected,' value="default"> Übernommene Tasks verstecken';
+			  }
+			  ?>
+			  <br><br>
+		  <?php endif; ?>
           <?php if(isset($filterings['priority'])): ?>
               <label><?php echo $lang['DYNAMIC_PROJECTS_PROJECT_PRIORITY']; ?></label>
               <select name="searchPriority" class="js-example-basic-single">

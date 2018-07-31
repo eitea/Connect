@@ -8,7 +8,8 @@ include dirname(__DIR__) . '/header.php';
 require dirname(__DIR__) . "/misc/helpcenter.php";
 require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
 
-$currently_open_project_description /* for search and when clicking on 'task läuft' */ = isset($_GET["open"])?test_input($_GET["open"]):false;
+/* for search and when clicking on 'task läuft' */
+$currently_open_project_description = isset($_GET["open"]) ? test_input($_GET["open"]) : false;
 
 //$referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
 function generate_progress_bar($current, $estimate, Array $options = ['referenceTime' => 8]){
@@ -59,12 +60,7 @@ function generate_progress_bar($current, $estimate, Array $options = ['reference
     .'<div '.$redID.' data-toggle="tooltip" title="'.round($timeOver,2).' Stunden" class="progress-bar progress-bar-danger" style="height:10px;width:'.$redBar.'%"></div></div>';
 }
 $available_teams = array();
-$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', "priority" => 0, 'employees' => ["user;".$userID]); //set_filter requirement
-$result = $conn->query("SELECT teamID FROM relationship_team_user WHERE userID = $userID");
-while($result && ( $row = $result->fetch_assoc())){
-	$available_teams[] = $row['teamID'];
-    $filterings['employees'][] = 'team;'.$row['teamID'];
-}
+$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', 'taskview' => 'default', "priority" => 0, 'employees' => []);
 
 $templateResult = $conn->query("SELECT projectname,projectid,v2 FROM dynamicprojects WHERE isTemplate = 'TRUE'");
 ?>
@@ -90,10 +86,6 @@ $templateResult = $conn->query("SELECT projectname,projectid,v2 FROM dynamicproj
 		<?php endif; ?>
 	</div></h3></div>
 </div>
-
-//TODO: backend statusänderungen,
- statusänderungen gehören noch geloggt 5b45937468480
-
 
 <?php include __DIR__.'/taskTemplateEditor.php'; ?>
 <div class="page-content-fixed-100">
@@ -154,11 +146,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 		}
 	} elseif(!empty($_POST['take_task'])){
         $x = test_input($_POST['take_task'], true);
-        $conn->query("UPDATE dynamicprojectsemployees SET position = 'leader' WHERE userid = $userID AND projectid = '$x' AND position != 'owner'");
+        $conn->query("INSERT INTO dynamicprojectsemployees (position, userid, projectid) VALUES('leader', $userID, '$x')
+		ON DUPLICATE KEY UPDATE position = IF(position = 'owner', 'owner', 'leader')");
         if($conn->error){
             showError($conn->error);
         } else {
-            $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$x', 'DUTY', $userID)");
+			$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$x', 'DUTY', $userID)");
             showSuccess($lang['OK_ADD']);
         }
     } elseif(!empty($_POST['send_new_message']) && !empty($_POST['new_message_body'])){
@@ -544,7 +537,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 					if(isset($userID_toName[$row_emps['userid']])) $emps .= $userID_toName[$row_emps['userid']].',<br>';
 				}
 			}
-			if($leader && $user_roles['isDynamicProjectsAdmin'] == 'FALSE' && $leader != $userID) continue;
+			if($filterings['taskview'] == 'default' && $leader && $user_roles['isDynamicProjectsAdmin'] == 'FALSE' && $leader != $userID) continue;
 			if(!$owner){ //has to always exist
 				$conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES('$x', 1, 'owner') ON DUPLICATE KEY UPDATE position = 'owner'");
 				$owner = 1;
@@ -568,8 +561,19 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             echo '<td>'.$A.'</td>';
             echo '<td>'.$B.'</td>';
             echo '<td>';
-
-            if($row['workingUser']){ echo 'WORKING<br><small>'.$userID_toName[$row['workingUser']].'</small>'; } else { echo $row['projectstatus']; }
+            if($row['workingUser']){
+				echo 'WORKING<br><small>'.$userID_toName[$row['workingUser']].'</small>';
+			} elseif($row['projectstatus'] == 'COMPLETED') {
+				echo 'FINISHED';
+			} elseif(!$leader && !$row['projectpercentage']){
+				echo 'UNASSIGNED';
+			} elseif($leader == $userID) {
+				echo 'ACTIVE';
+			} elseif($row['projectstatus'] == 'ACTIVE') {
+				echo 'TAKEN';
+			} else {
+				echo $row['projectstatus'];
+			}
             if($row['projectstatus'] != 'COMPLETED'){ echo ' ('.$row['projectpercentage'].'%)'; }
             echo '<br><small style="color:transparent;">'.$x.'</small>';
             echo '</td>';
