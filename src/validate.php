@@ -4,15 +4,20 @@
  * Does nothing when user has permission. When the user doesn't have permission, 
  * a message and the footer are displayed and the script execution stops
  * 
+ * @param string $type 'READ' or 'WRITE'
+ * @param string|false $permission_name Permission name. If false, require_permission allows users 
+ *                     who have ANY permission in that group
+ * @param int|false $userID User ID; uses $_SESSION if false
+ * 
  * @see has_permission, example: dsgvo_training.php, header.php
  */
-function require_permission($type, $group_name, $permission_name = false, $userID = false)
+function require_permission($type, $group_name, $permission_name = false, $userID = false, $include_footer = true)
 {
   if (!has_permission($type, $group_name, $permission_name, $userID)) {
     echo 'Access denied. <a href="../user/logout"> logout</a>';
     $type = strtolower($type);
-    showError("You don't have permission to ${type} $group_name $permission_name (<a href='#' onclick='window.history.back()'>go back</a> or <a href='../user/logout'>logout</a>)");
-    include 'footer.php';
+    if(function_exists("showError")) showError("You don't have permission to ${type} $group_name $permission_name (<a href='#' onclick='window.history.back()'>go back</a> or <a href='../user/logout'>logout</a>)");
+    if($include_footer) include 'footer.php';
     die();
   }
 }
@@ -67,7 +72,7 @@ function has_permission($type, $group_name, $permission_name = false, $userID = 
 }
 
 function enableToCore($userID){
-  require_permission("WRITE", "CORE");
+  require_permission("WRITE", "CORE", false, $userID);
   }
 
 function enableToTime($userID){
@@ -143,7 +148,7 @@ function enableToReport($userID){
 }
 
 function enableToERP($userID){
-  require_permission("WRITE", "ERP");
+  require_permission("WRITE", "ERP", false, $userID);
 }
 
 function enableToFinance($userID){
