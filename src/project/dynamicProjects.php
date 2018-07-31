@@ -61,7 +61,12 @@ function generate_progress_bar($current, $estimate, Array $options = ['reference
 }
 $available_teams = array();
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', 'taskview' => 'default', "priority" => 0, 'employees' => []);
-
+//$filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "project" => 0, 'tasks' => 'ACTIVE', "priority" => 0, 'employees' => ["user;".$userID]); //set_filter requirement
+$result = $conn->query("SELECT teamID FROM relationship_team_user WHERE userID = $userID");
+while($result && ( $row = $result->fetch_assoc())){
+	$available_teams[] = $row['teamID'];
+    $filterings['employees'][] = 'team;'.$row['teamID'];
+}
 $templateResult = $conn->query("SELECT projectname,projectid,v2 FROM dynamicprojects WHERE isTemplate = 'TRUE'");
 ?>
 <div class="page-header-fixed">
