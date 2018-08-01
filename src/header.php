@@ -698,19 +698,19 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     echo create_menu(["children" => [
                         "OVERVIEW" => [
                             "href" => "user/home",
-                            "icon" => "fa fa-home",
+                            "icon" => "fa fa-fw fa-home",
                         ],
                         "VIEW_TIMESTAMPS" => [
                             "href" => "user/time", // canStamp missing
-                            "icon" => "fa fa-clock-o"
+                            "icon" => "fa fa-fw fa-clock-o"
                         ],
                         "REQUESTS" => [
                             "href" => "user/request",
-                            "icon" => "fa fa-calendar-plus-o"
+                            "icon" => "fa fa-fw fa-calendar-plus-o"
                         ],
                         "MESSAGING" => [
                             "href" => "social/post",
-                            "icon" => "fa fa-commenting-o",
+                            "icon" => "fa fa-fw fa-commenting-o",
                             "badge" => [
                                 "count" => getUnreadMessages(), // initial count, replaced with "" if it is 0 or "0"
                                 "id" => "chat_unread_message"
@@ -719,28 +719,28 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                         "PROJECTS" => [
                             "show" => $show_projects_menu_item, // manually control existence
                             "href" => "project/public",
-                            "icon" => "fa fa-tags",
+                            "icon" => "fa fa-fw fa-tags",
                             "badge" => [
                                 "count" => $projects_menu_item_badge
                             ]
                         ],
                         "BOOK_PROJECTS" => [
                             "show" => $user_roles['canBook'] == 'TRUE' && $showProjectBookingLink,
-                            "icon" => "fa fa-bookmark",
+                            "icon" => "fa fa-fw fa-bookmark",
                             "href" => "user/book"
                         ],
                         "DYNAMIC_PROJECTS" => [
-                            "icon" => "fa fa-tasks",
+                            "icon" => "fa fa-fw fa-tasks",
                             "href" => "dynamic-projects/view",
 
                         ],
                         "ADDRESS_BOOK" => [
                             "show" => ($user_roles['canUseClients'] == 'TRUE' || $user_roles['canEditClients'] == 'TRUE' || $user_roles['canUseSuppliers'] == 'TRUE' || $user_roles['canEditSuppliers'] == 'TRUE'),
                             "href" => "system/clients",
-                            "icon" => "fa fa-file-text-o",
+                            "icon" => "fa fa-fw fa-file-text-o",
                         ],
                         "ADMIN_CORE_OPTIONS" => [
-                            "icon" => "fa fa-gear",
+                            "icon" => "fa fa-fw fa-gear",
                             "children" => [
                                 "Security" => ["href" => "system/security", ],
                                 "USERS" => [
@@ -786,7 +786,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             ],
                         ],
                         "ADMIN_TIME_OPTIONS" => [
-                            "icon" => "fa fa-history",
+                            "icon" => "fa fa-fw fa-history",
                             "children" => [
                                 $lang["TIMES"] . " " . $lang["OVERVIEW"] => ["href" => "time/view", ],
                                 "CORRECTION" => ["href" => "time/corrections", ],
@@ -796,7 +796,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             ]
                         ],
                         "PROJECTS" => [
-                            "icon" => "fa fa-tags",
+                            "icon" => "fa fa-fw fa-tags",
                             "children" => [
                                 "PROJECTS" => ["href" => "project/view", ],
                                 "PROJECT_LOGS" => ["href" => "project/log", ],
@@ -804,7 +804,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             ]
                         ],
                         "ERP" => [
-                            "icon" => "fa fa-file-text-o",
+                            "icon" => "fa fa-fw fa-file-text-o",
                             "children" => [
                                 "PROCESS" => ["href" => "erp/view", ],
                                 "CLIENTS" => [
@@ -858,14 +858,14 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             ]
                         ],
                         "FINANCES" => [
-                            "icon" => "fa fa-book",
+                            "icon" => "fa fa-fw fa-book",
                             "children" => [
                                 "TAX_RATES" => ["href" => "erp/taxes"]
                             ],
                             "company_children_callback" => $finances_company_children_callback // this function is called for every company separately. it has to return an array one would usually put in company_children 
                         ],
                         "DSGVO" => [
-                            "icon_raw" => "<strong class='pull-left' style='padding: 0px 6px;'> § </strong>",
+                            "icon_raw" => "<i class='pull-left fa fa-fw' style='padding: 0px 6px;'><strong>§</strong></i>", // this is not a font awesome icon, but we need fa-fw (fixed width)
                             "company_children" => [
                                 "DOCUMENTS" => ["href" => "dsgvo/documents"],
                                 "PROCEDURE_DIRECTORY" => [
@@ -881,7 +881,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             ]
                         ],
                         "ARCHIVE" => [
-                            "icon" => "fa fa-folder-open-o",
+                            "icon" => "fa fa-fw fa-folder-open-o",
                             "children" => [
                                 "SHARE" => ["href" => "archive/share"],
                                 "PRIVATE" => ["href" => "archive/private"],
