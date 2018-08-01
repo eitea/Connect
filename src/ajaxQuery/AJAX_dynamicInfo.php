@@ -130,6 +130,7 @@ echo $conn->error;
 if (sizeof($missingBookingsArray) == 0) {
     $showMissingBookings = false;
 }
+
 $archiveResult = $conn->query("SELECT uniqID, name, uploadDate, type FROM archive WHERE category = 'TASK' AND categoryID = '$x'");
 $messageResult = $conn->query("SELECT id FROM messenger_conversations WHERE category='task' AND categoryID='$x'");
 ?>
@@ -209,23 +210,34 @@ $messageResult = $conn->query("SELECT id FROM messenger_conversations WHERE cate
 				</div>
                 <div id="projectDescription<?php echo $x; ?>" class="tab-pane fade in active"><br>
                     <?php
-                    // $micro = $conn->query("SELECT * FROM microtasks WHERE projectid = '$x'");
-                    // if($micro && $micro->num_rows > 0){
-                    //     while($nextmtask = $micro->fetch_assoc()){
-                    //         if($nextmtask['ischecked'] == 'TRUE'){
-                    //             $mtaskid = $nextmtask['microtaskid'];
-                    //             $description = preg_replace("/id=.$mtaskid./","id=\"$mtaskid\" checked",$description);
-                    //             $user = $nextmtask['finisher'];
-                    //             $username = $conn->query("SELECT CONCAT(firstname,CONCAT(' ',lastname)) AS name FROM userdata WHERE id = '$user'");
-                    //             if($username){
-                    //                 $username = $username->fetch_assoc()['name'];
-                    //                 $description = preg_replace("/id=.$mtaskid. checked disabled title=../","id=\"$mtaskid\" checked disabled title=\"$username\"",$description);
-                    //             }
-                    //         }
-                    //     }
-                    // }
                     echo $description;
+					$result = $conn->query("SELECT userID, notedate, notetext, firstname, lastname FROM dynamicprojectsnotes
+						LEFT JOIN UserData ON UserData.id = userID WHERE taskID = '$x'"); echo $conn->error;
+					if($result && $result->num_rows > 0):
                     ?>
+					<hr>
+					<h4>Notizen</h4>
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th>Benutzer</th>
+								<th>Datum</th>
+								<th>Notiz</th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php
+							while($row = $result->fetch_assoc()){
+								echo '<tr>';
+								echo '<td>',$row['firstname'],' ',$row['lastname'],'</td>';
+								echo '<td>',date('d.m.Y H:i', strtotime(carryOverAdder_Hours($row['notedate'], $timeToUTC))),'</td>';
+								echo '<td>',$row['notetext'],'</td>';
+								echo '</tr>';
+							}
+							?>
+						</tbody>
+					</table>
+					<?php endif; ?>
                 </div>
                 <div id="projectInfoBookings<?php echo $x; ?>" class="tab-pane fade"><br>
                     <table class="table table-hover">
@@ -264,16 +276,18 @@ $messageResult = $conn->query("SELECT id FROM messenger_conversations WHERE cate
                                 <th>Zeit <small>(System-Zeit)</small></th>
                                 <th>Benutzer</th>
                                 <th>Aktivität</th>
+								<th>Notiz</th>
                         </tr></thead>
                         <tbody>
                             <?php
-                            $result = $conn->query("SELECT firstname, lastname, p.activity, logTime FROM dynamicprojectslogs p LEFT JOIN UserData ON p.userID = UserData.id WHERE projectid = '$x'");
+                            $result = $conn->query("SELECT firstname, lastname, p.activity, logTime, extra1, extra2 FROM dynamicprojectslogs p LEFT JOIN UserData ON p.userID = UserData.id WHERE projectid = '$x'");
                             echo $conn->error;
                             while($result && ($row = $result->fetch_assoc())){
                                 echo '<tr>';
                                 echo '<td>'.$row['logTime'].'</td>';
                                 echo '<td>'.$row['firstname'].' '.$row['lastname'].'</td>';
                                 echo '<td>'.$row['activity'].'</td>';
+								echo '<td>'.$row['extra1'].' - '.$row['extra2'].'</td>';
                                 echo '</tr>';
                             }
                             ?>

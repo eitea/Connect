@@ -59,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 				FROM messenger_messages m
 				INNER JOIN relationship_conversation_participant rcp ON rcp.id = m.participantID AND rcp.conversationID = $conversationID
 				LEFT JOIN archive ON m.message = archive.uniqID
-				WHERE m.sentTime >= (SELECT lastCheck FROM relationship_conversation_participant rcp2 WHERE rcp2.conversationID = rcp.conversationID
+				WHERE m.sentTime > (SELECT lastCheck FROM relationship_conversation_participant rcp2 WHERE rcp2.conversationID = rcp.conversationID
 				AND rcp2.status != 'exited' AND rcp2.partType = 'USER' AND rcp2.partID = '$userID')
 				ORDER BY m.sentTime DESC) AS tbl ORDER BY tbl.sentTime ASC");
 				echo $conn->error;

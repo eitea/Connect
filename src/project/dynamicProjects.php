@@ -141,7 +141,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             showError('Datum ungültig. Format YYYY-MM-DD HH:mm');
         }
     } elseif(!empty($_POST['add-note']) && !empty($_POST['add-note-text'])){
-		$x = test_input($_POST['note'], true);
+		$x = test_input($_POST['add-note'], true);
 		$val = test_input($_POST['add-note-text']);
 		$conn->query("INSERT INTO dynamicprojectsnotes(taskID, userID, notetext) VALUES('$x', '$userID', '$val')");
 		if($conn->error){
@@ -152,11 +152,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 	} elseif(!empty($_POST['take_task'])){
         $x = test_input($_POST['take_task'], true);
         $conn->query("INSERT INTO dynamicprojectsemployees (position, userid, projectid) VALUES('leader', $userID, '$x')
-		ON DUPLICATE KEY UPDATE position = IF(position = 'owner', 'owner', 'leader')");
+			ON DUPLICATE KEY UPDATE position = IF(position = 'owner', 'owner', 'leader')");
         if($conn->error){
             showError($conn->error);
         } else {
-			$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$x', 'DUTY', $userID)");
+			$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$x', 'TAKEOVER', $userID)");
             showSuccess($lang['OK_ADD']);
         }
     } elseif(!empty($_POST['send_new_message']) && !empty($_POST['new_message_body'])){
@@ -285,6 +285,26 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             showError('<strong>Project not Available.</strong> '.$lang['ERROR_STRIKE']);
         }
     }
+	if(!empty($_POST['change-status']) && !empty($_POST['change-status-assigned-user']) && !empty($_POST['change-status-status']) && !empty($_POST['change-status-note'])){
+		$val = test_input($_POST['change-status']);
+		$note = test_input($_POST['change-status-note']);
+		$newUser = intval($_POST['change-status-assigned-user']);
+
+		$conn->query("DELETE FROM dynamicprojectsemployees WHERE position = 'leader' AND projectid = '$val'");
+		$err = $conn->error;
+		$conn->query("INSERT INTO dynamicprojectsemployees (position, userid, projectid) VALUES('leader', $newUser, '$val')
+			ON DUPLICATE KEY UPDATE position = IF(position = 'owner', 'owner', 'leader')");
+		$err .= $conn->error;
+		$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID, extra1, extra2) VALUES('$val', 'STATECHANGE', $userID, '".$userID_toName[$newUser]."', '$note')");
+		$err .= $conn->error;
+		if($err){
+			showError($err);
+		} else {
+			showSuccess('Status wurde auf '.$userID_toName[$newUser].' Übertragen');
+		}
+	} elseif(isset($_POST['change-status'])){
+		showError($lang['ERROR_MISSING_FIELDS']);
+	}
     if($user_roles['isDynamicProjectsAdmin'] == 'TRUE' || $user_roles['canCreateTasks'] == 'TRUE'){
         if(!empty($_POST['deleteProject'])){
             $val = test_input($_POST['deleteProject']);
@@ -629,7 +649,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 			//5b45d4ae6b4cc
 			echo "<li><button type='button' data-toggle='modal' data-chatid='$x' data-target='#add-note-modal' class='btn btn-link'><i class='fa fa-sticky-note-o'></i> Notiz anheften</button></li>";
 			//5b45cfa8a0bd0
-			echo "<li><button type='button' data-toggle='modal' data-chatid='$x' data-target='#change-status-modal' class='btn btn-link'><i class='fa fa-random'></i> Status Ändern</button></li>";
+			echo "<li><button type='button' data-leader='$leader' data-status='{$row['projectstatus']}' data-toggle='modal' data-chatid='$x' data-target='#change-status-modal' class='btn btn-link'><i class='fa fa-random'></i> Status Ändern</button></li>";
 			echo '</ul></div>';
 
 			if($filterings['tasks'] == 'ACTIVE_PLANNED') echo '<label><input type="checkbox" name="icalID[]" value="'.$x.'" checked /> .ical</label>';
@@ -715,10 +735,10 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 			<div class="modal-body">
 				<label>Status</label>
 				<select class="js-example-basic-single" name="change-status-status">
-					<option value="ASSIGNED">Assigned</option>
+					<option value="ACTIVE">Assigned</option>
 					<option value="REVIEW">Review</option>
-					<option value="DELAY">Delay</option>
-					<option value="FINISHED">Finished</option>
+					<option value="DEACTIVATED">Delay</option>
+					<option value="COMPLETED">Finished</option>
 				</select><br>
 				<br>
 				<div id="change-status-assigned-user">
@@ -741,7 +761,6 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 		</div>
 	</form>
 </div>
-
 
 <div id="editingModalDiv">
 	<div id="play-take" class="modal fade" style="z-index:1500;">
@@ -1185,8 +1204,10 @@ $(document).ready(function() {
 	  $(this).find('button[name=task-plan]').val(index);
 	});
 	$('#change-status-modal').on('show.bs.modal', function (event) {
-	  var index = $(event.relatedTarget).data('chatid');
-	  $(this).find('button[name=change-status]').val(index);
+	  var button = $(event.relatedTarget);
+	  $(this).find('button[name=change-status]').val(button.data('chatid'));
+	  $(this).find('select[name=change-status-assigned-user]').val(button.data('leader')).trigger('change');
+	  $(this).find('select[name=change-status-status]').val(button.data('status')).trigger('change');
 	});
 	$('#add-note-modal').on('show.bs.modal', function (event) {
 	  var index = $(event.relatedTarget).data('chatid');
