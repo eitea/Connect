@@ -119,7 +119,7 @@ if (isset($_POST["english"])) {
 if (isset($_POST["advanced"])) {
     $advanced = $_POST["advanced"] == "true";
 }
-
+// todo: use definitions used for create_menu (header) to generate routes (and apply permissions)
 $routes = array();
 $routesENG = array();
 $routesGER = array();
@@ -129,9 +129,8 @@ $routesENG[] = array("name" => "My Times", "url" => "../user/time", "tags" => ar
 $routesGER[] = array("name" => "Meine Zeiten", "url" => "../user/time", "tags" => array("Monatsbericht"));
 $routesENG[] = array("name" => "Request", "url" => "../user/request");
 $routesGER[] = array("name" => "Anträge", "url" => "../user/request", "tags" => array("Antrag stellen"));
-//TODO: Add Tags
-$routesENG[] = array("name"=>"Request", "url"=>"../social/post");
-$routesGER[] = array("name"=>"Anträge", "url"=>"../social/post");
+$routesENG[] = array("name" => "Post", "url"=>"../social/post", "tags" => array("Messages"));
+$routesGER[] = array("name" => "Post", "url"=>"../social/post", "tags" => array("Nachrichten"));
 $routesENG[] = array("name" => "Book Projects", "url" => "../user/book", "tags" => array("Booking"));
 $routesGER[] = array("name" => "Projekte buchen", "url" => "../user/book", "tags" => array("Buchungen"));
 $routesENG[] = array("name" => "Suppliers", "url" => "../erp/suppliers", "tags" => array("Supplier List"));
@@ -211,28 +210,28 @@ foreach ($available_companies as $company) {
     $name = $company["name"];
     $routesENG[] = array("name" => "Clients ($name)", "url" => "../system/clients?t=$companyID", "tags" => array("Client List"));
     $routesGER[] = array("name" => "Kundenliste ($name)", "url" => "../system/clients?t=$companyID", "tags" => array("Kunden"));
-    $routesENG[] = array("name" => "Agreements ($name)", "url" => "../dsgvo/documents?n=$companyID", "tags" => array("DSGVO Documents"));
-    $routesGER[] = array("name" => "Vereinbarungen ($name)", "url" => "../dsgvo/documents?n=$companyID", "tags" => array("DSGVO Vereinbarungen"));
-    $routesENG[] = array("name" => "Procedure Directory ($name)", "url" => "../dsgvo/vv?n=$companyID", "tags" => array("DSGVO Procedures"));
-    $routesGER[] = array("name" => "Verfahrensverzeichnis ($name)", "url" => "../dsgvo/vv?n=$companyID", "tags" => array("DSGVO Verfahren", "VV"));
-    $routesENG[] = array("name" => "Email Templates ($name)", "url" => "../dsgvo/templates?n=$companyID", "tags" => array("DSGVO Emails"));
-    $routesGER[] = array("name" => "Email Vorlagen ($name)", "url" => "../dsgvo/templates?n=$companyID", "tags" => array("DSGVO Emails", "DSGVO Vorlagen"));
-    $routesENG[] = array("name" => "Data Matrix ($name)", "url" => "../dsgvo/data-matrix?n=$companyID", "tags" => array("DSGVO Data Matrix", "DSGVO Templates" ));
-    $routesGER[] = array("name" => "Datenmatrix ($name)", "url" => "../dsgvo/data-matrix?n=$companyID", "tags" => array("DSGVO Datenmatrix", "DSGVO Vorlagen"));
-    $routesENG[] = array("name" => "Procedure Directory - Templates ($name)", "url" => "../dsgvo/vtemplates?n=$companyID", "tags" => array("DSGVO Procedure Templates"));
-    $routesGER[] = array("name" => "Verfahrensverzeichnis - Templates ($name)", "url" => "../dsgvo/vtemplates?n=$companyID", "tags" => array("DSGVO Verfahrensverzeichnis Vorlagen"));
-    $routesENG[] = array("name" => "Trainings ($name)", "url" => "../dsgvo/training?n=$companyID", "tags" => array("DSGVO Trainings"));
-    $routesGER[] = array("name" => "Schulungen ($name)", "url" => "../dsgvo/training?n=$companyID", "tags" => array("DSGVO Schulungen"));
+    $routesENG[] = array("name" => "Agreements ($name)", "url" => "../dsgvo/documents?cmp=$companyID", "tags" => array("DSGVO Documents"));
+    $routesGER[] = array("name" => "Vereinbarungen ($name)", "url" => "../dsgvo/documents?cmp=$companyID", "tags" => array("DSGVO Vereinbarungen"));
+    $routesENG[] = array("name" => "Procedure Directory ($name)", "url" => "../dsgvo/vv?cmp=$companyID", "tags" => array("DSGVO Procedures"));
+    $routesGER[] = array("name" => "Verfahrensverzeichnis ($name)", "url" => "../dsgvo/vv?cmp=$companyID", "tags" => array("DSGVO Verfahren", "VV"));
+    $routesENG[] = array("name" => "Email Templates ($name)", "url" => "../dsgvo/templates?cmp=$companyID", "tags" => array("DSGVO Emails"));
+    $routesGER[] = array("name" => "Email Vorlagen ($name)", "url" => "../dsgvo/templates?cmp=$companyID", "tags" => array("DSGVO Emails", "DSGVO Vorlagen"));
+    $routesENG[] = array("name" => "Data Matrix ($name)", "url" => "../dsgvo/data-matrix?cmp=$companyID", "tags" => array("DSGVO Data Matrix", "DSGVO Templates" ));
+    $routesGER[] = array("name" => "Datenmatrix ($name)", "url" => "../dsgvo/data-matrix?cmp=$companyID", "tags" => array("DSGVO Datenmatrix", "DSGVO Vorlagen"));
+    $routesENG[] = array("name" => "Procedure Directory - Templates ($name)", "url" => "../dsgvo/vtemplates?cmp=$companyID", "tags" => array("DSGVO Procedure Templates"));
+    $routesGER[] = array("name" => "Verfahrensverzeichnis - Templates ($name)", "url" => "../dsgvo/vtemplates?cmp=$companyID", "tags" => array("DSGVO Verfahrensverzeichnis Vorlagen"));
+    $routesENG[] = array("name" => "Trainings ($name)", "url" => "../dsgvo/training?cmp=$companyID", "tags" => array("DSGVO Trainings"));
+    $routesGER[] = array("name" => "Schulungen ($name)", "url" => "../dsgvo/training?cmp=$companyID", "tags" => array("DSGVO Schulungen"));
     $routesENG[] = array("name" => "Edit Company ($name)", "url" => "../system/company?cmp=$companyID", "tags" => array("Companies"));
     $routesGER[] = array("name" => "Mandant Bearbeiten ($name)", "url" => "../system/company?cmp=$companyID", "tags" => array("Mandanten"));
-    $routesENG[] = array("name" => "Account Plan ($name)", "url" => "../finance/plan?n=$companyID", "tags" => array("Finances"));
-    $routesGER[] = array("name" => "Kontenplan ($name)", "url" => "../finance/plan?n=$companyID", "tags" => array("Finanzen"));
-    $routesENG[] = array("name" => "Accounting Journal ($name)", "url" => "../finance/journal?n=$companyID", "tags" => array("Finances"));
-    $routesGER[] = array("name" => "Buchungsjournal ($name)", "url" => "../finance/journal?n=$companyID", "tags" => array("Finanzen", "Buchungen"));
+    $routesENG[] = array("name" => "Account Plan ($name)", "url" => "../finance/plan?cmp=$companyID", "tags" => array("Finances"));
+    $routesGER[] = array("name" => "Kontenplan ($name)", "url" => "../finance/plan?cmp=$companyID", "tags" => array("Finanzen"));
+    $routesENG[] = array("name" => "Accounting Journal ($name)", "url" => "../finance/journal?cmp=$companyID", "tags" => array("Finances"));
+    $routesGER[] = array("name" => "Buchungsjournal ($name)", "url" => "../finance/journal?cmp=$companyID", "tags" => array("Finanzen", "Buchungen"));
     $routesENG[] = array("name" => "Articles ($name)", "url" => "../erp/articles?cmp=$companyID", "tags" => array("ERP Articles"));
     $routesGER[] = array("name" => "Artikel ($name)", "url" => "../erp/articles?cmp=$companyID", "tags" => array("ERP Artikel"));
-    $routesENG[] = array("name" => "DSGVO Logs ($name)", "url" => "../dsgvo/log?n=$companyID", "tags" => array("Training Logs", "Procedure Directory Logs"));
-    $routesGER[] = array("name" => "DSGVO Logs ($name)", "url" => "../dsgvo/log?n=$companyID", "tags" => array("Schulung Logs", "Verfahrensverzeichnis Logs"));
+    $routesENG[] = array("name" => "DSGVO Logs ($name)", "url" => "../dsgvo/log?cmp=$companyID", "tags" => array("Training Logs", "Procedure Directory Logs"));
+    $routesGER[] = array("name" => "DSGVO Logs ($name)", "url" => "../dsgvo/log?cmp=$companyID", "tags" => array("Schulung Logs", "Verfahrensverzeichnis Logs"));
 }
 
 if ($advanced && $enableToAdvancedSearch) { // todo: search should be done in the database itself in future versions
@@ -280,8 +279,8 @@ if ($advanced && $enableToAdvancedSearch) { // todo: search should be done in th
         $name = $training["name"];
         $id = $training["id"];
         $companyID = $training["company"];
-        $routesENG[] = array("name" => "Trainings ($name)", "url" => "../dsgvo/training?n=$companyID&trainingid=$id");
-        $routesGER[] = array("name" => "Schulungen ($name)", "url" => "../dsgvo/training?n=$companyID&trainingid=$id");
+        $routesENG[] = array("name" => "Trainings ($name)", "url" => "../dsgvo/training?cmp=$companyID&trainingid=$id");
+        $routesGER[] = array("name" => "Schulungen ($name)", "url" => "../dsgvo/training?cmp=$companyID&trainingid=$id");
     }
     foreach ($tasks as $task) {
         $name = $task["name"];

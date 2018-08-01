@@ -2,14 +2,14 @@
 include dirname(__DIR__) . '/header.php'; 
 require_permission("READ","DSGVO","AGREEMENTS");
 require dirname(__DIR__) . "/misc/helpcenter.php";
-if (empty($_GET['n']) || !in_array($_GET['n'], $available_companies)) { //eventually STRIKE
+if (empty($_GET['cmp']) || !in_array($_GET['cmp'], $available_companies)) { //eventually STRIKE
     $conn->query("UPDATE UserData SET strikeCount = strikeCount + 1 WHERE id = $userID");
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Invalid Access.</strong> '.$lang['ERROR_STRIKE'].'</div>';
     include dirname(__DIR__) . '/footer.php';
     die();
 }
 
-$cmpID = intval($_GET['n']);
+$cmpID = intval($_GET['cmp']);
 $bucket = $identifier .'-uploads'; //no uppercase, no underscores, no ending dashes, no adjacent special chars
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","AGREEMENTS")) {
     if (!empty($_POST['delete'])){
@@ -228,7 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","AGRE
         $link = "https://" . $_SERVER['HTTP_HOST'] . $link_id . $_SERVER['REQUEST_URI'];
         $link = explode('/', $link);
         array_pop($link);
-        $link = implode('/', $link) . "/access?n=$processID";
+        $link = implode('/', $link) . "/access?n=$processID"; // n is not company id
         //prepare document
         $result = $conn->query("SELECT docID, name, txt, version FROM documents WHERE id = $docID AND companyID = $cmpID");
         if($row = $result->fetch_assoc()){

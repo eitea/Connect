@@ -1088,8 +1088,8 @@ $lang_ger['NEWEST_AGREEMENTS_FROM_CONSULIO'] = 'Neueste Dokumente von Consulio l
 $lang_eng['NO'] = 'No';
 $lang_ger['NO'] = 'Nein';
 
-$lang_eng['NO_MATRIX'] = 'This company does not have a matrix. Click <a href="../dsgvo/data-matrix?n=%s">here</a> to create one.';
-$lang_ger['NO_MATRIX'] = 'Diese Firma hat keine Matrix in den Einstellungen. Zum Erstellen <a href="../dsgvo/data-matrix?n=%s">hier klicken</a>.';
+$lang_eng['NO_MATRIX'] = 'This company does not have a matrix. Click <a href="../dsgvo/data-matrix?cmp=%s">here</a> to create one.';
+$lang_ger['NO_MATRIX'] = 'Diese Firma hat keine Matrix in den Einstellungen. Zum Erstellen <a href="../dsgvo/data-matrix?cmp=%s">hier klicken</a>.';
 
 $lang_eng['NOTES'] = 'Notes';
 $lang_ger['NOTES'] = 'Notizen';

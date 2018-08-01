@@ -42,13 +42,37 @@ html,body{
 <?php
 require dirname(dirname(__DIR__)) . "/connection.php";
 require dirname(dirname(__DIR__)) . "/utilities.php";
-include dirname(dirname(__DIR__)) . '/validate.php';
+require_once dirname(dirname(__DIR__)) . '/validate.php';
 set_time_limit(240);
 $result = mysqli_query($conn, "SELECT version FROM configurationData;");
 if(!$result){
     die($conn->error);
 } else {
     $row = $result->fetch_assoc();
+}
+
+/**
+ * Function for adding new permissions wich tests if the permission already exists
+ */
+function add_new_permission($group, $permission)
+{
+    global $conn;
+    $group = test_input($group);
+    $permission = test_input($permission);
+    $result = $conn->query("SELECT id FROM access_permission_groups WHERE name = '$group'");
+    echo $conn->error;
+    if ($result && $result->num_rows > 0 && ($row = $result->fetch_assoc())) {
+        $groupID = $row["id"];
+    } else {
+        $conn->query("INSERT INTO access_permission_groups (name) VALUES ('$group')");
+        echo $conn->error;
+        $groupID = $conn->insert_id;
+    }
+    $result = $conn->query("SELECT id FROM access_permissions WHERE groupID = $groupID AND name = '$permission'");
+    echo $conn->error;
+    if ($result && $result->num_rows > 0) return;
+    $conn->query("INSERT INTO access_permissions (groupID, name) VALUES ($groupID, '$permission')");
+    echo $conn->error;
 }
 
 if ($row['version'] < 100) {

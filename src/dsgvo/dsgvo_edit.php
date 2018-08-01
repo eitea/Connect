@@ -53,7 +53,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         <?php if($isBase == 'FALSE'): ?>
         <div class="col-sm-8"><label><?php echo mc_status(); ?> Name</label><input type="text" class="form-control" placeholder="Name of Template (Required)" name="templateName" value="<?php echo $name; ?>" /><br></div>
         <div class="col-sm-2"><label>Version</label><input type="text" class="form-control" name="templateVersion" value="<?php echo $version; ?>" placeholder="Version" /><br></div>
-        <div class="col-sm-2"><label><?php echo $lang['DOCUMENTS']; ?></label><a href='documents?n=<?php echo $cmpID; ?>' class='btn btn-info btn-block'><?php echo $lang['RETURN']; ?> <i class='fa fa-arrow-right'></i></a><br></div>
+        <div class="col-sm-2"><label><?php echo $lang['DOCUMENTS']; ?></label><a href='documents?cmp=<?php echo $cmpID; ?>' class='btn btn-info btn-block'><?php echo $lang['RETURN']; ?> <i class='fa fa-arrow-right'></i></a><br></div>
     </div>
     <br>
     <div class="row">
@@ -104,7 +104,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         </div>
         <?php else: ?>
             <div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Dieses Dokument ist nicht editierbar.</div>
-            <div class="col-sm-2"><a href='documents?n=<?php echo $cmpID; ?>' class='btn btn-info btn-block'><?php echo $lang['RETURN']; ?> <i class='fa fa-arrow-right'></i></a><br></div>
+            <div class="col-sm-2"><a href='documents?cmp=<?php echo $cmpID; ?>' class='btn btn-info btn-block'><?php echo $lang['RETURN']; ?> <i class='fa fa-arrow-right'></i></a><br></div>
         <?php endif; ?>
     </div>
 </form>

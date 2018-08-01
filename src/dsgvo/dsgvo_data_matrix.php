@@ -3,17 +3,17 @@ include dirname(__DIR__) . '/header.php';
 require dirname(__DIR__) . "/misc/helpcenter.php";
 require_permission("READ","DSGVO","PROCEDURE_DIRECTORY");
 
-if (isset($_GET['n'])) {
-	$cmpID = intval($_GET['n']);
+if (isset($_GET['cmp'])) {
+	$cmpID = intval($_GET['cmp']);
 } else if (count($available_companies) == 2) {
 	$cmpID = $available_companies[1];
-	redirect("data-matrix?n=$cmpID");
+	redirect("data-matrix?cmp=$cmpID");
 }
 
 if (isset($_POST['company_id'])) {
 	$newCmpID = intval($_POST['company_id']);
 	if ($cmpID !== $newCmpID) {
-		redirect("data-matrix?n=$newCmpID");
+		redirect("data-matrix?cmp=$newCmpID");
 	}
 }
 

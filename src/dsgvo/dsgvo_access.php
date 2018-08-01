@@ -1,5 +1,5 @@
 <?php //SECURE THIS PAGE LIKE A ROCK
-if(empty($_GET['n'])){
+if(empty($_GET['n'])){ // n is not company id
     echo "Invalid Access.";
     die();
 }
@@ -8,7 +8,7 @@ function clean($string) {
     return preg_replace('/[^A-Za-z0-9\-]/', '', $string);
 }
 
-$processID = clean($_GET['n']);
+$processID = clean($_GET['n']); // n is not company id
 $proc_agent = $_SERVER['HTTP_USER_AGENT'];
 $access = true;
 

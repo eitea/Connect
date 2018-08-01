@@ -2,14 +2,14 @@
 include dirname(__DIR__) . '/header.php';
 require dirname(__DIR__) . "/misc/helpcenter.php";
 require_permission("READ","DSGVO","PROCEDURE_DIRECTORY");
-if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventually STRIKE
+if(empty($_GET['cmp']) || !in_array($_GET['cmp'], $available_companies)){ //eventually STRIKE
     $conn->query("UPDATE UserData SET strikeCount = strikecount + 1 WHERE id = $userID");
     showError($lang['ERROR_STRIKE']);
     include dirname(__DIR__) . '/footer.php';
     die();
 }
 
-$cmpID = intval($_GET['n']);
+$cmpID = intval($_GET['cmp']);
 
 $stmt_insert_vv_log = $conn->prepare("INSERT INTO dsgvo_vv_logs (user_id,short_description,long_description,scope) VALUES ($userID,?,?,?)");
 showError($conn->error);
@@ -147,7 +147,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","PROCE
             <button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-app">+ <?php echo $lang['NEW_PROCESS'] ?></button>
             <button type="button" class="btn btn-default" data-toggle="modal" data-target="#list-templates"><?php echo $lang['MANAGE_TEMPLATES']; ?></button>
             <?php endif ?>
-            <a href="data-matrix?n=<?php echo $cmpID; //5acb74765fddc ?>" class="btn btn-default" ><?php echo $lang['DATA_MATRIX'] ?></a>
+            <a href="data-matrix?cmp=<?php echo $cmpID; //5acb74765fddc ?>" class="btn btn-default" ><?php echo $lang['DATA_MATRIX'] ?></a>
             <?php if( has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY")): ?>
             <button type="button" class="btn btn-default" data-toggle="modal" data-target="#list-default-folders"><?php echo $lang['ARCHIVE_STRUCTURE'] ?></button>
             <?php endif ?>
@@ -164,7 +164,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","PROCE
     ?>
         <form method="POST">
             <div class="row">
-                <div class="panel panel-default col-sm-6"><a href="vDetail?v=<?php echo $row['id']; ?>&n=<?php echo $cmpID; ?>" class="btn btn-link"> <?php echo "Stammblatt" ?> </a></div>
+                <div class="panel panel-default col-sm-6"><a href="vDetail?v=<?php echo $row['id']; ?>&cmp=<?php echo $cmpID; ?>" class="btn btn-link"> <?php echo "Stammblatt" ?> </a></div>
                 <div class="col-sm-5">
                     <select name="change_basic_template" class="js-example-basic-single">
                         <?php
@@ -197,7 +197,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","PROCE
         <div class="row">
             <form method="POST">
                 <div class="panel panel-default col-sm-5 col-sm-offset-1">
-                    <a href="vDetail?v=<?php echo $id; ?>&n=<?php echo $cmpID; ?>" class="btn btn-link"><?php echo $name; ?></a>
+                    <a href="vDetail?v=<?php echo $id; ?>&cmp=<?php echo $cmpID; ?>" class="btn btn-link"><?php echo $name; ?></a>
                     <?php if( has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY")): ?>
                     <a type="button" data-toggle="modal" href="#edit-app" data-name="<?php echo $name; ?>" data-valid="<?php echo $id; ?>"><i class="fa fa-pencil"></i></a>
                     <?php endif ?>
@@ -348,7 +348,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","PROCE
                             echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#clone-temp-'.$row['id'].'" title="Duplizieren"><i class="fa fa-files-o"></i></button> ';
                             if($row['name'] != 'Default'){
                                 echo '<button type="submit" name="delete_template" value="'.$row['id'].'" class="btn btn-default"><i class="fa fa-trash-o"></i></button> ';
-                                echo '<a href="editTemplate?t='.$row['id'].'&n='.$cmpID.'" class="btn btn-default"><i class="fa fa-pencil"></i></a>';
+                                echo '<a href="editTemplate?t='.$row['id'].'&cmp='.$cmpID.'" class="btn btn-default"><i class="fa fa-pencil"></i></a>';
                             }
                             echo '</td>';
                             echo '</tr>';

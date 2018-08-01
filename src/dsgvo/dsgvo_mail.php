@@ -2,7 +2,7 @@
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <?php require_permission("READ","DSGVO","EMAIL_TEMPLATES") ?>
 <?php
-if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventually STRIKE
+if(empty($_GET['cmp']) || !in_array($_GET['cmp'], $available_companies)){ //eventually STRIKE
     $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Invalid Access.</strong> '.$lang['ERROR_STRIKE'].'</div>';
     include dirname(__DIR__) . '/footer.php';
@@ -18,7 +18,7 @@ if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventual
 <div class="page-content-fixed-130">
 <?php
 
-$cmpID = intval($_GET['n']);
+$cmpID = intval($_GET['cmp']);
 
 $action = $action_id = '';
 if(isset($_POST['create_report'])){ $action = 'new'; }

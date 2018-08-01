@@ -878,7 +878,10 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                                 "DOCUMENTS" => ["href" => "dsgvo/documents"],
                                 "PROCEDURE_DIRECTORY" => ["href" => "dsgvo/vv"],
                                 "EMAIL_TEMPLATES" => ["href" => "dsgvo/templates"],
-                                "TRAINING" => ["href" => "dsgvo/training"], "Logs" => ["href" => "dsgvo/log"],
+                                "TRAINING" => ["href" => "dsgvo/training"], 
+                            ],
+                            "children"=>[
+                                "Logs" => ["href" => "dsgvo/log"],
                             ]
                         ],
                         "ARCHIVE" => [

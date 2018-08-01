@@ -7,8 +7,8 @@
 </div>
 <div class="page-content-fixed-130">
 <?php
-if(isset($_GET['n']) && in_array($_GET['n'], $available_companies)){
-    $cmpID = $_GET['n'];
+if(isset($_GET['cmp']) && in_array($_GET['cmp'], $available_companies)){
+    $cmpID = $_GET['cmp'];
 } else {
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>Zugriff verweigert.</div>';
     include dirname(__DIR__) . '/footer.php';

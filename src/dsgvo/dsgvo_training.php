@@ -12,17 +12,16 @@ if ($userHasUnansweredOnLoginSurveys) {
     $userHasUnansweredOnLoginSurveys = false;// do not display surveys when editing them
     showInfo("Da Sie gerade Schulungen bearbeiten, wurde eine fällige Schulung unterdrückt");
 }
-
 $trainingID = 0;
 if (isset($_REQUEST["trainingid"])) {
     $trainingID = intval($_REQUEST["trainingid"]);
 }
-if (!isset($_REQUEST["n"])) {
+if (!isset($_REQUEST["cmp"])) {
     showError("no company");
     include dirname(__DIR__) . '/footer.php';
     die();
 }
-$companyID = intval($_REQUEST['n']);
+$companyID = intval($_REQUEST['cmp']);
 $moduleID = 0;
 
 $stmt_insert_vv_log = $conn->prepare("INSERT INTO dsgvo_vv_logs (user_id,short_description,long_description,scope) VALUES ($userID,?,?,?)");
