@@ -662,7 +662,6 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                   <?php
                     require __DIR__ . DIRECTORY_SEPARATOR . "misc" . DIRECTORY_SEPARATOR . "create_menu.php";
                     
-                    
                     // projects
                     $result = $conn->query("SELECT projectID FROM relationship_project_user WHERE userID = $userID AND (expirationDate = '0000-00-00' OR DATE(expirationDate) > CURRENT_TIMESTAMP )");
                     echo $conn->error;
@@ -673,36 +672,33 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                         LEFT JOIN dynamicprojectsemployees de ON de.projectid = d.projectid AND de.userid = $userID AND de.position != 'owner'
                         LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid
                         LEFT JOIN relationship_team_user rtu ON rtu.teamID = dynamicprojectsteams.teamid AND rtu.userID = $userID
-                        WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).")
+                        WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, " . implode(', ', $available_companies) . ")
                         AND d.projectstatus = 'ACTIVE' AND (de.userid IS NOT NULL OR rtu.userID IS NOT NULL)");
                     $show_dynamic_projects_menu_item = (($result && $result->num_rows > 0) || $userHasSurveys || $user_roles['isDynamicProjectsAdmin'] || $user_roles['canCreateTasks']);
                     $dynamic_projects_menu_item_badge = $result->num_rows;
-                    $finances_company_children_callback = function($company /* has [id] and [name] */) use (&$conn){
+                    $finances_company_children_callback = function ($company /* has [id] and [name] */ ) use (&$conn) {
                         $company_children = [
                             "ACCOUNT_PLAN" => ["href" => "finance/plan"],
                             "ACCOUNT_JOURNAL" => ["href" => "finance/journal"],
                         ];
-                        $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = ".$company["id"]);
-                        while($acc_res && ($acc_row = $acc_res->fetch_assoc())){
+                        $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = " . $company["id"]);
+                        while ($acc_res && ($acc_row = $acc_res->fetch_assoc())) {
                             $acc_id = $acc_row['id'];
                             $company_children[$acc_row['name']] = [
                                 "href" => "finance/account?v=$acc_id",
-                                "url" => "finance/account", 
-                                "get_params" => ["v" => "$acc_id"] 
+                                "url" => "finance/account",
+                                "get_params" => ["v" => "$acc_id"]
                             ];
                         }
                         return $company_children;
                     };
 
                     // TODO: permissions from index
-                    // TODO: companies unified (route?cmp=1),
-
 
                     echo create_menu(["children" => [
                         "OVERVIEW" => [
                             "href" => "user/home",
                             "icon" => "fa fa-home",
-                            "active_files" => ["home.php"] // can be omitted if defined in $routes
                         ],
                         "VIEW_TIMESTAMPS" => [
                             "href" => "user/time", // canStamp missing
@@ -758,9 +754,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                                 ],
                                 "COMPANIES" => [
                                     "company_children" => [
-                                        "EDIT" => [
-                                            "href" => "system/company",
-                                        ],
+                                        "EDIT" => [   "href" => "system/company",      ],
                                     ],
                                     "children" => [
                                         "CREATE_NEW_COMPANY" => ["href" => "system/new", ],
@@ -842,9 +836,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                                     "children" => [
                                         "ORDER" => ["disabled" => true],
                                         "INCOMING_INVOICE" => ["disabled" => true],
-                                        "ADDRESS_BOOK" => [
-                                            "href" => "system/clients"
-                                        ]
+                                        "ADDRESS_BOOK" => [   "href" => "system/clients"        ]
                                     ]
                                 ],
                                 "ARTICLE" => [
@@ -873,10 +865,14 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             "company_children_callback" => $finances_company_children_callback // this function is called for every company separately. it has to return an array one would usually put in company_children 
                         ],
                         "DSGVO" => [
-                            "icon_raw" => "<strong style='padding: 0px 6px;'> § </strong>",
+                            "icon_raw" => "<strong class='pull-left' style='padding: 0px 6px;'> § </strong>",
                             "company_children" => [
                                 "DOCUMENTS" => ["href" => "dsgvo/documents"],
-                                "PROCEDURE_DIRECTORY" => ["href" => "dsgvo/vv"],
+                                "PROCEDURE_DIRECTORY" => [
+                                    "href" => "dsgvo/vv",
+                                    "active_routes" => ["dsgvo/data-matrix"] // additional active routes besides href
+                                    // "active_files" => ["dsgvo_vv.php"] // can be omitted if defined in $routes
+                                ],
                                 "EMAIL_TEMPLATES" => ["href" => "dsgvo/templates"],
                                 "TRAINING" => ["href" => "dsgvo/training"], 
                             ],
@@ -891,7 +887,6 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                                 "PRIVATE" => ["href" => "archive/private"],
                             ]
                         ]
-
                     ]]) ?>
                     <br>
                     <br>
@@ -954,10 +949,6 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 					  }, 120000); //120 seconds, should not cause request overflow
 					  </script>
                   
-
-                  <!-- User-Section: BOOKING -->
-                  
-                 
               <?php endif; //endif(canStamp) ?>
           </ul>
       </div>

@@ -26,8 +26,8 @@ function transform_company_children_to_real_children(&$options)
                 if (count($options["company_children"]) == 1) {
                     // if there is only one child, generate
                     // parent
-                    // |-company_child1
-                    // |-company_child2
+                    // |-company1
+                    //  \company1
                     reset($options["company_children"]); // set pointer to first (=only) element
                     $company_child_name = key($options["company_children"]);
                     $child_with_query_parameters = $options["company_children"][$company_child_name];
@@ -42,10 +42,10 @@ function transform_company_children_to_real_children(&$options)
                     // parent
                     // |-company1
                     // |  |-company_child1
-                    // |  |-company_child2
-                    // |-company2
-                    // |  |-company_child1
-                    // |  |-company_child2
+                    // |   \company_child2
+                    //  \company2
+                    //    |-company_child1
+                    //     \company_child2
                     $children_with_query_parameters = [];
                     foreach ($options["company_children"] as $company_child_name => $company_child) {
                         $children_with_query_parameters[$company_child_name] = $company_child;
@@ -70,7 +70,7 @@ function set_menu_item_active($options, &$is_active) : string
     global $this_url;
     global $this_page;
     $is_active = false;
-    if ((isset($options["active_files"]) && in_array($this_page, $options["active_files"])) || (isset($options["url"]) && $this_url == $options["url"])) {
+    if ((isset($options["active_files"]) && in_array($this_page, $options["active_files"])) || (isset($options["url"]) && $this_url == $options["url"]) || (isset($options["active_routes"]) && in_array($this_url, $options["active_routes"]))) {
         if (isset($options["get_params"])) { // every get param has to match in order for the item to be active
             $is_active = true;
             foreach ($options["get_params"] as $param_name => $param_value) {
@@ -108,7 +108,7 @@ function set_menu_item_href($options) : string
 function set_menu_item_icon($options) : string
 {
     if (isset($options["icon"]))
-        return '<i class="' . $options["icon"] . '"></i>';
+        return '<i class="' . $options["icon"] . ' pull-left"></i>';
     if (isset($options["icon_raw"]))
         return $options["icon_raw"];
     return '';
@@ -194,9 +194,7 @@ function create_menu_item($options, $title, $depth, &$is_active, $parent_hash, &
         if ($any_sub_menu_item_active) {
             $is_active = true;
         }
-        if ($any_sub_menu_item_visible) {
-            $is_visible = true;
-        }
+        $is_visible = $any_sub_menu_item_visible; // the parent is only visible if it has children
     }
     if ($is_visible) return $output;
     return "";
