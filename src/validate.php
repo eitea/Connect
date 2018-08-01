@@ -32,10 +32,18 @@ function require_permission($type, $group_name, $permission_name = false, $userI
  * 
  * @see example: dsgvo_training.php, header.php
  */
-function has_permission($type, $group_name, $permission_name = false, $userID = false) : bool
+function has_permission($type, $group_name, $permission_name = false, $userID = false)
 {
-  if (!$userID) $userID = $_SESSION['userid'];
-  if ($userID == 1) return true; // admin
+  if (!$userID) {
+    if (isset($_SESSION['userid'])) {
+      $userID = $_SESSION['userid'];
+    } else {
+      return false;
+    }
+  }
+  if (intval($userID) == 1) {
+    return true; // admin
+  }
   $group_only = $permission_name === false;
   global $conn;
   static $cache = [];
@@ -73,7 +81,7 @@ function has_permission($type, $group_name, $permission_name = false, $userID = 
 
 function enableToCore($userID){
   require_permission("WRITE", "CORE", false, $userID);
-  }
+}
 
 function enableToTime($userID){
   global $conn;

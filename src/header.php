@@ -12,7 +12,7 @@ $setActiveLink = 'class="active-link"';
 
 require __DIR__ . DIRECTORY_SEPARATOR . "connection.php";
 require __DIR__ . DIRECTORY_SEPARATOR . "utilities.php";
-require __DIR__ . DIRECTORY_SEPARATOR . "validate.php";
+require_once __DIR__ . DIRECTORY_SEPARATOR . "validate.php";
 require __DIR__ . DIRECTORY_SEPARATOR . "language.php";
 require __DIR__ . DIRECTORY_SEPARATOR . "dsgvo" . DIRECTORY_SEPARATOR . "dsgvo_training_common.php";
 include 'version_number.php';
@@ -659,19 +659,260 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                           </form><br>
                       </div>
                   </li>
-                  <!-- User-Section: BASIC -->
-                  <li><a <?php if ($this_page == 'home.php') {echo $setActiveLink;}?> href="../user/home"><i class="fa fa-home"></i> <span><?php echo $lang['OVERVIEW']; ?></span></a></li>
-                  <li><a <?php if ($this_page == 'timeCalcTable.php') {echo $setActiveLink;}?> href="../user/time"><i class="fa fa-clock-o"></i> <span><?php echo $lang['VIEW_TIMESTAMPS']; ?></span></a></li>
-                  <li><a <?php if ($this_page == 'makeRequest.php') {echo $setActiveLink;}?> href="../user/request"><i class="fa fa-calendar-plus-o"></i> <span><?php echo $lang['REQUESTS']; ?></span></a></li>
-                  <li>
-					  <a <?php if ($this_page == 'post.php') {echo $setActiveLink;}?> href="../social/post">
-						  <?php
-						  $unreadMessages = getUnreadMessages();
-						  if($unreadMessages) echo '<span class="pull-right"><small id="chat_unread_message">',$unreadMessages,'</small></span>';
-						  ?>
-						  <i class="fa fa-commenting-o"></i><?php echo $lang['MESSAGING']; ?>
-					  </a>
+                  <?php
+                    require __DIR__ . DIRECTORY_SEPARATOR . "misc" . DIRECTORY_SEPARATOR . "create_menu.php";
+                    
+                    
+                    // projects
+                    $result = $conn->query("SELECT projectID FROM relationship_project_user WHERE userID = $userID AND (expirationDate = '0000-00-00' OR DATE(expirationDate) > CURRENT_TIMESTAMP )");
+                    echo $conn->error;
+                    $show_projects_menu_item = $result && $result->num_rows > 0;
+                    $projects_menu_item_badge = $result->num_rows;       
+                    // dynamic projects
+                    $result = $conn->query("SELECT DISTINCT d.projectid FROM dynamicprojects d
+                        LEFT JOIN dynamicprojectsemployees de ON de.projectid = d.projectid AND de.userid = $userID AND de.position != 'owner'
+                        LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid
+                        LEFT JOIN relationship_team_user rtu ON rtu.teamID = dynamicprojectsteams.teamid AND rtu.userID = $userID
+                        WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).")
+                        AND d.projectstatus = 'ACTIVE' AND (de.userid IS NOT NULL OR rtu.userID IS NOT NULL)");
+                    $show_dynamic_projects_menu_item = (($result && $result->num_rows > 0) || $userHasSurveys || $user_roles['isDynamicProjectsAdmin'] || $user_roles['canCreateTasks']);
+                    $dynamic_projects_menu_item_badge = $result->num_rows;
+                    $finances_company_children_callback = function($company /* has [id] and [name] */) use (&$conn){
+                        $company_children = [
+                            "ACCOUNT_PLAN" => ["href" => "finance/plan"],
+                            "ACCOUNT_JOURNAL" => ["href" => "finance/journal"],
+                        ];
+                        $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = ".$company["id"]);
+                        while($acc_res && ($acc_row = $acc_res->fetch_assoc())){
+                            $acc_id = $acc_row['id'];
+                            $company_children[$acc_row['name']] = [
+                                "href" => "finance/account?v=$acc_id",
+                                "url" => "finance/account", 
+                                "get_params" => ["v" => "$acc_id"] 
+                            ];
+                        }
+                        return $company_children;
+                    };
+
+                    // TODO: permissions from index
+                    // TODO: companies unified (route?cmp=1),
+
+
+                    echo create_menu(["children" => [
+                        "OVERVIEW" => [
+                            "href" => "user/home",
+                            "icon" => "fa fa-home",
+                            "active_files" => ["home.php"] // can be omitted if defined in $routes
+                        ],
+                        "VIEW_TIMESTAMPS" => [
+                            "href" => "user/time", // canStamp missing
+                            "icon" => "fa fa-clock-o"
+                        ],
+                        "REQUESTS" => [
+                            "href" => "user/request",
+                            "icon" => "fa fa-calendar-plus-o"
+                        ],
+                        "MESSAGING" => [
+                            "href" => "social/post",
+                            "icon" => "fa fa-commenting-o",
+                            "badge" => [
+                                "count" => getUnreadMessages(), // initial count, replaced with "" if it is 0 or "0"
+                                "id" => "chat_unread_message"
+                            ]
+                        ],
+                        "PROJECTS" => [
+                            "show" => $show_projects_menu_item, // manually control existence
+                            "href" => "project/public",
+                            "icon" => "fa fa-tags",
+                            "badge" => [
+                                "count" => $projects_menu_item_badge
+                            ]
+                        ],
+                        "BOOK_PROJECTS" => [
+                            "show" => $user_roles['canBook'] == 'TRUE' && $showProjectBookingLink,
+                            "icon" => "fa fa-bookmark",
+                            "href" => "user/book"
+                        ],
+                        "DYNAMIC_PROJECTS" => [
+                            "icon" => "fa fa-tasks",
+                            "href" => "dynamic-projects/view",
+
+                        ],
+                        "ADDRESS_BOOK" => [
+                            "show" => ($user_roles['canUseClients'] == 'TRUE' || $user_roles['canEditClients'] == 'TRUE' || $user_roles['canUseSuppliers'] == 'TRUE' || $user_roles['canEditSuppliers'] == 'TRUE'),
+                            "href" => "system/clients",
+                            "icon" => "fa fa-file-text-o",
+                        ],
+                        "ADMIN_CORE_OPTIONS" => [
+                            "icon" => "fa fa-gear",
+                            "children" => [
+                                "Security" => ["href" => "system/security", ],
+                                "USERS" => [
+                                    "children" => [
+                                        "EDIT_USERS" => ["href" => "system/users", ],
+                                        "Saldo" => ["href" => "system/saldo", ],
+                                        "REGISTER" => ["href" => "system/register", ],
+                                        "USER_INACTIVE" => ["href" => "system/deactivated", ],
+                                        "Checkin Logs" => ["href" => "system/checkinLogs", ],
+                                    ],
+                                ],
+                                "COMPANIES" => [
+                                    "company_children" => [
+                                        "EDIT" => [
+                                            "href" => "system/company",
+                                        ],
+                                    ],
+                                    "children" => [
+                                        "CREATE_NEW_COMPANY" => ["href" => "system/new", ],
+                                    ]
+                                ],
+                                "Teams" => ["href" => "system/teams", ],
+                                "SETTINGS" => [
+                                    "children" => [
+                                        "HOLIDAYS" => ["href" => "system/holidays", ],
+                                        "ADVANCED_OPTIONS" => ["href" => "system/advanced", ],
+                                        $lang["PASSWORD"] . ' ' . $lang["OPTIONS"] => ["href" => "system/password", ],
+                                        "E-Mail ". $lang["OPTIONS"] => ["href" => "system/email", ],
+                                        $lang["ARCHIVE"]. " " .$lang["OPTIONS"] => ["href" => "system/archive", ],
+                                        "TASK_SCHEDULER" => ["href" => "system/tasks", ],
+                                        "DB Backup" => ["href" => "system/backup", ],
+                                        "Report Designer" => ["href" => "report/designer", ],
+                                        "DB_RESTORE" => [
+                                            "show" => (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])),
+                                            "href" => "system/restore",
+                                        ],
+                                        "Git Update" => [
+                                            "show" => (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])),
+                                            "href" => "system/update",
+                                        ],
+                                        "Restic Backup" => ["href" => "system/restic", ],
+                                        "Tags" => ["href" => "system/tags", ],
+                                    ]
+                                ]
+                            ],
+                        ],
+                        "ADMIN_TIME_OPTIONS" => [
+                            "icon" => "fa fa-history",
+                            "children" => [
+                                $lang["TIMES"] . " " . $lang["OVERVIEW"] => ["href" => "time/view", ],
+                                "CORRECTION" => ["href" => "time/corrections", ],
+                                "TRAVEL_FORM" => ["href" => "time/travels", ],
+                                "VACATION" => ["href" => "time/vacations", ],
+                                "CHECKLIST" => ["href" => "time/check", ],
+                            ]
+                        ],
+                        "PROJECTS" => [
+                            "icon" => "fa fa-tags",
+                            "children" => [
+                                "PROJECTS" => ["href" => "project/view", ],
+                                "PROJECT_LOGS" => ["href" => "project/log", ],
+                                "Workflow" => ["href" => "project/options", ],
+                            ]
+                        ],
+                        "ERP" => [
+                            "icon" => "fa fa-file-text-o",
+                            "children" => [
+                                "PROCESS" => ["href" => "erp/view", ],
+                                "CLIENTS" => [
+                                    "children" => [
+                                        $lang['PROPOSAL_TOSTRING']['ANG'] => [
+                                            "href" => "erp/view?t=ang",
+                                            "url" => "erp/view", // url is the part that is matched with the current route
+                                            "get_params" => ["t" => "ang"] // every $_GET[$key] == $value has to be true to be active
+                                        ],
+                                        $lang['PROPOSAL_TOSTRING']['AUB'] => [
+                                            "href" => "erp/view?t=aub",
+                                            "url" => "erp/view",
+                                            "get_params" => ["t" => "aub"]
+                                        ],
+                                        $lang['PROPOSAL_TOSTRING']['RE'] => [
+                                            "href" => "erp/view?t=re",
+                                            "url" => "erp/view",
+                                            "get_params" => ["t" => "re"]
+                                        ],
+                                        $lang['PROPOSAL_TOSTRING']['LFS'] => [
+                                            "href" => "erp/view?t=lfs",
+                                            "url" => "erp/view",
+                                            "get_params" => ["t" => "lfs"]
+                                        ],
+                                        "ADDRESS_BOOK" => ["href" => "system/clients"]
+                                    ]
+                                ],
+                                "SUPPLIERS" => [
+                                    "children" => [
+                                        "ORDER" => ["disabled" => true],
+                                        "INCOMING_INVOICE" => ["disabled" => true],
+                                        "ADDRESS_BOOK" => [
+                                            "href" => "system/clients"
+                                        ]
+                                    ]
+                                ],
+                                "ARTICLE" => [
+                                    "company_children" => [ // if there is only one company child, the child's name is the company name and it has no children
+                                        "ARTICLE" => ["href" => "erp/articles"]
+                                    ]
+                                ],
+                                "RECEIPT_BOOK" => ["href" => "erp/receipts"],
+                                "VACANT_POSITIONS" => ["disabled" => true],
+                                "SETTINGS" => [
+                                    "children" => [
+                                        "TAX_RATES" => ["href" => "erp/taxes"],
+                                        "UNITS" => ["href" => "erp/units"],
+                                        "PAYMENT_METHODS" => ["href" => "erp/payment"],
+                                        "SHIPPING_METHODS" => ["href" => "erp/shipping"],
+                                        "REPRESENTATIVE" => ["href" => "erp/representatives"],
+                                    ]
+                                ]
+                            ]
+                        ],
+                        "FINANCES" => [
+                            "icon" => "fa fa-book",
+                            "children" => [
+                                "TAX_RATES" => ["href" => "erp/taxes"]
+                            ],
+                            "company_children_callback" => $finances_company_children_callback // this function is called for every company separately. it has to return an array one would usually put in company_children 
+                        ],
+                        "DSGVO" => [
+                            "icon_raw" => "<strong style='padding: 0px 6px;'> § </strong>",
+                            "company_children" => [
+                                "DOCUMENTS" => ["href" => "dsgvo/documents"],
+                                "PROCEDURE_DIRECTORY" => ["href" => "dsgvo/vv"],
+                                "EMAIL_TEMPLATES" => ["href" => "dsgvo/templates"],
+                                "TRAINING" => ["href" => "dsgvo/training"], "Logs" => ["href" => "dsgvo/log"],
+                            ]
+                        ],
+                        "ARCHIVE" => [
+                            "icon" => "fa fa-folder-open-o",
+                            "children" => [
+                                "SHARE" => ["href" => "archive/share"],
+                                "PRIVATE" => ["href" => "archive/private"],
+                            ]
+                        ]
+
+                    ]]) ?>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
 					  <script>
+                        // scroll into view
+                        function scrollCurrentActiveLinkIntoView(){
+                            $.each($(".active-link"),function(index, element){
+                                if(element.scrollIntoView){
+                                    element.scrollIntoView({
+                                        behavior: "instant",
+                                        block: "start"
+                                    });
+                                }
+                            })
+                        }
+                        $(document).ready(function(){
+                            scrollCurrentActiveLinkIntoView()
+                        });
+                        scrollCurrentActiveLinkIntoView()
+
+
+                        // unread message badge (post)
 					  var firstTime = true;
                       function displayNotificationIfEnabled(title, body){
                         var notificationEnabled = <?php $result = $conn->query("SELECT new_message_notification FROM socialprofile WHERE userID = $userID AND new_message_notification = 'TRUE'"); echo $result && $result->num_rows > 0?"true":"false" ?>;
@@ -709,400 +950,14 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 						  });
 					  }, 120000); //120 seconds, should not cause request overflow
 					  </script>
-                  </li>
-				  <?php
-				  $result = $conn->query("SELECT projectID FROM relationship_project_user WHERE userID = $userID AND (expirationDate = '0000-00-00' OR DATE(expirationDate) > CURRENT_TIMESTAMP )");
-				  echo $conn->error;
-				  if($result && $result->num_rows > 0){
-					  echo '<li><a href="../project/public"';
-					  if ($this_page == 'project_public.php') {echo $setActiveLink;}
-					  echo '><span class="pull-right"><small>'.$result->num_rows.'</small></span><i class="fa fa-tags"></i>'.$lang['PROJECTS'].'</a></li>';
-				  }
-				  ?>
+                  
 
                   <!-- User-Section: BOOKING -->
-                  <?php if ($user_roles['canBook'] == 'TRUE' && $showProjectBookingLink): ?>
-                      <li><a <?php if ($this_page == 'userProjecting.php') {echo $setActiveLink;}?> href="../user/book"><i class="fa fa-bookmark"></i><span> <?php echo $lang['BOOK_PROJECTS']; ?></span></a></li>
-                  <?php endif;?>
-                  <?php
-                  $result = $conn->query("SELECT DISTINCT d.projectid FROM dynamicprojects d
-					  LEFT JOIN dynamicprojectsemployees de ON de.projectid = d.projectid AND de.userid = $userID AND de.position != 'owner'
-                      LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid
-					  LEFT JOIN relationship_team_user rtu ON rtu.teamID = dynamicprojectsteams.teamid AND rtu.userID = $userID
-                      WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, ".implode(', ', $available_companies).")
-					  AND d.projectstatus = 'ACTIVE' AND (de.userid IS NOT NULL OR rtu.userID IS NOT NULL)");
-                      if (($result && $result->num_rows > 0) || $userHasSurveys || $user_roles['isDynamicProjectsAdmin'] || $user_roles['canCreateTasks']): ?>
-                      <li><a <?php if ($this_page == 'dynamicProjects.php') {echo $setActiveLink;}?> href="../dynamic-projects/view">
-						  <?php  echo $conn->error; if($result->num_rows > 0) echo '<span class="pull-right"><small>'.$result->num_rows.'</small></span>'; ?>
-                          <i class="fa fa-tasks"></i><?php echo $lang['DYNAMIC_PROJECTS']; ?>
-                          <span title="Unread messages" id="projectMessagingBadge" class="badge pull-right" style="display: none; margin-right: 15px;"></span> <!-- separate badge for unread messages -->
-                      </a></li>
-                  <?php endif; ?>
+                  
+                 
               <?php endif; //endif(canStamp) ?>
-            <?php if ($user_roles['canUseClients'] == 'TRUE' || $user_roles['canEditClients'] == 'TRUE' || $user_roles['canUseSuppliers'] == 'TRUE' || $user_roles['canEditSuppliers'] == 'TRUE'): ?>
-            <li><a <?php if ($this_page == 'editCustomers.php') {echo $setActiveLink; }?> href="../system/clients"><i class="fa fa-file-text-o"></i><span><?php echo $lang['ADDRESS_BOOK']; ?></span></a></li>
-            <?php endif;//canuseClients ?>
           </ul>
       </div>
-    <div class="panel-group" id="sidebar-accordion">
-      <!-- Section One: CORE -->
-      <?php if (has_permission("READ", "CORE")): ?>
-        <div class="panel panel-default panel-borderless">
-          <div class="panel-heading" role="tab">
-            <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-core"  id="adminOption_CORE"><i class="fa fa-caret-down pull-right"></i>
-                <i class="fa fa-gear"></i> <?php echo $lang['ADMIN_CORE_OPTIONS']; ?>
-            </a>
-          </div>
-          <div id="collapse-core" role="tabpanel" class="panel-collapse collapse">
-            <div class="panel-body">
-              <ul class="nav navbar-nav">
-              <?php if(has_permission("READ","CORE","SECURITY")): ?><li><a <?php if ($this_page == 'securitySettings.php') {echo $setActiveLink;}?> href="../system/security">Security</a></li><? endif ?>
-                  <li>
-                      <a id="coreUserToggle" href="#" data-toggle="collapse" data-target="#toggleUsers" data-parent="#sidenav01" class="collapse in">
-                          <span><?php echo $lang['USERS']; ?></span> <i class="fa fa-caret-down"></i>
-                      </a>
-                      <div class="collapse" id="toggleUsers" style="height: 0px;">
-                          <ul class="nav nav-list">
-                              <li><a <?php if ($this_page == 'editUsers.php') {echo $setActiveLink;}?> href="../system/users"><?php echo $lang['EDIT_USERS']; ?></a></li>
-                              <li><a <?php if ($this_page == 'admin_saldoview.php') {echo $setActiveLink;}?> href="../system/saldo"><?php echo $lang['USERS']; ?> Saldo</a></li>
-                              <li><a <?php if ($this_page == 'register.php') {echo $setActiveLink;}?> href="../system/register"><?php echo $lang['REGISTER']; ?></a></li>
-                              <li><a <?php if ($this_page == 'deactivatedUsers.php') {echo $setActiveLink;}?> href="../system/deactivated"><?php echo $lang['USER_INACTIVE']; ?></a></li>
-                              <li><a <?php if ($this_page == 'checkinLogs.php') {echo $setActiveLink;}?> href="../system/checkinLogs">Checkin Logs</a></li>
-                          </ul>
-                      </div>
-                  </li>
-                <li>
-                    <a id="coreCompanyToggle" <?php if ($this_page == 'editCompanies.php') {echo $setActiveLink;}?> href="#" data-toggle="collapse" data-target="#toggleCompany" data-parent="#sidenav01" class="collapse in">
-                        <span><?php echo $lang['COMPANIES']; ?></span> <i class="fa fa-caret-down"></i>
-                    </a>
-                    <div class="collapse" id="toggleCompany" style="height: 0px;">
-                        <ul class="nav nav-list">
-                            <?php
-                            $result = $conn->query("SELECT * FROM $companyTable");
-                            while ($result && ($row = $result->fetch_assoc())) {
-                                if (in_array($row['id'], $available_companies)) {
-                                    echo "<li><a href='../system/company?cmp=" . $row['id'] . "'>" . $row['name'] . "</a></li>";
-                                }
-                            }
-                            ?>
-                            <li><a <?php if ($this_page == 'new_Companies.php') {echo $setActiveLink;}?> href="../system/new"><?php echo $lang['CREATE_NEW_COMPANY']; ?></a></li>
-                        </ul>
-                    </div>
-                </li>
-                <li><a <?php if ($this_page == 'teamConfig.php') {echo $setActiveLink;}?> href="../system/teams">Teams</a></li>
-                <li>
-                    <a id="coreSettingsToggle" href="#" data-toggle="collapse" data-target="#toggleSettings" data-parent="#sidenav01" class="collapsed">
-                        <span><?php echo $lang['SETTINGS']; ?></span> <i class="fa fa-caret-down"></i>
-                    </a>
-                    <div class="collapse" id="toggleSettings" style="height: 0px;">
-                        <ul class="nav nav-list">
-                            <li><a <?php if ($this_page == 'editHolidays.php') {echo $setActiveLink;}?> href="../system/holidays"><span><?php echo $lang['HOLIDAYS']; ?></span></a></li>
-                            <li><a <?php if ($this_page == 'options_advanced.php') {echo $setActiveLink;}?> href="../system/advanced"><span><?php echo $lang['ADVANCED_OPTIONS']; ?></span></a></li>
-                            <li><a <?php if ($this_page == 'options_password.php') {echo $setActiveLink;}?> href="../system/password"><span><?php echo $lang['PASSWORD'] . ' ' . $lang['OPTIONS']; ?></span></a></li>
-                            <li><a <?php if ($this_page == 'options_report.php') {echo $setActiveLink;}?> href="../system/email"><span> E-mail <?php echo $lang['OPTIONS']; ?> </span></a></li>
-                            <li><a <?php if ($this_page == 'options_archive.php') {echo $setActiveLink;}?> href="../system/archive"><span><?php echo $lang['ARCHIVE'] . ' ' . $lang['OPTIONS'] ?></span></a></li>
-                            <li><a <?php if ($this_page == 'taskScheduler.php') {echo $setActiveLink;}?> href="../system/tasks"><span><?php echo $lang['TASK_SCHEDULER']; ?> </span></a></li>
-                            <li><a <?php if ($this_page == 'download_sql.php') {echo $setActiveLink;}?> href="../system/backup"><span> DB Backup</span></a></li>
-                            <li><a <?php if ($this_page == 'templateSelect.php') {echo $setActiveLink;}?> href="../report/designer"><span>Report Designer</span> </a></li>
-                            <?php if (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])): ?>
-                                <li><a <?php if ($this_page == 'upload_database.php') {echo $setActiveLink;}?> href="../system/restore"><span> <?php echo $lang['DB_RESTORE']; ?></span> </a></li>
-                                <li><a <?php if ($this_page == 'pullGitRepo.php') {echo $setActiveLink;}?> href="../system/update"><span>Git Update</span></a></li>
-                            <?php endif;?>
-                            <li><a <?php if ($this_page == 'resticBackup.php') {echo $setActiveLink;}?> href="../system/restic"><span> Restic Backup</span></a></li>
-							<li><a <?php if($this_page == 'options_tags.php') {echo $setActiveLink;}?> href="../system/tags"><span> Tags</span></a> </li>
-                        </ul>
-                    </div>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <?php
-        if($this_page == "editUsers.php" || $this_page == "admin_saldoview.php" || $this_page == "register.php" || $this_page == "deactivatedUsers.php" || $this_page == "checkinLogs.php"){
-          echo "<script>document.getElementById('coreUserToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-        } elseif($this_page == "options_report.php" || $this_page == "editHolidays.php" || $this_page == "options_advanced.php" || $this_page == "taskScheduler.php"
-        || $this_page == "pullGitRepo.php" || $this_page == "options_password.php" || $this_page == 'options_archive.php' || $this_page == 'resticBackup.php' || $this_page == 'templateSelect.php' || $this_page == 'options_tags.php' ){
-          echo "<script>document.getElementById('coreSettingsToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-        } elseif($this_page == "editCompanies.php" || $this_page == "new_Companies.php"){
-          echo "<script>document.getElementById('coreCompanyToggle').click();document.getElementById('adminOption_CORE').click();</script>";
-        } elseif($this_page == "download_sql.php" || $this_page == "teamConfig.php" || $this_page == "upload_database.php" || $this_page == "securitySettings.php") {
-          echo "<script>document.getElementById('adminOption_CORE').click();</script>";
-        }
-        ?>
-      <?php endif; ?>
-
-      <!-- Section Two: TIME -->
-      <?php if ($user_roles['isTimeAdmin'] == 'TRUE'): ?>
-        <div class="panel panel-default panel-borderless">
-          <div class="panel-heading" role="tab">
-            <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-time"  id="adminOption_TIME"><i class="fa fa-caret-down pull-right"></i>
-            <i class="fa fa-history"></i> <?php echo $lang['ADMIN_TIME_OPTIONS']; ?>
-            </a>
-          </div>
-          <div id="collapse-time" class="panel-collapse collapse" role="tabpanel">
-            <div class="panel-body">
-              <ul class="nav navbar-nav">
-                <li><a <?php if ($this_page == 'getTimeprojects.php') {echo $setActiveLink;}?> href="../time/view"> <span><?php echo $lang['TIMES'] . ' ' . $lang['VIEW']; ?></span></a></li>
-                <li><a <?php if ($this_page == 'bookAdjustments.php') {echo $setActiveLink;}?> href="../time/corrections"><?php echo $lang['CORRECTION']; ?></a></li>
-                <li><a <?php if ($this_page == 'getTravellingExpenses.php') {echo $setActiveLink;}?> href="../time/travels"><?php echo $lang['TRAVEL_FORM']; ?></a></li>
-                <li><a <?php if ($this_page == 'display_vacation.php') {echo $setActiveLink;}?> href="../time/vacations"><?php echo $lang['VACATION']; ?></a></li>
-                <li><a <?php if ($this_page == 'adminTodos.php') {echo $setActiveLink;}?> href="../time/check"><?php echo $lang['CHECKLIST']; ?></a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <?php if ($this_page == "getTimeprojects.php" || $this_page == "monthlyReport.php" || $this_page == "adminTodos.php" || $this_page == "getTravellingExpenses.php" || $this_page == "bookAdjustments.php" || $this_page == "getTimestamps_select.php" || $this_page == 'display_vacation.php') {
-            echo "<script>document.getElementById('adminOption_TIME').click();</script>";
-        } ?>
-      <?php endif;?>
-
-      <!-- Section Three: PROJECTS -->
-      <?php if ($user_roles['isProjectAdmin'] == 'TRUE' || $user_roles['canUseWorkflow'] == 'TRUE'): ?>
-          <div class="panel panel-default panel-borderless">
-              <div class="panel-heading" role="tab">
-                  <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-project"  id="adminOption_PROJECT"><i class="fa fa-caret-down pull-right"></i>
-                      <i class="fa fa-tags"></i><?php echo $lang['PROJECTS']; ?>
-                  </a>
-              </div>
-              <div id="collapse-project" class="panel-collapse collapse" role="tabpanel">
-                  <div class="panel-body">
-                      <ul class="nav navbar-nav">
-                          <?php if ($user_roles['isProjectAdmin'] == 'TRUE'): ?>
-                              <li><a <?php if ($this_page == 'project_public.php') {echo $setActiveLink;}?> href="../project/view"><span><?php echo $lang['PROJECTS']; ?></span></a></li>
-                              <li><a <?php if ($this_page == 'audit_projectBookings.php') {echo $setActiveLink;}?> href="../project/log"><span><?php echo $lang['PROJECT_LOGS']; ?></span></a></li>
-                          <?php endif; ?>
-                          <li><a <?php if ($this_page == 'options.php') {echo $setActiveLink;}?> href="../project/options"><span>Workflow</span></a></li>
-                      </ul>
-                  </div>
-              </div>
-          </div>
-          <?php if ($this_page == 'project_detail.php' || $this_page == "audit_projectBookings.php" || $this_page == "options.php") {
-              echo "<script>$('#adminOption_PROJECT').click();</script>";
-          } ?>
-      <?php endif; ?>
-
-      <!-- Section Four: REPORTS    !! REMOVED 5aa0dafd9fbf0 !! -->
-
-      <!-- Section Five: ERP -->
-      <?php if (has_permission("READ", "ERP")): ?>
-        <div class="panel panel-default panel-borderless">
-          <div class="panel-heading" role="tab">
-            <a role="button" data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-erp"  id="adminOption_ERP"><i class="fa fa-caret-down pull-right"></i><i class="fa fa-file-text-o"></i> ERP</a>
-          </div>
-          <div id="collapse-erp" class="panel-collapse collapse" role="tabpanel">
-            <div class="panel-body">
-              <ul class="nav navbar-nav">
-                <li><a <?php if ($this_page == 'offer_proposal_edit.php') {echo $setActiveLink;}?> href="../erp/view"><span><?php echo $lang['PROCESS']; ?></span></a></li>
-                <li><a id="erpClients" href="#" data-toggle="collapse" data-target="#toggleERPClients" data-parent="#sidenav01" class="collapsed">
-                    <span><?php echo $lang['CLIENTS']; ?></span> <i class="fa fa-caret-down"></i>
-                  </a>
-                  <div class="collapse" id="toggleERPClients">
-                      <ul class="nav nav-list">
-                          <li><a <?php if (isset($_GET['t']) && $_GET['t'] == 'ang') { echo $setActiveLink; } ?> href="../erp/view?t=ang"><span><?php echo $lang['PROPOSAL_TOSTRING']['ANG']; ?></span></a></li>
-                          <li><a href="../erp/view?t=aub"><span><?php echo $lang['PROPOSAL_TOSTRING']['AUB']; ?></span></a></li>
-                          <li><a href="../erp/view?t=re"><span><?php echo $lang['PROPOSAL_TOSTRING']['RE']; ?></span></a></li>
-                          <li><a href="../erp/view?t=lfs"><span><?php echo $lang['PROPOSAL_TOSTRING']['LFS']; ?></span></a></li>
-                          <li><a href="../system/clients"><span><?php echo $lang['ADDRESS_BOOK']; ?></span></a></li>
-                      </ul>
-                  </div>
-                </li>
-                <li><a id="erpSuppliers" href="#" data-toggle="collapse" data-target="#toggleERPSuppliers" data-parent="#sidenav01" class="collapsed">
-                    <span><?php echo $lang['SUPPLIERS']; ?></span> <i class="fa fa-caret-down"></i>
-                  </a>
-                  <div class="collapse" id="toggleERPSuppliers">
-                    <ul class="nav nav-list">
-                      <li><a disabled href=""><span><?php echo $lang['ORDER']; ?></span></a></li>
-                      <li><a disabled href=""><span><?php echo $lang['INCOMING_INVOICE']; ?></span></a></li>
-                      <li><a href="../system/clients"><span><?php echo $lang['ADDRESS_BOOK']; ?></span></a></li>
-                    </ul>
-                  </div>
-                </li>
-                <li>
-                    <a id="articleToggle" <?php if($this_page =='product_articles.php'){echo $setActiveLink;}?> href="#" data-toggle="collapse" data-target="#toggleArticle" data-parent="#sidenav01" class="collapse in">
-                        <span><?php echo $lang['ARTICLE']; ?></span> <i class="fa fa-caret-down"></i>
-                    </a>
-                    <div class="collapse" id="toggleArticle" style="height: 0px;">
-                        <ul class="nav nav-list">
-                            <?php
-                            $result = $conn->query("SELECT * FROM $companyTable");
-                            while ($result && ($row = $result->fetch_assoc())) {
-                                if (in_array($row['id'], $available_companies)) {
-                                    echo "<li><a href='../erp/articles?cmp=" . $row['id'] . "'>" . $row['name'] . "</a></li>";
-                                }
-                            }
-                            ?>
-                        </ul>
-                    </div>
-                </li>
-                <li><a <?php if($this_page =='receiptBook.php'){echo $setActiveLink;}?> href="../erp/receipts"><span><?php echo $lang['RECEIPT_BOOK']; ?></span></a></li>
-                <li><a disabled href=""><span><?php echo $lang['VACANT_POSITIONS']; ?></span></a></li>
-
-                <li><a id="erpSettings" href="#" data-toggle="collapse" data-target="#toggleERPSettings" data-parent="#sidenav01" class="collapsed">
-                    <span><?php echo $lang['SETTINGS']; ?></span> <i class="fa fa-caret-down"></i>
-                  </a>
-                  <div class="collapse" id="toggleERPSettings">
-                    <ul class="nav nav-list">
-                      <li><a <?php if ($this_page == 'editTaxes.php') {echo $setActiveLink;}?> href="../erp/taxes"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
-                      <li><a <?php if ($this_page == 'editUnits.php') {echo $setActiveLink;}?> href="../erp/units"><span><?php echo $lang['UNITS']; ?></span></a></li>
-                      <li><a <?php if ($this_page == 'editPaymentMethods.php') {echo $setActiveLink;}?> href="../erp/payment"><span><?php echo $lang['PAYMENT_METHODS']; ?></span></a></li>
-                      <li><a <?php if ($this_page == 'editShippingMethods.php') {echo $setActiveLink;}?> href="../erp/shipping"><span><?php echo $lang['SHIPPING_METHODS']; ?></span></a></li>
-                      <li><a <?php if ($this_page == 'editRepres.php') {echo $setActiveLink;}?> href="../erp/representatives"><span><?php echo $lang['REPRESENTATIVE']; ?></span></a></li>
-                    </ul>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <?php
-        if ($this_page == "erp_view.php" || $this_page == "erp_process.php") {
-            echo "<script>$('#adminOption_ERP').click();$('#erpClients').click();</script>";
-        } elseif ($this_page == "editTaxes.php" || $this_page == "editUnits.php" || $this_page == "editPaymentMethods.php" || $this_page == "editShippingMethods.php" || $this_page == "editRepres.php") {
-            echo "<script>$('#adminOption_ERP').click();$('#erpSettings').click();</script>";
-        } elseif ($this_page == "product_articles.php" || $this_page == "receiptBook.php") {
-            echo "<script>document.getElementById('articleToggle').click();$('#adminOption_ERP').click();</script>";
-        }
-        ?>
-      <?php endif;?>
-      <!-- Section Six: FINANCES -->
-      <?php if ($user_roles['isFinanceAdmin'] == 'TRUE'): ?>
-        <div class="panel panel-default panel-borderless">
-          <div class="panel-heading">
-            <a data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-finance"  id="adminOption_FINANCE"><i class="fa fa-caret-down pull-right"></i><i class="fa fa-book"></i><?php echo $lang['FINANCES']; ?></a>
-          </div>
-          <div id="collapse-finance" class="panel-collapse collapse">
-            <div class="panel-body">
-              <ul class="nav navbar-nav">
-                <?php
-                if(count($available_companies) == 2){
-                    echo '<li><a href="../finance/plan?n='.$available_companies[1].'">'.$lang['ACCOUNT_PLAN'].'</a></li>';
-                    echo '<li><a href="../finance/journal?n='.$available_companies[1].'">'.$lang['ACCOUNT_JOURNAL'].'</a></li>';
-                    $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = ".$available_companies[1]);
-                    while($acc_res && ($acc_row = $acc_res->fetch_assoc())){
-                        echo '<li><a href="../finance/account?v='.$acc_row['id'].'">'.$acc_row['name'].'</a></li>';
-                        if($this_page == 'accounting.php' && !empty($_GET['v']) && $_GET['v'] == $acc_row['id']){
-                            echo "<script>$('#finance-click-".$acc_row['companyID']."').click();</script>";
-                        }
-                    }
-                } else {
-                    $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
-                    while($result && ($row = $result->fetch_assoc())){
-                        echo '<li>';
-                        echo '<a id="finance-click-'.$row['id'].'" href="#" data-toggle="collapse" data-target="#tfinances-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$row['name'].' <i class="fa fa-caret-down"></i></a>';
-                        echo '<div class="collapse" id="tfinances-'.$row['id'].'" >';
-                        echo '<ul class="nav nav-list">';
-                        echo '<li><a href="../finance/plan?n='.$row['id'].'">'.$lang['ACCOUNT_PLAN'].'</a></li>';
-                        echo '<li><a href="../finance/journal?n='.$row['id'].'">'.$lang['ACCOUNT_JOURNAL'].'</a></li>';
-                        $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = ".$row['id']);
-                        while($acc_res && ($acc_row = $acc_res->fetch_assoc())){
-                            echo '<li><a href="../finance/account?v='.$acc_row['id'].'">'.$acc_row['name'].'</a></li>';
-                            if($this_page == 'accounting.php' && !empty($_GET['v']) && $_GET['v'] == $acc_row['id']){
-                                echo "<script>$('#finance-click-".$acc_row['companyID']."').click();</script>";
-                            }
-                        }
-                        echo '</ul></div></li>';
-                    }
-                }
-                ?>
-                <li><a <?php if($this_page == 'editTaxes.php'){echo $setActiveLink;}?> href="../erp/taxes"><span><?php echo $lang['TAX_RATES']; ?></span></a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <?php
-        if ($this_page == "accounting.php" || $this_page == 'accountPlan.php' || $this_page == 'accountJournal.php') {
-            echo "<script>$('#adminOption_FINANCE').click();";
-            if (isset($_GET['n'])) {
-                echo "$('#finance-click-" . $_GET['n'] . "').click();";
-            }
-            echo '</script>';
-        }
-        ?>
-      <?php endif;?>
-      <!-- Section Six: DSGVO -->
-      <?php if (has_permission("READ", "DSGVO") /* any read (or write) permission in dsgvo */): ?>
-        <div class="panel panel-default panel-borderless">
-          <div class="panel-heading">
-            <a data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-dsgvo"  id="adminOption_DSGVO"><i class="fa fa-caret-down pull-right"></i><strong style="padding: 0px 6px;"> § </strong>DSGVO</a>
-          </div>
-          <div id="collapse-dsgvo" class="panel-collapse collapse">
-            <div class="panel-body">
-              <ul class="nav navbar-nav">
-                <?php
-                if(count($available_companies) == 2){
-                  $isActivePanel = true;
-                  $isActive = ($isActivePanel && $this_page == 'dsgvo_view.php') ? $setActiveLink : "";
-                  if(has_permission("READ","DSGVO","AGREEMENTS")) echo '<li><a '.$isActive.' href="../dsgvo/documents?n='.$available_companies[1].'">'.$lang['DOCUMENTS'].'</a></li>';
-                  $isActive = ($isActivePanel && ($this_page == 'dsgvo_vv.php' || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php" || $this_page == 'dsgvo_data_matrix.php')) ? $setActiveLink : "";
-                  if(has_permission("READ","DSGVO","PROCEDURE_DIRECTORY")) echo '<li><a '.$isActive.' href="../dsgvo/vv?n='.$available_companies[1].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
-                  $isActive = ($isActivePanel && $this_page == 'dsgvo_mail.php') ? $setActiveLink : "";
-                  if(has_permission("READ","DSGVO","EMAIL_TEMPLATES")) echo '<li><a '.$isActive.' href="../dsgvo/templates?n='.$available_companies[1].'">' .$lang['EMAIL_TEMPLATES']. '</a></li>';
-                  $isActive = ($isActivePanel && $this_page == 'dsgvo_training.php') ? $setActiveLink : "";
-                  if(has_permission("READ","DSGVO","TRAINING")) echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$available_companies[1].'" >' .$lang["TRAINING"]. '</a></li>';
-                  $isActive = ($isActivePanel && $this_page == 'dsgvo_log.php') ? $setActiveLink : "";
-                  if(has_permission("READ","DSGVO","LOGS")) echo '<li><a '.$isActive.' href="../dsgvo/log?n='.$row['id'].'" >Logs</a></li>';
-                } else {
-                  $result = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (".implode(', ', $available_companies).")");
-                  while($result && ($row = $result->fetch_assoc())){
-                    $isActivePanel = isset($_GET['n']) && ($row['id'] ==  $_GET['n']); //only highlight the current page in the tab for the current company
-                    echo '<li>';
-                    echo '<a href="#" data-toggle="collapse" data-target="#tdsgvo-'.$row['id'].'" data-parent="#sidenav01" class="collapsed">'.$row['name'].' <i class="fa fa-caret-down"></i></a>';
-                    echo '<div class="collapse" id="tdsgvo-'.$row['id'].'" >';
-                    echo '<ul class="nav nav-list">';
-                    $isActive = ($isActivePanel && $this_page == 'dsgvo_view.php') ? $setActiveLink : "";
-                    if(has_permission("READ","DSGVO","AGREEMENTS")) echo '<li><a '.$isActive.' href="../dsgvo/documents?n='.$row['id'].'">'.$lang['DOCUMENTS'].'</a></li>';
-                    $isActive = ($isActivePanel && ($this_page == 'dsgvo_vv.php' || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php" || $this_page == 'dsgvo_data_matrix.php')) ? $setActiveLink : "";
-                    if(has_permission("READ","DSGVO","PROCEDURE_DIRECTORY")) echo '<li><a '.$isActive.' href="../dsgvo/vv?n='.$row['id'].'" >'.$lang['PROCEDURE_DIRECTORY'].'</a></li>';
-                    $isActive = ($isActivePanel && $this_page == 'dsgvo_mail.php') ? $setActiveLink : "";
-                    if(has_permission("READ","DSGVO","EMAIL_TEMPLATES")) echo '<li><a '.$isActive.' href="../dsgvo/templates?n='.$row['id'].'">' .$lang['EMAIL_TEMPLATES']. '</a></li>';
-                    $isActive = ($isActivePanel && $this_page == 'dsgvo_training.php') ? $setActiveLink : "";
-                    if(has_permission("READ","DSGVO","TRAINING")) echo '<li><a '.$isActive.' href="../dsgvo/training?n='.$row['id'].'" >' .$lang['TRAINING']. '</a></li>';
-                    $isActive = ($isActivePanel && $this_page == 'dsgvo_log.php') ? $setActiveLink : "";
-                    if(has_permission("READ","DSGVO","LOGS")) echo '<li><a '.$isActive.' href="../dsgvo/log?n='.$row['id'].'" >Logs</a></li>';
-                    echo '</ul></div></li>';
-                  }
-                }
-                ?>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <?php
-        if ($this_page == "dsgvo_view.php" || $this_page == "dsgvo_edit.php" || $this_page == "dsgvo_mail.php" || $this_page == "dsgvo_vv.php"
-            || $this_page == "dsgvo_vv_detail.php" || $this_page == "dsgvo_vv_templates.php" || $this_page == "dsgvo_vv_template_edit.php"
-            || $this_page == "dsgvo_training.php" || $this_page == "dsgvo_log.php" || $this_page == 'dsgvo_data_matrix.php') {
-            echo "<script>$('#adminOption_DSGVO').click();";
-            if (isset($_GET['n'])) {
-                echo "$('#tdsgvo-" . $_GET['n'] . "').toggle();";
-            }
-            echo '</script>';
-        }
-        ?>
-      <?php endif;?>
-      <!-- Section Seven: ARCHIVE -->
-      <?php if ($user_roles['canUseArchive'] == 'TRUE'): ?>
-        <div class="panel panel-default panel-borderless">
-          <div class="panel-heading">
-            <a data-toggle="collapse" data-parent="#sidebar-accordion" href="#collapse-archives"  id="adminOption_ARCHIVE"><i class="fa fa-caret-down pull-right"></i><i class="fa fa-folder-open-o"></i><?php echo $lang['ARCHIVE'] ?></a>
-          </div>
-          <div id="collapse-archives" class="panel-collapse collapse">
-            <div class="panel-body">
-              <ul class="nav navbar-nav">
-                <li><a <?php if ($this_page == 'archive_share.php') {echo $setActiveLink;}?> href="../archive/share" data-parent="#sidenav01" class="collapsed"><?php echo $lang['SHARE'] ?></a></li>
-                <li><a <?php if ($this_page == 'private_view.php') {echo $setActiveLink;}?> href="../archive/private" data-parent="#sidenav01" class="collapsed"><?php echo $lang['PRIVATE'] ?></a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      <?php
-        if ($this_page == "archive_share.php" || $this_page == "private_view.php") {
-            echo "<script>$('#adminOption_ARCHIVE').click();</script>";
-        }
-        ?>
-      <?php endif;?>
-      <!-- END SECTIONS -->
-      <br><br>
-    </div> <!-- /accordions -->
     <br><br><br>
   </div>
 </div>
@@ -1153,3 +1008,4 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           showError('Der Browser den Sie verwenden ist veraltet oder unterstützt wichtige Funktionen nicht. Wenn Sie Probleme mit der Anzeige oder beim Interagieren bekommen, versuchen sie einen anderen Browser.');
       }
       ?>
+      

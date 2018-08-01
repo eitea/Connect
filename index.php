@@ -1,62 +1,138 @@
 <?php
-$routes = array(
-	'login/auth' => 'core/login/login.php',                           'login/register' => 'core/login/selfregistration.php',       'login/update' => 'core/login/doUpdate.php',
-	'login/access' => 'core/login/login_docker.php',
+$routes = [ // each route has a path and an optional permission
+    'login/auth' => ["path" => 'core/login/login.php'],
+    'login/register' => ["path" => 'core/login/selfregistration.php'],
+    'login/update' => ["path" => 'core/login/doUpdate.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'login/access' => ["path" => 'core/login/login_docker.php', "permission" => "WRITE:CORE.SETTINGS"],
 
-	'php/info' => 'core/dev/phpinfo.php',                             'php/debug' => 'core/dev/crypt.php',
+    'php/info' => ["path" => 'core/dev/phpinfo.php', "permission" => "WRITE:CORE.SETTINGS"], 
+    'php/debug' => ["path" => 'core/dev/crypt.php', "permission" => "WRITE:CORE.SETTINGS"],
 
-	'user/home' => 'core/user/home.php',                              'user/time' => 'core/user/timeCalcTable.php',                'user/book' => 'core/user/userProjecting.php',
-	'user/logout' => 'core/user/logout.php',                          'user/request' => 'core/user/makeRequest.php',
+    'user/home' => ["path" => 'core/user/home.php'],
+    'user/time' => ["path" => 'core/user/timeCalcTable.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'user/book' => ["path" => 'core/user/userProjecting.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'user/logout' => ["path" => 'core/user/logout.php'],
+    'user/request' => ["path" => 'core/user/makeRequest.php', "permission" => "WRITE:CORE.SETTINGS"],
 
-	'social/post' => 'social/social_messages.php',               	  'social/profile' => 'social/user_profile.php',
+    'social/post' => ["path" => 'social/social_messages.php', "permission" => "READ:CORE.SETTINGS"],
+    'social/profile' => ["path" => 'social/user_profile.php', "permission" => "WRITE:CORE.SETTINGS"],
 
-	'setup/run' => 'core/setup/setup.php',                            'setup/wizard' => 'core/setup/install_wizard.php',           'setup/keys' => 'core/setup/download_keys.php',
+    'setup/run' => ["path" => 'core/setup/setup.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'setup/wizard' => ["path" => 'core/setup/install_wizard.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'setup/keys' => ["path" => 'core/setup/download_keys.php', "permission" => "WRITE:CORE.SETTINGS"],
 
-	'system/users' => 'core/system/editUsers.php',                    'system/saldo' => 'core/system/admin_saldoview.php',         'system/register' => 'core/system/register.php',
-	'system/deactivated' => 'core/system/deactivatedUsers.php',       'system/company' => 'core/system/editCompanies.php',         'system/new' => 'core/system/new_Companies.php',
-	'system/teams' => 'core/system/teamConfig.php',                   'system/holidays' => 'core/system/editHolidays.php',         'system/advanced' => 'core/system/options_advanced.php',
-	'system/password' => 'core/system/options_password.php',          'system/email' => 'core/system/options_report.php',          'system/tasks' => 'core/system/taskScheduler.php',
-	'system/backup' => 'core/system/system_backup.php',               'system/restore' => 'core/system/system_restore.php',        'system/clients' => 'core/system/editCustomers.php',
-	'system/archive' => 'core/system/options_archive.php',            'system/security' => 'core/system/securitySettings.php',     'system/restic' => 'core/system/resticBackup.php',
-	'system/downloadSql' => 'core/system/backup_download.php',        'system/cryptlog'=> 'core/system/viewCryptLog.php',		   'system/tags' => 'core/system/options_tags.php',
-	'system/checkinLogs' => 'core/system/checkinLogs.php',
+    'system/users' => ["path" => 'core/system/editUsers.php', "permission" => "CORE.USERS"],
+    'system/saldo' => ["path" => 'core/system/admin_saldoview.php', "permission" => "CORE.USERS"],
+    'system/register' => ["path" => 'core/system/register.php', "permission" => "WRITE:CORE.USERS"],
+    'system/deactivated' => ["path" => 'core/system/deactivatedUsers.php', "permission" => "CORE.USERS"],
+    'system/company' => ["path" => 'core/system/editCompanies.php', "permission" => "CORE.COMPANIES"],
+    'system/new' => ["path" => 'core/system/new_Companies.php', "permission" => "WRITE:CORE.COMPANIES"],
+    'system/teams' => ["path" => 'core/system/teamConfig.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'system/holidays' => ["path" => 'core/system/editHolidays.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'system/advanced' => ["path" => 'core/system/options_advanced.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'system/password' => ["path" => 'core/system/options_password.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'system/email' => ["path" => 'core/system/options_report.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'system/tasks' => ["path" => 'core/system/taskScheduler.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'system/backup' => ["path" => 'core/system/system_backup.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'system/restore' => ["path" => 'core/system/system_restore.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'system/clients' => ["path" => 'core/system/editCustomers.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'system/archive' => ["path" => 'core/system/options_archive.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'system/security' => ["path" => 'core/system/securitySettings.php', "permission" => "CORE.SECURITY"],
+    'system/restic' => ["path" => 'core/system/resticBackup.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'system/downloadSql' => ["path" => 'core/system/backup_download.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'system/cryptlog' => ["path" => 'core/system/viewCryptLog.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'system/tags' => ["path" => 'core/system/options_tags.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'system/checkinLogs' => ["path" => 'core/system/checkinLogs.php', "permission" => "CORE.USERS"],
 
-	'time/view' => 'time/time_projects.php',                          'time/corrections' => 'time/time_adjusts.php',               'time/travels' => 'time/time_travel.php',
-	'time/vacations' => 'time/time_vacation.php',                     'time/check' => 'time/adminTodos.php',                       'time/requests' => 'time/time_requests.php',
+    'time/view' => ["path" => 'time/time_projects.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'time/corrections' => ["path" => 'time/time_adjusts.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'time/travels' => ["path" => 'time/time_travel.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'time/vacations' => ["path" => 'time/time_vacation.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'time/check' => ["path" => 'time/adminTodos.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'time/requests' => ["path" => 'time/time_requests.php', "permission" => "WRITE:CORE.SETTINGS"],
 
-	'project/view' => 'project/project_public.php',                   'project/csvDownload' => 'project/csvDownload.php',          'project/pdfDownload' => 'project/pdfDownload.php',
-	'project/log' => 'project/audit_projectBookings.php',             'project/options' => 'project/options.php',                  'project/detailDownload' => 'project/download_archiveObject.php',
-	'project/public' => 'project/project_public.php',
+    'project/view' => ["path" => 'project/project_public.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'project/csvDownload' => ["path" => 'project/csvDownload.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'project/pdfDownload' => ["path" => 'project/pdfDownload.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'project/log' => ["path" => 'project/audit_projectBookings.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'project/options' => ["path" => 'project/options.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'project/detailDownload' => ["path" => 'project/download_archiveObject.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'project/public' => ["path" => 'project/project_public.php', "permission" => "WRITE:CORE.SETTINGS"],
 
-	'report/designer' => 'report/templateSelect.php',                 'report/downloadTem' => 'report/templateDownload.php',       'report/editTemp' => 'report/templateEdit.php',
-	'report/previewTem' => 'report/templatePreview.php',
+    'report/designer' => ["path" => 'report/templateSelect.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'report/downloadTem' => ["path" => 'report/templateDownload.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'report/editTemp' => ["path" => 'report/templateEdit.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'report/previewTem' => ["path" => 'report/templatePreview.php', "permission" => "WRITE:CORE.SETTINGS"],
 
-	'dynamic-projects/view' => 'project/dynamicProjects.php',         'tasks/icalDownload' => 'project/download_ical.php',
+    'dynamic-projects/view' => ["path" => 'project/dynamicProjects.php', "permission" => "WRITE:CORE.SETTINGS"],
 
-	'report/send' => 'schedule/sendMailReport.php',                   'report/autotask' => 'schedule/autotask.php',                'report/tasks' => 'schedule/getAllEmailTasks.php',
+    'tasks/icalDownload' => ["path" => 'project/download_ical.php', "permission" => "WRITE:CORE.SETTINGS"],
 
-	'erp/view' => 'erp/erp_view.php',                                 'erp/articles' => 'erp/product_articles.php',                'erp/taxes' => 'erp/editTaxes.php',
-	'erp/units' => 'erp/editUnits.php',                               'erp/payment' => 'erp/editPaymentMethods.php',               'erp/shipping' => 'erp/editShippingMethods.php',
-	'erp/representatives' => 'erp/editRepres.php',                    'erp/download' => 'erp/download_proposal.php',               'erp/edit' => 'erp/erp_process.php',
-	'erp/receipts' => 'erp/receiptBook.php',
+    'report/send' => ["path" => 'schedule/sendMailReport.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'report/autotask' => ["path" => 'schedule/autotask.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'report/tasks' => ["path" => 'schedule/getAllEmailTasks.php', "permission" => "WRITE:CORE.SETTINGS"],
 
-	'finance/account' => 'finance/accounting.php',                    'finance/plan' => 'finance/accountPlan.php',                 'finance/journal' => 'finance/accountJournal.php',
+    'erp/view' => ["path" => 'erp/erp_view.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'erp/articles' => ["path" => 'erp/product_articles.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'erp/taxes' => ["path" => 'erp/editTaxes.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'erp/units' => ["path" => 'erp/editUnits.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'erp/payment' => ["path" => 'erp/editPaymentMethods.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'erp/shipping' => ["path" => 'erp/editShippingMethods.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'erp/representatives' => ["path" => 'erp/editRepres.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'erp/download' => ["path" => 'erp/download_proposal.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'erp/edit' => ["path" => 'erp/erp_process.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'erp/receipts' => ["path" => 'erp/receiptBook.php', "permission" => "WRITE:CORE.SETTINGS"],
 
-	'dsgvo/documents' => 'dsgvo/dsgvo_view.php',                      'dsgvo/access' => 'dsgvo/dsgvo_access.php',                  'dsgvo/templates' => 'dsgvo/dsgvo_mail.php',
-	'dsgvo/edit' => 'dsgvo/dsgvo_edit.php',                           'dsgvo/vv' => 'dsgvo/dsgvo_vv.php',                          'dsgvo/log' => 'dsgvo/dsgvo_log.php',
-	'dsgvo/vDetail' => 'dsgvo/dsgvo_vv_detail.php',                   'dsgvo/editTemplate' => 'dsgvo/dsgvo_vv_template_edit.php',  'dsgvo/training' => 'dsgvo/dsgvo_training.php',
-	'dsgvo/data-matrix' => 'dsgvo/dsgvo_data_matrix.php',             'dsgvo/pdfDownload' => 'dsgvo/dsgvo_vv_pdfDownload.php',
+    'finance/account' => ["path" => 'finance/accounting.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'finance/plan' => ["path" => 'finance/accountPlan.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'finance/journal' => ["path" => 'finance/accountJournal.php', "permission" => "WRITE:CORE.SETTINGS"],
 
-	'archive/share' => 'archive/archive_share.php',                   'archive/files' => 'archive/archive_files.php',			   'archive/private'  => 'archive/private_view.php',
+    'dsgvo/documents' => ["path" => 'dsgvo/dsgvo_view.php', "permission" => "DSGVO.AGREEMENTS"],
+    'dsgvo/access' => ["path" => 'dsgvo/dsgvo_access.php', "permission" => "DSGVO.SETTINGS"],
+    'dsgvo/templates' => ["path" => 'dsgvo/dsgvo_mail.php', "permission" => "DSGVO.SETTINGS"],
+    'dsgvo/edit' => ["path" => 'dsgvo/dsgvo_edit.php', "permission" => "DSGVO.SETTINGS"],
+    'dsgvo/vv' => ["path" => 'dsgvo/dsgvo_vv.php', "permission" => "DSGVO.SETTINGS"],
+    'dsgvo/log' => ["path" => 'dsgvo/dsgvo_log.php', "permission" => "DSGVO.LOGS"],
+    'dsgvo/vDetail' => ["path" => 'dsgvo/dsgvo_vv_detail.php', "permission" => "DSGVO.SETTINGS"],
+    'dsgvo/editTemplate' => ["path" => 'dsgvo/dsgvo_vv_template_edit.php', "permission" => "DSGVO.SETTINGS"],
+    'dsgvo/training' => ["path" => 'dsgvo/dsgvo_training.php', "permission" => "DSGVO.TRAINING"],
+    'dsgvo/data-matrix' => ["path" => 'dsgvo/dsgvo_data_matrix.php', "permission" => "DSGVO.SETTINGS"],
+    'dsgvo/pdfDownload' => ["path" => 'dsgvo/dsgvo_vv_pdfDownload.php', "permission" => "DSGVO.SETTINGS"],
 
-	'extern/login' => 'external/login.php',                           'extern/home' => 'external/home.php'
-);
+    'archive/share' => ["path" => 'archive/archive_share.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'archive/files' => ["path" => 'archive/archive_files.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'archive/private' => ["path" => 'archive/private_view.php', "permission" => "WRITE:CORE.SETTINGS"],
+
+    'extern/login' => ["path" => 'external/login.php', "permission" => "WRITE:CORE.SETTINGS"],
+    'extern/home' => ["path" => 'external/home.php', "permission" => "WRITE:CORE.SETTINGS"]
+];
 
 $mime_types = array(
 	'.css' => "text/css",                 '.js' => "text/javascript",               '.png' => "image/png",
 	'.jpeg' => "image/jpeg",              '.jpg' => "image/jpg",                    '.woff2' => "application/font-woff2",
 	'.gif' => "image/gif",                '.woff' => "application/font-woff",       '.ttf' => "font/opentype"
 );
+
+function has_permission_for_route($route){
+	if(isset($route["permission"]) && $route["permission"]){
+    $exploded = explode(":",$route["permission"]);
+		if(count($exploded) == 0) return false;
+		if(count($exploded) == 1){
+			$type = "READ";
+			$rest = $exploded[0];
+		}else{
+			$type = $exploded[0];
+			$rest = $exploded[1];
+		}
+		$exploded = explode(".",$rest);
+		if(count($exploded) != 2) return false;
+		$group = $exploded[0];
+		$permission = $exploded[1];
+		require_once "src" . DIRECTORY_SEPARATOR . "validate.php";
+		return has_permission($type,$group,$permission);
+  }
+  return true;
+}
 
 //url must end like this:  / ACCESS / PAGE
 $url = strtok($_SERVER['REQUEST_URI'], '?');
@@ -65,8 +141,16 @@ $l = count($params) -1 ;
 if($l > 1){
 	$route = strtok($params[$l - 1].'/'.$params[$l], '?'); //clean get params
 	if(array_key_exists($route, $routes)){
-		$this_page = basename($routes[$route]);
-		include 'src/'.$routes[$route];
+		session_start();
+		$this_page = basename($routes[$route]["path"]);
+		$this_route = $routes[$route];
+		$this_url = $route;
+		$has_permission_to_view_page = has_permission_for_route($this_route);
+		if(!$has_permission_to_view_page){
+			echo 'Access denied. <a href="../user/logout"> logout</a>';
+			die();
+		}
+		include 'src/'.$routes[$route]["path"];
 	} elseif(preg_match("/(images|plugins|modules)(\/.*)(\/[A-Za-z0-9\.]*)*(\.css|\.js|\.png|\.jpg|\.woff2|\.woff|\.ttf|\.gif)$/", $url, $matches)){
 		if(array_key_exists($matches[4], $mime_types)){
 			header('Content-Type: '. $mime_types[$matches[4]]);
