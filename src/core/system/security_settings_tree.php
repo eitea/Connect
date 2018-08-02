@@ -59,11 +59,11 @@ $permission_groups = $result->fetch_all(MYSQLI_ASSOC);
                                     $read_checked = ($permission_row["type"] === 'READ'||$permission_row["type"] === 'WRITE')?"checked":"";
                                     $write_checked = ($permission_row["type"] === 'WRITE')?"checked":"";
 
-                                    if($group_name == "DSGVO" && array_key_exists('DSGVO', $encrypted_modules)&& !array_key_exists('DSGVO', $grantable_modules)){ 
+                                    if($group_name == "DSGVO" && array_key_exists('DSGVO', $encrypted_modules)&& !array_key_exists('DSGVO', $grantable_modules)){
                                         $read_checked .= ' disabled';
                                         $write_checked .= ' disabled';
-                                    } else if($group_name == "ERP" && array_key_exists('ERP', $encrypted_modules) && !array_key_exists('ERP', $grantable_modules)){
-                                        $read_checked .= ' disabled';
+                                    } elseif($group_name == "ERP" && array_key_exists('ERP', $encrypted_modules) && !array_key_exists('ERP', $grantable_modules)){
+						                $read_checked .= ' disabled';
                                         $write_checked .= ' disabled';
                                     }
 

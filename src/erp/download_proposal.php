@@ -183,10 +183,9 @@ if($prod_res && $prod_res->num_rows > 0){
   $pdf->Cell($w[3],7,$lang['PRICE_STK'], '', 0, 'R', 1);
   $pdf->Cell($w[4],7,$lang['TAXES'], '', 0, 'R', 1);
   $pdf->Cell($w[5],7,$lang['TOTAL_PRICE'], '', 1, 'R', 1);
-
   while($prod_row = $prod_res->fetch_assoc()){
-    $prod_row["name"] = secure_data('ERP', $prod_row['name'], 'decrypt', $userID, $privateKey);
-    $prod_row["description"] = secure_data('ERP', $prod_row['description'], 'decrypt', $userID, $privateKey);
+    $prod_row["name"] = secure_data('ERP', $prod_row['name'], 'decrypt', $userID, $privateKey, $err);
+    $prod_row["description"] = secure_data('ERP', $prod_row['description'], 'decrypt', $userID, $privateKey, $err);
     if($prod_row['name'] == 'NEW_PAGE'){
       $pdf->AddPage();
     } elseif($prod_row['name'] == 'PARTIAL_SUM'){

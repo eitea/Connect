@@ -121,13 +121,14 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
     static $symmetric = false;
 	static $usedModule = '';
     if((!$symmetric || $usedModule != $module) && $userID && $privateKey){
-		$usedModule = $module;
 		if(is_array($module)){
 			$optionalID = $module[1];
 			$module = $module[0];
-			$result = $conn->query("SELECT privateKey FROM security_access a INNER JOIN security_modules m ON a.module = m.module AND m.outdated = 'FALSE'WHERE userID = $userID AND a.module = '$module' AND optionalID = '$optionalID' AND a.outDated = 'FALSE' ORDER BY a.recentDate LIMIT 1");
+			$result = $conn->query("SELECT privateKey FROM security_access a INNER JOIN security_modules m ON a.module = m.module AND m.outdated = 'FALSE'
+				WHERE userID = $userID AND a.module = '$module' AND optionalID = '$optionalID' AND a.outDated = 'FALSE' ORDER BY a.recentDate LIMIT 1");
 		} else {
-			$result = $conn->query("SELECT privateKey FROM security_access a INNER JOIN security_modules m ON a.module = m.module AND m.outdated = 'FALSE' WHERE userID = $userID AND a.module = '$module' AND a.outDated = 'FALSE' ORDER BY a.recentDate LIMIT 1");
+			$result = $conn->query("SELECT privateKey FROM security_access a INNER JOIN security_modules m ON a.module = m.module AND m.outdated = 'FALSE'
+				WHERE userID = $userID AND a.module = '$module' AND a.outDated = 'FALSE' ORDER BY a.recentDate LIMIT 1");
         }
         if($result && ( $row=$result->fetch_assoc() )){
 			//echo $row['privateKey'] .' --encrypted base64 private module key<br>';
@@ -150,6 +151,8 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
 				$nonce = mb_substr($cipher_symmetric, 0, 24, '8bit');
 				$cipher_symmetric = mb_substr($cipher_symmetric, 24, null, '8bit');
 				$symmetric = sodium_crypto_box_open($cipher_symmetric, $nonce, $private_module.$public_module);
+				$usedModule = $module;
+
 				//echo base64_encode($symmetric) .' -- plain symmetric<br>';
                 if(!$symmetric){
 					$err = 'Could not retrieve symmetric Key';
@@ -157,17 +160,18 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
                 }
             } elseif($result){
                 $err = 'Module encryption not active';
-                return $message;
+				return $message;
             }
         } elseif($result){
             $err = 'User Access not found';
-            return $message;
+			return $message;
         } elseif($conn->error){
 			$err = $conn->error;
 			return $message;
 		}
     }
-	if($symmetric) {
+
+	if($symmetric && $module == $usedModule) {
         if($mode == 'encrypt'){
             return simple_encryption($message, $symmetric);
         } else {
@@ -175,6 +179,7 @@ function secure_data($module, $message, $mode = 'encrypt', $userID = 0, $private
         }
     }
     $err = 'Something went wrong';
+	$symmetric = false;
     return $message;
 }
 

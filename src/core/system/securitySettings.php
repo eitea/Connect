@@ -26,6 +26,8 @@ while($row = $result->fetch_assoc()){
 	$grantable_modules[$row['module']]['public'] = $row['publicKey'];
 }
 
+//echo '<pre>', print_r($grantable_modules, 1),'</pre>';
+
 if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","CORE","SECURITY")){
 
     if(!empty($_POST['saveRoles'])) {
