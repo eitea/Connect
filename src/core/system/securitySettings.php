@@ -42,9 +42,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","CORE","SECURI
                     $permissionID = intval($arr[2]);
                     $stmt_insert_permission_relationship->execute();
                     echo $stmt_insert_permission_relationship->error;
-                }        
+                }
             }
-            $stmt_insert_permission_relationship->close();    
+            $stmt_insert_permission_relationship->close();
         }
     }
 
@@ -181,7 +181,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","CORE","SECURI
 				} else {
 					showSuccess("$module Schlüssel wurde hinzugefügt");
 				}
-			} elseif(!array_key_exists($module, $grantable_modules)) {
+			} elseif(array_key_exists($module, $encrypted_modules) && !array_key_exists($module, $grantable_modules)) {
 				showInfo("Fehlende $module Verschlüsselung: Sie können keinen Modulzugriff gewähren, zudem Sie selbst keinen Zugriff besitzen.");
 				return 'FALSE';
 			}

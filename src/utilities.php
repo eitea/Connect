@@ -839,6 +839,22 @@ function getUnreadMessages($conversationID = 0){
 	return '';
 }
 
+function sendNotification($recipient, $subject, $message){
+	if(!$recipient || !$message) return;
+	global $conn;
+	$identifier = uniqid();
+	$conn->query("INSERT INTO messenger_conversations (subject, category, identifier) VALUES('$subject', 'notification', '$identifier')"); echo $conn->error;
+	$conversationID = $conn->insert_id;
+	$conn->query("INSERT INTO relationship_conversation_participant (conversationID, partType, partID, status) VALUES($conversationID, 'USER', $recipient, 'normal')");
+	echo $conn->error;
+	$rcpID = $conn->insert_id;
+	if($rcpID){
+		$conn->query("INSERT INTO messenger_messages (message, participantID) VALUES('$message', $rcpID)");
+	} else {
+		echo $conn->error;
+	}
+}
+
 function str_starts_with($prefix, $subject){
     return substr($subject, 0, strlen($prefix)) === $prefix;
 }

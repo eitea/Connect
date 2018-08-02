@@ -136,6 +136,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 showError($conn->error);
             } else {
                 showSuccess($lang['OK_SAVE']);
+				$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID, extra1) VALUES('$x', 'DELAY', $userID, '$date')");
             }
         } else {
             showError('Datum ungültig. Format YYYY-MM-DD HH:mm');
@@ -222,6 +223,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     $percentage = 100; //safety
                     if($row['needsreview'] == 'TRUE'){
                         $conn->query("UPDATE dynamicprojects SET projectstatus = 'REVIEW' WHERE projectid = '$dynamicID'");
+						if(!$conn->error){
+							$result = $conn->query("SELECT userid FROM dynamicprojectsemployees WHERE position = 'owner' AND projectid = '$dynamicID'");
+							if($result && ($emp_row = $result->fetch_assoc())){
+								sendNotification($emp_row['userid'], "Review Task $dynamicID", "Task $dynamicID wurde soeben abgeschlossen und ist bereit zur Überprüfung!");
+							} else {
+								echo $conn->error;
+							}
+						} else {
+							showError($conn->error);
+						}
                     } else {
                         $conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' WHERE projectid = '$dynamicID'");
                     }
@@ -251,6 +262,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     $percentage = 100; //safety
                     if($row['needsreview'] == 'TRUE'){
                         $conn->query("UPDATE dynamicprojects SET projectstatus = 'REVIEW' WHERE projectid = '$dynamicID'");
+						if(!$conn->error){
+							$result = $conn->query("SELECT userid FROM dynamicprojectsemployees WHERE position = 'owner' AND projectid = '$dynamicID'");
+							if($result && ($emp_row = $result->fetch_assoc())){
+								sendNotification($emp_row['userid'], "Review Task $dynamicID", "Task $dynamicID wurde soeben abgeschlossen und ist bereit zur Überprüfung!");
+							}
+						} else {
+							showError($conn->error);
+						}
                     } else {
                         $conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' WHERE projectid = '$dynamicID'");
                     }
