@@ -78,6 +78,7 @@ if($result && $result->num_rows > 0){
 <!DOCTYPE html>
 <html>
 <meta http-equiv="Cache-Control" content="max-age=600, must-revalidate">
+<meta name="google" content="notranslate">
 <link href="../plugins/homeMenu/loginMenu.css" rel="stylesheet" />
 <head>
     <title>Login</title>
