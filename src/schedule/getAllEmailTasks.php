@@ -27,7 +27,7 @@ while($result_serv && $row = $result_serv->fetch_assoc()){
     $security = empty($row['smtpSecure']) ? '' : '/'.$row['smtpSecure'];
 	//$mailbox = '{'.$row['server'] .':'. $row['port']. '/'.$row['service'] . $security.'/novalidate-cert}'.'INBOX'; //{imap.gmail.com:993/imap/ssl}INBOX ; {localhost:993/imap/ssl/novalidate-cert}
     $mailbox = '{'.$row['server'] .':'. $row['port']. '/'.$row['service'] . $security.'/novalidate-cert}';
-	$imap = imap_open($mailbox, $row['username'], $row['password'], CL_EXPUNGE);
+	$imap = imap_open($mailbox, $row['username'], $row['password']);
 
     @imap_createmailbox($imap, imap_utf7_encode($mailbox.$archive));
 	imap_reopen($imap, $mailbox.'INBOX');
@@ -44,7 +44,13 @@ while($result_serv && $row = $result_serv->fetch_assoc()){
 			$archiveCat = 'CHAT';
 			$bucket = $identifier.'-uploads';
 		}
-        foreach(imap_search($imap, 'ALL') as $mail_number){
+		$email_res = imap_search($imap, 'ALL');
+		for($i = 0; $i < 5; $i++){
+			if(isset($email_res[$i])){
+				$mail_number = $email_res[$i];
+			} else {
+				continue;
+			}
             $header = imap_headerinfo($imap, $mail_number);
 			$match = true;
 			$pos = $rule['subject'] ? strpos($header->subject, $rule['subject']) : false;
