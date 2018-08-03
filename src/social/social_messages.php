@@ -24,7 +24,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $partType = 'USER';
             $partID = $userID;
             $status = 'creator';
-
             $stmt_participant->execute();
             $options = ['subject' => "$subject - [CON - $identifier]"];
             if ($conn->error) {
@@ -49,6 +48,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } else {
                 $options['userid'] = $userID;
             }
+			if(isset($_FILES['new_message_files'])){ //5b45f089288db
+				$s3 = getS3Object($bucket);
+				for ($i = 0; $i < count($_FILES['new_message_files']['name']); $i++) {
+					if($s3 && file_exists($_FILES['new_message_files']['tmp_name'][$i]) && is_uploaded_file($_FILES['new_message_files']['tmp_name'][$i])){
+						$file_info = pathinfo($_FILES['new_message_files']['name'][$i]);
+						$ext = test_input(strtolower($file_info['extension']));
+						if (!validate_file($err, $ext, $_FILES['new_message_files']['size'][$i])){
+							showError($err);
+						} else {
+							try{
+								$hashkey = uniqid('', true); //23 chars
+								$file = file_get_contents($_FILES['new_message_files']['tmp_name'][$i]);
+								$file_encrypt = asymmetric_encryption('CHAT', $file, $userID, $privateKey);
+								$s3->putObject(array(
+									'Bucket' => $bucket,
+									'Key' => $hashkey,
+									'Body' => $file_encrypt
+								));
+								$filename = test_input($file_info['filename']);
+								$options['attachments'] = [$filename => $file];
+								$conn->query("INSERT INTO archive (category, categoryID, name, parent_directory, type, uniqID, uploadUser)
+								VALUES ('CHAT', '$openChatID', '$filename', 'ROOT', '$ext', '$hashkey', $userID)");
+
+								if($conn->error){ showError($conn->error.__LINE__); }
+								$conn->query("INSERT INTO messenger_messages(message, type, participantID, vKey) SELECT '$hashkey', 'file', id, '$v2Key'
+								FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' AND conversationID = $openChatID");
+
+								if($conn->error){ showError($conn->error.__LINE__); } else { showSuccess($lang['OK_UPLOAD']); }
+							} catch(Exception $e){
+								echo $e->getTraceAsString();
+								echo '<br><hr><br>';
+								echo $e->getMessage();
+							}
+
+						}
+					}
+				}
+			}
             if ($user_roles['canSendToExtern'] == 'TRUE') {
                 if (!empty($_POST['new_message_cc_contacts'])) {
                     foreach ($_POST['new_message_cc_contacts'] as $val) {
@@ -284,6 +321,11 @@ while ($row = $result->fetch_assoc()) {
 							</a></label>
 							<textarea name="new_message_body" rows="8" style="resize:none" class="form-control"></textarea>
 							<small>*Felder werden benötigt</small>
+						</div>
+						<div class="col-md-12">
+							<br>
+							<label class="btn btn-default"><input type="file" name="new_message_files[]" style="display:none" multiple />Dateien Hochladen</label>
+							<br>
 						</div>
 					</div>
 					<div class="row enable-personal-role">

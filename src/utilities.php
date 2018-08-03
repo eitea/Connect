@@ -745,6 +745,11 @@ function send_standard_email($recipient, $content, Array $options = ['subject' =
 	} else {
 		$mail->setFrom($row['sender'], $row['senderName']);
 	}
+	if(isset($options['attachments'])){
+		foreach($options['attachments'] as $filename => $file){
+			$mail->addStringAttachment($file, $filename);
+		}
+	}
 	if(!$signature && $companyID){
 		$result = $conn->query("SELECT emailSignature FROM companyData WHERE id = $companyID");
 		if($row_fc = $result->fetch_assoc()){
