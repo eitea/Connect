@@ -146,9 +146,7 @@ while($result_serv && $row = $result_serv->fetch_assoc()){
 					}
 				}
 				$move_sequence[] = $mail_number;
-				imap_delete($imap, $mail_number);
 			}
-
         } //end foreach mail
 		if(!imap_mail_move($imap, implode(',', $move_sequence), $archive)) imap_expunge($imap);
     }
