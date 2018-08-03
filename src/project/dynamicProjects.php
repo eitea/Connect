@@ -65,7 +65,6 @@ $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, "pr
 $result = $conn->query("SELECT teamID FROM relationship_team_user WHERE userID = $userID");
 while($result && ( $row = $result->fetch_assoc())){
 	$available_teams[] = $row['teamID'];
-    $filterings['employees'][] = 'team;'.$row['teamID'];
 }
 $templateResult = $conn->query("SELECT projectname,projectid,v2 FROM dynamicprojects WHERE isTemplate = 'TRUE'");
 ?>

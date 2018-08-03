@@ -344,7 +344,7 @@ while ($row = $result->fetch_assoc()) {
 		},
 		error : function(resp){alert(resp);}
 	  });
-  }, 15000);
+  }, 25000);
   <?php endif; ?>
 </script>
 <?php require dirname(__DIR__) . '/footer.php'; ?>

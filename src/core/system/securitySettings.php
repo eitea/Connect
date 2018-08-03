@@ -29,7 +29,6 @@ while($row = $result->fetch_assoc()){
 //echo '<pre>', print_r($grantable_modules, 1),'</pre>';
 
 if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","CORE","SECURITY")){
-
     if(!empty($_POST['saveRoles'])) {
         $x = intval($_POST['saveRoles']);
         if($x != 1){
