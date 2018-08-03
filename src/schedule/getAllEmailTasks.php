@@ -112,9 +112,9 @@ while($result_serv && $row = $result_serv->fetch_assoc()){
 					$name = asymmetric_encryption('TASK', substr_replace($header->subject, '', $pos, strlen($rule['subject'])), 0, $secret);
 					$conn->query("INSERT INTO dynamicprojects(
 					projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-					projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2, projectmailheader)
+					projectpriority, projectparent, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2, projectmailheader)
 					SELECT '$projectid', '$name', '$html', companyid, clientid, clientprojectid, projectcolor, IF(projectstart='0000-00-00', UTC_TIMESTAMP , projectstart),
-					projectend, projectstatus, projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, 'FALSE',
+					projectend, projectstatus, projectpriority, projectparent, projectpercentage, estimatedHours, level, projecttags, 'FALSE',
 					'$v2', '$encrypted_header' FROM dynamicprojects WHERE projectid = '{$rule['templateID']}'");
 					if($conn->error) echo $conn->error.__LINE__;
 					if($rule['autoResponse']) send_standard_email($sender, $rule['autoResponse'], ['subject' => "Connect - Ticket Nr. [$projectid]"]); //5b20ad39615f9
