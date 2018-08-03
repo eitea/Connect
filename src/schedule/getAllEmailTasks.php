@@ -44,109 +44,107 @@ while($result_serv && $row = $result_serv->fetch_assoc()){
 			$archiveCat = 'CHAT';
 			$bucket = $identifier.'-uploads';
 		}
-		$email_res = imap_search($imap, 'ALL');
-		for($i = 0; $i < 5; $i++){
-			if(isset($email_res[$i])){
-				$mail_number = $email_res[$i];
-			} else {
-				continue;
-			}
-            $header = imap_headerinfo($imap, $mail_number);
-			$match = true;
-			$pos = $rule['subject'] ? strpos($header->subject, $rule['subject']) : false;
-			$sender = $header->from[0]->mailbox.'@'.$header->from[0]->host;
-			if($rule['fromAddress'] && strpos($sender, $rule['fromAddress']) === false ) $match = false;
-			if($rule['toAddress'] && $header->to[0]->mailbox.'@'.$header->to[0]->host != $rule['toAddress']) $match = false;
-			if($rule['subject'] && $pos === false) $match = false;
-			if(!$rule['workflowID'] && !preg_match("/\[CON - [0-9a-z]{13}\]$/", $rule['subject'], $out)) $match = false;
-			if($match){
-				$keypair = sodium_crypto_box_keypair();
-				$v2 = base64_encode(sodium_crypto_box_publickey($keypair));
-				$secret = base64_encode(sodium_crypto_box_secretkey($keypair));
-				$encrypted_header = asymmetric_encryption('TASK', imap_fetchheader($imap, $mail_number), 0, $secret);
+		$email_counter = 0; //fun fact: naming this $i will break it
+		foreach(imap_search($imap, 'ALL') as $mail_number){
+			if($email_counter < 5){
+				$email_counter++;
+				$header = imap_headerinfo($imap, $mail_number);
+				$match = true;
+				$pos = $rule['subject'] ? strpos($header->subject, $rule['subject']) : false;
+				$sender = $header->from[0]->mailbox.'@'.$header->from[0]->host;
+				if($rule['fromAddress'] && strpos($sender, $rule['fromAddress']) === false ) $match = false;
+				if($rule['toAddress'] && $header->to[0]->mailbox.'@'.$header->to[0]->host != $rule['toAddress']) $match = false;
+				if($rule['subject'] && $pos === false) $match = false;
+				if(!$rule['workflowID'] && !preg_match("/\[CON - [0-9a-z]{13}\]$/", $rule['subject'], $out)) $match = false;
+				if($match){
+					$keypair = sodium_crypto_box_keypair();
+					$v2 = base64_encode(sodium_crypto_box_publickey($keypair));
+					$secret = base64_encode(sodium_crypto_box_secretkey($keypair));
+					$encrypted_header = asymmetric_encryption('TASK', imap_fetchheader($imap, $mail_number), 0, $secret);
 
-				$html = '';
-				$projectid = uniqid();
-				if(!$rule['templateID']){
-					$projectid = substr($header->subject, -14, -1); echo "Messenger ID : $projectid";
-				}
-				foreach(create_part_array(imap_fetchstructure($imap, $mail_number)) as $partoverview){
-					$part = $partoverview['part_object'];
-					$content = imap_fetchbody($imap, $mail_number, $partoverview['part_number']);
-					if($part->encoding == 3){
-						$content = base64_decode($content);
-					} elseif($part->encoding == 4){
-						$content = quoted_printable_decode($content);
+					$html = '';
+					$projectid = uniqid();
+					if(!$rule['templateID']){
+						$projectid = substr($header->subject, -14, -1); echo "Messenger ID : $projectid";
 					}
-					if($part->ifparameters) $params = $part->parameters;
-					if($part->ifdparameters) $params = $part->dparameters;
-					foreach($params as $object){
-						if($part->ifdisposition && ($part->disposition == 'attachment' || $part->disposition == 'inline')){
-							if($object->attribute == 'filename' || $object->attribute == 'name'){
-								$filename = pathinfo($object->value, PATHINFO_FILENAME);
-								$filetype = strtolower($part->subtype);
-								$archiveID = uniqid('', true);
-								if(in_array($filetype, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'zip', 'msg', 'jpg', 'jpeg', 'png', 'gif'])){
-									$stmt_insertarchive->execute();
-									$s3->putObject(array(
-										'Bucket' => $bucket,
-										'Key' => $archiveID,
-										'Body' => asymmetric_encryption('TASK', $content, 0, $secret)
-									));
-									if($part->ifid && $part->disposition == 'inline'){
-										$attachmentId = trim($part->id, " <>");
-										$html = str_replace("cid:$attachmentId", "cid:$archiveID", $html); //replace the image with the archive id. makes it easier.
+					foreach(create_part_array(imap_fetchstructure($imap, $mail_number)) as $partoverview){
+						$part = $partoverview['part_object'];
+						$content = imap_fetchbody($imap, $mail_number, $partoverview['part_number']);
+						if($part->encoding == 3){
+							$content = base64_decode($content);
+						} elseif($part->encoding == 4){
+							$content = quoted_printable_decode($content);
+						}
+						if($part->ifparameters) $params = $part->parameters;
+						if($part->ifdparameters) $params = $part->dparameters;
+						foreach($params as $object){
+							if($part->ifdisposition && ($part->disposition == 'attachment' || $part->disposition == 'inline')){
+								if($object->attribute == 'filename' || $object->attribute == 'name'){
+									$filename = pathinfo($object->value, PATHINFO_FILENAME);
+									$filetype = strtolower($part->subtype);
+									$archiveID = uniqid('', true);
+									if(in_array($filetype, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'zip', 'msg', 'jpg', 'jpeg', 'png', 'gif'])){
+										$stmt_insertarchive->execute();
+										$s3->putObject(array(
+											'Bucket' => $bucket,
+											'Key' => $archiveID,
+											'Body' => asymmetric_encryption('TASK', $content, 0, $secret)
+										));
+										if($part->ifid && $part->disposition == 'inline'){
+											$attachmentId = trim($part->id, " <>");
+											$html = str_replace("cid:$attachmentId", "cid:$archiveID", $html); //replace the image with the archive id. makes it easier.
+										}
 									}
 								}
+							} elseif($object->attribute == 'charset' && !empty($params)){
+								$html = iconv($object->value, 'UTF-8//TRANSLIT', trim($content));
 							}
-						} elseif($object->attribute == 'charset' && !empty($params)){
-							$html = iconv($object->value, 'UTF-8//TRANSLIT', trim($content));
 						}
 					}
-				}
 
-				if($rule['templateID']){ //dynamicproject
-					$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$projectid', 'CREATED', 1)");
-					if($conn->error) echo $conn->error.__LINE__;
-					$html = asymmetric_encryption('TASK', $html, 0, $secret);
-					$name = asymmetric_encryption('TASK', substr_replace($header->subject, '', $pos, strlen($rule['subject'])), 0, $secret);
-					$conn->query("INSERT INTO dynamicprojects(
-					projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-					projectpriority, projectparent, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2, projectmailheader)
-					SELECT '$projectid', '$name', '$html', companyid, clientid, clientprojectid, projectcolor, IF(projectstart='0000-00-00', UTC_TIMESTAMP , projectstart),
-					projectend, projectstatus, projectpriority, projectparent, projectpercentage, estimatedHours, level, projecttags, 'FALSE',
-					'$v2', '$encrypted_header' FROM dynamicprojects WHERE projectid = '{$rule['templateID']}'");
-					if($conn->error) echo $conn->error.__LINE__;
-					if($rule['autoResponse']) send_standard_email($sender, $rule['autoResponse'], ['subject' => "Connect - Ticket Nr. [$projectid]"]); //5b20ad39615f9
-					$conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) SELECT '$projectid', userid, position FROM dynamicprojectsemployees WHERE projectid = '{$rule['templateID']}'");
-					if($conn->error) echo $conn->error.__LINE__;
-					$conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) SELECT '$projectid', teamid FROM dynamicprojectsteams WHERE projectid = '{$rule['templateID']}'");
-					if($conn->error) echo $conn->error.__LINE__;
-				} else { //message
-					echo 'Message Detected';
-					$result = $conn->query("SELECT id FROM messenger_conversations WHERE identifier = '$projectid'");
-					if($row = $result->fetch_assoc()){
-						$conversationID = $row['id'];
-						$result = $conn->query("SELECT id FROM relationship_conversation_participant WHERE conversationID = $conversationID AND partID = '$sender' ");
-						if($row = $result->fetch_assoc()){
-							$participantID = $row['id'];
-						} else {
-							echo "Adding new participant... ";
-							$conn->query("INSERT INTO relationship_conversation_participant(conversationID, partType, partID, status)
-								VALUES ($conversationID, 'unknown', '$sender', 'normal')");
-							$participantID = $conn->insert_id;
-							if($conn->error) echo $conn->error.__LINE__;
-						}
-						$result->free();
-						$message = asymmetric_encryption('CHAT', $html, 0, $secret);
-						$conn->query("INSERT INTO messenger_messages(message, participantID, vKey) VALUES ('$message', $participantID, '$v2')");
+					if($rule['templateID']){ //dynamicproject
+						$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$projectid', 'CREATED', 1)");
 						if($conn->error) echo $conn->error.__LINE__;
-					} else {
-						echo "Error: No Message found with identifier $projectid";
+						$html = asymmetric_encryption('TASK', $html, 0, $secret);
+						$name = asymmetric_encryption('TASK', substr_replace($header->subject, '', $pos, strlen($rule['subject'])), 0, $secret);
+						$conn->query("INSERT INTO dynamicprojects(
+						projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
+						projectpriority, projectparent, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2, projectmailheader)
+						SELECT '$projectid', '$name', '$html', companyid, clientid, clientprojectid, projectcolor, IF(projectstart='0000-00-00', UTC_TIMESTAMP , projectstart),
+						projectend, projectstatus, projectpriority, projectparent, projectpercentage, estimatedHours, level, projecttags, 'FALSE',
+						'$v2', '$encrypted_header' FROM dynamicprojects WHERE projectid = '{$rule['templateID']}'");
+						if($conn->error) echo $conn->error.__LINE__;
+						if($rule['autoResponse']) send_standard_email($sender, $rule['autoResponse'], ['subject' => "Connect - Ticket Nr. [$projectid]"]); //5b20ad39615f9
+						$conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) SELECT '$projectid', userid, position FROM dynamicprojectsemployees WHERE projectid = '{$rule['templateID']}'");
+						if($conn->error) echo $conn->error.__LINE__;
+						$conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) SELECT '$projectid', teamid FROM dynamicprojectsteams WHERE projectid = '{$rule['templateID']}'");
+						if($conn->error) echo $conn->error.__LINE__;
+					} else { //message
+						echo 'Message Detected';
+						$result = $conn->query("SELECT id FROM messenger_conversations WHERE identifier = '$projectid'");
+						if($row = $result->fetch_assoc()){
+							$conversationID = $row['id'];
+							$result = $conn->query("SELECT id FROM relationship_conversation_participant WHERE conversationID = $conversationID AND partID = '$sender' ");
+							if($row = $result->fetch_assoc()){
+								$participantID = $row['id'];
+							} else {
+								echo "Adding new participant... ";
+								$conn->query("INSERT INTO relationship_conversation_participant(conversationID, partType, partID, status)
+									VALUES ($conversationID, 'unknown', '$sender', 'normal')");
+								$participantID = $conn->insert_id;
+								if($conn->error) echo $conn->error.__LINE__;
+							}
+							$result->free();
+							$message = asymmetric_encryption('CHAT', $html, 0, $secret);
+							$conn->query("INSERT INTO messenger_messages(message, participantID, vKey) VALUES ('$message', $participantID, '$v2')");
+							if($conn->error) echo $conn->error.__LINE__;
+						} else {
+							echo "Error: No Message found with identifier $projectid";
+						}
 					}
+					$move_sequence[] = $mail_number;
 				}
-				$move_sequence[] = $mail_number;
-			}
+			} //endif mail exists
         } //end foreach mail
 		if(!imap_mail_move($imap, implode(',', $move_sequence), $archive)) imap_expunge($imap);
     }
