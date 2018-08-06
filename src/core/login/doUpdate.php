@@ -3424,7 +3424,13 @@ if($row['version'] < 166){
 	$conn->query("ALTER TABLE dynamicprojects DROP COLUMN projectleader");
 }
 
-// if($row['version'] < 167){}
+
+if($row['version'] < 167){
+	$conn->query("ALTER TABLE messenger_messages ADD UNIQUE KEY uq_participant_time (participantID, sentTime)");
+    if (!$conn->error) {
+        echo '<br>Messenger: Doppelte PNs Fix';
+    }
+}
 // if($row['version'] < 168){}
 // if($row['version'] < 169){}
 // if($row['version'] < 170){}

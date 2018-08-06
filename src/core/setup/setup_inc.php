@@ -1748,12 +1748,13 @@ function create_tables($conn) {
 		vKey VARCHAR(150),
 		FOREIGN KEY (participantID) REFERENCES relationship_conversation_participant(id)
 		ON UPDATE CASCADE
-		ON DELETE CASCADE
+		ON DELETE CASCADE,
+		UNIQUE KEY uq_participant_time (participantID, sentTime)
 	)");
 	if($conn->error){
 		echo $conn->error;
     }
-    
+
     $sql = "CREATE TABLE access_permission_groups (
         id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(20) NOT NULL UNIQUE
