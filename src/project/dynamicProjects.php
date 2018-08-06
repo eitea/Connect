@@ -580,7 +580,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 					if(isset($userID_toName[$row_emps['userid']])) $emps .= $userID_toName[$row_emps['userid']].',<br>';
 				}
 			}
-			if($filterings['taskview'] == 'default' && $leader && $user_roles['isDynamicProjectsAdmin'] == 'FALSE' && $leader != $userID) continue;
+			if($filterings['taskview'] == 'default' && $leader && $leader != $userID) continue;
 			if(!$owner){ //has to always exist
 				$conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES('$x', 1, 'owner') ON DUPLICATE KEY UPDATE position = 'owner'");
 				$owner = 1;
