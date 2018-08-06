@@ -1,6 +1,6 @@
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    if(!empty($_POST['play'])){
+    if(!empty($_POST['play']) || !empty($_POSt['play-take'])){ //5b03f7a9d151a
         $ckIn_disabled = 'disabled';
     }
 }
@@ -292,8 +292,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 }
                 if($conn->error){
                     showError($conn->error);
-                } else {
-                    redirect('view'); //to refresh the disabled check out button. i know.
                 }
             } else {
                 showError($lang['ERROR_MISSING_SELECTION'].' (Projekt)');
