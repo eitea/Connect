@@ -1785,4 +1785,15 @@ function create_tables($conn) {
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
     }
+
+	$sql = "CREATE TABLE tags(
+		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		value VARCHAR(50) NOT NULL,
+		type VARCHAR(20) NOT NULL DEFAULT 'text',
+		extra VARCHAR(80)
+	)";
+	if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
+
 }
