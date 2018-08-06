@@ -242,13 +242,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
   } elseif(isset($_POST['saveFinances']) && isset($_POST['finance_istVersteuerer'])){
     $val = 'FALSE';
+	$ecoYear = 'NULL';
     if($_POST['finance_istVersteuerer']) $val = 'TRUE';
-    $conn->query("UPDATE companyData SET istVersteuerer = '$val' WHERE id = $cmpID");
+	if($_POST['finance_ecoYear']){ //5b642eece3110
+		$ecoYear = "'".test_Date($_POST['finance_ecoYear'], 'Y-m-d')."'";
+	}
+    $conn->query("UPDATE companyData SET istVersteuerer = '$val', ecoYear = $ecoYear WHERE id = $cmpID");
     if($conn->error){
       showError($conn->error);
     } else {
       showSuccess($lang['OK_SAVE']);
     }
+
   } elseif(!empty($_POST['turnBookingOn'])){
     $val = intval($_POST['turnBookingOn']);
     $conn->query("UPDATE accounts SET manualBooking = 'TRUE' WHERE id = $val AND companyID IN (".implode(', ', $available_companies).")");
@@ -1052,23 +1057,28 @@ $row = $result->fetch_assoc();
   </div><br>
 </form><br>
 
-<!-- FINANCES -->
 <form method="POST" class="page-seperated-section">
   <h4><?php echo $lang['FINANCES']; ?>
     <div class="page-header-button-group">
       <button type="button" class="btn btn-default" data-toggle="modal" data-target=".add-finance-account" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
-      <button id="blinker" type="submit" class="btn btn-default" name="saveFinances" title="<?php echo $lang['SAVE']; ?>"><i class="fa fa-floppy-o"></i></button>
+      <button type="submit" class="btn btn-default blinking" name="saveFinances" title="<?php echo $lang['SAVE']; ?>"><i class="fa fa-floppy-o"></i></button>
     </div>
   </h4>
   <div class="container-fluid">
     <br><br>
     <div class="row">
       <div class="col-sm-2 radio"><label><strong><?php echo $lang['VAT']; ?>:</strong></label></div>
-      <div class="col-sm-8 radio">
-        <label><input onchange="startBlinker();" type="radio" name="finance_istVersteuerer" value="1" <?php if($companyRow['istVersteuerer'] == 'TRUE') echo 'checked'; ?>> Ist-Versteuerer</label>
+      <div class="col-sm-4 radio">
+        <label><input type="radio" name="finance_istVersteuerer" value="1" <?php if($companyRow['istVersteuerer'] == 'TRUE') echo 'checked'; ?>> Ist-Versteuerer</label>
         <br>
-        <label><input onchange="startBlinker();" type="radio" name="finance_istVersteuerer" value="0" <?php if($companyRow['istVersteuerer'] != 'TRUE') echo 'checked' ?>> Soll-Versteuerer</label>
+        <label><input type="radio" name="finance_istVersteuerer" value="0" <?php if($companyRow['istVersteuerer'] != 'TRUE') echo 'checked' ?>> Soll-Versteuerer</label>
       </div>
+	  <div class="col-sm-2">
+		  <label>Beginn Wirtschaftsjahr</label>
+	  </div>
+	  <div class="col-sm-4">
+		  <input type="text" class="form-control datepicker" name="finance_ecoYear" value="<?php echo $companyRow['ecoYear']; ?>">
+	  </div>
     </div><br>
     <table class="table table-hover">
     <thead><tr>
@@ -1342,15 +1352,6 @@ $("button[name='deleteCompany']").click(function() {
 });
 
 $('#account2').mask("0000");
-function startBlinker(){
-  var blink = $('#blinker');
-  blink.attr('class', 'btn btn-warning blinking');
-  setInterval(function() {
-    blink.fadeOut(500, function() {
-      blink.fadeIn(500);
-    });
-  }, 1000);
-}
 
 $(document).ready(function(){
   $('.table').DataTable({

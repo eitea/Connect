@@ -3430,6 +3430,11 @@ if($row['version'] < 167){
     if (!$conn->error) {
         echo '<br>Messenger: Doppelte PNs Fix';
     }
+	//5b642eece3110
+	$conn->query("ALTER TABLE companyData ADD COLUMN ecoYear DATE");
+	if (!$conn->error) {
+        echo '<br>Mandant: Wirtschaftsjahr';
+    }
 }
 // if($row['version'] < 168){}
 // if($row['version'] < 169){}

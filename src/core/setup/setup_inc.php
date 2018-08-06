@@ -96,7 +96,8 @@ function create_tables($conn) {
 		companyCommercialCourt VARCHAR(80),
 		companyWKOLink VARCHAR(150),
 		fax VARCHAR(60),
-		emailSignature TEXT
+		emailSignature TEXT,
+		ecoYear DATE
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
