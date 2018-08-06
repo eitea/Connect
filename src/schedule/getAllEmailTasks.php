@@ -50,7 +50,8 @@ while($result_serv && $row = $result_serv->fetch_assoc()){
 				$email_counter++;
 				$header = imap_headerinfo($imap, $mail_number);
 				$match = true;
-				$pos = $rule['subject'] ? strpos($header->subject, $rule['subject']) : false;
+				$headerSubject = iconv_mime_decode($header->subject,0,"UTF-8"); //5b642461cee79
+				$pos = $rule['subject'] ? strpos($headerSubject, $rule['subject']) : false;
 				$sender = $header->from[0]->mailbox.'@'.$header->from[0]->host;
 				if($rule['fromAddress'] && strpos($sender, $rule['fromAddress']) === false ) $match = false;
 				if($rule['toAddress'] && $header->to[0]->mailbox.'@'.$header->to[0]->host != $rule['toAddress']) $match = false;
@@ -65,7 +66,7 @@ while($result_serv && $row = $result_serv->fetch_assoc()){
 					$html = '';
 					$projectid = uniqid();
 					if(!$rule['templateID']){
-						$projectid = substr($header->subject, -14, -1); echo "Messenger ID : $projectid";
+						$projectid = substr($headerSubject, -14, -1); echo "Messenger ID : $projectid";
 					}
 					foreach(create_part_array(imap_fetchstructure($imap, $mail_number)) as $partoverview){
 						$part = $partoverview['part_object'];
@@ -106,7 +107,7 @@ while($result_serv && $row = $result_serv->fetch_assoc()){
 						$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$projectid', 'CREATED', 1)");
 						if($conn->error) echo $conn->error.__LINE__;
 						$html = asymmetric_encryption('TASK', $html, 0, $secret);
-						$name = asymmetric_encryption('TASK', substr_replace($header->subject, '', $pos, strlen($rule['subject'])), 0, $secret);
+						$name = asymmetric_encryption('TASK', substr_replace($headerSubject, '', $pos, strlen($rule['subject'])), 0, $secret);
 						$conn->query("INSERT INTO dynamicprojects(
 						projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
 						projectpriority, projectparent, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2, projectmailheader)
