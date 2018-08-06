@@ -113,7 +113,6 @@ input[type="radio"]:checked {
   box-shadow: 0 0 2px #33C7D5;
 }
 
-
 /* Bootstrap */
 .btn-warning{
   background-color: #33C7D5;
@@ -131,15 +130,7 @@ input[type="radio"]:checked {
   background-color: white;
   color: #2E2E2E;
 }
-.alert.alert-info{
-  border-color: #32c5d2;
-}
-.alert.alert-success{
-  border-color: #4ece04;
-}
-.alert.alert-danger{
-  border-color: #e7505a;
-}
+
 .badge.badge-alert{
   background-color: #33C7D5;
 }
