@@ -194,7 +194,7 @@ while ($row = $result->fetch_assoc()) {
             $stmt = $conn->prepare("SELECT partType, partID FROM relationship_conversation_participant
 				WHERE conversationID = ? AND status != 'exited' AND (partType != 'USER' OR partID != '$userID')"); echo $conn->error;
             $stmt->bind_param('i', $conversationID);
-            $result = $conn->query("SELECT c.id, subject, rcp.lastCheck, rcp.id AS participantID, tbl.unreadMessages, mm.sentTime FROM messenger_conversations c
+            $result = $conn->query("SELECT c.id, c.category, subject, rcp.lastCheck, rcp.id AS participantID, tbl.unreadMessages, mm.sentTime FROM messenger_conversations c
 				INNER JOIN relationship_conversation_participant rcp
 				ON (rcp.status != 'exited' AND rcp.conversationID = c.id AND rcp.partType = 'USER' AND rcp.partID = '$userID')
 				LEFT JOIN (SELECT COUNT(*) AS unreadMessages, rcp1.conversationID FROM messenger_messages m
@@ -206,7 +206,7 @@ while ($row = $result->fetch_assoc()) {
 				LEFT JOIN messenger_messages mm ON mm.id = (SELECT mm2.id FROM messenger_messages mm2
 					INNER JOIN relationship_conversation_participant rcp1 ON mm2.participantID = rcp1.id
 					WHERE rcp1.conversationID = c.id ORDER BY mm2.id DESC LIMIT 1)
-				 ORDER BY mm.sentTime DESC");
+				ORDER BY mm.sentTime DESC");
             echo $conn->error;
             while ($result && ($row = $result->fetch_assoc())) {
                 $conversationID = $row['id'];
@@ -215,23 +215,27 @@ while ($row = $result->fetch_assoc()) {
                 echo '<td><small>', date('d.m.Y H:i', strtotime(carryOverAdder_Hours($row['sentTime'], $timeToUTC))),'</small>',
 					$row['unreadMessages'] ? '<span class="badge badge-alert" title="Ungelesene Nachrichten">'.$row['unreadMessages'] .'</span>' : '', '</td>';
                 echo '<td>';
-                echo '<form method="POST" id="form_openChat_',$row['id'],'"><input type="hidden" name="openChat" value="', $row['id'], '" ></form>';
-                $participantID = $row['participantID'];
-                $stmt->execute();
-                $partres = $stmt->get_result();
-                if ($partres->num_rows < 1) {
-                    echo '<b style="color:red">- Niemand mehr da -</b>';
-                }
-                while ($partrow = $partres->fetch_assoc()) {
-                    if ($partrow['partType'] == 'USER') {
-                        echo $userID_toName[$partrow['partID']];
-                    } elseif ($partrow['partType'] == 'team') {
-                        echo $teamID_toName[$partrow['partID']];
-                    } else { //show client and contact with email
-                        echo $partrow['partID'];
-                    }
-                    echo '<br>';
-                }
+				echo '<form method="POST" id="form_openChat_',$row['id'],'"><input type="hidden" name="openChat" value="', $row['id'], '" ></form>';
+				if($row['category'] == 'notification'){
+					echo '<b style="color:blue">- System -</b>';
+				} else {
+	                $participantID = $row['participantID'];
+	                $stmt->execute();
+	                $partres = $stmt->get_result();
+	                if ($partres->num_rows < 1) {
+	                    echo '<b style="color:red">- Niemand mehr da -</b>';
+	                }
+	                while ($partrow = $partres->fetch_assoc()) {
+	                    if ($partrow['partType'] == 'USER') {
+	                        echo $userID_toName[$partrow['partID']];
+	                    } elseif ($partrow['partType'] == 'team') {
+	                        echo $teamID_toName[$partrow['partID']];
+	                    } else { //show client and contact with email
+	                        echo $partrow['partID'];
+	                    }
+	                    echo '<br>';
+	                }
+				}
                 echo '</td>';
                 echo '</tr> ';
                 if ($openChatID == $conversationID) {

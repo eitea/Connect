@@ -3429,22 +3429,30 @@ if($row['version'] < 167){
 	$conn->query("ALTER TABLE messenger_messages ADD UNIQUE KEY uq_participant_time (participantID, sentTime)");
     if (!$conn->error) {
         echo '<br>Messenger: Doppelte PNs Fix';
-    }
+    } else {
+		echo '<br>',$conn->error;
+	}
 	//5b642eece3110
 	$conn->query("ALTER TABLE companyData ADD COLUMN ecoYear DATE");
 	if (!$conn->error) {
         echo '<br>Mandant: Wirtschaftsjahr';
-    }
+    } else {
+		echo '<br>',$conn->error;
+	}
 
 	//5b6800f1881fb
 	$conn->query("ALTER TABLE tags ADD COLUMN type VARCHAR(20) NOT NULL DEFAULT 'text'");
 	if (!$conn->error) {
         echo '<br>Tags: typ';
-    }
+    } else {
+		echo '<br>',$conn->error;
+	}
 	$conn->query("ALTER TABLE tags ADD COLUMN extra VARCHAR(80)");
 	if (!$conn->error) {
         echo '<br>Tags: Benutzerdef. Status';
-    }
+    } else {
+		echo '<br>',$conn->error;
+	}
 
 }
 // if($row['version'] < 168){}

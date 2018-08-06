@@ -71,7 +71,7 @@
 	</div>
 	<form method="POST" enctype="multipart/form-data">
 		<input type="hidden" readonly value="<?php echo $openChatID; ?>" name="openChat" />
-		<?php if($participantID): ?>
+		<?php if($messenger_row['category'] != 'notification' && $participantID): ?>
 				<textarea id="chat_message_<?php echo $openChatID; ?>" autofocus name="chat_message" rows="3" class="form-control"  placeholder="Deine Nachricht... " style="resize:none"></textarea>
 				<div style="border:1px solid #cccccc;background-color: #eaeaea">
 					<label class="btn btn-empty">
@@ -82,7 +82,7 @@
 						<button id="chat_send_<?php echo $openChatID; ?>" type="submit" class="btn btn-link" name="chat_send">Senden <i class="fa fa-paper-plane-o"></i></button>
 					</span>
 				</div>
-		<?php else: ?>
+		<?php elseif(!$participantID): ?>
 			Sie sind noch kein Teilnehmer dieser Konversation. Wollen Sie an dieser Konversation teilnehmen?
 			<button type="submit" name="chat_join_conversation" class="btn btn-warning">Ja, ich möchte teilnehmen.</button>
 		<?php endif; ?>
