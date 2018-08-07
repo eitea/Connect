@@ -7,8 +7,8 @@ while ($result_company_id_to_name && $row_company_id_to_name = $result_company_i
 }
 
 /**
- * It's easier to not have special cases for company children. 
- * This function adds companies to the current menu item's children 
+ * It's easier to not have special cases for company children.
+ * This function adds companies to the current menu item's children
  * which have company children as normal children.
  */
 function transform_company_children_to_real_children(&$options)
@@ -53,7 +53,7 @@ function transform_company_children_to_real_children(&$options)
                             $children_with_query_parameters[$company_child_name]["url"] = $children_with_query_parameters[$company_child_name]["href"]; // copy href before ?cmp=... is added
                         $href = ((strpos($children_with_query_parameters[$company_child_name]["href"], "?") === false) ? "?" : "&") . "cmp=$cmpID";
                         $children_with_query_parameters[$company_child_name]["href"] .= $href; // the href can change
-                        $children_with_query_parameters[$company_child_name]["get_params"]["cmp"] = $cmpID; // for only setting one item active 
+                        $children_with_query_parameters[$company_child_name]["get_params"]["cmp"] = $cmpID; // for only setting one item active
                     }
                     $options["children"][$cmpName] = ["children" => $children_with_query_parameters];
                 }
@@ -132,13 +132,13 @@ function set_menu_item_badge($options) : string
 }
 
 /**
- * adds data-toggle if the menu item is a parent 
+ * adds data-toggle if the menu item is a parent
  */
 function set_menu_item_collapse($options, $hash, $parent_hash) : string
 {
     if (isset($options["children"]))
         // return 'data-toggle="collapse" data-parent="#sidebar-accordion"  href="#header-collapse-' . $hash . '"';
-    return 'data-toggle="collapse" data-parent="#header-collapse-parent-' . $parent_hash . '"  href="#header-collapse-' . $hash . '" style="border-top: 1px solid;"';
+    return 'data-toggle="collapse" data-parent="#header-collapse-parent-' . $parent_hash . '"  href="#header-collapse-' . $hash . '"';
     return '';
 }
 
@@ -150,7 +150,7 @@ function set_menu_item_style($options)
 }
 
 /**
- * Creates a menu item 
+ * Creates a menu item
  */
 function create_menu_item($options, $title, $depth, &$is_active, $parent_hash, &$is_visible) : string
 {
@@ -207,9 +207,9 @@ function create_menu_item($options, $title, $depth, &$is_active, $parent_hash, &
 
 /**
  * Creates a list of menu items
- * @param array $options only requires a "children" key, which is 
- * an array (key = name of menu item (will be taken from $lang if available)) 
- * of children. Each child may have "href", "icon", "icon_raw", "children", 
+ * @param array $options only requires a "children" key, which is
+ * an array (key = name of menu item (will be taken from $lang if available))
+ * of children. Each child may have "href", "icon", "icon_raw", "children",
  * "company_children", "show", "get_params" and "badge".
  */
 function create_menu($options = [], $depth = 0, $parent_hash = "nohash", &$any_item_active = false, &$any_item_visible = false)
