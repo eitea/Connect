@@ -19,7 +19,7 @@
 				</ul>
 			</div>
 		</div>
-		<div class="panel-body scrollDown" style="height:40vh; overflow-y:auto;">
+		<div id="panel_openChat_<?php echo $openChatID; ?>" class="panel-body scrollDown" style="height:40vh; overflow-y:auto;">
 			<?php
 			$date = '';
 			$result_cw = $conn->query("SELECT * FROM (SELECT message, vKey, sentTime, m.type, rcp.partType, rcp.partID, rcp.status, rcp.lastCheck,
@@ -71,7 +71,7 @@
 	</div>
 	<form method="POST" enctype="multipart/form-data">
 		<input type="hidden" readonly value="<?php echo $openChatID; ?>" name="openChat" />
-		<?php if($participantID): ?>
+		<?php if($messenger_row['category'] != 'notification' && $participantID): ?>
 				<textarea id="chat_message_<?php echo $openChatID; ?>" autofocus name="chat_message" rows="3" class="form-control"  placeholder="Deine Nachricht... " style="resize:none"></textarea>
 				<div style="border:1px solid #cccccc;background-color: #eaeaea">
 					<label class="btn btn-empty">
@@ -82,16 +82,17 @@
 						<button id="chat_send_<?php echo $openChatID; ?>" type="submit" class="btn btn-link" name="chat_send">Senden <i class="fa fa-paper-plane-o"></i></button>
 					</span>
 				</div>
-		<?php else: ?>
+		<?php elseif(!$participantID): ?>
 			Sie sind noch kein Teilnehmer dieser Konversation. Wollen Sie an dieser Konversation teilnehmen?
 			<button type="submit" name="chat_join_conversation" class="btn btn-warning">Ja, ich möchte teilnehmen.</button>
 		<?php endif; ?>
 	</form>
 	<script type="text/javascript">
-	$("#chat_message_<?php echo $openChatID; ?>").keypress(function (e) {
+	var index = <?php echo $openChatID; ?>;
+	$("#chat_message_"+index).keypress(function (e) {
 		if(e.which == 13) {
 			e.preventDefault();
-			$("#chat_send_<?php echo $openChatID; ?>").click();
+			$("#chat_send_"+index).click();
 		}
 	});
 	</script>

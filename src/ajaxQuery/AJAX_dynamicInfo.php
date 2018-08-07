@@ -14,14 +14,12 @@ if (($row = $result->fetch_assoc()) && $row['activity'] != 'VIEWED') {
     $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$x', 'VIEWED', $userID)");
 }
 
-$result = $conn->query("SELECT projectname, projectdescription, projectstart, projectstatus, projectleader,
-	projectmailheader, projectpercentage, v2, d.companyid, d.clientid, d.clientprojectid
+$result = $conn->query("SELECT projectname, projectdescription, projectstart, projectstatus, projectmailheader, projectpercentage, v2, d.companyid, d.clientid, d.clientprojectid
     FROM dynamicprojects d LEFT JOIN dynamicprojectsemployees ON dynamicprojectsemployees.projectid = d.projectid
     LEFT JOIN dynamicprojectsteams ON dynamicprojectsteams.projectid = d.projectid LEFT JOIN relationship_team_user ON relationship_team_user.teamID = dynamicprojectsteams.teamid
-    WHERE (dynamicprojectsemployees.userid = $userID OR d.projectowner = $userID OR (relationship_team_user.userID = $userID AND relationship_team_user.skill >= d.level))
+    WHERE (dynamicprojectsemployees.userid = $userID OR (relationship_team_user.userID = $userID AND relationship_team_user.skill >= d.level))
     AND d.projectstart <= UTC_TIMESTAMP and d.projectid = '$x'");
 $dynrow = $result->fetch_assoc();
-$projectleader = $dynrow['projectleader'];
 
 $showMissingBookings = true;
 $missingBookingsArray = array();
@@ -132,6 +130,7 @@ echo $conn->error;
 if (sizeof($missingBookingsArray) == 0) {
     $showMissingBookings = false;
 }
+
 $archiveResult = $conn->query("SELECT uniqID, name, uploadDate, type FROM archive WHERE category = 'TASK' AND categoryID = '$x'");
 $messageResult = $conn->query("SELECT id FROM messenger_conversations WHERE category='task' AND categoryID='$x'");
 ?>
@@ -211,23 +210,34 @@ $messageResult = $conn->query("SELECT id FROM messenger_conversations WHERE cate
 				</div>
                 <div id="projectDescription<?php echo $x; ?>" class="tab-pane fade in active"><br>
                     <?php
-                    // $micro = $conn->query("SELECT * FROM microtasks WHERE projectid = '$x'");
-                    // if($micro && $micro->num_rows > 0){
-                    //     while($nextmtask = $micro->fetch_assoc()){
-                    //         if($nextmtask['ischecked'] == 'TRUE'){
-                    //             $mtaskid = $nextmtask['microtaskid'];
-                    //             $description = preg_replace("/id=.$mtaskid./","id=\"$mtaskid\" checked",$description);
-                    //             $user = $nextmtask['finisher'];
-                    //             $username = $conn->query("SELECT CONCAT(firstname,CONCAT(' ',lastname)) AS name FROM userdata WHERE id = '$user'");
-                    //             if($username){
-                    //                 $username = $username->fetch_assoc()['name'];
-                    //                 $description = preg_replace("/id=.$mtaskid. checked disabled title=../","id=\"$mtaskid\" checked disabled title=\"$username\"",$description);
-                    //             }
-                    //         }
-                    //     }
-                    // }
                     echo $description;
+					$result = $conn->query("SELECT userID, notedate, notetext, firstname, lastname FROM dynamicprojectsnotes
+						LEFT JOIN UserData ON UserData.id = userID WHERE taskID = '$x'"); echo $conn->error;
+					if($result && $result->num_rows > 0):
                     ?>
+					<hr>
+					<h4>Notizen</h4>
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th>Benutzer</th>
+								<th>Datum</th>
+								<th>Notiz</th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php
+							while($row = $result->fetch_assoc()){
+								echo '<tr>';
+								echo '<td>',$row['firstname'],' ',$row['lastname'],'</td>';
+								echo '<td>',date('d.m.Y H:i', strtotime(carryOverAdder_Hours($row['notedate'], $timeToUTC))),'</td>';
+								echo '<td>',$row['notetext'],'</td>';
+								echo '</tr>';
+							}
+							?>
+						</tbody>
+					</table>
+					<?php endif; ?>
                 </div>
                 <div id="projectInfoBookings<?php echo $x; ?>" class="tab-pane fade"><br>
                     <table class="table table-hover">
@@ -266,16 +276,18 @@ $messageResult = $conn->query("SELECT id FROM messenger_conversations WHERE cate
                                 <th>Zeit <small>(System-Zeit)</small></th>
                                 <th>Benutzer</th>
                                 <th>Aktivität</th>
+								<th>Notiz</th>
                         </tr></thead>
                         <tbody>
                             <?php
-                            $result = $conn->query("SELECT firstname, lastname, p.activity, logTime FROM dynamicprojectslogs p LEFT JOIN UserData ON p.userID = UserData.id WHERE projectid = '$x'");
+                            $result = $conn->query("SELECT firstname, lastname, p.activity, logTime, extra1, extra2 FROM dynamicprojectslogs p LEFT JOIN UserData ON p.userID = UserData.id WHERE projectid = '$x'");
                             echo $conn->error;
                             while($result && ($row = $result->fetch_assoc())){
                                 echo '<tr>';
                                 echo '<td>'.$row['logTime'].'</td>';
                                 echo '<td>'.$row['firstname'].' '.$row['lastname'].'</td>';
                                 echo '<td>'.$row['activity'].'</td>';
+								echo '<td>'.$row['extra1'].' - '.$row['extra2'].'</td>';
                                 echo '</tr>';
                             }
                             ?>
@@ -434,15 +446,8 @@ $messageResult = $conn->query("SELECT id FROM messenger_conversations WHERE cate
                 $hasActiveBooking = $result->num_rows;
                 $result = $conn->query("SELECT p.id FROM projectBookingData p WHERE `end` = '0000-00-00 00:00:00' AND dynamicID = '$x'");
                 if(strtotime($dynrow['projectstart']) < time() && $dynrow['projectstatus'] == 'ACTIVE' && $result->num_rows < 1 && !$hasActiveBooking){
-                    if(!$projectleader){
-                        echo "<button type='button' class='btn btn-default' title='Task starten' data-toggle='modal' data-valid='$x' data-target='#play-take'><i class='fa fa-play'></i></button>";
-                    } else {
-                        echo "<button type='submit' class='btn btn-default' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button>";
-                    }
+					echo "<button type='submit' class='btn btn-default' title='Task starten' name='play' value='$x'><i class='fa fa-play'></i></button>";
                     echo "<button type='button' class='btn btn-default' title='Task Planen' data-toggle='modal' data-valid='$x' data-target='#task-plan'><i class='fa fa-clock-o'></i></button>";
-                }
-                if(!$projectleader){
-                    echo "<button class='btn btn-default' type='submit' title='Task übernehmen' name='take_task' value='$x'><i class='fa fa-address-card'></i></button>";
                 }
                 ?>
                 <button type="button" class="btn btn-default" data-dismiss="modal">O.K.</button>

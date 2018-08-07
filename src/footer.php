@@ -32,6 +32,7 @@ function openSurveyModal(){
 
 $("#feedback_form").submit(function(event){
     //console.log("feedBack");
+	$(this).find("button[name=giveFeedback]").prop("disabled", true);
     event.preventDefault();
     var img = window.feedbackCanvasObject.toDataURL()
     var postData =  {

@@ -124,6 +124,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $val = test_input($_POST['exitDate']) . ' 00:00:00';
           $conn->query("UPDATE UserData SET exitDate = '$val' WHERE id = '$x'");
       }
+	  if(!empty($_POST['beginningDate']) && test_Date($_POST['beginningDate'] .' 00:00:00')) { //5b64223fc3cec
+          $val = test_input($_POST['beginningDate']) . ' 00:00:00';
+          $conn->query("UPDATE UserData SET beginningDate = '$val' WHERE id = '$x'");
+      }
       if(!empty($_POST['coreTime'])) {
           $val = test_input($_POST['coreTime']);
           $conn->query("UPDATE UserData SET coreTime = '$val' WHERE id = '$x'");
@@ -392,7 +396,9 @@ $stmt_company_relationship->bind_param('i', $x);
 			  </div>
               <div class="row">
                 <div class="col-md-5">
-                  <?php echo $lang['ENTRANCE_DATE'] .'<p class="form-control" style="background-color:#ececec">'. substr($row['beginningDate'],0,10); ?></p>
+                  <?php echo $lang['ENTRANCE_DATE']; ?>
+				  <input type="text" class="form-control datepicker" name="beginningDate" value="<?php echo substr($row['beginningDate'],0,10); ?>"/>
+
                 </div>
                 <div class="col-md-2">
                   <?php echo $lang['CORE_TIME']; ?>

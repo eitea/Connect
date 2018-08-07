@@ -86,8 +86,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && Permissions::has("WORKFLOW.WRITE")){
 				$tags = '';
 			}
 			$conn->query("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-			projectpriority, projectparent, projectowner, projectleader, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2) VALUES (
-			'$templateID', '$name', '', $company, $client, $project, '$color', '$start', '$end', '$status', $priority, '$parent', $owner, $leader, $percentage, '$estimate',
+			projectpriority, projectparent, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2) VALUES (
+			'$templateID', '$name', '', $company, $client, $project, '$color', '$start', '$end', '$status', $priority, '$parent', $percentage, '$estimate',
 			$skill, '$tags', 'TRUE', '$v2Key' )"); echo $conn->error;
 			if(!$conn->error){
 				//EMPLOYEES

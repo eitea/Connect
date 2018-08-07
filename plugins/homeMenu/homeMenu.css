@@ -247,13 +247,21 @@ input[type="radio"]:checked {
 }
 
 /* alerts */
-
 .alert-over{
   position:fixed;
   z-index: 1080;
   right: 0px;
   margin-right:1px;
   width:30%;
+}
+.alert.alert-success{
+  border-color: #4ece04;
+}
+.alert.alert-danger{
+  border-color: #e7505a;
+}
+.alert.alert-info{
+  border-color: #32c5d2;
 }
 
 /* little helperlings */

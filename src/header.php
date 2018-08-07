@@ -222,6 +222,7 @@ if ($_SESSION['color'] == 'light') {
 <!DOCTYPE html>
 <html>
 <head>
+	<meta name="google" content="notranslate">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -591,10 +592,10 @@ if($result && ($row = $result->fetch_assoc())) { //checkout
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji4" name="stampOut" value="4" title="'.$lang['EMOJI_TOSTRING'][4].'"></button>
     <button type="submit" '.$ckIn_disabled.' class="btn btn-emji emji5" name="stampOut" value="5" title="'.$lang['EMOJI_TOSTRING'][5].'"></button></div>
     <a data-toggle="modal" data-target="#explain-emji" style="position:relative;top:-7px;"><i class="fa fa-question-circle-o"></i></a>';
-    if($result && $result->num_rows > 0){ 
+    if($result && $result->num_rows > 0){
         $row_booking_data = $result->fetch_assoc();
         $booking_data_id = $row_booking_data["dynamicID"];
-        $buttonEmoji .= '<br><small class="clock-counter"><a href="../dynamic-projects/view?open='.$booking_data_id.'">Task läuft</a></small>'; 
+        $buttonEmoji .= '<br><small class="clock-counter"><a href="../dynamic-projects/view?open='.$booking_data_id.'">Task läuft</a></small>';
     }
 } else {
     // only display surveys when user is stamped in

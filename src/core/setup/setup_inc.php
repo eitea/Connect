@@ -97,7 +97,8 @@ function create_tables($conn) {
 		companyCommercialCourt VARCHAR(80),
 		companyWKOLink VARCHAR(150),
 		fax VARCHAR(60),
-		emailSignature TEXT
+		emailSignature TEXT,
+		ecoYear DATE
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -1719,12 +1720,13 @@ function create_tables($conn) {
 		vKey VARCHAR(150),
 		FOREIGN KEY (participantID) REFERENCES relationship_conversation_participant(id)
 		ON UPDATE CASCADE
-		ON DELETE CASCADE
+		ON DELETE CASCADE,
+		UNIQUE KEY uq_participant_time (participantID, sentTime)
 	)");
 	if($conn->error){
 		echo $conn->error;
     }
-    
+
     $sql = "CREATE TABLE access_permission_groups (
         id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(20) NOT NULL,
@@ -1766,4 +1768,15 @@ function create_tables($conn) {
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
     }
+    
+	$sql = "CREATE TABLE tags(
+		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		value VARCHAR(50) NOT NULL,
+		type VARCHAR(20) NOT NULL DEFAULT 'text',
+		extra VARCHAR(80)
+	)";
+	if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
+
 }

@@ -31,8 +31,10 @@ while($result && $row = $result->fetch_assoc()){
     $relationship_team_user[$row["teamID"]][] = $row["userID"];
 }
 
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
+//echo '<pre>', print_r($grantable_modules, 1),'</pre>';
+
+if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if(!empty($_POST['saveRoles'])) {
         $x = intval($_POST['saveRoles']);
         if($x != 1){
@@ -46,9 +48,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     $permissionID = intval($arr[2]);
                     $stmt_insert_permission_relationship->execute();
                     echo $stmt_insert_permission_relationship->error;
-                }        
+                }
             }
-            $stmt_insert_permission_relationship->close();    
+            $stmt_insert_permission_relationship->close();
         }
         Permissions::update_cache_user($x);
     }
@@ -204,7 +206,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 				} else {
 					showSuccess("$module Schlüssel wurde hinzugefügt");
 				}
-			} elseif(!array_key_exists($module, $grantable_modules)) {
+			} elseif(array_key_exists($module, $encrypted_modules) && !array_key_exists($module, $grantable_modules)) {
 				showInfo("Fehlende $module Verschlüsselung: Sie können keinen Modulzugriff gewähren, zudem Sie selbst keinen Zugriff besitzen.");
 				return 'FALSE';
 			}

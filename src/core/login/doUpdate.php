@@ -3426,6 +3426,44 @@ if($row['version'] < 166){
 }
 
 if($row['version'] < 167){
+	$conn->query("DELETE a1 FROM messenger_messages a1, messenger_messages a2 WHERE a1.id > a2.id AND a1.participantID = a2.participantID AND a1.sentTime = a2.sentTime");
+	$conn->query("ALTER TABLE messenger_messages ADD UNIQUE KEY uq_participant_time (participantID, sentTime)");
+    if (!$conn->error) {
+        echo '<br>Messenger: Doppelte PNs Fix';
+    } else {
+		echo '<br>',$conn->error;
+	}
+	//5b642eece3110
+	$conn->query("ALTER TABLE companyData ADD COLUMN ecoYear DATE");
+	if (!$conn->error) {
+        echo '<br>Mandant: Wirtschaftsjahr';
+    } else {
+		echo '<br>',$conn->error;
+	}
+
+	//5b6800f1881fb
+	$conn->query("ALTER TABLE tags ADD COLUMN type VARCHAR(20) NOT NULL DEFAULT 'text'");
+	if (!$conn->error) {
+        echo '<br>Tags: typ';
+    } else {
+		echo '<br>',$conn->error;
+	}
+	$conn->query("ALTER TABLE tags ADD COLUMN extra VARCHAR(80)");
+	if (!$conn->error) {
+        echo '<br>Tags: Benutzerdef. Status';
+    } else {
+		echo '<br>',$conn->error;
+	}
+}
+
+
+$conn->query("DELETE a1 FROM messenger_messages a1, messenger_messages a2 WHERE a1.id > a2.id AND a1.participantID = a2.participantID AND a1.sentTime = a2.sentTime");
+$conn->query("ALTER TABLE messenger_messages ADD UNIQUE KEY uq_participant_time (participantID, sentTime)");
+if (!$conn->error) {
+	echo '<br>Messenger: Doppelte PNs Fix';
+}
+
+if($row['version'] < 168){
     // drop access_permission_groups.name unique key
     $result = $conn->query("SHOW INDEX FROM access_permission_groups WHERE column_name = 'name'");
     while($row = $result->fetch_assoc()){
@@ -3434,7 +3472,7 @@ if($row['version'] < 167){
     }
     $conn->query("ALTER TABLE access_permission_groups ADD COLUMN parent INT(10) UNSIGNED");
     $conn->query("ALTER TABLE access_permission_groups ADD FOREIGN KEY (parent) REFERENCES access_permission_groups(id) ON UPDATE CASCADE ON DELETE CASCADE");
-	$conn->query("ALTER TABLE relationship_access_permissions DROP COLUMN type");
+    $conn->query("ALTER TABLE relationship_access_permissions DROP COLUMN type");
     
     $sql = "CREATE TABLE relationship_team_access_permissions (
         teamID INT(6) UNSIGNED NOT NULL,
@@ -3448,19 +3486,17 @@ if($row['version'] < 167){
     }
 
     $conn->query("ALTER TABLE UserData ADD COLUMN inherit_team_permissions ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'TRUE'");
-	if($conn->error){
-		echo $conn->error;
-	} else {
-		echo '<br>UserData: Inherit team permissions';
-	}
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>UserData: Inherit team permissions';
+    }
 
     $conn->query("DROP TABLE roles");
     echo $conn->error;
     
     setup_permissions();
 }
-
-// if($row['version'] < 168){}
 // if($row['version'] < 169){}
 // if($row['version'] < 170){}
 // if($row['version'] < 171){}

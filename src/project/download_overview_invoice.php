@@ -49,7 +49,7 @@ INNER JOIN $userTable ON $logTable.userID = $userTable.id
 LEFT JOIN $projectTable ON projectID = $projectTable.id
 LEFT JOIN $clientTable ON $projectTable.clientID = $clientTable.id
 LEFT JOIN $companyTable ON $clientTable.companyID = $companyTable.id
-$filterQuery ORDER BY companyID ASC, projectID ASC, $projectBookingTable.start ASC";
+$filterQuery ORDER BY  companyID ASC, $projectBookingTable.start ASC, projectID ASC";
 $result = $conn->query($sql);
 
 $pdf = new PDF();

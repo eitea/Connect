@@ -12,3 +12,62 @@
 .sidebar-nav .navbar{
   background-color: white;
 }
+
+input[type="checkbox"]:checked {
+  background-color:#f379a6;
+  border-color:#f379a6;
+}
+input[type="radio"]:checked {
+  border: 4px solid #f379a6;
+}
+
+/* Datatables pagination */
+.pagination > .active > a {
+  background-color: #f379a6;
+  border-color:#aaa;
+}
+.pagination > .active > a:hover {
+  background-color: #f379a6;
+  border-color:#aaa;
+}
+
+/* components */
+#loader {
+  border-top: 16px solid #f379a6;
+}
+.page-seperated-body{
+  background-color:#EEF1F5;
+}
+.active-link{
+  color: white !important;
+  background-color: #f379a6;
+  margin-left: -40px;
+  padding-left: 55px !important;
+}
+.active-link:hover{
+  color: white !important;
+  background-color: #f379a6 !important;
+}
+.required-field {
+  border: 1px solid #f379a6;
+  box-shadow: 0 0 2px #f379a6;
+}
+.required-field-subtle:focus{
+  border: 1px solid #f379a6;
+  box-shadow: 0 0 2px #f379a6;
+}
+
+/* Bootstrap */
+.btn-warning{
+  background-color: #f379a6;
+  color: #FFFFFF;
+  border-color:#f379a6;
+}
+.btn-warning:hover, .btn-warning:focus, .btn-warning.active.focus, .btn-warning.active:focus, .btn-warning.active:hover, .btn-warning:active.focus,
+.btn-warning:active:focus,.btn-warning[disabled]:hover, .btn-warning:active:hover, .open>.dropdown-toggle.btn-warning.focus, .open>.dropdown-toggle.btn-warning:focus, .open>.dropdown-toggle.btn-warning:hover{
+  background-color: #d85082;
+  border-color: #d85082;
+}
+.badge.badge-alert{
+  background-color: #f379a6;
+}

@@ -90,9 +90,9 @@ if(isset($_POST['request_submit'])){
   </thead>
   <tbody>
     <?php
-    $now = $filterings['date'][0];
-    $end = date('Y-m-d', strtotime('+1 month', strtotime($now)));
-    $calculator = new Interval_Calculator($userID, $now .'-01', $end);
+    $now = $filterings['date'][0].'-01';
+    $end = date('Y-m-t', strtotime($now));
+    $calculator = new Interval_Calculator($userID, $now, $end);
 
     $accumulatedSaldo = 0;
     for($i = 0; $i < $calculator->days; $i++){
