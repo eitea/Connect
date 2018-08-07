@@ -1,6 +1,6 @@
 <?php
 $tok = '$2y$10$GjtBPyaL4Xf83f9CQIptmePpeE0DF.XpQNct3pAe43mEXtmJ6cOdO';
-//if(!isset($_POST['token'])) header("Location: /login");
+if(!isset($_POST['token'])) header("Location: /login");
 $login_token = $_POST['token'];
 
 require dirname(dirname(__DIR__)) .'/connection.php';
@@ -55,18 +55,18 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
                 //check for updates
                 $result = mysqli_query($conn, "SELECT version FROM configurationData;");
                 if(!$result || (($row = $result->fetch_assoc()) && $row['version'] < $VERSION_NUMBER)){
-                    //redirect("update");
+                    redirect("update");
                     die ($lang['UPDATE_REQUIRED']. $lang['AUTOREDIRECT']. '<a href="update">update</a>');
                 }
             }
-            //redirect("../user/home");
+            redirect("../user/home");
         }
     }
 }
 
 if(empty($_POST['gate']) || crypt($_POST['gate'], $tok) != $tok){
     $login_token = urlencode($login_token);
-    //redirect("/login?tok=$login_token");
+    redirect("/login?tok=$login_token");
 }
 ?>
 
