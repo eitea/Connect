@@ -778,11 +778,6 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                                             "show" => (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])),
                                             "href" => "system/restore",
                                         ],
-                                        "Git Update" => [
-                                            "disabled" => true, // delete this line if this is still needed
-                                            "show" => (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])),
-                                            "href" => "system/update",
-                                        ],
                                         "Restic Backup" => ["href" => "system/restic", ],
                                         "Tags" => ["href" => "system/tags", ],
                                     ]
