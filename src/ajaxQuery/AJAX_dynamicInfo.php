@@ -206,6 +206,7 @@ $messageResult = $conn->query("SELECT id FROM messenger_conversations WHERE cate
 									} else {
 										$objectBody = asymmetric_seal('TASK', $object[ 'Body' ], 'decrypt', $userID, $privateKey);
 									}
+									$objectBody = base64_encode($objectBody);
 									if(strpos($description, 'cid:'.$row['uniqID'])){
 										$description = str_replace('cid:'.$row['uniqID'], "data:image/jpeg;base64,".$objectBody, $description);
 									} else {

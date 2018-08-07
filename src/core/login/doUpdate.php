@@ -3473,7 +3473,7 @@ if($row['version'] < 168){
     $conn->query("ALTER TABLE access_permission_groups ADD COLUMN parent INT(10) UNSIGNED");
     $conn->query("ALTER TABLE access_permission_groups ADD FOREIGN KEY (parent) REFERENCES access_permission_groups(id) ON UPDATE CASCADE ON DELETE CASCADE");
     $conn->query("ALTER TABLE relationship_access_permissions DROP COLUMN type");
-    
+
     $sql = "CREATE TABLE relationship_team_access_permissions (
         teamID INT(6) UNSIGNED NOT NULL,
         permissionID INT(10) UNSIGNED NOT NULL,
@@ -3491,11 +3491,18 @@ if($row['version'] < 168){
     } else {
         echo '<br>UserData: Inherit team permissions';
     }
-
     $conn->query("DROP TABLE roles");
     echo $conn->error;
-    
+
     setup_permissions();
+
+	$conn->query("CREATE TABLE log_encryption(
+		id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+		field VARCHAR(25),
+		type VARCHAR(25),
+		extra VARCHAR(25),
+		version VARCHAR(5) NOT NULL DEFAULT '1'
+	)");
 }
 
 // if($row['version'] < 169){}
