@@ -2,7 +2,6 @@
 include dirname(__DIR__) . '/header.php';?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <?php
-enableToFinance($userID);
 
 $filterings = array("savePage" => $this_page, 'date' => array(date('Y-m')));
 $show_undo = false;
@@ -333,7 +332,7 @@ while ($result && ($row = $result->fetch_assoc())) {
             <div class="col-md-2"><label><?php echo $lang['DATE']; ?></label><input type="text" class="form-control datepicker" name="add_date" value="<?php echo substr($docDate, 0, 10); ?>" /></div>
             <div class="col-md-4"><label><?php echo $lang['ACCOUNT']; ?></label>
                 <select id="account" class="js-example-basic-single" name="add_account" ><option>...</otpion><?php echo $account_select; ?></select>
-                    <small><a href="plan?n=<?php echo $account_row['companyID']; ?>" tabindex="-1" ><?php echo $lang['ACCOUNT_PLAN']; ?></a></small>
+                    <small><a href="plan?cmp=<?php echo $account_row['companyID']; ?>" tabindex="-1" ><?php echo $lang['ACCOUNT_PLAN']; ?></a></small>
                 </div>
                 <div class="col-md-4"><label><?php echo $lang['VAT']; ?></label><select id="tax" class="js-example-basic-single" name="add_tax" ><?php echo $tax_select; ?></select></div>
             </div>

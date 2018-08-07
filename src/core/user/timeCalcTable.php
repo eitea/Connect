@@ -1,4 +1,4 @@
-<?php include dirname(dirname(__DIR__)) . '/header.php'; enableToStamps($userID);?>
+<?php include dirname(dirname(__DIR__)) . '/header.php'; ?>
 <?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php
 $filterings = array('logs' => array(0, 'checked'), 'date' => array(substr(getCurrentTimestamp(),0,7)));

@@ -42,7 +42,8 @@ html,body{
 <?php
 require dirname(dirname(__DIR__)) . "/connection.php";
 require dirname(dirname(__DIR__)) . "/utilities.php";
-include dirname(dirname(__DIR__)) . '/validate.php';
+require_once dirname(dirname(__DIR__)) . '/validate.php';
+require_once dirname(dirname(__DIR__)) . '/core/setup/setup_permissions.php';
 set_time_limit(240);
 $result = mysqli_query($conn, "SELECT version FROM configurationData;");
 if(!$result){
@@ -3455,10 +3456,53 @@ if($row['version'] < 167){
 	}
 }
 
-// if($row['version'] < 168){}
+
+$conn->query("DELETE a1 FROM messenger_messages a1, messenger_messages a2 WHERE a1.id > a2.id AND a1.participantID = a2.participantID AND a1.sentTime = a2.sentTime");
+$conn->query("ALTER TABLE messenger_messages ADD UNIQUE KEY uq_participant_time (participantID, sentTime)");
+if (!$conn->error) {
+	echo '<br>Messenger: Doppelte PNs Fix';
+}
+
+if($row['version'] < 168){
+    // drop access_permission_groups.name unique key
+    $result = $conn->query("SHOW INDEX FROM access_permission_groups WHERE column_name = 'name'");
+    while($row = $result->fetch_assoc()){
+        $conn->query("ALTER TABLE access_permission_groups DROP INDEX ${row['Key_name']}");
+        echo $conn->error;
+    }
+    $conn->query("ALTER TABLE access_permission_groups ADD COLUMN parent INT(10) UNSIGNED");
+    $conn->query("ALTER TABLE access_permission_groups ADD FOREIGN KEY (parent) REFERENCES access_permission_groups(id) ON UPDATE CASCADE ON DELETE CASCADE");
+    $conn->query("ALTER TABLE relationship_access_permissions DROP COLUMN type");
+    
+    $sql = "CREATE TABLE relationship_team_access_permissions (
+        teamID INT(6) UNSIGNED NOT NULL,
+        permissionID INT(10) UNSIGNED NOT NULL,
+        PRIMARY KEY (teamID, permissionID),
+        FOREIGN KEY (permissionID) REFERENCES access_permissions(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (teamID) REFERENCES teamData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
+
+    $conn->query("ALTER TABLE UserData ADD COLUMN inherit_team_permissions ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'TRUE'");
+    if($conn->error){
+        echo $conn->error;
+    } else {
+        echo '<br>UserData: Inherit team permissions';
+    }
+
+    $conn->query("DROP TABLE roles");
+    echo $conn->error;
+    
+    setup_permissions();
+}
+
 // if($row['version'] < 169){}
 // if($row['version'] < 170){}
 // if($row['version'] < 171){}
+// if($row['version'] < 172){}
+// if($row['version'] < 173){}
 
 //cleanups for maintainable db sizes
 $conn->query("DELETE FROM `checkinLogs` WHERE id <= ( SELECT id FROM ( SELECT id FROM `checkinLogs` ORDER BY id DESC LIMIT 1 OFFSET 100 ) foo )");echo $conn->error;

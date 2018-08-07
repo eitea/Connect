@@ -54,6 +54,7 @@ $timesColorsArray = array();
                 <table class="table">
             <thead>
                 <tr>
+                    <th></th>
                     <th><?php echo $lang['USERS'] ?></th>
                     <th><?php echo $lang['ANSWER'] ?></th>
                     <th>Version</th>
@@ -84,6 +85,7 @@ $timesColorsArray = array();
             $timesColorsArray[] = "blue";
             $user_survey_answers = [];
             echo "<tr>";
+            echo "<td></td>";
             echo "<td>$name</td>";
             if ($survey) {
                 $select_survey_answers_stmt->execute();
@@ -133,6 +135,8 @@ $timesColorsArray = array();
         echo $conn->error;
         while ($row = $result->fetch_assoc()) {
             $name = "${row['firstname']} ${row['lastname']}";
+            $uid = $row["userID"];
+            list($sql_error, $survey_are_suspended) = surveys_are_suspended_query($uid, true);
             $unanswered++;
             $correct = $lang['TRAINING_QUESTION_CORRECT']['UNANSWERED'];
             $nameArray[] = $name;
@@ -141,6 +145,11 @@ $timesColorsArray = array();
             $triesColorsArray[] = "orange";
             $timesColorsArray[] = "blue";
             echo "<tr>";
+            if($survey_are_suspended){
+                echo "<td><i title='Aufgeschoben' data-container='body' data-toggle='tooltip' class='fa fa-fw fa-hourglass-half'><i></td>";
+            }else{
+                echo "<td></td>";
+            }
             echo "<td>$name</td>";
             echo "<td>$correct</td>";
             echo "<td>$correct</td>";

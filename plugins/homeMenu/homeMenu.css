@@ -93,6 +93,10 @@ ul.nav.nav-tabs {
   display: block;
 }
 
+#sidemenu {
+  user-select: none; /* disable text selection */
+}
+
 @media screen and (max-width:1400px){
   body{
     overflow-x: auto;

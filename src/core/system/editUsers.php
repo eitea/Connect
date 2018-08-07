@@ -1,6 +1,5 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; ?>
 <?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
-<?php enableToCore($userID);?>
 <!-- BODY -->
 <div class="page-header-fixed">
     <div class="page-header">

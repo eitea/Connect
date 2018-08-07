@@ -76,10 +76,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         VALUES ($mon, $tue, $wed, $thu, $fri, $sat, $sun, $curID, '25', '$overTimeLump','6', '0.5', '$begin');";
         $conn->query($sql);
         echo mysqli_error($conn);
-        //create roletable
-        $sql = "INSERT INTO roles (userID) VALUES($curID);";
-        $conn->query($sql);
-        echo mysqli_error($conn);
         //create socialprofile
         $sql = "INSERT INTO socialprofile (userID, isAvailable, status) VALUES($curID, 'TRUE', '-');";
         $conn->query($sql);

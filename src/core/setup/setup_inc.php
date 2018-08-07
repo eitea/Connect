@@ -42,7 +42,8 @@ function create_tables($conn) {
 		supervisor INT(6) DEFAULT NULL,
         lastLogin DATETIME DEFAULT NULL,
 		displayBirthday ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE',
-		canLogin ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'TRUE'
+		canLogin ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'TRUE',
+        inherit_team_permissions ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'TRUE'
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -237,36 +238,6 @@ function create_tables($conn) {
 
     $sql = "CREATE TABLE gitHubConfigTab(
         sslVerify ENUM('TRUE', 'FALSE') DEFAULT 'FALSE'
-    )";
-    if (!$conn->query($sql)) {
-        echo mysqli_error($conn);
-    }
-
-    $sql = "CREATE TABLE roles(
-        userID INT(6) UNSIGNED NOT NULL,
-        isCoreAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        isTimeAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        isProjectAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        isReportAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        isERPAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        isFinanceAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        isDSGVOAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        isDynamicProjectsAdmin ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        canStamp ENUM('TRUE', 'FALSE') DEFAULT 'TRUE' NOT NULL,
-        canBook ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        canUseSocialMedia ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        canUseSuppliers ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        canEditSuppliers ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        canUseClients ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        canEditClients ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        canEditTemplates ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        canCreateTasks ENUM('TRUE', 'FALSE') DEFAULT 'TRUE' NOT NULL,
-        canUseArchive ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL,
-        canUseWorkflow ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-		canSendToExtern ENUM('TRUE', 'FALSE') DEFAULT 'FALSE' NOT NULL,
-        FOREIGN KEY (userID) REFERENCES UserData(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -1758,7 +1729,9 @@ function create_tables($conn) {
 
     $sql = "CREATE TABLE access_permission_groups (
         id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(20) NOT NULL UNIQUE
+        name VARCHAR(20) NOT NULL,
+        parent INT(10) UNSIGNED,
+        FOREIGN KEY (parent) REFERENCES access_permission_groups(id) ON UPDATE CASCADE ON DELETE CASCADE
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);
@@ -1777,7 +1750,6 @@ function create_tables($conn) {
     $sql = "CREATE TABLE relationship_access_permissions (
         userID INT(6) UNSIGNED NOT NULL,
         permissionID INT(10) UNSIGNED NOT NULL,
-        type ENUM('READ', 'WRITE') NOT NULL,
         PRIMARY KEY (userID, permissionID),
         FOREIGN KEY (permissionID) REFERENCES access_permissions(id) ON UPDATE CASCADE ON DELETE CASCADE,
         FOREIGN KEY (userID) REFERENCES UserData(id) ON UPDATE CASCADE ON DELETE CASCADE
@@ -1786,6 +1758,17 @@ function create_tables($conn) {
         echo mysqli_error($conn);
     }
 
+    $sql = "CREATE TABLE relationship_team_access_permissions (
+        teamID INT(6) UNSIGNED NOT NULL,
+        permissionID INT(10) UNSIGNED NOT NULL,
+        PRIMARY KEY (teamID, permissionID),
+        FOREIGN KEY (permissionID) REFERENCES access_permissions(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (teamID) REFERENCES teamData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
+    
 	$sql = "CREATE TABLE tags(
 		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 		value VARCHAR(50) NOT NULL,

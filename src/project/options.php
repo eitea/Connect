@@ -1,7 +1,7 @@
 <?php
-require dirname(__DIR__) . '/header.php'; enableToWorkflow($userID);
+require dirname(__DIR__) . '/header.php';
 include dirname(__DIR__) . "/misc/helpcenter.php";
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
+if($_SERVER['REQUEST_METHOD'] == 'POST' && Permissions::has("WORKFLOW.WRITE")){
 	if(!empty($_POST['positions'])){
 		foreach($_POST['positions'] as $val){
 			$arr = explode('_', $val);
@@ -72,7 +72,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 			$leader = isset($_POST['leader']) ? intval($_POST['leader']) : '';
 			$percentage = intval($_POST['completed']);
 			$estimate = test_input($_POST['estimatedHours']);
-			if($user_roles['isDynamicProjectsAdmin'] == 'TRUE'){
+			if(Permissions::has("TASKS.ADMIN")){
 				$skill = intval($_POST['projectskill']);
 				$parent = test_input($_POST["parent"]); //dynamproject id
 			} else {

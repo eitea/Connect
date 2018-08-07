@@ -99,7 +99,7 @@ while($result && ($row = $result->fetch_assoc())){
         echo '<td>'.$row['percentage'].'% '. $row['description'].'</td>';
         echo '<td>'.number_format($row['amount'] - ($row['amount'] * 100) / (100 + $row['percentage'] ), 2, ',', '.').'</td>';
         if($row['journalID']){
-            echo '<td class="charged" ><a href="../finance/journal?n='.$row['companyID'].'" class="btn btn-link">'.$lang['BOOKED'].'</a></td>';
+            echo '<td class="charged" ><a href="../finance/journal?cmp='.$row['companyID'].'" class="btn btn-link">'.$lang['BOOKED'].'</a></td>';
         } else {
             echo '<td style="text-align:center"><form method="POST">';
             echo '<button type="submit" name="delete" value="'.$row['id'].'" class="btn btn-default"><i class="fa fa-trash-o"></i></button> ';

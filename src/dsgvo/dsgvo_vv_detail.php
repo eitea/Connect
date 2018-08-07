@@ -1,5 +1,4 @@
 <?php include dirname(__DIR__) . '/header.php';?>
-<?php require_permission("READ","DSGVO","PROCEDURE_DIRECTORY") ?>
 <?php
 if(empty($_GET['v'])){
     echo "Invalid Access.";
@@ -52,7 +51,7 @@ function insertVVLog($short,$long){
     showError($stmt_insert_vv_log->error);
 }
 
-if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY")){
+if($_SERVER['REQUEST_METHOD'] == 'POST' && Permissions::has("PROCEDURE_DIRECTORY.WRITE")){
 	if(isset($_POST['dsgvo_vv_detail_save'])){
 		$stmt_update_setting = $conn->prepare("UPDATE dsgvo_vv_settings SET setting = ? WHERE id = ?");
 		$stmt_update_setting->bind_param("si", $setting_encrypt, $valID);
@@ -222,7 +221,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 ?>
 <div class="page-header-fixed">
 	<div class="page-header"><h3><?php echo $vv_row['name'].' '.$lang['PROCEDURE_DIRECTORY']; ?>
-	<?php if(has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY")): ?>
+	<?php if(Permissions::has("PROCEDURE_DIRECTORY.WRITE")): ?>
 		<div class="page-header-button-group"><button type="submit" class="btn btn-default blinking" form="mainForm"><i class="fa fa-floppy-o"></i></button></div>
 	<?php endif ?>
 	</h3></div>
@@ -234,7 +233,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	<?php
 	$settings = getSettings('DESCRIPTION');
 	if(isset($settings['DESCRIPTION'])):
-	    if(has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY") && isset($_POST['DESCRIPTION'])){
+	    if(Permissions::has("PROCEDURE_DIRECTORY.WRITE") && isset($_POST['DESCRIPTION'])){
 	        $setting = strip_tags($_POST['DESCRIPTION']);
 	        $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
 	        $valID = $settings['DESCRIPTION']['valID'];
@@ -290,7 +289,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	        <?php
 	        $settings = getSettings('GEN_%');
 	        foreach($settings as $key => $val){
-	            if(has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY") && isset($_POST[$key])){
+	            if(Permissions::has("PROCEDURE_DIRECTORY.WRITE") && isset($_POST[$key])){
 	                $val['setting'] = $setting = strip_tags($_POST[$key]);
 	                $valID = $val['valID'];
 	                $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
@@ -325,7 +324,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 			<?php
 			$key = 'GRET_TEXTAREA';
 	        $settings = getSettings($key);
-			if(has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY") && isset($_POST[$key])){
+			if(Permissions::has("PROCEDURE_DIRECTORY.WRITE") && isset($_POST[$key])){
 				$settings[$key]['setting'] = $setting = htmlspecialchars($_POST[$key]);
 				$setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
 				$valID = $settings[$key]['valID'];
@@ -365,7 +364,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                    foreach($settings as $key => $val){
 	                        // numbers for checked radio and text field are saved together, separated by |
 	                        $textFieldKey = "${key}_TEXTFIELD";
-	                        if(has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY") && (isset($_POST[$key]) || isset($_POST[$textFieldKey]))){
+	                        if(Permissions::has("PROCEDURE_DIRECTORY.WRITE") && (isset($_POST[$key]) || isset($_POST[$textFieldKey]))){
 	                            $val['setting'] = $setting = (isset($_POST[$key])?intval($_POST[$key]):"")."|".(isset($_POST[$textFieldKey])?test_input($_POST[$textFieldKey]):"");
 	                            $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
 	                            $valID = $val['valID'];
@@ -419,7 +418,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	    global $setting_encrypt;
 	    global $setID;
 	    global $vvID;
-	    if(has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY") && isset($_POST[$name])){
+	    if(Permissions::has("PROCEDURE_DIRECTORY.WRITE") && isset($_POST[$name])){
 	        $settings[$name]['setting'] = $setting = strip_tags($_POST[$name]);
 	        $valID = $settings[$name]['valID'];
 	        $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
@@ -530,7 +529,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                }
 	            }
 	            // no other sane choice for the backend to be but here
-	            if(has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY") && (isset($_POST['add_category']) && !empty($_POST['add_category_name']))){
+	            if(Permissions::has("PROCEDURE_DIRECTORY.WRITE") && (isset($_POST['add_category']) && !empty($_POST['add_category_name']))){
 	                $setID = $space;
 	                $setting = test_input($_POST['add_category_name']);
 	                $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
@@ -588,7 +587,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                    $cats = getSettings('APP_CAT_'.util_strip_prefix($key, 'APP_GROUP_').'_%', false, true);
 	                    echo '<tr><td rowspan="'.(count($cats) +1).'" >'.$val['descr'].'</td></tr>';
 	                    foreach($cats as $catKey => $catVal){
-	                        if(has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY") && isset($_POST['dsgvo_vv_detail_save'])){ //5b4dc21e82dbf
+	                        if(Permissions::has("PROCEDURE_DIRECTORY.WRITE") && isset($_POST['dsgvo_vv_detail_save'])){ //5b4dc21e82dbf
 	                            $valID = $catVal['valID'];
 	                            if(!empty($_POST[$catKey])){
 	                                $catVal['setting'] = $setting = '1';
@@ -628,7 +627,7 @@ function getSettings($like, $mults = false, $from_matrix = false){
 	                        foreach($heading as $headKey => $headVal){
 	                            $j = array_search($catKey, $headVal['category']); //$j = numeric index
 	                            $checked = ($j && $headVal['setting'][$j]) ? 'checked' : '';
-	                            if(has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY") && isset($_POST['dsgvo_vv_detail_save'])){ //5b4dc21e82dbf
+	                            if(Permissions::has("PROCEDURE_DIRECTORY.WRITE") && isset($_POST['dsgvo_vv_detail_save'])){ //5b4dc21e82dbf
 	                                if(!empty($_POST[$headKey.'_'.$catKey])){
 	                                    $setting = '1';
 	                                    $setting_encrypt = secure_data('DSGVO', $setting, 'encrypt', $userID, $privateKey);
@@ -803,7 +802,7 @@ if($result && ($row = $result->fetch_assoc())){
 	});
 </script>
 <?php echo $last_encryption_error; ?>
-<?php if(!has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY")): ?>
+<?php if(!Permissions::has("PROCEDURE_DIRECTORY.WRITE")): ?>
 <script>
 $('#bodyContent .affix-content input').prop("disabled", true); // disable all input on this page (not header)
 $('#bodyContent .affix-content textarea').prop("disabled", true); // disable all input on this page (not header)

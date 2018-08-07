@@ -1,4 +1,4 @@
-<?php include dirname(dirname(__DIR__)) . '/header.php'; enableToCore($userID); ?>
+<?php include dirname(dirname(__DIR__)) . '/header.php'; ?>
 <?php
 if(isset($_POST['accept'])){
   $accept = true;

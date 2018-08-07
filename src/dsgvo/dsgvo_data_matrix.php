@@ -1,19 +1,18 @@
 <?php
 include dirname(__DIR__) . '/header.php';
 require dirname(__DIR__) . "/misc/helpcenter.php";
-require_permission("READ","DSGVO","PROCEDURE_DIRECTORY");
 
-if (isset($_GET['n'])) {
-	$cmpID = intval($_GET['n']);
+if (isset($_GET['cmp'])) {
+	$cmpID = intval($_GET['cmp']);
 } else if (count($available_companies) == 2) {
 	$cmpID = $available_companies[1];
-	redirect("data-matrix?n=$cmpID");
+	redirect("data-matrix?cmp=$cmpID");
 }
 
 if (isset($_POST['company_id'])) {
 	$newCmpID = intval($_POST['company_id']);
 	if ($cmpID !== $newCmpID) {
-		redirect("data-matrix?n=$newCmpID");
+		redirect("data-matrix?cmp=$newCmpID");
 	}
 }
 
@@ -87,7 +86,7 @@ if (isset($cmpID)) {
 	showError($conn->error);
 }
 
-if (has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY") && isset($_POST['add_setting']) && isset($matrixID)) {
+if (Permissions::has("PROCEDURE_DIRECTORY.WRITE") && isset($_POST['add_setting']) && isset($matrixID)) {
 	if (!empty($_POST['add_setting']) && !empty($_POST[test_input($_POST['add_setting'])])) {
 		$setting = test_input($_POST['add_setting']);
 		$descr = test_input($_POST[$setting]);
@@ -101,7 +100,7 @@ if (has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY") && isset($_POST['add_s
 	}
 }
 
-if (has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY") && isset($_POST['delete_setting']) && isset($matrixID)) {
+if (Permissions::has("PROCEDURE_DIRECTORY.WRITE") && isset($_POST['delete_setting']) && isset($matrixID)) {
 	if (!empty($_POST['delete_setting'])) {
 		$setting = test_input($_POST['delete_setting']);
 		$conn->query("DELETE FROM dsgvo_vv_data_matrix_settings WHERE matrixID = $matrixID AND opt_name = '$setting'");
@@ -114,7 +113,7 @@ if (has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY") && isset($_POST['delet
 	}
 }
 
-if (has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY") && isset($_POST['save_all']) && isset($matrixID)) {
+if (Permissions::has("PROCEDURE_DIRECTORY.WRITE") && isset($_POST['save_all']) && isset($matrixID)) {
 	$stmt = $conn->prepare("UPDATE dsgvo_vv_data_matrix_settings SET opt_descr = ?, opt_duration = ?, opt_unit = ?, opt_status = ? WHERE matrixID = $matrixID AND opt_name = ?"); echo $conn->error;
 	$stmt->bind_param("siiss", $descr, $duration, $unit, $status, $setting);
 	$affected_rows = 0;
@@ -150,7 +149,7 @@ if (has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY") && isset($_POST['save_
 	<div class="page-header">
 		<h3><?php echo $lang['DATA_MATRIX']; ?>
 			<div class="page-header-button-group">
-				<?php if(has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY")): ?> 
+				<?php if(Permissions::has("PROCEDURE_DIRECTORY.WRITE")): ?> 
 				<button type="submit" form="main-form" class="btn btn-default blinking" name="save_all" value="true"><i class="fa fa-floppy-o"></i></button>
 				<?php endif ?>
 			</div>
@@ -333,7 +332,7 @@ function resetBothSelects(baseName){
 	$("[name="+baseName+"_UNIT]").val("default");
 }
 </script>
-<?php if(!has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY")): ?>
+<?php if(!Permissions::has("PROCEDURE_DIRECTORY.WRITE")): ?>
 <script>
 $('#bodyContent .affix-content input').prop("disabled", true); // disable all input on this page (not header)
 $('#bodyContent .affix-content select').prop("disabled", true); // disable all input on this page (not header)

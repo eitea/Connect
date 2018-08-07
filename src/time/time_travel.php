@@ -1,6 +1,5 @@
 <?php include dirname(__DIR__) . '/header.php'; ?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
-<?php enableToCore($userID);?>
 
 <div class="page-header"><h3>Reisekostenabrechnung</h3></div>
 

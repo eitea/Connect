@@ -12,10 +12,10 @@
   <div id="container" class="clear">
     <section id="fof" class="clear">
       <div class="hgroup">
-        <h1>SOMETHING JUST WENT WRONG!</h1>
-        <h2>404 error</h2>
+        <h1><?php echo $error_message ?></h1>
+        <h2>Error <?php echo $error_code ?></h2>
       </div>
-      <p>The page you requested could not be found on our servers.</p>
+      <p><?php echo $error_explanation ?></p>
       <p>Go to <a href="./login/auth">Login</a> page or go <a href="javascript:history.back()">Back</a></p>
     </section>
   </div>

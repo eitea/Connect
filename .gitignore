@@ -9,3 +9,4 @@ src/connection_s3admin.php
 plugins/dompdf/dompdf/dompdf/lib/fonts/*
 /nbproject/*
 run.ps1
+src/development_debug.php

@@ -1,15 +1,14 @@
 <?php
 include dirname(__DIR__) . '/header.php';
 require dirname(__DIR__) . "/misc/helpcenter.php";
-require_permission("READ","DSGVO","PROCEDURE_DIRECTORY");
-if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventually STRIKE
+if(empty($_GET['cmp']) || !in_array($_GET['cmp'], $available_companies)){ //eventually STRIKE
     $conn->query("UPDATE UserData SET strikeCount = strikecount + 1 WHERE id = $userID");
     showError($lang['ERROR_STRIKE']);
     include dirname(__DIR__) . '/footer.php';
     die();
 }
 
-$cmpID = intval($_GET['n']);
+$cmpID = intval($_GET['cmp']);
 
 $stmt_insert_vv_log = $conn->prepare("INSERT INTO dsgvo_vv_logs (user_id,short_description,long_description,scope) VALUES ($userID,?,?,?)");
 showError($conn->error);
@@ -31,7 +30,7 @@ function insertVVLog($short,$long){
     showError($stmt_insert_vv_log->error);
 }
 
-if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY")){
+if($_SERVER['REQUEST_METHOD'] == 'POST' && Permissions::has("PROCEDURE_DIRECTORY.WRITE")){
     if(isset($_POST['add_app']) && !empty($_POST['add_app_name']) && !empty($_POST['add_app_template'])){
         $name = test_input($_POST['add_app_name']);
         $val = intval($_POST['add_app_template']);
@@ -143,12 +142,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","PROCE
 <div class="page-header-fixed">
     <div class="page-header"><h3><?php echo $lang['PROCEDURE_DIRECTORY']; ?>
         <div class="page-header-button-group">
-            <?php if( has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY")): ?>
+            <?php if( Permissions::has("PROCEDURE_DIRECTORY.WRITE")): ?>
             <button type="button" class="btn btn-default" data-toggle="modal" data-target="#add-app">+ <?php echo $lang['NEW_PROCESS'] ?></button>
             <button type="button" class="btn btn-default" data-toggle="modal" data-target="#list-templates"><?php echo $lang['MANAGE_TEMPLATES']; ?></button>
             <?php endif ?>
-            <a href="data-matrix?n=<?php echo $cmpID; //5acb74765fddc ?>" class="btn btn-default" ><?php echo $lang['DATA_MATRIX'] ?></a>
-            <?php if( has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY")): ?>
+            <a href="data-matrix?cmp=<?php echo $cmpID; //5acb74765fddc ?>" class="btn btn-default" ><?php echo $lang['DATA_MATRIX'] ?></a>
+            <?php if( Permissions::has("PROCEDURE_DIRECTORY.WRITE")): ?>
             <button type="button" class="btn btn-default" data-toggle="modal" data-target="#list-default-folders"><?php echo $lang['ARCHIVE_STRUCTURE'] ?></button>
             <?php endif ?>
             <form method="POST" target="_blank" action="pdfDownload" style="display: inline;">
@@ -164,7 +163,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","PROCE
     ?>
         <form method="POST">
             <div class="row">
-                <div class="panel panel-default col-sm-6"><a href="vDetail?v=<?php echo $row['id']; ?>&n=<?php echo $cmpID; ?>" class="btn btn-link"> <?php echo "Stammblatt" ?> </a></div>
+                <div class="panel panel-default col-sm-6"><a href="vDetail?v=<?php echo $row['id']; ?>&cmp=<?php echo $cmpID; ?>" class="btn btn-link"> <?php echo "Stammblatt" ?> </a></div>
                 <div class="col-sm-5">
                     <select name="change_basic_template" class="js-example-basic-single">
                         <?php
@@ -176,7 +175,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","PROCE
                     </select>
                 </div>
                 <div class="col-xs-1">
-                <?php if( has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY")): ?> <button type="submit" class="btn btn-warning"><i class="fa fa-floppy-o"></i></button><?php endif ?>
+                <?php if( Permissions::has("PROCEDURE_DIRECTORY.WRITE")): ?> <button type="submit" class="btn btn-warning"><i class="fa fa-floppy-o"></i></button><?php endif ?>
                 </div>
             </div>
         </form>
@@ -197,8 +196,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","PROCE
         <div class="row">
             <form method="POST">
                 <div class="panel panel-default col-sm-5 col-sm-offset-1">
-                    <a href="vDetail?v=<?php echo $id; ?>&n=<?php echo $cmpID; ?>" class="btn btn-link"><?php echo $name; ?></a>
-                    <?php if( has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY")): ?>
+                    <a href="vDetail?v=<?php echo $id; ?>&cmp=<?php echo $cmpID; ?>" class="btn btn-link"><?php echo $name; ?></a>
+                    <?php if( Permissions::has("PROCEDURE_DIRECTORY.WRITE")): ?>
                     <a type="button" data-toggle="modal" href="#edit-app" data-name="<?php echo $name; ?>" data-valid="<?php echo $id; ?>"><i class="fa fa-pencil"></i></a>
                     <?php endif ?>
                 </div>
@@ -207,7 +206,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","PROCE
                         <select name="template_id" class="js-example-basic-single">
                             <?php echo str_replace('<option value="'.$row['templateID'].'"', '<option selected value="'.$row['templateID'].'"' , $template_select); ?>
                         </select>
-                        <?php if( has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY")): ?>
+                        <?php if( Permissions::has("PROCEDURE_DIRECTORY.WRITE")): ?>
                         <div class="input-group-btn">
                             <button type="submit" class="btn btn-default" name="change_template" value="<?php echo $id; ?>"><i class="fa fa-floppy-o"></i></button>
                         </div>
@@ -215,7 +214,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","PROCE
                     </div>
                 </div>
                 <div class="col-sm-1">
-                    <?php if( has_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY")): ?>
+                    <?php if( Permissions::has("PROCEDURE_DIRECTORY.WRITE")): ?>
                     <button type="submit" class="btn btn-default" name="delete_app" value="<?php echo $id; ?>"><i class="fa fa-trash-o"></i></button>
                     <?php endif ?>
                 </div>
@@ -348,7 +347,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","PROCE
                             echo '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#clone-temp-'.$row['id'].'" title="Duplizieren"><i class="fa fa-files-o"></i></button> ';
                             if($row['name'] != 'Default'){
                                 echo '<button type="submit" name="delete_template" value="'.$row['id'].'" class="btn btn-default"><i class="fa fa-trash-o"></i></button> ';
-                                echo '<a href="editTemplate?t='.$row['id'].'&n='.$cmpID.'" class="btn btn-default"><i class="fa fa-pencil"></i></a>';
+                                echo '<a href="editTemplate?t='.$row['id'].'&cmp='.$cmpID.'" class="btn btn-default"><i class="fa fa-pencil"></i></a>';
                             }
                             echo '</td>';
                             echo '</tr>';

@@ -1,4 +1,4 @@
-<?php include dirname(dirname(__DIR__)) . '/header.php'; enableToCore($userID); //5b34fa15e7a23 ?>
+<?php include dirname(dirname(__DIR__)) . '/header.php';  //5b34fa15e7a23 ?>
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
 	if(!empty($_POST['delete_tag'])){

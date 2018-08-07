@@ -127,7 +127,7 @@ foreach ($userArray as $user) {
             <table class="table table-hover text-center vertical-align" >
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th></th>
                         <th>Name</th>
                         <th><?php echo $lang['TRAINING_QUESTION_CORRECT']['TRUE'] ?></th>
                         <th><?php echo $lang['TRAINING_QUESTION_CORRECT']['FALSE'] ?></th>
@@ -141,6 +141,7 @@ foreach ($userArray as $user) {
                     <?php
                     foreach ($userArray as $user) {
                         $id = $user["id"];
+                        list($sql_error, $survey_are_suspended) = surveys_are_suspended_query($id, true);
                         $name = $user["name"];
                         $result = $conn->query("SELECT count(*) count
                             FROM dsgvo_training_questions
@@ -177,7 +178,12 @@ foreach ($userArray as $user) {
                             $noAnswers = false;
                         }
                         echo "<tr>";
-                        echo "<td>$id</td>";
+                        if($survey_are_suspended && $unanswered != 0){
+                            echo "<td><i title='Aufgeschoben' data-container='body' data-toggle='tooltip' class='fa fa-fw fa-hourglass-half'><i></td>";
+                        }else{
+                            echo "<td></td>";
+                        }
+                        // echo "<td>$id</td>";
                         echo "<td>$name</td>";
                         echo "<td style='background-color:" . percentage_to_color($percentRight, false, $noAnswers || $base == 0) . ";'>$right (".formatPercent($percentRight). ")</td>";
                         echo "<td style='background-color:" . percentage_to_color($percentWrong, true, $noAnswers || $base == 0) . ";'>$wrong (".formatPercent($percentWrong). ")</td>";

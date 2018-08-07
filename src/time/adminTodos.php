@@ -1,13 +1,12 @@
 <?php include dirname(__DIR__) . '/header.php'; ?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
-<?php enableToTime($userID);?>
 <!-- BODY -->
 <title>TODOs</title>
 <div class="page-header">
   <h3><?php echo $lang['FOUNDERRORS']; ?></h3>
 </div>
 <?php
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && Permissions::has("TIMES.WRITE")) {
     //illegal lunchbreaks
     if (isset($_POST['saveNewBreaks']) && !empty($_POST['lunchbreakIndeces'])) {
         foreach ($_POST['lunchbreakIndeces'] as $indexIM) {
@@ -52,8 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             //first, match expectedHours. if user has booking, overwrite this var
             $adjustedTime = carryOverAdder_Hours($row['time'], $row[strtolower(date('D', strtotime($row['time'])))]);
             //adjust to match expectedHours OR last projectbooking, if any of these even exist
-            $result = $conn->query("SELECT canBook FROM roles WHERE userID = ".$row['userID']);
-            if (($rowCanBook = $result->fetch_assoc()) && $rowCanBook['canBook'] == 'TRUE') {
+            if (($rowCanBook = $result->fetch_assoc()) && Permissions::has("GENERAL.BOOK",$row['userID'])) {
                 $result = $conn->query("SELECT p.end FROM projectBookingData p WHERE p.timestampID = $indexIM ORDER BY p.end DESC LIMIT 1");
                 if ($result && $result->num_rows > 0) { //does a booking exist?
                     $rowLastBooking = $result->fetch_assoc();
@@ -500,6 +498,14 @@ function toggle(source, target) {
   }
 }
 </script>
+
+<?php if(!Permissions::has("TIMES.WRITE")): ?>
+<script>
+$('#bodyContent .affix-content input').prop("disabled", true); // disable all input on this page (not header)
+$('#bodyContent .affix-content select').prop("disabled", true); // disable all input on this page (not header)
+$('#bodyContent .affix-content button').prop("disabled", true); // disable all input on this page (not header)
+</script>
+<?php endif ?>
 
 <!-- /BODY -->
 <?php include dirname(__DIR__) . '/footer.php'; ?>

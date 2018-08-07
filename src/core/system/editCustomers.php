@@ -1,4 +1,4 @@
-<?php include dirname(dirname(__DIR__)) . '/header.php'; enableToClients($userID); ?>
+<?php include dirname(dirname(__DIR__)) . '/header.php'; ?>
 <?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, 'supplier' => 0); //set_filter requirement
@@ -372,8 +372,7 @@ WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clie
             echo ($row['isSupplier'] == 'FALSE') ? '<td>'.$lang['CLIENT'].'</td>' : '<td>'.$lang['SUPPLIER'].'</td>';
             echo '<td>'.$row['clientNumber'].'</td>';
             echo '<td>';
-            if($user_roles['isCoreAdmin'] == 'TRUE' || $user_roles['isERPAdmin'] == 'TRUE' || ($row['isSupplier'] == 'TRUE' && $user_roles['canEditSupplier']=='TRUE')
-			|| ($row['isSupplier'] == 'FALSE' && $user_roles['canEditClients']=='TRUE')){
+            if(($row['isSupplier'] == 'FALSE' && Permissions::has("ERP.CLIENTS")) || ($row['isSupplier'] == 'TRUE' && Permissions::has("ERP.SUPPLIERS"))){
                 echo '<button type="button" class="btn btn-default" name="deleteModal" value="'.$row['id'].'" title="'.$lang['DELETE'].'" ><i class="fa fa-trash-o"></i></button>';
                 echo '<button type="button" class="btn btn-default" name="editModal" value="'.$row['id'].'" ><i class="fa fa-pencil"></i></button>';
 

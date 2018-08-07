@@ -1,6 +1,5 @@
 <?php include dirname(__DIR__) . '/header.php'; ?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
-<?php enableToTemplate($userID); ?>
 
 <div class="page-header">
   <h3><?php echo $lang['TEMPLATES']; ?><div class="page-header-button-group">
@@ -164,7 +163,7 @@ while($result && ($row = $result->fetch_assoc())):  //create a modal for every t
 <br><br><br>
 <div class="container-fluid">
   <div class="col-md-4">
-    <a href="templateEdit.php" class="btn btn-warning"><?php echo $lang['NEW_TEMPLATE']; ?></a>
+    <a href="../report/editTemp" class="btn btn-warning"><?php echo $lang['NEW_TEMPLATE']; ?></a>
     <button class="btn btn-warning" type="button" data-toggle="collapse" data-target="#importTemplate" aria-expanded="false" aria-controls="collapseExample">
       <i class='fa fa-upload'></i> Upload <i class="fa fa-caret-down"></i>
     </button>

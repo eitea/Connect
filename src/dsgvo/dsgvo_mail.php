@@ -1,8 +1,7 @@
 <?php include dirname(__DIR__) . '/header.php';?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
-<?php require_permission("READ","DSGVO","EMAIL_TEMPLATES") ?>
 <?php
-if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventually STRIKE
+if(empty($_GET['cmp']) || !in_array($_GET['cmp'], $available_companies)){ //eventually STRIKE
     $conn->query("UPDATE userdata SET strikeCount = strikecount + 1 WHERE id = $userID");
     echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a><strong>Invalid Access.</strong> '.$lang['ERROR_STRIKE'].'</div>';
     include dirname(__DIR__) . '/footer.php';
@@ -10,7 +9,7 @@ if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventual
 }?>
 <div class="page-header-fixed">
 <div class="page-header"><h4><?php echo $lang["EMAIL_TEMPLATES"] ?>
-<?php if(has_permission("WRITE","DSGVO","EMAIL_TEMPLATES")): ?>
+<?php if(Permissions::has("DSGVO.EMAIL_TEMPLATES")): ?>
  <div class="page-header-button-group"><form method="POST" style="display:inline"><button type="submit" name="create_report" class="btn btn-default"><i class="fa fa-plus"></i></button></form>
 <?php endif ?>
 </h4></div>
@@ -18,12 +17,12 @@ if(empty($_GET['n']) || !in_array($_GET['n'], $available_companies)){ //eventual
 <div class="page-content-fixed-130">
 <?php
 
-$cmpID = intval($_GET['n']);
+$cmpID = intval($_GET['cmp']);
 
 $action = $action_id = '';
 if(isset($_POST['create_report'])){ $action = 'new'; }
 if(isset($_POST['edit_report'])){ $action = 'edit'; $action_id = intval($_POST['edit_report']); }
-if(has_permission("WRITE","DSGVO","EMAIL_TEMPLATES")){
+if(Permissions::has("DSGVO.EMAIL_TEMPLATES")){
     if($action && !empty($_POST['report_content']) && !empty($_POST['report_name'])){
         $templateName = test_input($_POST['report_name']);
         $templateContent = $_POST['report_content'];
@@ -68,7 +67,7 @@ if(has_permission("WRITE","DSGVO","EMAIL_TEMPLATES")){
         echo '<tr>';
         echo '<td>'.$row['name'].'</td>';
         echo '<td>';
-        if(has_permission("WRITE","DSGVO","EMAIL_TEMPLATES")){
+        if(Permissions::has("DSGVO.EMAIL_TEMPLATES")){
             echo '<button type="submit" name="delete_report" value="'.$row['id'].'" class="btn btn-default" title="'.$lang['DELETE'].'"><i class="fa fa-trash-o"></i></button> ';
         }
         echo '<button type="submit" name="edit_report" value="'.$row['id'].'" class="btn btn-default" title="'.$lang['EDIT'].'" ><i class="fa fa-pencil"></i></button>';
@@ -97,7 +96,7 @@ if($action == 'edit'){
 ?>
 <div class="row">
     <div class="col-xs-6"><label>Name</label><input type="text" class="form-control" placeholder="Name of Template (Required)" name="report_name" value="<?php echo $templateName; ?>" /></div>
-    <div class="col-xs-3"><?php if(has_permission("WRITE","DSGVO","EMAIL_TEMPLATES")): ?><label><?php echo $lang["SAVE"] ?></label><br><button type="submit" class="btn btn-warning"><i class="fa fa-floppy-o"></i></button><?php endif ?></div>
+    <div class="col-xs-3"><?php if(Permissions::has("DSGVO.EMAIL_TEMPLATES")): ?><label><?php echo $lang["SAVE"] ?></label><br><button type="submit" class="btn btn-warning"><i class="fa fa-floppy-o"></i></button><?php endif ?></div>
 </div>
 <div class="row">
     <div class="col-sm-9" style="max-width:790px;"><textarea name="report_content"><?php echo $templateContent; ?></textarea></div>

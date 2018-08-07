@@ -38,8 +38,14 @@ $lang_ger['ACCOUNT'] = 'Konto';
 $lang_eng['ACCOUNT_JOURNAL'] = 'Accounting Journal';
 $lang_ger['ACCOUNT_JOURNAL'] = 'Buchungsjournal';
 
+$lang_eng['ACCOUNTING_JOURNAL'] = 'Accounting Journal';
+$lang_ger['ACCOUNTING_JOURNAL'] = 'Buchungsjournal';
+
 $lang_eng['ACCOUNT_PLAN'] = 'Account Plan';
 $lang_ger['ACCOUNT_PLAN'] = 'Kontenplan';
+
+$lang_eng['ACCOUNTING_PLAN'] = 'Account Plan';
+$lang_ger['ACCOUNTING_PLAN'] = 'Kontenplan';
 
 $lang_eng['ADD'] = 'Add';
 $lang_ger['ADD'] = 'Hinzufügen';
@@ -85,6 +91,9 @@ $lang_ger['ADVANCED_SEARCH'] = 'Erweiterte Suche';
 
 $lang_eng['AFFECTED_MONTH'] = 'Affected Month';
 $lang_ger['AFFECTED_MONTH'] = 'Betroffener Monat';
+
+$lang_eng['AGREEMENTS'] = 'Agreements';
+$lang_ger['AGREEMENTS'] = 'Vereinbarungen';
 
 $lang_eng['ALL_SECTIONS'] = 'All sections';
 $lang_ger['ALL_SECTIONS'] = 'Alle Bereiche';
@@ -331,6 +340,9 @@ $lang_ger['CONSUMED'] = 'Konsumiert';
 
 $lang_eng['COPY'] = 'Copy';
 $lang_ger['COPY'] = 'Kopieren';
+
+$lang_eng['CORE'] = 'Core';
+$lang_ger['CORE'] = 'Allgemein';
 
 $lang_eng['CORE_TIME'] = 'Core Time';
 $lang_ger['CORE_TIME'] = 'Kernzeit';
@@ -977,6 +989,9 @@ $lang_ger['SUBCATEGORIES_EDIT'] = 'Subkategorien bearbeiten';
 $lang_eng['SUBCATEGORIES_MANAGE'] = 'Manage subcategories';
 $lang_ger['SUBCATEGORIES_MANAGE'] = 'Subkategorien Verwalten';
 
+$lang_eng['SUSPENDED_SURVEYS'] = 'Suspended surveys';
+$lang_ger['SUSPENDED_SURVEYS'] = 'Aufgeschobene Schulungen';
+
 $lang_eng['SEND'] = 'Send';
 $lang_ger['SEND'] = 'Senden';
 
@@ -1088,8 +1103,8 @@ $lang_ger['NEWEST_AGREEMENTS_FROM_CONSULIO'] = 'Neueste Dokumente von Consulio l
 $lang_eng['NO'] = 'No';
 $lang_ger['NO'] = 'Nein';
 
-$lang_eng['NO_MATRIX'] = 'This company does not have a matrix. Click <a href="../dsgvo/data-matrix?n=%s">here</a> to create one.';
-$lang_ger['NO_MATRIX'] = 'Diese Firma hat keine Matrix in den Einstellungen. Zum Erstellen <a href="../dsgvo/data-matrix?n=%s">hier klicken</a>.';
+$lang_eng['NO_MATRIX'] = 'This company does not have a matrix. Click <a href="../dsgvo/data-matrix?cmp=%s">here</a> to create one.';
+$lang_ger['NO_MATRIX'] = 'Diese Firma hat keine Matrix in den Einstellungen. Zum Erstellen <a href="../dsgvo/data-matrix?cmp=%s">hier klicken</a>.';
 
 $lang_eng['NOTES'] = 'Notes';
 $lang_ger['NOTES'] = 'Notizen';
@@ -1253,6 +1268,9 @@ $lang_ger['PRODUCTIVITY'] = 'Produktivität';
 $lang_eng['PRODUCTS'] = 'Products';
 $lang_ger['PRODUCTS'] = 'Produkte';
 
+$lang_eng['PROFILE'] = 'Profile';
+$lang_ger['PROFILE'] = 'Profil';
+
 $lang_eng['PROJECT'] = 'Project';
 $lang_ger['PROJECT'] = 'Projekt';
 
@@ -1351,6 +1369,9 @@ $lang_ger['RETURN'] = 'Zurück';
 
 $lang_eng['REQUESTS'] = "Request";
 $lang_ger['REQUESTS'] = "Anträge";
+
+$lang_eng['REQUEST'] = "Make a request";
+$lang_ger['REQUEST'] = "Antrag stellen";
 
 $lang_eng['REQUEST_TYPE'] = "Request Type";
 $lang_ger['REQUEST_TYPE'] = "Art des Antrags";
@@ -1487,6 +1508,9 @@ $lang_ger['SPECIAL_LEAVE'] = 'Sonderurlaub';
 $lang_eng['SPECIAL_LEAVE_RET'] = 'Return from Leave';
 $lang_ger['SPECIAL_LEAVE_RET'] = 'Sonderurlaub Beenden';
 
+$lang_eng['STAMP'] = 'Stamp';
+$lang_ger['STAMP'] = 'Stempeln';
+
 $lang_eng['STREET'] = 'Street';
 $lang_ger['STREET'] ='Straße';
 
@@ -1618,6 +1642,9 @@ $lang_ger['UPLOAD_DATE'] = 'Upload Datum';
 $lang_eng['UPLOAD_FILE'] = 'Upload file';
 $lang_ger['UPLOAD_FILE'] = 'Datei Hochladen';
 
+$lang_eng['USE'] = 'Use';
+$lang_ger['USE'] = 'Benutzen';
+
 $lang_eng['USED_DAYS'] ='Used Days';
 $lang_ger['USED_DAYS'] ='Verbrauchte Tage';
 
@@ -1700,6 +1727,9 @@ $lang_ger['WITHIN'] = 'innerhalb';
 
 $lang_eng['WORKING_HOURS'] = 'Working Hours';
 $lang_ger['WORKING_HOURS'] = 'Arbeitszeit';
+
+$lang_eng['WRITE'] = 'Write';
+$lang_ger['WRITE'] = 'Schreiben';
 
 $lang_eng['YEAR'] = 'Year';
 $lang_ger['YEAR'] = 'Jahr';
