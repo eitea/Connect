@@ -6,6 +6,7 @@ $login_token = $_POST['token'];
 require dirname(dirname(__DIR__)) .'/connection.php';
 require dirname(dirname(__DIR__)) .'/utilities.php';
 include dirname(dirname(__DIR__)) .'/version_number.php';
+require_once dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . "validate.php";
 
 if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
     $result = $conn->query("SELECT COUNT(*) as total FROM UserData");
