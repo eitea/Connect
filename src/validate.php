@@ -302,7 +302,7 @@ class Permissions
   }
 
   /**
-   * Tests if a user has any permission in a group (eg DSGVO)
+   * Tests if a user or a team the user is in has any permission in a group (eg DSGVO)
    */
   public static function has_any($group_name, $userID = false, $permission_groups = false, $parent_matches = false, $parent_name = "")
   {

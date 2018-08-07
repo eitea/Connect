@@ -58,6 +58,7 @@ if ($result && ($row = $result->fetch_assoc())) {
 $result = $conn->query("SELECT id, CONCAT(firstname,' ', lastname) AS name FROM UserData")->fetch_all(MYSQLI_ASSOC); echo $conn->error;
 $userID_toName = array_combine( array_column($result, 'id'), array_column($result, 'name'));
 
+$numberOfAlerts = 0;
 if (Permissions::has("TIMES.READ")) {
     $numberOfAlerts = 0;
     //requests

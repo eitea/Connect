@@ -91,7 +91,7 @@ $routes = [ // each route has a path and an optional permission
 
     'dsgvo/documents' => ["path" => 'dsgvo/dsgvo_view.php', "permission" => "AGREEMENTS.READ"],
     'dsgvo/access' => ["path" => 'dsgvo/dsgvo_access.php', "permission" => "PROCEDURE_DIRECTORY.READ"],
-    'dsgvo/templates' => ["path" => 'dsgvo/dsgvo_mail.php', "permission" => "PROCEDURE_DIRECTORY.READ"],
+    'dsgvo/templates' => ["path" => 'dsgvo/dsgvo_mail.php', "permission" => "DSGVO.EMAIL_TEMPLATES"],
     'dsgvo/edit' => ["path" => 'dsgvo/dsgvo_edit.php', "permission" => "AGREEMENTS.WRITE"],
     'dsgvo/vv' => ["path" => 'dsgvo/dsgvo_vv.php', "permission" => "PROCEDURE_DIRECTORY.READ"],
     'dsgvo/log' => ["path" => 'dsgvo/dsgvo_log.php', "permission" => "DSGVO.LOGS"],
