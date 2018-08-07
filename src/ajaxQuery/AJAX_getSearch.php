@@ -3,6 +3,7 @@ session_start();
 $userID = $_SESSION['userid'] or die("no user signed in");
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "connection.php";
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "language.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "validate.php";
 
 /*
 
@@ -10,8 +11,7 @@ This page is accessible when clicking 'search' in the navbar or using the follow
 
 */
 
-$result = $conn->query("SELECT isCoreAdmin FROM $roleTable WHERE userID = $userID AND isCoreAdmin = 'TRUE'");
-$enableToAdvancedSearch = !($userID != 1 && (!$result || $result->num_rows <= 0));
+$enableToAdvancedSearch = Permissions::has("CORE.SETTINGS"); // TODO: Test permissions for every route and only show routes the user can access
 
 if (isset($_REQUEST["modal"])) {
     $german = $english = "";

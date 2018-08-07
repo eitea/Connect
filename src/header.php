@@ -672,8 +672,13 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     $dynamic_projects_menu_item_badge = $result->num_rows;
                     $finances_company_children_callback = function ($company /* has [id] and [name] */ ) use (&$conn) {
                         $company_children = [
-                            "ACCOUNT_PLAN" => ["href" => "finance/plan"],
-                            "ACCOUNT_JOURNAL" => ["href" => "finance/journal"],
+                            "ACCOUNT_PLAN" => [
+                                "href" => "finance/plan",
+                                "active_routes" => ["finance/account"]
+                            ],
+                            "ACCOUNT_JOURNAL" => [
+                                "href" => "finance/journal"
+                            ],
                         ];
                         $acc_res = $conn->query("SELECT id, name, companyID FROM accounts WHERE manualBooking='TRUE' AND companyID = " . $company["id"]);
                         while ($acc_res && ($acc_row = $acc_res->fetch_assoc())) {
@@ -686,8 +691,6 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                         }
                         return $company_children;
                     };
-
-                    // TODO: permissions from index
 
                     echo create_menu(["children" => [
                         "OVERVIEW" => [
@@ -707,7 +710,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             "icon" => "fa fa-fw fa-commenting-o",
                             "badge" => [
                                 "count" => getUnreadMessages(), // initial count, replaced with "" if it is 0 or "0"
-                                "id" => "chat_unread_message"
+                                "id" => "chat_unread_message" // optional
                             ]
                         ],
                         "PROJECTS" => [
@@ -844,14 +847,12 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                                             "url" => "erp/view",
                                             "get_params" => ["t" => "lfs"]
                                         ],
-                                        "ADDRESS_BOOK" => ["href" => "system/clients"]
                                     ]
                                 ],
                                 "SUPPLIERS" => [
                                     "children" => [
                                         "ORDER" => ["disabled" => true],
                                         "INCOMING_INVOICE" => ["disabled" => true],
-                                        "ADDRESS_BOOK" => ["href" => "system/clients"]
                                     ]
                                 ],
                                 "ARTICLE" => [
