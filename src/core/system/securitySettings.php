@@ -25,6 +25,12 @@ while($row = $result->fetch_assoc()){
 	$grantable_modules[$row['module']]['public'] = $row['publicKey'];
 }
 
+$result = $conn->query("SELECT teamID, userID FROM relationship_team_user");
+echo $conn->error;
+while($result && $row = $result->fetch_assoc()){
+    $relationship_team_user[$row["teamID"]][] = $row["userID"];
+}
+
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     if(!empty($_POST['saveRoles'])) {
@@ -354,45 +360,66 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 				}
 			}
         }
-        $remove_permission_stmt = $conn->prepare("DELETE FROM relationship_access_permissions WHERE userID = $x AND permissionID IN (SELECT permission.id FROM access_permissions permission INNER JOIN access_permission_groups groups ON groups.id = permission.groupID WHERE groups.name = ?)"); //TODO: fix (doesn't always work)
-        echo $conn->error;
-        $remove_permission_stmt->bind_param('s', $group_to_remove);
-		if(Permissions::has_any("DSGVO",$x) /* test if the user has any DSGVO read or write permissions */){
-            if(grantAccess('DSGVO', $x) !== "TRUE"){
-                // remove permission if user doesn't have a key
-                $group_to_remove = "DSGVO";
-                $remove_permission_stmt->execute();
-                showError($conn->error);
+    }
+
+    if(!empty($_POST['saveRoles']) || !empty($_POST['saveTeamRoles'])){
+        if(!empty($_POST['saveRoles'])){
+            $x = intval($_POST['saveRoles']);            
+            $remove_permission_stmt = $conn->prepare("DELETE FROM relationship_access_permissions WHERE userID = $x AND permissionID IN (SELECT permission.id FROM access_permissions permission INNER JOIN access_permission_groups groups ON groups.id = permission.groupID WHERE groups.name = ?)");
+            echo $conn->error;
+            $remove_permission_stmt->bind_param('s', $group_to_remove);
+            $user_array[] = $x;
+        }else{
+            $x = intval($_POST['saveTeamRoles']);
+            $remove_permission_stmt = $conn->prepare("DELETE FROM relationship_team_access_permissions WHERE teamID = $x AND permissionID IN (SELECT permission.id FROM access_permissions permission INNER JOIN access_permission_groups groups ON groups.id = permission.groupID WHERE groups.name = ?)");
+            echo $conn->error;
+            $remove_permission_stmt->bind_param('s', $group_to_remove);
+            foreach ($relationship_team_user[$x] as $uid) {
+                $user_array[] = $uid;
             }
-		} else {
-			$conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'DSGVO' AND userID = $x");
-		}
-		if(Permissions::has_any("ERP",$x)) {
-			if(grantAccess('ERP', $x) !== "TRUE"){
-                // remove permission if user doesn't have a key
-                $group_to_remove = "ERP";
-                $remove_permission_stmt->execute();
-                showError($conn->error);
-            }
-		} else {
-			$conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'ERP' AND userID = $x");
         }
-
-		if(isset($_POST['hasTaskAccess'])){
-			//TODO: see if user has access already, and if not, and you can grant it, grant it.
-		} else {
-			$conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'TASK' AND userID = $x");
-		}
-		if(isset($_POST['hasChatAccess'])){
-
-		} else {
-			$conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'CHAT' AND userID = $x");
-		}
-
-        if($conn->error){
-            showError($conn->error);
-        } else {
-            showSuccess($lang['OK_SAVE']);
+        foreach ($user_array as $uid){ // either do this just for the user where the permissions have changed or for all users of a team where permissions have changed
+            if(Permissions::has_any("DSGVO",$uid) /* test if the user has any DSGVO read or write permissions */){
+                if(grantAccess('DSGVO', $uid) !== "TRUE"){
+                    // remove permission if user doesn't have a key
+                    $group_to_remove = "DSGVO";
+                    $remove_permission_stmt->execute();
+                    showError($conn->error);
+                }
+            } else {
+                $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'DSGVO' AND userID = $uid");
+            }
+            if(Permissions::has_any("ERP",$uid)) {
+                if(grantAccess('ERP', $uid) !== "TRUE"){
+                    // remove permission if user doesn't have a key
+                    $group_to_remove = "ERP";
+                    $remove_permission_stmt->execute();
+                    showError($conn->error);
+                }
+            } else {
+                $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'ERP' AND userID = $uid");
+            }
+    
+            if(isset($_POST['hasTaskAccess'])){
+                //TODO: see if user has access already, and if not, and you can grant it, grant it.
+            } else {
+                $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'TASK' AND userID = $uid");
+            }
+            if(isset($_POST['hasChatAccess'])){
+    
+            } else {
+                $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'CHAT' AND userID = $uid");
+            }
+    
+            if($conn->error){
+                showError($conn->error);
+            } else {
+                showSuccess($lang['OK_SAVE']);
+            }
+            Permissions::update_cache_user($uid);
+        }
+        if(!empty($_POST['saveTeamRoles'])){
+            Permissions::update_cache_team(intval($_POST['saveTeamRoles']));
         }
     }
 }

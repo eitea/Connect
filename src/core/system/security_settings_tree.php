@@ -5,11 +5,7 @@ $permission_name_to_ids = [];
 while($result && $row = $result->fetch_assoc()){
     $permission_name_to_ids[$row["group_name"]][$row["permission_name"]] = ["group_id"=>$row["group_id"], "permission_id" => $row["permission_id"]];
 }
-$result = $conn->query("SELECT teamID, userID FROM relationship_team_user");
-echo $conn->error;
-while($result && $row = $result->fetch_assoc()){
-    $relationship_team_user[$row["teamID"]][] = $row["userID"];
-}
+
 $collapse_counter = 0;
 
 function create_collapse_tree($permission_groups, $name, $x, $children_disabled = false, $mode = "USER"){
