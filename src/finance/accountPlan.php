@@ -1,4 +1,4 @@
-<?php include dirname(__DIR__) . '/header.php'; enableToFinance($userID); ?>
+<?php include dirname(__DIR__) . '/header.php'; ?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <div class="page-header-fixed" >
 <div class="page-header"><h3><?php echo $lang['ACCOUNT_PLAN']; ?><div class="page-header-button-group">

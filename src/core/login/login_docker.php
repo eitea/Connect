@@ -49,8 +49,7 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
 				$_SESSION['publicKey'] = $key_row['publicKey'];
             }
             //if core admin
-            $result = $conn->query("SELECT userID FROM roles WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'");
-            if($result && $result->num_rows > 0){
+            if(Permissions::has("CORE.SETTINGS",$row['id'])){
                 require dirname(dirname(__DIR__)) ."/language.php";
                 //check for updates
                 $result = mysqli_query($conn, "SELECT version FROM configurationData;");

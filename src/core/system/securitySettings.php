@@ -1,11 +1,10 @@
 <?php require dirname(dirname(__DIR__)) . '/header.php'; ?>
 <?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
-<?php require_permission("READ","CORE","SECURITY") ?>
 <?php
 $activeTab = 0;
 $query_access_modules = array(
-    'DSGVO' => "groups.name = 'DSGVO' AND (r.type = 'READ' OR r.type = 'WRITE')",
-    'ERP' => "groups.name = 'ERP' AND (r.type = 'READ' OR r.type = 'WRITE')"
+    'DSGVO' => "groups.name = 'DSGVO'",
+    'ERP' => "groups.name = 'ERP'"
 );
 $result = $conn->query("SELECT activeEncryption FROM configurationData");
 if(!$result) die($lang['ERROR_UNEXPECTED']);
@@ -26,19 +25,18 @@ while($row = $result->fetch_assoc()){
 	$grantable_modules[$row['module']]['public'] = $row['publicKey'];
 }
 
-if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","CORE","SECURITY")){
+if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     if(!empty($_POST['saveRoles'])) {
         $x = intval($_POST['saveRoles']);
         if($x != 1){
-            $stmt_insert_permission_relationship = $conn->prepare("INSERT INTO relationship_access_permissions (userID, permissionID, type) VALUES (?, ?, ?)");
+            $stmt_insert_permission_relationship = $conn->prepare("INSERT INTO relationship_access_permissions (userID, permissionID) VALUES (?, ?)");
             echo $conn->error;
-            $stmt_insert_permission_relationship->bind_param("iis", $x, $permissionID, $type);
+            $stmt_insert_permission_relationship->bind_param("ii", $x, $permissionID);
             $conn->query("DELETE FROM relationship_access_permissions WHERE userID = $x");
-            foreach ($_POST as $key => $type) {
+            foreach ($_POST as $key => $type) { // type is always 'TRUE'
                 if(str_starts_with("PERMISSION", $key)){
                     $arr = explode(";", $key);
-                    // $groupID = intval($arr[1]);
                     $permissionID = intval($arr[2]);
                     $stmt_insert_permission_relationship->execute();
                     echo $stmt_insert_permission_relationship->error;
@@ -46,6 +44,25 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","CORE","SECURI
             }
             $stmt_insert_permission_relationship->close();    
         }
+        Permissions::update_cache_user($x);
+    }
+
+    if(!empty($_POST['saveTeamRoles'])) {
+        $x = intval($_POST['saveTeamRoles']);
+        $stmt_insert_permission_relationship = $conn->prepare("INSERT INTO relationship_team_access_permissions (teamID, permissionID) VALUES (?, ?)");
+        echo $conn->error;
+        $stmt_insert_permission_relationship->bind_param("ii", $x, $permissionID);
+        $conn->query("DELETE FROM relationship_team_access_permissions WHERE teamID = $x");
+        foreach ($_POST as $key => $type) { // type is always 'TRUE'
+            if(str_starts_with("PERMISSION", $key)){
+                $arr = explode(";", $key);
+                $permissionID = intval($arr[2]);
+                $stmt_insert_permission_relationship->execute();
+                echo $stmt_insert_permission_relationship->error;
+            }        
+        }
+        $stmt_insert_permission_relationship->close();    
+        Permissions::update_cache_team($x);
     }
 
     function secure_module($module, $symmetric, $decrypt = false){
@@ -320,23 +337,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","CORE","SECURI
 
     if(!empty($_POST['saveRoles'])){
         $activeTab = $x = intval($_POST['saveRoles']);
-        $isDynamicProjectsAdmin = isset($_POST['isDynamicProjectsAdmin']) ? 'TRUE' : 'FALSE';
-		$isTimeAdmin = isset($_POST['isTimeAdmin']) ? 'TRUE' : 'FALSE';
-        $isProjectAdmin = isset($_POST['isProjectAdmin']) ? 'TRUE' : 'FALSE';
-        $isReportAdmin = isset($_POST['isReportAdmin']) ? 'TRUE' : 'FALSE';
-        $isFinanceAdmin = isset($_POST['isFinanceAdmin']) ? 'TRUE' : 'FALSE';
-        $canStamp = isset($_POST['canStamp']) ? 'TRUE' : 'FALSE';
-		$canBook = isset($_POST['canBook']) ? 'TRUE' : 'FALSE'; //5afc1e6e44373
-        $canEditTemplates = isset($_POST['canEditTemplates']) ? 'TRUE' : 'FALSE';
-        $canUseSocialMedia = isset($_POST['canUseSocialMedia']) ? 'TRUE' : 'FALSE';
-        $canCreateTasks = isset($_POST['canCreateTasks']) ? 'TRUE' : 'FALSE';
-        $canUseArchive = isset($_POST['canUseArchive']) ? 'TRUE' : 'FALSE';
-        $canUseClients = isset($_POST['canUseClients']) ? 'TRUE' : 'FALSE';
-        $canUseSuppliers = isset($_POST['canUseSuppliers']) ? 'TRUE' : 'FALSE';
-        $canEditClients = isset($_POST['canEditClients']) ? 'TRUE' : 'FALSE';
-        $canEditSuppliers = isset($_POST['canEditSuppliers']) ? 'TRUE' : 'FALSE';
-        $canUseWorkflow = isset($_POST['canUseWorkflow']) ? 'TRUE' : 'FALSE'; //5ab7ae7596e5c
-		$canSendToExtern = isset($_POST['canSendToExtern']) ? 'TRUE' : 'FALSE';
+        
+        $inherit_team_permissions = isset($_POST['inherit_team_permissions']) ? 'TRUE' : 'FALSE';
+        $conn->query("UPDATE UserData SET inherit_team_permissions = '$inherit_team_permissions' WHERE id = $x");
+        Permissions::update_cache_relationship_user_team();
 
 		//TODO: we need to grant access to these too.
 		$conn->query("DELETE FROM relationship_company_client WHERE userID = $x");
@@ -350,13 +354,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","CORE","SECURI
 				}
 			}
         }
-        $remove_permission_stmt = $conn->prepare("DELETE FROM relationship_access_permissions WHERE userID = $x AND permissionID IN (SELECT permission.id FROM access_permissions permission INNER JOIN access_permission_groups groups ON groups.id = permission.groupID WHERE groups.name = ?)");
+        $remove_permission_stmt = $conn->prepare("DELETE FROM relationship_access_permissions WHERE userID = $x AND permissionID IN (SELECT permission.id FROM access_permissions permission INNER JOIN access_permission_groups groups ON groups.id = permission.groupID WHERE groups.name = ?)"); //TODO: fix (doesn't always work)
         echo $conn->error;
         $remove_permission_stmt->bind_param('s', $group_to_remove);
-        // if(isset($_POST['isDSGVOAdmin'])){
-		if(has_permission("READ", "DSGVO",false,$x) /* test if the user has any DSGVO read or write permissions */){
+		if(Permissions::has_any("DSGVO",$x) /* test if the user has any DSGVO read or write permissions */){
             if(grantAccess('DSGVO', $x) !== "TRUE"){
-                echo "test1";
                 // remove permission if user doesn't have a key
                 $group_to_remove = "DSGVO";
                 $remove_permission_stmt->execute();
@@ -365,9 +367,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","CORE","SECURI
 		} else {
 			$conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'DSGVO' AND userID = $x");
 		}
-		if(has_permission("READ", "ERP",false,$x)) {
+		if(Permissions::has_any("ERP",$x)) {
 			if(grantAccess('ERP', $x) !== "TRUE"){
-                echo "test2";
                 // remove permission if user doesn't have a key
                 $group_to_remove = "ERP";
                 $remove_permission_stmt->execute();
@@ -376,16 +377,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","CORE","SECURI
 		} else {
 			$conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'ERP' AND userID = $x");
         }
-        $isDSGVOAdmin = has_permission("READ", "DSGVO",false,$x) ? 'TRUE' : 'FALSE'; // remove when all permissions are updated
-        $isERPAdmin = has_permission("READ", "ERP",false,$x) ? 'TRUE' : 'FALSE'; // remove when all permissions are updated
-        $isCoreAdmin = has_permission("READ", "CORE",false,$x) ? 'TRUE' : 'FALSE'; // remove when all permissions are updated
-
-		$conn->query("UPDATE roles SET isDSGVOAdmin = '$isDSGVOAdmin', isCoreAdmin = '$isCoreAdmin', isDynamicProjectsAdmin = '$isDynamicProjectsAdmin',
-        isTimeAdmin = '$isTimeAdmin', isProjectAdmin = '$isProjectAdmin', isReportAdmin = '$isReportAdmin', isERPAdmin = '$isERPAdmin', canBook = '$canBook',
-        isFinanceAdmin = '$isFinanceAdmin', canStamp = '$canStamp', canEditTemplates = '$canEditTemplates', canEditClients = '$canEditClients',
-        canUseSocialMedia = '$canUseSocialMedia', canCreateTasks = '$canCreateTasks', canUseArchive = '$canUseArchive', canUseClients = '$canUseClients',
-        canUseSuppliers = '$canUseSuppliers', canEditSuppliers = '$canEditSuppliers', canUseWorkflow = '$canUseWorkflow', canSendToExtern = '$canSendToExtern'
-        WHERE userID = '$x'");
 
 		if(isset($_POST['hasTaskAccess'])){
 			//TODO: see if user has access already, and if not, and you can grant it, grant it.
@@ -426,9 +417,9 @@ if(!empty($key_downloads)){
 ?>
 
 <form method="POST">
-    <div class="page-header"><h3>Security Einstellungen  <?php if(has_permission("WRITE","CORE","SECURITY")): ?><div class="page-header-button-group">
+    <div class="page-header"><h3>Security Einstellungen <div class="page-header-button-group">
         <button type="submit" class="btn btn-default" title="<?php echo $lang['SAVE']; ?>" name="saveSecurity"><i class="fa fa-floppy-o"></i></button>
-</div><?php endif; ?></h3></div>
+</div></h3></div>
 
     <h4>Verschlüsselung <a role="button" data-toggle="collapse" href="#password_info_encryption"> <i class="fa fa-info-circle"></i></a></h4><br>
     <div class="collapse" id="password_info_encryption"><div class="well"><?php echo $lang['INFO_ENCRYPTION']; ?></div></div>
@@ -469,9 +460,4 @@ $('#activate_encryption').change(function(){
     }
 });
 </script>
-<?php if(!has_permission("WRITE","CORE","SECURITY")): ?>
-<script>
-$('#bodyContent .affix-content input').prop("disabled", true); // disable all input on this page (not header)
-</script>
-<?php endif; ?>
 <?php require dirname(dirname(__DIR__)) . '/footer.php'; ?>

@@ -1,4 +1,4 @@
-<?php require dirname(__DIR__).DIRECTORY_SEPARATOR.'header.php'; enableToSocialMedia($userID); ?>
+<?php require dirname(__DIR__).DIRECTORY_SEPARATOR.'header.php'; ?>
 <?php
 if (isset($_POST['saveSocial']) && !empty($_POST['social_realemail'])) {
 	$val = $userdata['real_email'] =  test_input($_POST['social_realemail']);

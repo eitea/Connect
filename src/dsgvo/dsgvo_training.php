@@ -1,6 +1,5 @@
 <?php require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'header.php'; ?>
 <?php require dirname(__DIR__) . DIRECTORY_SEPARATOR . "misc" . DIRECTORY_SEPARATOR . "helpcenter.php"; ?>
-<?php require_permission("READ", "DSGVO", "TRAINING") ?>
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 
 <?php
@@ -69,7 +68,7 @@ function parse_question_form()
     return $text;
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE", "DSGVO", "TRAINING")) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && Permissions::has("TRAINING.WRITE")) {
     if (isset($_POST['createTraining']) && !empty($_POST['name'])) {
         $name = test_input($_POST['name']);
         $moduleID = intval($_POST["module"]);
@@ -347,7 +346,7 @@ showError($conn->error);
         <h3>
             <?php echo $lang['TRAINING'] ?>
             <div class="page-header-button-group">
-                <?php if (has_permission("WRITE", "DSGVO", "TRAINING")) : ?>
+                <?php if (Permissions::has("TRAINING.WRITE")) : ?>
                 <span data-container="body" data-toggle="tooltip" title="<?php echo $lang[" NEW_SET_DESCRIPTION "] ?>">
                     <button type="button" data-toggle="modal" data-target="#newModuleModal" class="btn btn-default">
                         <i class="fa fa-cubes"></i>
@@ -392,7 +391,7 @@ showError($conn->error);
                                 <i class="fa fa-fw fa-download"></i>
                             </button>
                         </span>
-                         <?php if (has_permission("WRITE", "DSGVO", "TRAINING")) : ?>
+                         <?php if (Permissions::has("TRAINING.WRITE")) : ?>
                         <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['NEW_MODULE'] ?>">
                             <button type="button" style="background:none;border:none;" name="addTraining" value="<?php echo $moduleID; ?>">
                                 <i class="fa fa-fw fa-plus"></i>
@@ -443,7 +442,7 @@ showError($conn->error);
                                             <i class="fa fa-fw fa-play"></i>
                                         </button>
                                     </span>
-                                    <?php if (has_permission("WRITE", "DSGVO", "TRAINING")) : ?>
+                                    <?php if (Permissions::has("TRAINING.WRITE")) : ?>
                                     <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['ADD_QUESTION'] ?>">
                                         <button type="button" style="background:none;border:none;" name="addQuestion" value="<?php echo $trainingID; ?>">
                                             <i class="fa fa-fw fa-plus"></i>
@@ -502,7 +501,7 @@ showError($conn->error);
                                                     </button>
                                                 </span>
                                                 <?php endif ?>
-                                                <?php if (has_permission("WRITE", "DSGVO", "TRAINING")) : ?>
+                                                <?php if (Permissions::has("TRAINING.WRITE")) : ?>
                                                 <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['EDIT_QUESTION'] ?>">
                                                     <button type="button" style="background:none;border:none" name="editQuestion" value="<?php echo $questionID; ?>">
                                                         <i class="fa fa-fw fa-pencil"></i>

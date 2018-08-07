@@ -97,7 +97,7 @@ function set_menu_item_active($options, &$is_active) : string
  */
 function set_menu_item_href($options) : string
 {
-    if (isset($options["href"]))
+    if (isset($options["href"]) && !(isset($options["disabled"]) && $options["disabled"]))
         return 'href="../' . $options["href"] . '"';
     return '';
 }
@@ -195,6 +195,11 @@ function create_menu_item($options, $title, $depth, &$is_active, $parent_hash, &
             $is_active = true;
         }
         $is_visible = $any_sub_menu_item_visible; // the parent is only visible if it has children
+    }
+    if(isset($options["disabled"]) && $options["disabled"] && $is_visible){
+        // the item is visible, but the parent should not render if every child is disabled
+        $is_visible = false;
+        return $output;
     }
     if ($is_visible) return $output;
     return "";

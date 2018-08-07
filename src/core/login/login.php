@@ -13,6 +13,7 @@ if(!empty($_POST['captcha']))  die("mep.");
 require dirname(dirname(__DIR__)) .'/connection.php';
 require dirname(dirname(__DIR__)) .'/utilities.php';
 include dirname(dirname(__DIR__)) .'/version_number.php';
+include dirname(dirname(__DIR__)) .'/validate.php';
 
 $invalidLogin = "";
 
@@ -50,10 +51,7 @@ if(!empty($_POST['loginName']) && !empty($_POST['password'])) {
             $_SESSION['privateKey'] = simple_decryption($key_row['privateKey'], $_POST['password']);
 			$_SESSION['publicKey'] = $key_row['publicKey'];
         }
-        //if core admin
-        $sql = "SELECT userID FROM roles WHERE userID = ".$row['id']." AND isCoreAdmin = 'TRUE'";
-        $result = $conn->query($sql);
-        if($result && $result->num_rows > 0){
+        if(Permissions::has("CORE.SETTINGS",$row['id'])){
             require dirname(dirname(__DIR__)) .'/language.php';
             //check for updates
             $result = mysqli_query($conn, "SELECT version FROM configurationData;");

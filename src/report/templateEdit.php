@@ -1,4 +1,4 @@
-<?php include dirname(__DIR__) . '/header.php'; enableToTemplate($userID); ?>
+<?php include dirname(__DIR__) . '/header.php'; ?>
 
 <script src='../plugins/tinymce/tinymce.min.js'></script>
 

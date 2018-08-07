@@ -1,4 +1,4 @@
-<?php include dirname(dirname(__DIR__)) . '/header.php'; enableToStamps($userID); ?>
+<?php include dirname(dirname(__DIR__)) . '/header.php'; ?>
 <?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php
 $filterRequest_text = 'Alte ausblenden';

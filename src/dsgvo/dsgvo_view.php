@@ -1,6 +1,5 @@
 <?php
 include dirname(__DIR__) . '/header.php'; 
-require_permission("READ","DSGVO","AGREEMENTS");
 require dirname(__DIR__) . "/misc/helpcenter.php";
 if (empty($_GET['cmp']) || !in_array($_GET['cmp'], $available_companies)) { //eventually STRIKE
     $conn->query("UPDATE UserData SET strikeCount = strikeCount + 1 WHERE id = $userID");
@@ -11,7 +10,7 @@ if (empty($_GET['cmp']) || !in_array($_GET['cmp'], $available_companies)) { //ev
 
 $cmpID = intval($_GET['cmp']);
 $bucket = $identifier .'-uploads'; //no uppercase, no underscores, no ending dashes, no adjacent special chars
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","AGREEMENTS")) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && Permissions::has("AGREEMENTS.WRITE")) {
     if (!empty($_POST['delete'])){
         $val = intval($_POST['delete']);
         $conn->query("DELETE FROM documents WHERE id = $val AND companyID = $cmpID;");
@@ -316,7 +315,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","AGRE
 
 <div class="page-header"><h3><?php echo $lang['DOCUMENTS']; ?>
     <div class="page-header-button-group">
-		<?php if(has_permission("WRITE","DSGVO","AGREEMENTS")): ?>
+		<?php if(Permissions::has("AGREEMENTS.WRITE")): ?>
         <button type="button" data-toggle="modal" data-target="#pdf-upload" class="btn btn-default" title="Upload PDF File"><i class="fa fa-upload"></i> PDF Upload</button>
 		<?php endif ?>
 		<a data-toggle="collapse" href="#show-categories" class="btn btn-default" title="<?php echo $lang['SUBCATEGORIES_EDIT'] ?>"><?php echo $lang['CATEGORIES'] ?></a>
@@ -327,7 +326,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","AGRE
 	<form method="POST">
 	<h4><?php echo $lang['SUBCATEGORIES_MANAGE'] ?>
 		<div class="page-header-button-group">
-			<?php if(has_permission("WRITE","DSGVO","AGREEMENTS")): ?>
+			<?php if(Permissions::has("AGREEMENTS.WRITE")): ?>
 	        <button type="button" data-toggle="modal" data-target="#edit-categories" class="btn btn-default" title="Neue Subkategorie Hinzufügen"><i class="fa fa-plus"></i></button>
 	   		<?php endif ?>
 		</div>
@@ -348,7 +347,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","AGRE
 				echo '<td>'.$lang['CONTRACT'].'</td>';
 				echo '<td>'.$cats['name'].'</td>';
 				echo '<td>';
-				if(has_permission("WRITE","DSGVO","AGREEMENTS")){
+				if(Permissions::has("AGREEMENTS.WRITE")){
 					if($conn->query("SELECT id FROM archive_meta WHERE category = ".$cats['id'])->num_rows < 1){
 						echo '<button type="submit" name="deletecat" value="'.$cats['id'].'" class="btn btn-default" title="'.$lang['DELETE'].'"><i class="fa fa-trash-o"></i></button> ';
 					}
@@ -429,7 +428,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","AGRE
 
 <div class="page-header"><h3><?php echo $lang['TEMPLATES'].' '.$lang['FOR'].' '.$lang['DOCUMENTS']; ?>
     <div class="page-header-button-group">
-		<?php if(has_permission("WRITE","DSGVO","AGREEMENTS")): ?>
+		<?php if(Permissions::has("AGREEMENTS.WRITE")): ?>
         <button type="button" data-toggle="modal" data-target="#new-document" class="btn btn-default" title="New..."><i class="fa fa-plus"></i></button>
 		<button type="button" data-toggle="modal" data-target="#zip-upload" class="btn btn-default" title="Upload Zip File"><i class="fa fa-upload"></i> ZIP Upload</button>
 		<?php endif ?>
@@ -456,7 +455,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && has_permission("WRITE","DSGVO","AGRE
             echo '<td>' .mc_status('DSGVO'). secure_data('DSGVO', $row['name'], 'decrypt', $userID, $privateKey) . '</td>';
             echo '<td>' . $row['version'] . '</td>';
 			echo '<td><form method="POST">';
-			if(has_permission("WRITE","DSGVO","AGREEMENTS")){
+			if(Permissions::has("AGREEMENTS.WRITE")){
 				echo '<a href="edit?d=' . $row['id'] . '" title="'.$lang['EDIT'].'" class="btn btn-default"><i class="fa fa-pencil"></i></a> ';
 				echo '<button type="submit" name="clone" value="' . $row['id'] . '" title="'.$lang['CLONE'].'" class="btn btn-default" ><i class="fa fa-files-o"></i></button> ';
 				echo '<button type="submit" name="delete" value="' . $row['id'] . '" title="'.$lang['DELETE'].'" class="btn btn-default" ><i class="fa fa-trash-o"></i></button> ';

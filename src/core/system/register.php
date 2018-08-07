@@ -1,6 +1,5 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; ?>
 <?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
-<?php enableToCore($userID)?>
 <!-- BODY -->
 
 <div class="page-header">
@@ -106,10 +105,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           //create interval
           $sql = "INSERT INTO intervalData (mon, tue, wed, thu, fri, sat, sun, userID, vacPerYear, overTimeLump, pauseAfterHours, hoursOfrest, startDate)
           VALUES ($mon, $tue, $wed, $thu, $fri, $sat, $sun, $curID, '$vacDaysPerYear', '$overTimeLump','$pauseAfter', '$hoursOfRest', '$begin');";
-          $conn->query($sql);
-          echo mysqli_error($conn);
-          //create roletable
-          $sql = "INSERT INTO roles (userID, canStamp, canUseSocialMedia) VALUES($curID, 'TRUE', 'TRUE');";
           $conn->query($sql);
           echo mysqli_error($conn);
           //create socialprofile

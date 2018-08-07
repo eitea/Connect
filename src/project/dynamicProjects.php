@@ -71,7 +71,7 @@ $templateResult = $conn->query("SELECT projectname,projectid,v2 FROM dynamicproj
 <div class="page-header-fixed">
 	<div class="page-header"><h3>Tasks<div class="page-header-button-group">
 	    <?php include dirname(__DIR__) . '/misc/set_filter.php';
-		if($user_roles['isDynamicProjectsAdmin'] == 'TRUE'|| $user_roles['canCreateTasks'] == 'TRUE'):
+		if(Permissions::has("TASKS.WRITE")):
 			if($templateResult->num_rows > 0): ?>
 	        <div class="dropdown" style="display:inline;">
 	            <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button"><i class="fa fa-plus"></i></button>
@@ -287,7 +287,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             showError('<strong>Project not Available.</strong> '.$lang['ERROR_STRIKE']);
         }
     }
-    if($user_roles['isDynamicProjectsAdmin'] == 'TRUE' || $user_roles['canCreateTasks'] == 'TRUE'){
+    if(Permissions::has("TASKS.WRITE")){
         if(!empty($_POST['deleteProject'])){
             $val = test_input($_POST['deleteProject']);
             $conn->query("DELETE FROM dynamicprojectslogs WHERE projectid = '$val'");
@@ -341,7 +341,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 				$percentage = intval($_POST['completed']);
 				$estimate = test_input($_POST['estimatedHours']);
 				$isTemplate = isset($_POST['isTemplate']) ? 'TRUE' : 'FALSE';
-				if($user_roles['isDynamicProjectsAdmin'] == 'TRUE'){
+				if(Permissions::has("TASKS.ADMIN")){
 					$skill = intval($_POST['projectskill']);
 					$parent = test_input($_POST["parent"]); //dynamproject id
 				} else {
@@ -499,7 +499,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
         $hasActiveBooking = $result->num_rows;
 
 	    $nonAdminQuery = '';
-        if($user_roles['isDynamicProjectsAdmin'] == 'FALSE'){
+        if(!Permissions::has("TASKS.ADMIN")){
 			foreach($available_teams as $val) $nonAdminQuery .= " OR conteamsids LIKE '% $val %' ";
 			$nonAdminQuery = "AND conemployees LIKE '% $userID %' $nonAdminQuery";
         }
@@ -574,7 +574,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 				$conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) VALUES('$x', 1, 'owner') ON DUPLICATE KEY UPDATE position = 'owner'");
 				$owner = 1;
 			}
-			if($leader && $user_roles['isDynamicProjectsAdmin'] == 'FALSE' && $leader != $userID) continue;
+			if($leader && !Permissions::has("TASKS.ADMIN") && $leader != $userID) continue;
             if($leader == $owner){
                 echo '<u title="Besitzer und Verantwortlicher Mitarbeiter"><b>'. $userID_toName[$leader].'</b></u>,<br>';
             } else {
@@ -584,7 +584,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             echo $emps, $row['conteams'];
             echo '</td>';
             echo '<td>';
-            if(($user_roles['isDynamicProjectsAdmin'] == 'TRUE' || $row['projectowner'] == $userID)){
+            if((Permissions::has("TASKS.ADMIN") || $row['projectowner'] == $userID)){
                 $checked = $row['needsreview'] == 'TRUE' ? 'checked' : '';
                 echo '<input type="checkbox" onchange="reviewChange(event,\''.$x.'\')" '.$checked.'/>';
             }
@@ -607,7 +607,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 			<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="task-dropdown-'.$x.'">';
             if(!$row['workingUser']){ //5acdfb19c0e84
                 //echo " <button type='button' class='btn btn-default' title='Task Planen' data-toggle='modal' data-valid='$x' data-target='#task-plan'><i class='fa fa-clock-o'></i></button> ";
-                if($user_roles['isDynamicProjectsAdmin'] == 'TRUE' || $row['projectowner'] == $userID) { //don't show edit tools for trainings
+                if(Permissions::has("TASKS.ADMIN") || $row['projectowner'] == $userID) { //don't show edit tools for trainings
                     echo '<li><button type="submit" name="deleteProject" value="'.$x.'" class="btn btn-link"><i class="fa fa-trash-o"></i> Löschen</button></li>';
                     echo '<li><button type="button" name="editModal" value="'.$x.'" class="btn btn-link"><i class="fa fa-pencil"></i> Bearbeiten</button></li>';
                 }
@@ -1040,7 +1040,7 @@ function dynamicOnLoad(modID){
 function appendModal(index){
 	$.ajax({
 		url:'ajaxQuery/AJAX_dynamicEditModal.php',
-		data:{projectid: index,isDPAdmin: "<?php echo $user_roles['isDynamicProjectsAdmin']; ?>"},
+		data:{projectid: index,isDPAdmin: "<?php echo Permissions::has("TASKS.ADMIN")?"TRUE":"FALSE" ?>"},
 		type: 'post',
 		success : function(resp){
 			$("#editingModalDiv").append(resp);

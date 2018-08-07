@@ -2,7 +2,6 @@
 include dirname(__DIR__) . '/header.php';?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <?php
-enableToFinance($userID);
 
 if(isset($_GET['cmp']) && in_array($_GET['cmp'], $available_companies)){
     $cmpID = $_GET['cmp'];

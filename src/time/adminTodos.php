@@ -1,13 +1,12 @@
 <?php include dirname(__DIR__) . '/header.php'; ?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
-<?php enableToTime($userID);?>
 <!-- BODY -->
 <title>TODOs</title>
 <div class="page-header">
   <h3><?php echo $lang['FOUNDERRORS']; ?></h3>
 </div>
 <?php
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
+if($_SERVER['REQUEST_METHOD'] == 'POST' && Permissions::has("TIMES.WRITE")){
   //illegal lunchbreaks
   if(isset($_POST['saveNewBreaks']) && !empty($_POST['lunchbreakIndeces'])){
     foreach($_POST['lunchbreakIndeces'] as $indexIM){
@@ -45,8 +44,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
       //first, match expectedHours. if user has booking, overwrite this var
       $adjustedTime = carryOverAdder_Hours($row['time'], $row[strtolower(date('D', strtotime($row['time'])))]);
       //adjust to match expectedHours OR last projectbooking, if any of these even exist
-      $result = $conn->query("SELECT canBook FROM $roleTable WHERE userID = ".$row['userID']);
-      if(($rowCanBook = $result->fetch_assoc()) && $rowCanBook['canBook'] == 'TRUE'){
+      if(Permissions::has("GENERAL.BOOK",$row['userID'])){
         $sql = "SELECT $projectBookingTable.end FROM $projectBookingTable
         WHERE ($projectBookingTable.timestampID = $indexIM AND $projectBookingTable.start LIKE '$date %' )";
         $result = mysqli_query($conn, $sql);
@@ -488,6 +486,14 @@ function toggle(source, target) {
   }
 }
 </script>
+
+<?php if(!Permissions::has("TIMES.WRITE")): ?>
+<script>
+$('#bodyContent .affix-content input').prop("disabled", true); // disable all input on this page (not header)
+$('#bodyContent .affix-content select').prop("disabled", true); // disable all input on this page (not header)
+$('#bodyContent .affix-content button').prop("disabled", true); // disable all input on this page (not header)
+</script>
+<?php endif ?>
 
 <!-- /BODY -->
 <?php include dirname(__DIR__) . '/footer.php'; ?>

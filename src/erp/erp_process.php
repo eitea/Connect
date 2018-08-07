@@ -1,4 +1,4 @@
-<?php include dirname(__DIR__) . '/header.php'; enableToERP($userID); ?>
+<?php include dirname(__DIR__) . '/header.php';  ?>
 <script src="../plugins/jQuery/jquery-ui/jquery-ui.min.js"></script>
 <?php
 if(!empty($_GET['val'])){

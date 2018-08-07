@@ -43,36 +43,13 @@ html,body{
 require dirname(dirname(__DIR__)) . "/connection.php";
 require dirname(dirname(__DIR__)) . "/utilities.php";
 require_once dirname(dirname(__DIR__)) . '/validate.php';
+require_once dirname(dirname(__DIR__)) . '/core/setup/setup_permissions.php';
 set_time_limit(240);
 $result = mysqli_query($conn, "SELECT version FROM configurationData;");
 if(!$result){
     die($conn->error);
 } else {
     $row = $result->fetch_assoc();
-}
-
-/**
- * Function for adding new permissions wich tests if the permission already exists
- */
-function add_new_permission($group, $permission)
-{
-    global $conn;
-    $group = test_input($group);
-    $permission = test_input($permission);
-    $result = $conn->query("SELECT id FROM access_permission_groups WHERE name = '$group'");
-    echo $conn->error;
-    if ($result && $result->num_rows > 0 && ($row = $result->fetch_assoc())) {
-        $groupID = $row["id"];
-    } else {
-        $conn->query("INSERT INTO access_permission_groups (name) VALUES ('$group')");
-        echo $conn->error;
-        $groupID = $conn->insert_id;
-    }
-    $result = $conn->query("SELECT id FROM access_permissions WHERE groupID = $groupID AND name = '$permission'");
-    echo $conn->error;
-    if ($result && $result->num_rows > 0) return;
-    $conn->query("INSERT INTO access_permissions (groupID, name) VALUES ($groupID, '$permission')");
-    echo $conn->error;
 }
 
 if ($row['version'] < 100) {
@@ -3448,7 +3425,41 @@ if($row['version'] < 166){
 	$conn->query("ALTER TABLE dynamicprojects DROP COLUMN projectleader");
 }
 
-// if($row['version'] < 167){}
+if($row['version'] < 167){
+    // drop access_permission_groups.name unique key
+    $result = $conn->query("SHOW INDEX FROM access_permission_groups WHERE column_name = 'name'");
+    while($row = $result->fetch_assoc()){
+        $conn->query("ALTER TABLE access_permission_groups DROP INDEX ${row['Key_name']}");
+        echo $conn->error;
+    }
+    $conn->query("ALTER TABLE access_permission_groups ADD COLUMN parent INT(10) UNSIGNED");
+    $conn->query("ALTER TABLE access_permission_groups ADD FOREIGN KEY (parent) REFERENCES access_permission_groups(id) ON UPDATE CASCADE ON DELETE CASCADE");
+	$conn->query("ALTER TABLE relationship_access_permissions DROP COLUMN type");
+    
+    $sql = "CREATE TABLE relationship_team_access_permissions (
+        teamID INT(6) UNSIGNED NOT NULL,
+        permissionID INT(10) UNSIGNED NOT NULL,
+        PRIMARY KEY (teamID, permissionID),
+        FOREIGN KEY (permissionID) REFERENCES access_permissions(id) ON UPDATE CASCADE ON DELETE CASCADE,
+        FOREIGN KEY (teamID) REFERENCES teamData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
+
+    $conn->query("ALTER TABLE UserData ADD COLUMN inherit_team_permissions ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'TRUE'");
+	if($conn->error){
+		echo $conn->error;
+	} else {
+		echo '<br>UserData: Inherit team permissions';
+	}
+
+    $conn->query("DROP TABLE roles");
+    echo $conn->error;
+    
+    setup_permissions();
+}
+
 // if($row['version'] < 168){}
 // if($row['version'] < 169){}
 // if($row['version'] < 170){}

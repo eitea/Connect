@@ -1,5 +1,4 @@
 <?php include dirname(__DIR__) . '/header.php';
-require_permission("WRITE","DSGVO","AGREEMENTS");
 ?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <?php

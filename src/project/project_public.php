@@ -8,7 +8,7 @@ if(isset($_GET['custID']) && is_numeric($_GET['custID'])){
     $filterings['client'] = test_input($_GET['custID']);
 }
 
-if($user_roles['isProjectAdmin'] == 'TRUE' && $_SERVER['REQUEST_METHOD'] == 'POST'){
+if(Permissions::has("PROJECTS.ADMIN") && $_SERVER['REQUEST_METHOD'] == 'POST'){
 	if(!empty($_POST['deleteProject'])){
 		$val = intval($_POST['deleteProject']);
 		$conn->query("DELETE FROM folder_default_sturctures WHERE category = 'PROJECT' AND categoryID = '$val'");
@@ -235,7 +235,7 @@ if(!empty($_SESSION['external_id'])){
 	$tableName = 'relationship_project_user';
 }
 
-if($user_roles['isProjectAdmin'] == 'TRUE'){
+if(Permissions::has("PROJECTS.ADMIN")){
 	$result = $conn->query("SELECT id FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")");
 	if(!$result || $result->num_rows <= 0){
 	    echo '<div class="alert alert-info">'.$lang['WARNING_NO_CLIENTS'].'<br><br>';
@@ -257,7 +257,7 @@ echo $conn->error
 <div class="page-header h3"><?php echo $lang['PROJECTS']; ?>
 	<div class="page-header-button-group">
 		<?php include dirname(__DIR__) . '/misc/set_filter.php'; ?>
-		<?php if($user_roles['isProjectAdmin'] == 'TRUE'): ?>
+		<?php if(Permissions::has("PROJECTS.ADMIN")): ?>
 			<button type="button" class="btn btn-default" data-toggle="modal" data-target=".add-project" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
 		<?php endif; ?>
 	</div>

@@ -5,7 +5,6 @@ if(empty($_SESSION['userid'])){
 }
 $userID = $_SESSION['userid'];
 require_once dirname(dirname(__DIR__)).'/validate.php';
-enableToCore($userID);
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
   if(isset($_POST['start_Download'])){

@@ -1,4 +1,4 @@
-<?php include dirname(__DIR__) . '/header.php'; enableToTime($userID); ?>
+<?php include dirname(__DIR__) . '/header.php'; ?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <div class="page-header-fixed">
 <div class="page-header">
@@ -16,7 +16,7 @@ if(isset($_POST['filterUserID'])){
   $filterName = $inp[1];
 }
 
-if(!empty($_POST['creatInfoText']) && !empty($_POST['creatFromTime']) && test_Date($_POST['creatTimeTime']. "-01 12:00:00")){
+if(Permissions::has("TIMES.WRITE") && !empty($_POST['creatInfoText']) && !empty($_POST['creatFromTime']) && test_Date($_POST['creatTimeTime']. "-01 12:00:00")){
   $accept = true;
   //vacation/ log come from different forms, button name tells us which one was submitted
   if(isset($_POST['creatSignVac'])){

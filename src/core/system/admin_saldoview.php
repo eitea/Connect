@@ -1,5 +1,5 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; ?>
-<?php enableToCore($userID); require dirname(dirname(__DIR__)) . '/Calculators/IntervalCalculator.php'; ?>
+<?php  require dirname(dirname(__DIR__)) . '/Calculators/IntervalCalculator.php'; ?>
 
 <div class="page-header">
 <h3><?php echo $lang['USERS']; ?> Saldo</h3>

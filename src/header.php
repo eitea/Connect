@@ -32,15 +32,6 @@ if($row = $result->fetch_assoc()){
 	$identifier = uniqid('');
 	$conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
 }
-$result = $conn->query("SELECT * FROM roles WHERE userID = $userID LIMIT 1");
-if ($result && $result->num_rows > 0) {
-    $user_roles = $result->fetch_assoc();
-} else {
-	showError("Es konnten keine Berechtigungen für $userID gefunden werden".$conn->error);
-}
-if($user_roles['isERPAdmin'] == 'TRUE'){
-    $user_roles['canEditClients'] = $user_roles['canEditSuppliers'] = 'TRUE';
-}
 $result = $conn->query("SELECT psw, lastPswChange, forcedPwdChange, birthday, displayBirthday, real_email FROM UserData WHERE id = $userID");
 echo $conn->error;
 if(!$result || $result->num_rows < 1){
@@ -67,7 +58,7 @@ if ($result && ($row = $result->fetch_assoc())) {
 $result = $conn->query("SELECT id, CONCAT(firstname,' ', lastname) AS name FROM UserData")->fetch_all(MYSQLI_ASSOC); echo $conn->error;
 $userID_toName = array_combine( array_column($result, 'id'), array_column($result, 'name'));
 
-if ($user_roles['isTimeAdmin']) {
+if (Permissions::has("TIMES.READ")) {
     $numberOfAlerts = 0;
     //requests
     $result = $conn->query("SELECT id FROM $userRequests WHERE status = '0'");
@@ -302,7 +293,7 @@ if ($_SESSION['color'] == 'light') {
             </div>
             <div class="navbar-right" style="margin-right:10px;">
                 <a class="btn navbar-btn hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#sidemenu"><i class="fa fa-bars"></i></a>
-                <?php if ($user_roles['canUseSocialMedia'] == 'TRUE'): ?>
+                <?php if (Permissions::has("SOCIAL.PROFILE")): ?>
 					<a href="../social/profile" class="hidden-xs">
 						<?php $result = $conn->query("SELECT picture FROM socialprofile WHERE userID = $userID"); echo $conn->error;
 						if($result && ($row = $result->fetch_assoc())): ?>
@@ -311,7 +302,7 @@ if ($_SESSION['color'] == 'light') {
 					</a>
 				<?php endif; ?>
                     <span class="navbar-text hidden-xs"><?php echo $_SESSION['firstname']; ?></span>
-                <?php if ($user_roles['isTimeAdmin'] == 'TRUE' && $numberOfAlerts > 0): ?>
+                <?php if (Permissions::has("TIMES.READ") && $numberOfAlerts > 0): ?>
                     <a href="../time/check" class="btn navbar-btn navbar-link hidden-xs" title="Your Database is in an invalid state, please fix these Errors after clicking this button.">
                         <i class="fa fa-bell"></i><span class="badge badge-alert" style="position:absolute;top:5px;right:220px;"> <?php echo $numberOfAlerts; ?></span>
                     </a>
@@ -643,7 +634,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
   <div class="inner">
       <div class="navbar navbar-default" role="navigation">
           <ul class="nav navbar-nav" id="sidenav01">
-              <?php if ($user_roles['canStamp'] == 'TRUE'): ?>
+              <?php if (Permissions::has("GENERAL.STAMP")): ?>
                   <li>
                       <div class='container-fluid'>
                           <form method='post' action="../user/home"><br>
@@ -659,6 +650,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                           </form><br>
                       </div>
                   </li>
+                <?php endif; //endif(GENERAL.STAMP) ?>
                   <?php
                     require __DIR__ . DIRECTORY_SEPARATOR . "misc" . DIRECTORY_SEPARATOR . "create_menu.php";
                     
@@ -674,7 +666,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                         LEFT JOIN relationship_team_user rtu ON rtu.teamID = dynamicprojectsteams.teamid AND rtu.userID = $userID
                         WHERE d.isTemplate = 'FALSE' AND d.companyid IN (0, " . implode(', ', $available_companies) . ")
                         AND d.projectstatus = 'ACTIVE' AND (de.userid IS NOT NULL OR rtu.userID IS NOT NULL)");
-                    $show_dynamic_projects_menu_item = (($result && $result->num_rows > 0) || $userHasSurveys || $user_roles['isDynamicProjectsAdmin'] || $user_roles['canCreateTasks']);
+                    $show_dynamic_projects_menu_item = (($result && $result->num_rows > 0) || $userHasSurveys || Permissions::has("TASKS.WRITE") || Permissions::has("TASKS.READ"));
                     $dynamic_projects_menu_item_badge = $result->num_rows;
                     $finances_company_children_callback = function ($company /* has [id] and [name] */ ) use (&$conn) {
                         $company_children = [
@@ -701,7 +693,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             "icon" => "fa fa-fw fa-home",
                         ],
                         "VIEW_TIMESTAMPS" => [
-                            "href" => "user/time", // canStamp missing
+                            "href" => "user/time",
                             "icon" => "fa fa-fw fa-clock-o"
                         ],
                         "REQUESTS" => [
@@ -725,17 +717,16 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             ]
                         ],
                         "BOOK_PROJECTS" => [
-                            "show" => $user_roles['canBook'] == 'TRUE' && $showProjectBookingLink,
+                            "show" => Permissions::has("GENERAL.BOOK") && $showProjectBookingLink,
                             "icon" => "fa fa-fw fa-bookmark",
                             "href" => "user/book"
                         ],
                         "DYNAMIC_PROJECTS" => [
                             "icon" => "fa fa-fw fa-tasks",
                             "href" => "dynamic-projects/view",
-
                         ],
                         "ADDRESS_BOOK" => [
-                            "show" => ($user_roles['canUseClients'] == 'TRUE' || $user_roles['canEditClients'] == 'TRUE' || $user_roles['canUseSuppliers'] == 'TRUE' || $user_roles['canEditSuppliers'] == 'TRUE'),
+                            "show" => Permissions::has("ERP.CLIENTS") || Permissions::has("ERP.SUPPLIERS"),
                             "href" => "system/clients",
                             "icon" => "fa fa-fw fa-file-text-o",
                         ],
@@ -754,7 +745,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                                 ],
                                 "COMPANIES" => [
                                     "company_children" => [
-                                        "EDIT" => [   "href" => "system/company",      ],
+                                        "EDIT" => ["href" => "system/company", ],
                                     ],
                                     "children" => [
                                         "CREATE_NEW_COMPANY" => ["href" => "system/new", ],
@@ -766,16 +757,24 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                                         "HOLIDAYS" => ["href" => "system/holidays", ],
                                         "ADVANCED_OPTIONS" => ["href" => "system/advanced", ],
                                         $lang["PASSWORD"] . ' ' . $lang["OPTIONS"] => ["href" => "system/password", ],
-                                        "E-Mail ". $lang["OPTIONS"] => ["href" => "system/email", ],
-                                        $lang["ARCHIVE"]. " " .$lang["OPTIONS"] => ["href" => "system/archive", ],
+                                        "E-Mail " . $lang["OPTIONS"] => ["href" => "system/email", ],
+                                        $lang["ARCHIVE"] . " " . $lang["OPTIONS"] => ["href" => "system/archive", ],
                                         "TASK_SCHEDULER" => ["href" => "system/tasks", ],
                                         "DB Backup" => ["href" => "system/backup", ],
-                                        "Report Designer" => ["href" => "report/designer", ],
+                                        "Report Designer" => [
+                                            "href" => "report/designer",
+                                            "active_routes" => [
+                                                "report/downloadTem",
+                                                "report/editTemp",
+                                                "report/previewTem"
+                                            ],
+                                        ],
                                         "DB_RESTORE" => [
                                             "show" => (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])),
                                             "href" => "system/restore",
                                         ],
                                         "Git Update" => [
+                                            "disabled" => true, // delete this line if this is still needed
                                             "show" => (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])),
                                             "href" => "system/update",
                                         ],
@@ -792,13 +791,24 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                                 "CORRECTION" => ["href" => "time/corrections", ],
                                 "TRAVEL_FORM" => ["href" => "time/travels", ],
                                 "VACATION" => ["href" => "time/vacations", ],
-                                "CHECKLIST" => ["href" => "time/check", ],
+                                "CHECKLIST" => [
+                                    "href" => "time/check",
+                                    "badge" => [
+                                        "count" => $numberOfAlerts
+                                    ]
+                                ],
                             ]
                         ],
-                        "PROJECTS" => [
+                        $lang["PROJECTS"] => [
                             "icon" => "fa fa-fw fa-tags",
                             "children" => [
-                                "PROJECTS" => ["href" => "project/view", ],
+                                "PROJECTS" => [
+                                    "href" => "project/view",
+                                    // "active_routes" => ["project/public"],
+                                    "badge" => [
+                                        "count" => $projects_menu_item_badge
+                                    ]
+                                ],
                                 "PROJECT_LOGS" => ["href" => "project/log", ],
                                 "Workflow" => ["href" => "project/options", ],
                             ]
@@ -806,7 +816,10 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                         "ERP" => [
                             "icon" => "fa fa-fw fa-file-text-o",
                             "children" => [
-                                "PROCESS" => ["href" => "erp/view", ],
+                                "PROCESS" => [
+                                    "href" => "erp/view",
+                                    "active_routes" => ["erp/edit"]
+                                ],
                                 "CLIENTS" => [
                                     "children" => [
                                         $lang['PROPOSAL_TOSTRING']['ANG'] => [
@@ -836,7 +849,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                                     "children" => [
                                         "ORDER" => ["disabled" => true],
                                         "INCOMING_INVOICE" => ["disabled" => true],
-                                        "ADDRESS_BOOK" => [   "href" => "system/clients"        ]
+                                        "ADDRESS_BOOK" => ["href" => "system/clients"]
                                     ]
                                 ],
                                 "ARTICLE" => [
@@ -874,9 +887,9 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                                     // "active_files" => ["dsgvo_vv.php"] // can be omitted if defined in $routes
                                 ],
                                 "EMAIL_TEMPLATES" => ["href" => "dsgvo/templates"],
-                                "TRAINING" => ["href" => "dsgvo/training"], 
+                                "TRAINING" => ["href" => "dsgvo/training"],
                             ],
-                            "children"=>[
+                            "children" => [
                                 "Logs" => ["href" => "dsgvo/log"],
                             ]
                         ],
@@ -947,9 +960,12 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 							  }
 						  });
 					  }, 120000); //120 seconds, should not cause request overflow
+
+                      $('[href*="header-collapse"]').click(function(){
+                          $(this).parent().children('[id*="header-collapse"]').not(this).collapse("hide") // closes all sibling collapses 
+                      })
 					  </script>
-                  
-              <?php endif; //endif(canStamp) ?>
+             
           </ul>
       </div>
     <br><br><br>

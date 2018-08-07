@@ -1,4 +1,4 @@
-<?php include dirname(__DIR__) . '/header.php'; enableToERP($userID); ?>
+<?php include dirname(__DIR__) . '/header.php'; ?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){

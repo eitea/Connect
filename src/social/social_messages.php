@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			} else {
 				$options['userid'] = $userID;
 			}
-			if($user_roles['canSendToExtern'] == 'TRUE'){
+			if(Permissions::has("POST.EXTERN")){
 				if(!empty($_POST['new_message_cc_contacts'])){
 					foreach($_POST['new_message_cc_contacts'] as $val){
 						$arr = explode('_', $val);
@@ -295,7 +295,7 @@ while($row = $result->fetch_assoc()){
 	</div>
 </form>
 <script type="text/javascript">
-<?php if($user_roles['canSendToExtern'] == 'FALSE'): ?>
+<?php if(!Permissions::has("POST.EXTERN")): ?>
 	$("input[name='new_message_sender']").change(function(){
 		if($('#sender_personal_radio').is(':checked')){
 			$('.enable-personal-role').hide();

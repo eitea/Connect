@@ -1,4 +1,4 @@
-<?php include dirname(dirname(__DIR__)) . '/header.php'; enableToCore($userID); ?>
+<?php include dirname(dirname(__DIR__)) . '/header.php';  ?>
 
 <div class="page-header">
   <h3>Download Backup SQL</h3>

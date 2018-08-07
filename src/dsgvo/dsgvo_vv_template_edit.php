@@ -1,5 +1,4 @@
 <?php include dirname(__DIR__) . '/header.php'; 
-require_permission("WRITE","DSGVO","PROCEDURE_DIRECTORY"); 
 ?>
 <div class="page-header-fixed">
 <div class="page-header"><h3>Template <?php echo $lang['EDIT']; ?> <div class="page-header-button-group">

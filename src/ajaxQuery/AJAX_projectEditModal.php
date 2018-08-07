@@ -2,6 +2,7 @@
 require dirname(__DIR__) . DIRECTORY_SEPARATOR.'connection.php';
 require dirname(__DIR__) . DIRECTORY_SEPARATOR.'utilities.php';
 require dirname(__DIR__) . DIRECTORY_SEPARATOR.'/language.php';
+require dirname(__DIR__) . DIRECTORY_SEPARATOR.'validate.php';
 require dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.'aws'.DIRECTORY_SEPARATOR.'autoload.php';
 $projectID = intval($_GET['projectID']);
 
@@ -15,10 +16,6 @@ if(!empty($_SESSION['external_id'])){
 	$privateKey = $_SESSION['privateKey'];
 }
 
-$result = $conn->query("SELECT isProjectAdmin FROM roles WHERE userID = $userID");
-if ($result && ($row = $result->fetch_assoc())) {
-	$isProjectAdmin = $row['isProjectAdmin'];
-}
 
 $result = $conn->query("SELECT p.*, c.companyID, s.publicKey, s.symmetricKey, c.name AS clientName FROM projectData p INNER JOIN clientData c ON p.clientID = c.id
 INNER JOIN security_projects s ON s.projectID = p.id AND s.outDated = 'FALSE' WHERE p.id = $projectID LIMIT 1"); echo $conn->error;
@@ -88,7 +85,7 @@ if($projectRow['publicKey']){
   <div class="modal-dialog modal-content modal-lg">
 	<div class="modal-header h3"><?php echo $projectRow['clientName'].' - '.$projectRow['name']; ?></div>
 	<div class="modal-body">
-		<?php if($isProjectAdmin == 'TRUE'): ?>
+		<?php if(Permissions::has("PROJECTS.ADMIN")): ?>
 			<form method="POST">
 				<input type="hidden" name="saveGeneral" value="1" />
 			    <?php if(!$projectRow['publicKey']) echo '<div class="alert alert-warning"><a href="#" data-dismiss="alert" class="close">&times;</a>
@@ -138,9 +135,9 @@ if($projectRow['publicKey']){
 			        ?>
 			    </div>
 			</form>
-		<?php endif; //$isProjectAdmin ?>
+		<?php endif; //Permissions::has("PROJECTS.ADMIN") ?>
 		<?php if(isset($project_private)): ?>
-			<?php if($isProjectAdmin == 'TRUE'): ?>
+			<?php if(Permissions::has("PROJECTS.ADMIN")): ?>
 			    <form method="POST" action="../setup/keys" target="_blank">
 			        <div class="row form-group">
 			            <div class="col-sm-2">
@@ -236,7 +233,7 @@ if($projectRow['publicKey']){
 			        </div>
 			    </div>
 			    <br><hr>
-			<?php endif; //$isProjectAdmin ?>
+			<?php endif; //Permissions::has("PROJECTS.ADMIN") ?>
 			<?php if(!empty($s3)) : ?>
 				<?php
 				$result = $conn->query("SELECT name FROM folder_default_sturctures WHERE category = 'COMPANY' AND categoryID = '".$projectRow['companyID']."' AND name NOT IN

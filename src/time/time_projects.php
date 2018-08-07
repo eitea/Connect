@@ -1,4 +1,4 @@
-<?php include dirname(__DIR__) . '/header.php'; enableToTime($userID); ?>
+<?php include dirname(__DIR__) . '/header.php'; ?>
 <?php require dirname(__DIR__) . "/misc/helpcenter.php"; ?>
 <?php
 require_once dirname(__DIR__) . '/Calculators/IntervalCalculator.php';
@@ -11,7 +11,7 @@ $activeTab = 'home';
 <div class="page-header"><h3><?php echo $lang['TIMES'].' - '.$lang['OVERVIEW']; ?><div class="page-header-button-group"><?php include dirname(__DIR__) . '/misc/set_filter.php'; ?></div></h3></div>
 </div>
 <?php
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
+if($_SERVER['REQUEST_METHOD'] == 'POST' && Permissions::has("TIMES.WRITE")){
     if(!empty($_POST['setActiveTab'])){$activeTab = $_POST['setActiveTab']; }
 
     if (!empty($_POST['ts_remove'])){

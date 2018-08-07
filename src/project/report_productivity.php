@@ -1,4 +1,4 @@
-<?php include dirname(__DIR__) . '/header.php'; enableToReport($userID);?>
+<?php include dirname(__DIR__) . '/header.php';?>
 <script src="../plugins/chartsjs/Chart.min.js"></script>
 <!-- BODY -->
 <div class="page-header-fixed">

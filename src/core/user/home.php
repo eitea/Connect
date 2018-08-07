@@ -121,7 +121,7 @@ if($result_Sum && $result_Sum->num_rows > 0){
     <?php
 	$result = $conn->query("SELECT enableReadyCheck FROM configurationData");
 	$row = $result->fetch_assoc();
-	if($row['enableReadyCheck'] == 'TRUE' || $user_roles['isCoreAdmin'] == 'TRUE'): ?>
+	if($row['enableReadyCheck'] == 'TRUE' || Permissions::has("CORE.USERS")): ?>
       <br><h4><?php echo $lang['READY_STATUS'];?></h4>
       <table class="table table-striped">
         <thead>
@@ -263,7 +263,7 @@ if($result && ($row = $result->fetch_assoc())){
 //CALENDAR STUFF
 $dates = array();
 $start = getCurrentTimestamp(); //normal users can only see future dates
-if($user_roles['isCoreAdmin'] == 'TRUE') { $start = date('Y-m-d', strtotime('-1 year')); }
+if(Permissions::has("CORE.USERS")) { $start = date('Y-m-d', strtotime('-1 year')); }
 $result = $conn->query("SELECT time, status, userID FROM logs WHERE status != 0 AND status != 5 AND DATE(time) >= DATE('$start') ORDER BY userID, status, time");
 if($result && ($row = $result->fetch_assoc())){
     $start = substr($row['time'], 0, 10);
