@@ -977,6 +977,9 @@ $lang_ger['SUBCATEGORIES_EDIT'] = 'Subkategorien bearbeiten';
 $lang_eng['SUBCATEGORIES_MANAGE'] = 'Manage subcategories';
 $lang_ger['SUBCATEGORIES_MANAGE'] = 'Subkategorien Verwalten';
 
+$lang_eng['SUSPENDED_SURVEYS'] = 'Suspended surveys';
+$lang_ger['SUSPENDED_SURVEYS'] = 'Aufgeschobene Schulungen';
+
 $lang_eng['SEND'] = 'Send';
 $lang_ger['SEND'] = 'Senden';
 

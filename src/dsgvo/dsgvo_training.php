@@ -347,20 +347,24 @@ showError($conn->error);
             <?php echo $lang['TRAINING'] ?>
             <div class="page-header-button-group">
                 <?php if (Permissions::has("TRAINING.WRITE")) : ?>
-                <span data-container="body" data-toggle="tooltip" title="<?php echo $lang[" NEW_SET_DESCRIPTION "] ?>">
+                <span data-container="body" data-toggle="tooltip" title="<?php echo $lang["NEW_SET_DESCRIPTION"] ?>">
                     <button type="button" data-toggle="modal" data-target="#newModuleModal" class="btn btn-default">
                         <i class="fa fa-cubes"></i>
                         <?php echo $lang['NEW_SET'] ?>
                     </button>
                 </span>
-                <span data-container="body" data-toggle="tooltip" title="<?php echo $lang[" IMPORT_DESCRIPTION "] ?>">
+                <span data-container="body" data-toggle="tooltip" title="<?php echo $lang["IMPORT_DESCRIPTION"] ?>">
                     <button type="button" name="importExport" value="import" class="btn btn-default">
                         <i class="fa fa-upload"></i> Import</button>
                 </span>
                 <?php endif ?>
-                <span data-container="body" data-toggle="tooltip" title="<?php echo $lang[" EXPORT_ALL_SETS "] ?>">
+                <span data-container="body" data-toggle="tooltip" title="<?php echo $lang["EXPORT_ALL_SETS"] ?>">
                     <button type="button" name="importExport" value="export" class="btn btn-default">
                         <i class="fa fa-download"></i> Export</button>
+                </span>
+                <span data-container="body" data-toggle="tooltip" title="<?php echo $lang["SUSPENDED_SURVEYS"] ?>">
+                    <button type="button" name="suspendedSurveys" class="btn btn-default">
+                        <i class="fa fa-hourglass-half"></i> Aufgeschoben</button>
                 </span>
             </div>
         </h3>
@@ -676,6 +680,9 @@ showError($conn->error);
         })
         $("button[name=addTraining]").click(function () {
             setCurrentModal({ moduleID: $(this).val() }, 'get', 'ajaxQuery/ajax_dsgvo_training_training_add.php')
+        })
+        $("button[name=suspendedSurveys]").click(function () {
+            setCurrentModal({}, 'post', 'ajaxQuery/ajax_dsgvo_training_suspended_surveys.php')
         })
     </script>
 

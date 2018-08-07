@@ -12,11 +12,11 @@
  * @param string|int $userID The user id
  * @return array [string $error, bool suspended]
  */
-function surveys_are_suspended_query($userID) : array
+function surveys_are_suspended_query($userID, $no_cache = false) : array
 {
     global $conn;
     static $cached_result = 0; // 0 == no cached result
-    if ($cached_result !== 0) {
+    if ($cached_result !== 0 && !$no_cache) {
         return array("", $cached_result);
     }
     $result = $conn->query("SELECT suspension_count FROM dsgvo_training_user_suspension WHERE userID = $userID AND TIMESTAMPDIFF(DAY, last_suspension, CURRENT_TIMESTAMP) = 0");
