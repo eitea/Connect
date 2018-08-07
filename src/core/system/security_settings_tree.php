@@ -12,6 +12,7 @@ function create_collapse_tree($permission_groups, $name, $x, $children_disabled 
     global $collapse_counter;
     global $permission_name_to_ids;
     global $grantable_modules;
+    global $lang;
     $collapse_counter ++;
     $id = "permissionCollapseListGroup$collapse_counter";
     $child_groups = "";
@@ -44,16 +45,18 @@ function create_collapse_tree($permission_groups, $name, $x, $children_disabled 
             }else{
                 $disabled = "";
             }
-            $children .= "<li class='list-group-item'><input data-permission-name='$value' $checked $disabled name='$checkbox_name' value='TRUE' type='checkbox'>$value $note</li>";
+            $display_name = isset($lang[$value])? $lang[$value]:ucwords(strtolower($value));
+            $children .= "<li class='list-group-item'><input data-permission-name='$value' $checked $disabled name='$checkbox_name' value='TRUE' type='checkbox'>$display_name $note</li>";
         }
     }
     $toolbar .= " <a title='Alles aktivieren' data-toggle='tooltip' data-check-all='#$id' role='button' style='float:right'> <i class='fa fa-fw fa-check-square-o'></i> </a>";             
     $toolbar .= " <a title='Alles deaktivieren' data-toggle='tooltip' data-uncheck-all='#$id' role='button' style='float:right'> <i class='fa fa-fw fa-square-o'></i> </a>";             
+    $display_name = isset($lang[$name])? $lang[$name]:ucwords(strtolower($name));
    return "
     <div class='panel-group' role='tablist' style='margin:0'> 
         <div class='panel panel-default'> 
             <div class='panel-heading' role='tab'> 
-                <h4 class='panel-title'> <a href='#$id' class='' role='button' data-toggle='collapse'> $name </a> $toolbar $toolbar_expand </h4> 
+                <h4 class='panel-title'> <a href='#$id' class='' role='button' data-toggle='collapse'> $display_name </a> $toolbar $toolbar_expand </h4> 
                 
             </div> 
             <div class='panel-collapse collapse' role='tabpanel' id='$id' style='margin-left: 20px'> 
