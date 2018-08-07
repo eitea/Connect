@@ -1,3 +1,7 @@
+.sidebar-nav .navbar li a:hover, .panel-borderless .panel-collapse .nav li a:hover{
+  background-color: #c74e90;
+}
+
 /* General colors */
 .navbar-default{
   background-color:white;
@@ -30,6 +34,11 @@ input[type="radio"]:checked {
   background-color: #f379a6;
   border-color:#aaa;
 }
+.pagination > .active > a:focus{
+	background-color: #dc628b;
+    border-color:#aaa;
+}
+
 
 /* components */
 #loader {

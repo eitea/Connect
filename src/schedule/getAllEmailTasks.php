@@ -58,11 +58,7 @@ while($result_serv && $row = $result_serv->fetch_assoc()){
 				if($rule['subject'] && $pos === false) $match = false;
 				if(!$rule['workflowID'] && !preg_match("/\[CON - [0-9a-z]{13}\]$/", $rule['subject'], $out)) $match = false;
 				if($match){
-					$keypair = sodium_crypto_box_keypair();
-					$v2 = base64_encode(sodium_crypto_box_publickey($keypair));
-					$secret = base64_encode(sodium_crypto_box_secretkey($keypair));
-					$encrypted_header = asymmetric_encryption('TASK', imap_fetchheader($imap, $mail_number), 0, $secret);
-
+					$encrypted_header = asymmetric_seal('TASK', imap_fetchheader($imap, $mail_number));
 					$html = '';
 					$projectid = uniqid();
 					if(!$rule['templateID']){
@@ -89,7 +85,7 @@ while($result_serv && $row = $result_serv->fetch_assoc()){
 										$s3->putObject(array(
 											'Bucket' => $bucket,
 											'Key' => $archiveID,
-											'Body' => asymmetric_encryption('TASK', $content, 0, $secret)
+											'Body' => asymmetric_seal('TASK', $content)
 										));
 										if($part->ifid && $part->disposition == 'inline'){
 											$attachmentId = trim($part->id, " <>");
@@ -106,14 +102,14 @@ while($result_serv && $row = $result_serv->fetch_assoc()){
 					if($rule['templateID']){ //dynamicproject
 						$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$projectid', 'CREATED', 1)");
 						if($conn->error) echo $conn->error.__LINE__;
-						$html = asymmetric_encryption('TASK', $html, 0, $secret);
-						$name = asymmetric_encryption('TASK', substr_replace($headerSubject, '', $pos, strlen($rule['subject'])), 0, $secret);
+						$html = asymmetric_seal('TASK', $html);
+						$name = asymmetric_seal('TASK', substr_replace($headerSubject, '', $pos, strlen($rule['subject'])));
 						$conn->query("INSERT INTO dynamicprojects(
 						projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart, projectend, projectstatus,
-						projectpriority, projectparent, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2, projectmailheader)
+						projectpriority, projectparent, projectpercentage, estimatedHours, level, projecttags, isTemplate, projectmailheader)
 						SELECT '$projectid', '$name', '$html', companyid, clientid, clientprojectid, projectcolor, IF(projectstart='0000-00-00', UTC_TIMESTAMP , projectstart),
-						projectend, projectstatus, projectpriority, projectparent, projectpercentage, estimatedHours, level, projecttags, 'FALSE',
-						'$v2', '$encrypted_header' FROM dynamicprojects WHERE projectid = '{$rule['templateID']}'");
+						projectend, projectstatus, projectpriority, projectparent, projectpercentage, estimatedHours, level, projecttags, 'FALSE', '$encrypted_header'
+						FROM dynamicprojects WHERE projectid = '{$rule['templateID']}'");
 						if($conn->error) echo $conn->error.__LINE__;
 						if($rule['autoResponse']) send_standard_email($sender, $rule['autoResponse'], ['subject' => "Connect - Ticket Nr. [$projectid]"]); //5b20ad39615f9
 						$conn->query("INSERT INTO dynamicprojectsemployees (projectid, userid, position) SELECT '$projectid', userid, position FROM dynamicprojectsemployees WHERE projectid = '{$rule['templateID']}'");
@@ -136,8 +132,8 @@ while($result_serv && $row = $result_serv->fetch_assoc()){
 								if($conn->error) echo $conn->error.__LINE__;
 							}
 							$result->free();
-							$message = asymmetric_encryption('CHAT', $html, 0, $secret);
-							$conn->query("INSERT INTO messenger_messages(message, participantID, vKey) VALUES ('$message', $participantID, '$v2')");
+							$message = asymmetric_seal('CHAT', $html);
+							$conn->query("INSERT INTO messenger_messages(message, participantID) VALUES ('$message', $participantID)");
 							if($conn->error) echo $conn->error.__LINE__;
 						} else {
 							echo "Error: No Message found with identifier $projectid";

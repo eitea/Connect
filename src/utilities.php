@@ -61,7 +61,7 @@ function test_Time($time) {
 }
 
 function displayAsHoursMins($hour) {
-    $hours = round($hour, 2); //i know params are passed by value if not specified otherwise, but still.. I got trust issues with this language
+    $hours = round($hour, 2); //trust issues
     $s = '';
     if ($hours < 0) {
         $s = '-';
@@ -229,6 +229,52 @@ function asymmetric_encryption($module, $message, $userID, $privateKey, $mode = 
 		}
 	}
 	$err = $conn->error;
+	return $message;
+}
+
+//userID and privateKey are only required when decrypting
+function asymmetric_seal($module, $message, $mode = 'encrypt', $userID ='', $privateKey='',  &$err = ''){
+	global $conn;
+	$privateKey = base64_decode($privateKey);
+	static $activeEncryption = null;
+    if($activeEncryption === null){
+        $activeEncryption = true;
+        $result = $conn->query("SELECT activeEncryption FROM configurationData WHERE activeEncryption = 'TRUE'");
+        if(!$result || $result->num_rows < 1){ $activeEncryption = false; }
+    }
+    if(!$activeEncryption || !$mode) return $message;
+	$result = $conn->query("SELECT publicKey FROM security_modules WHERE module = '$module' AND outDated = 'FALSE' LIMIT 1");
+	if($result && ( $row=$result->fetch_assoc() )){
+		$public_module = base64_decode($row['publicKey']);
+		if($mode == 'encrypt'){
+			return base64_encode(sodium_crypto_box_seal($message, $public_module));
+		} else {
+			$result = $conn->query("SELECT privateKey FROM security_access WHERE userID = $userID AND module = '$module' AND outDated = 'FALSE' ORDER BY recentDate LIMIT 1");
+			if($result && ( $row=$result->fetch_assoc() )){
+				$cipher_private_module = base64_decode($row['privateKey']);
+				$nonce = mb_substr($cipher_private_module, 0, 24, '8bit');
+				$encrypted = mb_substr($cipher_private_module, 24, null, '8bit');
+				try{
+					$private_module = sodium_crypto_box_open($encrypted, $nonce, $privateKey.$public_module);
+					if(strlen($private_module.$public_module) != 64){
+						$err = 'module keys do not have the right size: '.strlen($private_module.$public_module);
+						return $message;
+					}
+					return sodium_crypto_box_seal_open(base64_decode($message), $private_module.$public_module);
+				} catch(Exception $e){
+					// echo '<br> public module: '.$public_module;
+					// echo '<br> key:'.$privateKey;
+					// echo '<br> private module: '.$private_module;
+				}
+			} else {
+				$err = 'Missing access to decrypt module';
+				return $message;
+			}
+		}
+	} else {
+		$err = 'No public key found for this module';
+	}
+	$err .= $conn->error;
 	return $message;
 }
 

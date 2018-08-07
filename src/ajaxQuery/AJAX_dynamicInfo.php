@@ -178,7 +178,11 @@ $messageResult = $conn->query("SELECT id FROM messenger_conversations WHERE cate
 								$identifier = uniqid('');
 								$conn->query("INSERT INTO identification (id) VALUES ('$identifier')");
 							}
-							$description = asymmetric_encryption('TASK', $dynrow['projectdescription'], $userID, $privateKey, $dynrow['v2']);
+							if($dynrow['v2']){
+								$description = asymmetric_encryption('TASK', $dynrow['projectdescription'], $userID, $privateKey, $dynrow['v2']);
+							} else {
+								$description = asymmetric_seal('TASK', $dynrow['projectdescription'], 'decrypt', $userID, $privateKey);
+							}
 
 							if($archiveResult && $archiveResult->num_rows > 0){
 								$bucket = $identifier .'-tasks';
@@ -197,10 +201,15 @@ $messageResult = $conn->query("SELECT id FROM messenger_conversations WHERE cate
 							            'Key' => $row['uniqID']
 							        ));
 
-									if(strpos($description, 'cid:'.$row['uniqID'])){
-										$description = str_replace('cid:'.$row['uniqID'], "data:image/jpeg;base64,".base64_encode(asymmetric_encryption('TASK', $object[ 'Body' ], $userID, $privateKey, $dynrow['v2'])), $description);
+									if($dynrow['v2']){
+										$objectBody = asymmetric_encryption('TASK', $object[ 'Body' ], $userID, $privateKey, $dynrow['v2']);
 									} else {
-										$description .= '<img style="width:80%;" src="data:image/jpeg;base64,'.base64_encode(asymmetric_encryption('TASK', $object[ 'Body' ], $userID, $privateKey, $dynrow['v2'])).'" />';
+										$objectBody = asymmetric_seal('TASK', $object[ 'Body' ], 'decrypt', $userID, $privateKey);
+									}
+									if(strpos($description, 'cid:'.$row['uniqID'])){
+										$description = str_replace('cid:'.$row['uniqID'], "data:image/jpeg;base64,".$objectBody, $description);
+									} else {
+										$description .= '<img style="width:80%;" src="data:image/jpeg;base64,'.$objectBody.'" />';
 									}
 								}
 							}
@@ -295,7 +304,12 @@ $messageResult = $conn->query("SELECT id FROM messenger_conversations WHERE cate
                     </table>
 					<?php
 					if($dynrow['projectmailheader']){ //5b1fe6dbb361a
-						echo '<br><label>E-Mail Header</label><br><pre>'.asymmetric_encryption('TASK', $dynrow['projectmailheader'], $userID, $privateKey, $dynrow['v2']).'</pre>';
+						if($dynrow['v2']){
+							$projectHeader = asymmetric_encryption('TASK', $object[ 'Body' ], $userID, $privateKey, $dynrow['v2']);
+						} else {
+							$projectHeader = asymmetric_seal('TASK', $object[ 'Body' ], 'decrypt', $userID, $privateKey);
+						}
+						echo '<br><label>E-Mail Header</label><br><pre>'.$projectHeader.'</pre>';
 					}
 					?>
                 </div>

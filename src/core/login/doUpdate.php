@@ -3455,13 +3455,6 @@ if($row['version'] < 167){
 	}
 }
 
-
-$conn->query("DELETE a1 FROM messenger_messages a1, messenger_messages a2 WHERE a1.id > a2.id AND a1.participantID = a2.participantID AND a1.sentTime = a2.sentTime");
-$conn->query("ALTER TABLE messenger_messages ADD UNIQUE KEY uq_participant_time (participantID, sentTime)");
-if (!$conn->error) {
-	echo '<br>Messenger: Doppelte PNs Fix';
-}
-
 // if($row['version'] < 168){}
 // if($row['version'] < 169){}
 // if($row['version'] < 170){}

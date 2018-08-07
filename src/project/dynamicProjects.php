@@ -8,9 +8,6 @@ include dirname(__DIR__) . '/header.php';
 require dirname(__DIR__) . "/misc/helpcenter.php";
 require dirname(__DIR__) . "/Calculators/dynamicProjects_ProjectSeries.php";
 
-/* for search and when clicking on 'task läuft' */
-$currently_open_project_description = isset($_GET["open"]) ? test_input($_GET["open"]) : false;
-
 //$referenceTime is the time where the progress bar overall length hits 100% (it can't go over 100%)
 function generate_progress_bar($current, $estimate, Array $options = ['referenceTime' => 8]){
     $allHours = 0;
@@ -305,6 +302,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 		$val = test_input($_POST['change-status']);
 		$note = test_input($_POST['change-status-note']);
 		$newUser = intval($_POST['change-status-assigned-user']);
+		$status = test_input($_POST['change-status-status'], 1);
 
 		$conn->query("DELETE FROM dynamicprojectsemployees WHERE position = 'leader' AND projectid = '$val'");
 		$err = $conn->error;
@@ -312,6 +310,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 			ON DUPLICATE KEY UPDATE position = IF(position = 'owner', 'owner', 'leader')");
 		$err .= $conn->error;
 		$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID, extra1, extra2) VALUES('$val', 'STATECHANGE', $userID, '".$userID_toName[$newUser]."', '$note')");
+		$err .= $conn->error;
+		if($status == 'COMPLETED'){
+			$conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' AND projectpercentage = '100' WHERE projectid = '$val'");
+		} else {
+			$conn->query("UPDATE dynamicprojects SET projectstatus = '$status' WHERE projectid = '$val'");
+		}
 		$err .= $conn->error;
 		if($err){
 			showError($err);
@@ -346,8 +350,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 					$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$id', 'CREATED', $userID)");
 				}
 				$null = null;
-				$name = asymmetric_encryption('TASK', test_input($_POST["name"]), $userID, $privateKey);
-				$v2Key = ($name == test_input($_POST["name"])) ? '' : $publicKey;
+				$name = asymmetric_seal('TASK', test_input($_POST["name"]));
 				$description = $_POST["description"];
 				if(preg_match_all("/\[([^\]]*)\]\s*\{([^\[]*)\}/m",$description,$matches) && count($matches[0])>0){
 					for($i = 0;$i<count($matches[0]);$i++){
@@ -363,7 +366,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 						}
 					}
 				}
-				$description = asymmetric_encryption('TASK', $description, $userID, $privateKey);
+				$description = asymmetric_seal('TASK', $description);
 				$company = $_POST["filterCompany"] ?? $available_companies[1];
 				$client = isset($_POST['filterClient']) ? intval($_POST['filterClient']) : '';
 				$project = isset($_POST['filterProject']) ? intval($_POST['filterProject']) : '';
@@ -390,9 +393,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 				}
 				// PROJECT
 				$stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart,
-					projectend, projectstatus, projectpriority, projectparent, projectpercentage, estimatedHours, level, projecttags, isTemplate, v2)
-					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-				$stmt->bind_param("ssbiiissssissisiss", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $percentage, $estimate, $skill, $tags, $isTemplate, $v2Key);
+					projectend, projectstatus, projectpriority, projectparent, projectpercentage, estimatedHours, level, projecttags, isTemplate)
+					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); echo $conn->error;
+				$stmt->bind_param("ssbiiissssissisis", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $percentage, $estimate, $skill, $tags, $isTemplate);
 				$stmt->send_long_data(2, $description);
 				$stmt->execute();
 				if(!$stmt->error){
@@ -447,7 +450,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 									showError($err);
 								} else {
 									$hashkey = uniqid('', true); //23 chars
-									$file_encrypt = asymmetric_encryption('TASK', file_get_contents($_FILES['newTaskFiles']['tmp_name'][$i]), $userID, $privateKey);
+									$file_encrypt = asymmetric_seal('TASK', file_get_contents($_FILES['newTaskFiles']['tmp_name'][$i]));
 									$s3->putObject(array(
 										'Bucket' => $bucket,
 										'Key' => $hashkey,
@@ -531,15 +534,11 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 
         if($filter_emps || $filter_team) $query_filter .= " AND ($filter_emps OR $filter_team)";
 
-        $result = $conn->query("SELECT id FROM projectBookingData p, logs WHERE p.timestampID = logs.indexIM AND logs.userID = $userID AND `end` = '0000-00-00 00:00:00' LIMIT 1");
-        $hasActiveBooking = $result->num_rows;
-
 	    $nonAdminQuery = '';
         if($user_roles['isDynamicProjectsAdmin'] == 'FALSE'){
 			foreach($available_teams as $val) $nonAdminQuery .= " OR conteamsids LIKE '% $val %' ";
 			$nonAdminQuery = "AND (conemployees LIKE '% $userID %' $nonAdminQuery)";
         }
-
 		$stmt_employees = $conn->prepare("SELECT userid, position FROM dynamicprojectsemployees WHERE projectid = ?");
 		$stmt_employees->bind_param('s', $x);
 
@@ -589,8 +588,12 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             echo '<td>';
             // echo $row['activity'];
             if($row['estimatedHours'] || $row['currentHours']) echo generate_progress_bar($row['currentHours'], $row['estimatedHours'], ['animate' => ($row['workingUser'] == $userID)]);
-            echo '<i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.mc_status('TASK', $row['v2'])
-			.asymmetric_encryption('TASK', $row['projectname'],$userID, $privateKey, $row['v2']).' <div>';
+            echo '<i style="color:'.$row['projectcolor'].'" class="fa fa-circle"></i> '.mc_status('TASK');
+			if($row['v2'] || strtotime($row['projectstart']) < strtotime('2018-08-07')) {
+				echo asymmetric_encryption('TASK', $row['projectname'],$userID, $privateKey, $row['v2']);
+			} else {
+				echo asymmetric_seal('TASK', $row['projectname'], 'decrypt', $userID, $privateKey);
+			}
             foreach(explode(',', $row['projecttags']) as $tag){
                 if($tag) echo '<span class="badge">'.$tag.'</span> ';
             }
@@ -1136,9 +1139,9 @@ function openViewModal(index /*projectid*/){
     $('#infoModal-'+index).modal('show');
   }
 };
-<?php if($currently_open_project_description): // 5b47043bac66a ?>
+<?php if(isset($_POST['open'])): // 5b47043bac66a ?>
 $(document).ready(function(){
-   setTimeout(function(){ openViewModal("<?php echo $currently_open_project_description?>")},500);
+   setTimeout(function(){ openViewModal("<?php echo $_POST['open']?>")},500);
 });
 <?php endif; ?>
 $('.view-modal-open').click(function(){

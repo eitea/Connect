@@ -2,6 +2,10 @@
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'header.php';
 $openChatID = 0;
 $bucket = $identifier .'-uploads'; //no uppercase, no underscores, no ending dashes, no adjacent special chars
+$archiveToggle = 'set1';
+if(isset($_GET['toggleArchive'])){
+	if($_GET['toggleArchive'] == 'set1') $archiveToggle = 'set2';
+}
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     require __DIR__.'/chatwindow_backend.php'; //sets openChatID and takes care of chatwindow.php default operations
     if (isset($_POST['send_new_message']) && !empty($_POST['new_message_subject']) && !empty($_POST['new_message_body'])) {
@@ -177,9 +181,14 @@ while ($row = $result->fetch_assoc()) {
     $teamID_toName[$row['teamID']] = $row['name'];
 }
 ?>
-<div class="page-header h3">Nachrichten
-    <div class="page-header-button-group"><a data-toggle="modal" href="#new-message-modal" class="btn btn-default"><i class="fa fa-plus"></i></a></div>
-</div>
+<form>
+	<div class="page-header h3">Nachrichten
+	    <div class="page-header-button-group">
+				<a data-toggle="modal" href="#new-message-modal" class="btn btn-default"><i class="fa fa-plus"></i></a>
+				<button type="submit" name="toggleArchive" value="<?php echo $archiveToggle; ?>" class="btn btn-default" title="Archivierte Nachrichten anzeigen"><i class="fa fa-archive"></i></button>
+		</div>
+	</div>
+</form>
 <div class="col-md-8 col-md-offset-2">
 	<table class="table table-hover">
 		<thead>
@@ -187,10 +196,13 @@ while ($row = $result->fetch_assoc()) {
 				<th>Betreff</th>
 				<th></th>
 				<th>Teilnehmer</th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
 			<?php
+			$showArchive = "WHERE category NOT LIKE 'archive_%'";
+			if($archiveToggle == 'set1') $showArchive = '';
             $stmt = $conn->prepare("SELECT partType, partID FROM relationship_conversation_participant
 				WHERE conversationID = ? AND status != 'exited' AND (partType != 'USER' OR partID != '$userID')"); echo $conn->error;
             $stmt->bind_param('i', $conversationID);
@@ -206,6 +218,7 @@ while ($row = $result->fetch_assoc()) {
 				LEFT JOIN messenger_messages mm ON mm.id = (SELECT mm2.id FROM messenger_messages mm2
 					INNER JOIN relationship_conversation_participant rcp1 ON mm2.participantID = rcp1.id
 					WHERE rcp1.conversationID = c.id ORDER BY mm2.id DESC LIMIT 1)
+				$showArchive
 				ORDER BY mm.sentTime DESC");
             echo $conn->error;
             while ($result && ($row = $result->fetch_assoc())) {
@@ -237,14 +250,23 @@ while ($row = $result->fetch_assoc()) {
 	                }
 				}
                 echo '</td>';
+				echo '<td>';
+				if(substr($row['category'], 0, 8) == 'archive_') {
+					echo '<b style="color:violet">- Archiviert -</b>';
+				} else {
+					echo '<form method="POST"><button type="submit" name="chat_archive" value="', $row['id']
+						, '" title="Konversation Archivieren" class="btn btn-default btn-sm"><i class="fa fa-archive"></i></button></form>';
+				}
+				echo '</td>';
                 echo '</tr> ';
                 if ($openChatID == $conversationID) {
-                    echo '<td colspan="3" style="padding:0">';
+                    echo '<td colspan="4" style="padding:0">';
                     require __DIR__.'/chatwindow.php';
                     echo '</td>';
                 }
                 echo '</tr>';
             }
+
             $stmt->close();
             ?>
 		</tbody>

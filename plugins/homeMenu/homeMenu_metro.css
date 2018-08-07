@@ -86,6 +86,10 @@ input[type="radio"]:checked {
   background-color: #33C7D5;
   border-color:#aaa;
 }
+.pagination > .active > a:focus{
+	background-color: #1fafb4;
+    border-color:#aaa;
+}
 
 /* components */
 #loader {

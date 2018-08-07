@@ -274,14 +274,14 @@ if($result && ($row = $result->fetch_assoc())){
             if($prev_row['userID'] != $row['userID'] || $timeDiff > 36 || $timeDiff < 0){ //cut chain
                 $title = 'Abwesend: ' . $userID_toName[$prev_row['userID']];
                 $end = substr(carryOverAdder_Hours($prev_row['time'],24), 0, 10); //adding hours would display '5a' for 5am.
-                $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '#81e8e5'}";
+                $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '#b4d2ff'}";
                 $start = substr($row['time'], 0, 10);
             }
             $prev_row = $row;
         } while($row = $result->fetch_assoc());
         $title = 'Abwesend: ' . $userID_toName[$prev_row['userID']];
         $end = substr(carryOverAdder_Hours($prev_row['time'],24), 0, 10); //adding hours would display '5a' for 5am.
-        $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '#81e8e5'}";
+        $dates[] = "{ title: '$title', start: '$start', end: '$end', backgroundColor: '#b4d2ff'}";
     }
 } else {
     $conn->error;
