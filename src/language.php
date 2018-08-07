@@ -626,7 +626,7 @@ $lang_ger['ERROR_TIMES_INVALID'] = 'Ungültige Zeitangaben.';
 $lang_eng['ERROR_UNEXPECTED'] = 'An unexpected error has occured. Please try again. If this message continues to be displayed, please contact support.'; //we dont have a support.
 $lang_ger['ERROR_UNEXPECTED'] = 'Ein unerwarteter Fehler ist aufgetaucht. Bitte versuchen Sie es erneut. Wird diese Nachricht weiterhin angezeigt, wenden Sie sich an den Support.';
 
-$lang_eng['ESTIMATED_TIME_SECONDS'] = 'Estimated time (in seconds)'; 
+$lang_eng['ESTIMATED_TIME_SECONDS'] = 'Estimated time (in seconds)';
 $lang_ger['ESTIMATED_TIME_SECONDS'] = 'Geschätzte zeit (in Sekunden)';
 
 $lang_eng['EVALUATION'] = 'Evaluation';
@@ -901,10 +901,10 @@ $lang_ger['LANGUAGE_SETTING'] = 'Sprache';
 $lang_eng['LAST_BOOKING'] = 'Last Booking'; //I gave u my heaaart
 $lang_ger['LAST_BOOKING'] = 'Letzte Buchung';
 
-$lang_eng['LAST_ANSWERED'] = 'Last answered'; 
+$lang_eng['LAST_ANSWERED'] = 'Last answered';
 $lang_ger['LAST_ANSWERED'] = 'Zuletzt beantwortet';
 
-$lang_eng['LAST_EDITED'] = 'Last edited'; 
+$lang_eng['LAST_EDITED'] = 'Last edited';
 $lang_ger['LAST_EDITED'] = 'Zuletzt bearbeitet';
 
 $lang_eng['LASTNAME'] = 'Last Name';
@@ -1135,6 +1135,9 @@ $lang_ger['OFFERS'] = 'Angebote';
 
 $lang_eng['OFFSET_ACCOUNT'] = 'Offset Account';
 $lang_ger['OFFSET_ACCOUNT'] = 'Gegenkonto';
+
+$lang_eng['OK_ARCHIVE'] = 'Selected entry was successfully archived.';
+$lang_ger['OK_ARCHIVE'] = 'Der ausgewählte Eintrag wurde erfolgreich archiviert.';
 
 $lang_eng['OK_CREATE'] = 'New entry was successfully created.';
 $lang_ger['OK_CREATE'] = 'Neuer Eintrag wurde erfolgreich erstellt.';
@@ -1800,10 +1803,10 @@ $lang_eng['TRAINING_QUESTION_CORRECT'] = array('TRUE' => 'Right', 'FALSE' => 'Wr
 $lang_ger['TRAINING_QUESTION_CORRECT'] = array('TRUE' => 'Richtig', 'FALSE' => 'Falsch', 'UNANSWERED' => 'Nicht beantwortet', 'SURVEY' => 'Umfrage');
 
 $lang_eng['TRAINING_BUTTON_DESCRIPTIONS'] = array(
-  'NEW_MODULE' => 'Create a new module', 
-  'EDIT_SET' => 'Edit set', 
-  'EXPORT_SET' => 'Export this set', 
-  'DELETE_SET' => 'Delete set with all modules and questions', 
+  'NEW_MODULE' => 'Create a new module',
+  'EDIT_SET' => 'Edit set',
+  'EXPORT_SET' => 'Export this set',
+  'DELETE_SET' => 'Delete set with all modules and questions',
   'DELETE_MODULE' => 'Delete module with all questions',
   'DELETE_QUESTION' => 'Delete question',
   'DELETE_QUESTION_ANSWERS' => 'Delete question answers',
@@ -1817,10 +1820,10 @@ $lang_eng['TRAINING_BUTTON_DESCRIPTIONS'] = array(
   'EDIT_MODULE' => 'Edit module',
 );
 $lang_ger['TRAINING_BUTTON_DESCRIPTIONS'] = array(
-  'NEW_MODULE' => 'Hinzufügen eines neuen Moduls', 
-  'EDIT_SET' => 'Set bearbeiten', 
-  'EXPORT_SET' => 'Exportieren eines einzelnen Sets', 
-  'DELETE_SET' => 'Gesamtes Set mit allen Modulen und Fragen löschen', 
+  'NEW_MODULE' => 'Hinzufügen eines neuen Moduls',
+  'EDIT_SET' => 'Set bearbeiten',
+  'EXPORT_SET' => 'Exportieren eines einzelnen Sets',
+  'DELETE_SET' => 'Gesamtes Set mit allen Modulen und Fragen löschen',
   'DELETE_MODULE' => 'Gesamtes Modul mit allen Fragen löschen',
   'DELETE_QUESTION' => 'Frage löschen',
   'DELETE_QUESTION_ANSWERS' => 'Antworten der Benutzer löschen',
@@ -1835,29 +1838,29 @@ $lang_ger['TRAINING_BUTTON_DESCRIPTIONS'] = array(
 );
 
 $lang_eng['TRAINING_SETTINGS'] = array(
-  'ANSWER_TYPE' => 'Answer type', 
-  'OVERWRITE_ANSWERS' => 'Overwriting answers', 
-  'ANSWER_ORDER' => 'Answer order', 
-  'REPEAT_DAYS' => 'Repeat interval (days)', 
-  'ANSWER_LOGIN' => 'After login', 
-  'ANSWER_OPTIONAL' => 'Optional', 
-  'OVERWRITE' => 'Allow users to overwrite old answers', 
-  'NO_OVERWRITE' => 'Keep first answer (users can still repeat the training)', 
-  'RANDOM_ORDER' => 'Random order', 
-  'PRESERVE_ORDER' => 'Preserve answer order', 
+  'ANSWER_TYPE' => 'Answer type',
+  'OVERWRITE_ANSWERS' => 'Overwriting answers',
+  'ANSWER_ORDER' => 'Answer order',
+  'REPEAT_DAYS' => 'Repeat interval (days)',
+  'ANSWER_LOGIN' => 'After login',
+  'ANSWER_OPTIONAL' => 'Optional',
+  'OVERWRITE' => 'Allow users to overwrite old answers',
+  'NO_OVERWRITE' => 'Keep first answer (users can still repeat the training)',
+  'RANDOM_ORDER' => 'Random order',
+  'PRESERVE_ORDER' => 'Preserve answer order',
   'REPEAT_DAYS_NOTE' => 'Only active if overwriting answers and answer on login is selected',
 );
 $lang_ger['TRAINING_SETTINGS'] = array(
-  'ANSWER_TYPE' => 'Beantwortungsart', 
-  'OVERWRITE_ANSWERS' => 'Überschreiben von Antworten', 
-  'ANSWER_ORDER' => 'Anordnung der Antworten', 
-  'REPEAT_DAYS' => 'Wiederholungsintervall in Tagen', 
-  'ANSWER_LOGIN' => 'Beantwortung bei Login', 
-  'ANSWER_OPTIONAL' => 'Beantwortung freiwillig', 
-  'OVERWRITE' => 'Alte Antworten werden durch das erneute Beantworten überschrieben', 
-  'NO_OVERWRITE' => 'User können das Training wiederholen, aber es bleiben die alten Antworten bestehen', 
-  'RANDOM_ORDER' => 'Antwortmöglichkeiten zufällig anordnen', 
-  'PRESERVE_ORDER' => 'Antwortmöglichkeiten wie in der Frage belassen', 
+  'ANSWER_TYPE' => 'Beantwortungsart',
+  'OVERWRITE_ANSWERS' => 'Überschreiben von Antworten',
+  'ANSWER_ORDER' => 'Anordnung der Antworten',
+  'REPEAT_DAYS' => 'Wiederholungsintervall in Tagen',
+  'ANSWER_LOGIN' => 'Beantwortung bei Login',
+  'ANSWER_OPTIONAL' => 'Beantwortung freiwillig',
+  'OVERWRITE' => 'Alte Antworten werden durch das erneute Beantworten überschrieben',
+  'NO_OVERWRITE' => 'User können das Training wiederholen, aber es bleiben die alten Antworten bestehen',
+  'RANDOM_ORDER' => 'Antwortmöglichkeiten zufällig anordnen',
+  'PRESERVE_ORDER' => 'Antwortmöglichkeiten wie in der Frage belassen',
   'REPEAT_DAYS_NOTE' => 'Kann nur aktiviert werden, wenn das Überschreiben von Antworten erlaubt ist und die Beantwortung bei Login erfolgt',
 );
 

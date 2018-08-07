@@ -71,13 +71,16 @@
 	</div>
 	<form method="POST" enctype="multipart/form-data">
 		<input type="hidden" readonly value="<?php echo $openChatID; ?>" name="openChat" />
-		<?php if($messenger_row['category'] != 'notification' && $participantID): ?>
+		<?php if($messenger_row['category'] != 'notification' && substr($messenger_row['category'], 0, 8) != 'archive_' && $participantID): ?>
 				<textarea id="chat_message_<?php echo $openChatID; ?>" autofocus name="chat_message" rows="3" class="form-control"  placeholder="Deine Nachricht... " style="resize:none"></textarea>
 				<div style="border:1px solid #cccccc;background-color: #eaeaea">
-					<label class="btn btn-empty">
+					<label class="btn btn-empty" title="Datei anhängen">
 						<i class="fa fa-paperclip"></i>
 						<input type="file" name="chat_newfile" style="display:none" >
 					</label>
+					<button type="submit" name="chat_archive" value="<?php echo $openChatID; ?>" title="Konversation Archivieren" class="btn btn-link btn-sm">
+						<i class="fa fa-archive"></i>
+					</button>
 					<span style="float:right">
 						<button id="chat_send_<?php echo $openChatID; ?>" type="submit" class="btn btn-link" name="chat_send">Senden <i class="fa fa-paper-plane-o"></i></button>
 					</span>

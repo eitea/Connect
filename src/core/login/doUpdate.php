@@ -3497,9 +3497,12 @@ if($row['version'] < 168){
     
     setup_permissions();
 }
+
 // if($row['version'] < 169){}
 // if($row['version'] < 170){}
 // if($row['version'] < 171){}
+// if($row['version'] < 172){}
+// if($row['version'] < 173){}
 
 //cleanups for maintainable db sizes
 $conn->query("DELETE FROM `checkinLogs` WHERE id <= ( SELECT id FROM ( SELECT id FROM `checkinLogs` ORDER BY id DESC LIMIT 1 OFFSET 100 ) foo )");echo $conn->error;

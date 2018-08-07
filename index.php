@@ -102,7 +102,7 @@ $routes = [ // each route has a path and an optional permission
     'dsgvo/pdfDownload' => ["path" => 'dsgvo/dsgvo_vv_pdfDownload.php', "permission" => "DSGVO.PROCEDURE_DIRECTORY"],
 
     'archive/share' => ["path" => 'archive/archive_share.php', "permission" => "ARCHIVE.SHARE"],
-    // 'archive/files' => ["path" => 'archive/archive_files.php', "permission" => "CORE.SETTINGS"], doesn't exist
+    // 'archive/files' => ["path" => 'archive/archive_files.php', "permission" => "CORE.SETTINGS"], // doesn't exist
     'archive/private' => ["path" => 'archive/private_view.php', "permission" => "ARCHIVE.PRIVATE"],
 
     'extern/login' => ["path" => 'external/login.php', "permission" => "CORE.SETTINGS"],

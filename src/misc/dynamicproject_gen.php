@@ -27,6 +27,8 @@ if($x){
 		$dynrow['isTemplate'] = 'TRUE';
 	}
 }
+
+if(strtotime($dynrow['projectstart']) < strtotime('2018-08-07')) $dynrow['projectstart'] = date('Y-m-d');
 ?>
 <ul class="nav nav-tabs">
 	<li class="active"><a data-toggle="tab" href="#projectBasics<?php echo $x; ?>">Basic</a></li>
@@ -43,7 +45,13 @@ if($x){
 
 		<div class="col-md-12"><small>*Auswahl ist Optional. Falls leer, entscheidet der Benutzer.</small><br><br></div>
 		<div class="col-md-12"><label><?php echo mc_status('TASK'); ?> Task Name*</label>
-			<input spellchecking="true" class="form-control required-field" type="text" name="name" placeholder="Bezeichnung" maxlength="55" value="<?php echo asymmetric_encryption('TASK', $dynrow['projectname'], $userID, $privateKey, $dynrow['v2']); ?>" />
+			<input spellchecking="true" class="form-control required-field" type="text" name="name" placeholder="Bezeichnung" maxlength="55"
+			value="<?php if($dynrow['v2']) {
+				echo asymmetric_encryption('TASK', $dynrow['projectname'], $userID, $privateKey, $dynrow['v2']);
+			} else {
+				echo asymmetric_seal('TASK', $dynrow['projectname'], 'decrypt', $userID, $privateKey);
+			}
+			?>" >
 		<br></div>
 		<?php
 		$modal_options = '';
@@ -149,7 +157,11 @@ if($x){
 			<div class="col-md-12">
 				<label><?php echo mc_status('TASK').' '.$lang["DESCRIPTION"]; ?>* <small>(Max. 15MB)</small></label>
 				<textarea class="form-control projectDescriptionEditor required-field" name="description">
-					<?php echo asymmetric_encryption('TASK', $dynrow['projectdescription'], $userID, $privateKey, $dynrow['v2']); ?>
+					<?php if($dynrow['v2']) {
+						echo asymmetric_encryption('TASK', $dynrow['projectdescription'], $userID, $privateKey, $dynrow['v2']);
+					} else {
+						echo asymmetric_seal('TASK', $dynrow['projectdescription'], 'decrypt', $userID, $privateKey);
+					} ?>
 				</textarea>
 				<br>
 				<label class="btn btn-default"><input type="file" name="newTaskFiles[]" style="display:none" multiple />Dateien Hochladen</label>
