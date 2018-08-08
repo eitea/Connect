@@ -190,7 +190,10 @@ while ($row = $result->fetch_assoc()) {
 	</div>
 </form>
 <div class="col-md-8 col-md-offset-2">
-	<table class="table table-hover">
+	<div class="pull-right">
+		<input type="search" class="form-control" placeholder="Suchen..." id="social_message_search">
+	</div>
+	<table id="social_message_table" class="table table-hover">
 		<thead>
 			<tr>
 				<th>Betreff</th>
@@ -201,12 +204,12 @@ while ($row = $result->fetch_assoc()) {
 		</thead>
 		<tbody>
 			<?php
-			$showArchive = "WHERE category NOT LIKE 'archive_%'";
-			if($archiveToggle == 'set1') $showArchive = '';
+			$showArchive = "WHERE archive IS NULL";
+			if($archiveToggle == 'set2') $showArchive = '';
             $stmt = $conn->prepare("SELECT partType, partID FROM relationship_conversation_participant
 				WHERE conversationID = ? AND status != 'exited' AND (partType != 'USER' OR partID != '$userID')"); echo $conn->error;
             $stmt->bind_param('i', $conversationID);
-            $result = $conn->query("SELECT c.id, c.category, subject, rcp.lastCheck, rcp.id AS participantID, tbl.unreadMessages, mm.sentTime FROM messenger_conversations c
+            $result = $conn->query("SELECT c.id, c.category, subject, rcp.lastCheck, rcp.id AS participantID, rcp.archive, tbl.unreadMessages, mm.sentTime FROM messenger_conversations c
 				INNER JOIN relationship_conversation_participant rcp
 				ON (rcp.status != 'exited' AND rcp.conversationID = c.id AND rcp.partType = 'USER' AND rcp.partID = '$userID')
 				LEFT JOIN (SELECT COUNT(*) AS unreadMessages, rcp1.conversationID FROM messenger_messages m
@@ -251,7 +254,7 @@ while ($row = $result->fetch_assoc()) {
 				}
                 echo '</td>';
 				echo '<td>';
-				if(substr($row['category'], 0, 8) == 'archive_') {
+				if($row['archive']) {
 					echo '<b style="color:violet">- Archiviert -</b>';
 				} else {
 					echo '<form method="POST"><button type="submit" name="chat_archive" value="', $row['id']
@@ -414,5 +417,12 @@ while ($row = $result->fetch_assoc()) {
 	  });
   }, 25000);
   <?php endif; ?>
+  //5b69879c81ea8
+  $("#social_message_search").on('keyup', function(){
+	  var value = $(this).val().toLowerCase();
+       $("#social_message_table tr").filter(function() {
+         $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+       });
+  });
 </script>
 <?php require dirname(__DIR__) . '/footer.php'; ?>
