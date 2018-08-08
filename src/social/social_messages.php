@@ -2,9 +2,9 @@
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . 'header.php';
 $openChatID = 0;
 $bucket = $identifier .'-uploads'; //no uppercase, no underscores, no ending dashes, no adjacent special chars
-$archiveToggle = 'set1';
+$archiveToggle = 'set2';
 if(isset($_GET['toggleArchive'])){
-	if($_GET['toggleArchive'] == 'set1') $archiveToggle = 'set2';
+	if($_GET['toggleArchive'] == 'set2') $archiveToggle = 'set1';
 }
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     require __DIR__.'/chatwindow_backend.php'; //sets openChatID and takes care of chatwindow.php default operations

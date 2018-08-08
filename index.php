@@ -150,6 +150,7 @@ if($l > 1){
 	} elseif(preg_match("/(images|plugins|modules)(\/.*)(\/[A-Za-z0-9\.]*)*(\.css|\.js|\.png|\.jpg|\.woff2|\.woff|\.ttf|\.gif)$/", $url, $matches)){
 		if(array_key_exists($matches[4], $mime_types)){
 			header('Content-Type: '. $mime_types[$matches[4]]);
+			header('Cache-Control: public, max-age=3600');
 		}
 		echo file_get_contents($matches[0]);
 	} elseif($params[$l -1] == 'ajaxQuery'){

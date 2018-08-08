@@ -148,6 +148,7 @@ if (isset($_REQUEST["questionID"])) {
         <!-- /question editor -->
     </div>
     <div class="modal-footer">
+    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#question-edit-info"><i data-container="body" data-toggle="tooltip" title="<?php echo $lang['HELP'] ?>" class="fa fa-question-circle-o"></i></button>
         <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang['CANCEL']; ?></button>
         <button type="submit" class="btn btn-warning" name="<?php echo $edit ? 'editQuestion' : 'addQuestion' ?>" value="<?php echo $edit ? $questionID : $trainingID; ?>"><?php echo $lang[$edit ? 'EDIT' : 'ADD'] ?></button>
     </div>
@@ -156,8 +157,17 @@ if (isset($_REQUEST["questionID"])) {
 </form>
 <div id="question-edit-info" class="modal fade">
   <div class="modal-dialog modal-content modal-md">
-    <div class="modal-header">Fragentypen</div>
+    <div class="modal-header"><?php echo $lang['HELP'] ?></div>
     <div class="modal-body">
+        <h5>Editor</h5>
+        <div>Der hier eingegebene Text wird dem User über der eigentlichen Frage angezeigt und kann zum Beispiel Informationen oder eine detaillierte Fragestellung beinhalten. </div>
+        <dl>
+            <dt>Links</dt>
+            <dd>Links können einfach eingefügt werden. Nach dem weiterschreiben werden sie automatisch als solche erkannt.</dd>
+            <dt>YouTube Videos</dt>
+            <dd>Wird ein link eingefügt, der im Format https://www.youtube.com/watch?v=XXXXXXXXX oder https://youtu.be/XXXXXXXXX ist, wird das dazugehörige Video über dem Text angezeigt (Der Link ist weiterhin sichtbar und anklickbar). Es spielt dabei keine Rolle, wo sich der link befindet. Es können auch mehrere dieser Links in einer Frage vorhanden sein. </dd>
+        </dl>
+        <hr>
         <h5>Schulung</h5>
         <div>In der Auswertung des Moduls sind Schulungen eine Farbe zwischen rot und grün, an der man erkennen kann, ob der Benutzer die gestellte Frage richtig oder falsch beantwortet hat. </div>
         <dl>
