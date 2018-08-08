@@ -31,8 +31,8 @@ function openSurveyModal(){
 <?php if($userHasUnansweredOnLoginSurveys){echo "setTimeout(function(){ openSurveyModal() },500); clearTimeout(window.homeReloadTimeout);";} ?>
 
 $("#feedback_form").submit(function(event){
-    //console.log("feedBack");
-	$(this).find("button[name=giveFeedback]").prop("disabled", true);
+  $feedbackForm = $(this);
+	$feedbackForm.find("button[name=giveFeedback]").prop("disabled", true);
     event.preventDefault();
     var img = window.feedbackCanvasObject.toDataURL()
     var postData =  {
@@ -55,6 +55,10 @@ $("#feedback_form").submit(function(event){
             $("#feedback_message").val("");
             $("#feedback_title").val("");
             $('#feedbackModal').modal('hide');
+            $('#feedback_includeScreenshot').prop("checked", true);
+            $('#feedback_default_type').prop("checked", true);
+            // reset feedback button
+            $feedbackForm.find("button[name=giveFeedback]").prop("disabled", false);
         }
     });
 });

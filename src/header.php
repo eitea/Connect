@@ -518,7 +518,7 @@ if ($_SESSION['color'] == 'light') {
                 </div>
                 <div class="modal-body">
                     <div class="radio">
-                        <label><input type="radio" name="feedback_type" value="Problem" checked><?php echo $lang['FEEDBACK_PROBLEM']; ?></label>
+                        <label><input type="radio" name="feedback_type" id="feedback_default_type" value="Problem" checked><?php echo $lang['FEEDBACK_PROBLEM']; ?></label>
                     </div>
                     <div class="radio">
                         <label><input type="radio" name="feedback_type" value="Additional Feature"><?php echo $lang['FEEDBACK_FEATURES']; ?></label>

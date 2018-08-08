@@ -684,7 +684,6 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
                 <td>-</td>
                 <td><?=date("Y-m-d")?></td>
                 <td></td>
-                <td><i class="fa fa-times" style="color:red" title="Keine Routine"></i></td>
                 <td>ACTIVE</td>
                 <td style="color:white;"><span class="badge" style="background-color:<?=$priority_color[1]?>" title="<?=$lang['PRIORITY_TOSTRING'][1]?>">1</span></td>
                 <td>-</td>
