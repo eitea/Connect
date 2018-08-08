@@ -185,7 +185,7 @@ while ($row = $result->fetch_assoc()) {
 	<div class="page-header h3">Nachrichten
 	    <div class="page-header-button-group">
 			<a data-toggle="modal" href="#new-message-modal" class="btn btn-default"><i class="fa fa-plus"></i></a>
-			<button type="submit" name="toggleArchive" style="background-color:<?php if($archiveToggle == 'set2') {echo 'violet'; } //5b6a9acc84186 ?>"
+			<button type="submit" name="toggleArchive" style="background-color:<?php if($archiveToggle == 'set1') {echo 'violet'; } //5b6a9acc84186 ?>"
 				 value="<?php echo $archiveToggle; ?>" class="btn btn-default" title="Archivierte Nachrichten anzeigen/ ausblenden"><i class="fa fa-archive"></i>
 			 </button>
 		</div>
@@ -207,7 +207,7 @@ while ($row = $result->fetch_assoc()) {
 		<tbody>
 			<?php
 			$showArchive = "WHERE archive IS NULL";
-			if($archiveToggle == 'set2') $showArchive = '';
+			if($archiveToggle == 'set1') $showArchive = '';
             $stmt = $conn->prepare("SELECT partType, partID FROM relationship_conversation_participant
 				WHERE conversationID = ? AND status != 'exited' AND (partType != 'USER' OR partID != '$userID')"); echo $conn->error;
             $stmt->bind_param('i', $conversationID);
