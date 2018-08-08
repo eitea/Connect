@@ -923,16 +923,33 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                         });
                         scrollCurrentActiveLinkIntoView()
 
-
+                    function requestNotificationPermissionNotification(){
+                        Notification.requestPermission().then(function(permission){
+                            if(permission !== "granted"){
+                                showWarning("Notifications werden vom Browser blockiert.")
+                            }else{
+                                showSuccess("Sie können ab jetzt Notifications erhalten.")
+                            }
+                        })
+                    }
+                    var notificationEnabled = <?php $result = $conn->query("SELECT new_message_notification FROM socialprofile WHERE userID = $userID AND new_message_notification = 'TRUE'"); echo $result && $result->num_rows > 0?"true":"false" ?>;
+                    if(notificationEnabled && Notification.permission !== "granted"){
+                        // if the user has notifications enabled but not allowed, ask for permission
+                        showWarning('Sie haben Web Notifications aktiviert, aber beim Browser noch nicht erlaubt. <a href="#" onclick="requestNotificationPermissionNotification()">Erlauben</a> oder <a href="../social/profile">zu den Einstellungen</a>.');
+                    }
                         // unread message badge (post)
 					  var firstTime = true;
                       function displayNotificationIfEnabled(title, body){
-                        var notificationEnabled = <?php $result = $conn->query("SELECT new_message_notification FROM socialprofile WHERE userID = $userID AND new_message_notification = 'TRUE'"); echo $result && $result->num_rows > 0?"true":"false" ?>;
                         if(notificationEnabled && window.Notification){
                             var unreadMessageNotification = new Notification(title,{
                                 body: body,
                                 requireInteraction: true
                             })
+                            unreadMessageNotification.onclick = function(event){
+                                window.location.href = "../social/post" 
+                                window.focus();
+                                this.close();
+                            }
                         }
                       }
                       setInterval(function(){
@@ -949,7 +966,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 									  audioElement.play();
 								  }
 								  if(response && firstTime){
-                                      displayNotificationIfEnabled("Sie haben eine neue Nachricht erhalten","Sie finden Sie in Ihrer Post")
+                                      displayNotificationIfEnabled("Es sind neue Nachrichten in Connect vorhanden","Zum Anzeigen hier klicken")
                                       firstTime = false;
 									  var newTitle = 'Ungelese Nachricht';
 									  setInterval(function(){

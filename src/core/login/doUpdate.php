@@ -3505,7 +3505,20 @@ if($row['version'] < 168){
 	)");
 }
 
-// if($row['version'] < 169){}
+if($row['version'] < 169){
+    $conn->query("ALTER TABLE socialprofile MODIFY COLUMN new_message_notification ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'");
+    if($conn->error){
+        echo $conn->error;
+    }else{
+        echo "<br>new_message_notification default true";
+    }
+    $conn->query("UPDATE socialprofile SET new_message_notification = 'TRUE'");
+    if($conn->error){
+        echo $conn->error;
+    }else{
+        echo "<br>new_message_notification existing true";
+    }
+}
 // if($row['version'] < 170){}
 // if($row['version'] < 171){}
 // if($row['version'] < 172){}
