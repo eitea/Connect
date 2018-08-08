@@ -3511,8 +3511,20 @@ if($row['version'] < 169){
 	$conn->query("UPDATE relationship_conversation_participant SET archive = '$date'
 		WHERE conversationID IN (SELECT id FROM messenger_conversations WHERE category LIKE 'archive_%')");
 	$conn->query("UPDATE messenger_conversations SET category = SUBSTRING(category, 9) WHERE category LIKE 'archive_%'");
-}
 
+    $conn->query("ALTER TABLE socialprofile MODIFY COLUMN new_message_notification ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'");
+    if($conn->error){
+        echo $conn->error;
+    }else{
+        echo "<br>new_message_notification default true";
+    }
+    $conn->query("UPDATE socialprofile SET new_message_notification = 'TRUE'");
+    if($conn->error){
+        echo $conn->error;
+    }else{
+        echo "<br>new_message_notification existing true";
+    }
+}
 // if($row['version'] < 170){}
 // if($row['version'] < 171){}
 // if($row['version'] < 172){}

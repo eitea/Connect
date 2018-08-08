@@ -204,10 +204,31 @@ $question_inner_regex = '/\[(\S+)\]([^\[\}]+)/s';
 
 /**
  * Removes questions (enclosed in '{}') from html.
+ * 
+ * @param bool $parse Enables parsing of special syntax (eg embed)
  */
-function strip_questions(string $html) : string
+function strip_questions(string $html, $parse = false) : string
 {
-    return preg_replace('/\{.*?\}/s', "", $html);
+    $stripped = preg_replace('/\{.*?\}/s', "", $html);
+    if (!$parse) {
+        return $stripped;
+    }
+    
+    $videos = [];
+    preg_match_all('/https:\/\/www\.youtube\.com\/watch\?v=(\w+)/ms', $stripped, $matches);
+    foreach ($matches[1] as $video) {
+        $videos[$video] = true;
+    }
+    preg_match_all('/https:\/\/youtu.be\/(\w+)/ms', $stripped, $matches);
+    foreach ($matches[1] as $video) {
+        $videos[$video] = true;
+    }
+
+    foreach($videos as $video => $value){
+        $stripped = '<div class="stretchy-wrapper"><iframe src="https://www.youtube.com/embed/'.$video.'" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>' . $stripped;
+    }
+
+    return $stripped;
 }
 
 /**
@@ -284,7 +305,7 @@ function generate_survey_page(array $options) : array
         [
             "type" => "html",
             "name" => "question",
-            "html" => strip_questions($options["text"])
+            "html" => strip_questions($options["text"], true)
         ],
         $question
     ];
@@ -301,10 +322,10 @@ function validate_question(string $html, $answer, bool $survey)
     $html = preg_replace($html_regex, "", $html); // strip all html tags
     preg_match($question_regex, $html, $matches);
     // only parse the first question
-    if (sizeof($matches) == 0) return $survey ? ($answer?[true, ["read"]]:[false,["not read"]]) : $answer == true;
+    if (sizeof($matches) == 0) return $survey ? ($answer ? [true, ["read"]] : [false, ["not read"]]) : $answer == true;
     $question = $matches[0]; // eg "{[-]wrong answer[+]right answer}"
     preg_match_all($question_inner_regex, $question, $matches);
-    if (sizeof($matches) == 0) return $survey ? ($answer?[true, ["read"]]:[false,["not read"]]) : $answer == true;
+    if (sizeof($matches) == 0) return $survey ? ($answer ? [true, ["read"]] : [false, ["not read"]]) : $answer == true;
     if ($survey) {
         $survey_answers = [];
         for ($i = 0; $i < count($matches[0]); $i++) {
@@ -325,7 +346,7 @@ function validate_question(string $html, $answer, bool $survey)
             }
         }
         // return that user has read the question and answers
-        if(!count($survey_answers)){
+        if (!count($survey_answers)) {
             $survey_answers[] = "read";
         }
         return [true, $survey_answers];
@@ -338,10 +359,10 @@ function validate_question(string $html, $answer, bool $survey)
                 continue;
             }
         }
-        if($has_answers){
+        if ($has_answers) {
             if (!isset($matches[1][$answer])) return false;
             if ($matches[1][$answer] == "+") return true;
-        }else{
+        } else {
             // 'I have read' checkbox
             return true;
         }
@@ -363,7 +384,7 @@ function str_to_hsl_color($str, $saturation = "75%", $luminosity = "50%")
  * get a color based on a percentage (0% ... red, 100% ... green)
  * @param float $percent Number between 0 and 1
  */
-function percentage_to_color($percent, $inverse = false, $gray = false): string
+function percentage_to_color($percent, $inverse = false, $gray = false) : string
 {
     if ($gray) return "#e2e2e2";
     if ($inverse) $percent = 1 - $percent;
@@ -376,8 +397,9 @@ function percentage_to_color($percent, $inverse = false, $gray = false): string
 /**
  * adds ... if string is too long
  */
-function str_ellipsis(string $str, $len = 50){
-   return strlen($str) > $len ? substr($str,0,$len)."..." : $str;
+function str_ellipsis(string $str, $len = 50)
+{
+    return strlen($str) > $len ? substr($str, 0, $len) . "..." : $str;
 }
 
 ?>

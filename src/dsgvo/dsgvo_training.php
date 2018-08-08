@@ -69,7 +69,23 @@ function parse_question_form()
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && Permissions::has("TRAINING.WRITE")) {
-    if (isset($_POST['createTraining']) && !empty($_POST['name'])) {
+    if (isset($_POST['undoSuspension'])) {
+        $user = intval($_POST['undoSuspension']);
+        $conn->query("DELETE FROM dsgvo_training_user_suspension WHERE userID = $user");
+        if ($conn->error) {
+            showError($conn->error);
+        } else {
+            showSuccess($lang["OK_SAVE"]);
+        }
+    } elseif (isset($_POST['fastForwardSuspension'])) {
+        $user = intval($_POST['fastForwardSuspension']);
+        $conn->query("INSERT INTO dsgvo_training_user_suspension (suspension_count, userID, last_suspension) VALUES (3,$user,TIMESTAMP(DATE_SUB(NOW(), INTERVAL 3 day))) ON DUPLICATE KEY UPDATE suspension_count = 3, last_suspension = TIMESTAMP(DATE_SUB(NOW(), INTERVAL 3 day))");
+        if ($conn->error) {
+            showError($conn->error);
+        } else {
+            showSuccess($lang["OK_SAVE"]);
+        }
+    } elseif (isset($_POST['createTraining']) && !empty($_POST['name'])) {
         $name = test_input($_POST['name']);
         $moduleID = intval($_POST["module"]);
         $conn->query("INSERT INTO dsgvo_training (name,companyID, moduleID) VALUES('$name', $companyID, $moduleID)");
@@ -498,7 +514,7 @@ showError($conn->error);
                                                         <i class="fa fa-fw fa-play"></i>
                                                     </button>
                                                 </span>
-                                                <?php if($answer_count != 0): ?>
+                                                <?php if ($answer_count != 0) : ?>
                                                 <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['QUESTION_STATS'] ?>">
                                                     <button type="button" style="background:none;border:none" name="infoQuestion" value="<?php echo $questionID; ?>">
                                                         <i class="fa fa-fw fa-pie-chart"></i>
@@ -516,7 +532,7 @@ showError($conn->error);
                                                         <i class="fa fa-fw fa-trash-o"></i>
                                                     </button>
                                                 </span>
-                                                <?php if($answer_count != 0): ?>
+                                                <?php if ($answer_count != 0) : ?>
                                                 <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['DELETE_QUESTION_ANSWERS'] ?>">
                                                     <button onclick="return (confirm('<?php echo $lang['ARE_YOU_SURE'] ?>') === true)" type="submit" style="background:none;border:none;color:#d90000;" name="removeQuestionAnswers" value="<?php echo $questionID; ?>">
                                                         <i class="fa fa-fw fa-eraser"></i>
