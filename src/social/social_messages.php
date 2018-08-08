@@ -227,13 +227,13 @@ while ($row = $result->fetch_assoc()) {
 				ORDER BY mm.sentTime DESC");
             echo $conn->error;
             while ($result && ($row = $result->fetch_assoc())) {
-                $conversationID = $row['id'];
+				$conversationID = $openChatID == $row['id'] ? '' : $row['id']; //5b6a9bbe461cb
                 echo '<tr class="clicker" data-val="'.$conversationID.'">';
                 echo '<td>', $row['subject'], '</td>';
                 echo '<td><small>', date('d.m.Y H:i', strtotime(carryOverAdder_Hours($row['sentTime'], $timeToUTC))),'</small>',
 					$row['unreadMessages'] ? '<span class="badge badge-alert" title="Ungelesene Nachrichten">'.$row['unreadMessages'] .'</span>' : '', '</td>';
                 echo '<td>';
-				echo '<form method="POST" id="form_openChat_',$row['id'],'"><input type="hidden" name="openChat" value="', $row['id'], '" ></form>';
+				echo '<form method="POST" id="form_openChat_',$conversationID,'"><input type="hidden" name="openChat" value="', $conversationID, '" ></form>';
 				if($row['category'] == 'notification'){
 					echo '<b style="color:blue">- System -</b>';
 				} else {
@@ -264,7 +264,7 @@ while ($row = $result->fetch_assoc()) {
 				}
 				echo '</td>';
                 echo '</tr> ';
-                if ($openChatID == $conversationID) {
+                if (!$conversationID) {
                     echo '<td colspan="4" style="padding:0">';
                     require __DIR__.'/chatwindow.php';
                     echo '</td>';
