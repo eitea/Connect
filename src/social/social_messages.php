@@ -191,7 +191,7 @@ while ($row = $result->fetch_assoc()) {
 		</div>
 	</div>
 </form>
-<div class="col-md-8 col-md-offset-2">
+<div class="col-md-12">
 	<div class="pull-right">
 		<input type="search" class="form-control" placeholder="Suchen..." id="social_message_search">
 	</div>
