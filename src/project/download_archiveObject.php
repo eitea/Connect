@@ -57,7 +57,11 @@ if(isset($object)){
 		if($module == 'CHAT') $result = $conn->query("SELECT vKey AS v2 FROM messenger_messages WHERE id = {$arr[1]}");
 		echo $conn->error;
 		$row = $result->fetch_assoc();
-		echo asymmetric_encryption($module, $object[ 'Body' ], $userID, $privateKey, $row['v2'], $err);
+		if($row['v2']){
+			echo asymmetric_encryption($module, $object[ 'Body' ], $userID, $privateKey, $row['v2'], $err);
+		} else {
+			echo asymmetric_seal($module, $object['Body'], 'decrypt', $userID, $privateKey);
+		}
 		echo $err;
 	} elseif($module == 'PERSONAL'){
 		$body = base64_decode($object['Body']);
