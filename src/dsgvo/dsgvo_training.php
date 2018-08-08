@@ -69,7 +69,23 @@ function parse_question_form()
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && Permissions::has("TRAINING.WRITE")) {
-    if (isset($_POST['createTraining']) && !empty($_POST['name'])) {
+    if(isset( $_POST['undoSuspension'])){
+        $user = intval($_POST['undoSuspension']);
+        $conn->query("DELETE FROM dsgvo_training_user_suspension WHERE userID = $user");
+        if($conn->error){
+            showError($conn->error);
+        }else{
+            showSuccess($lang["OK_SAVE"]);
+        }
+    }elseif(isset( $_POST['fastForwardSuspension'])){
+        $user = intval($_POST['fastForwardSuspension']);
+        $conn->query("INSERT INTO dsgvo_training_user_suspension (suspension_count, userID, last_suspension) VALUES (3,$user,TIMESTAMP(DATE_SUB(NOW(), INTERVAL 3 day))) ON DUPLICATE KEY UPDATE suspension_count = 3, last_suspension = TIMESTAMP(DATE_SUB(NOW(), INTERVAL 3 day))");
+        if($conn->error){
+            showError($conn->error);
+        }else{
+            showSuccess($lang["OK_SAVE"]);
+        }
+    }elseif (isset($_POST['createTraining']) && !empty($_POST['name'])) {
         $name = test_input($_POST['name']);
         $moduleID = intval($_POST["module"]);
         $conn->query("INSERT INTO dsgvo_training (name,companyID, moduleID) VALUES('$name', $companyID, $moduleID)");
