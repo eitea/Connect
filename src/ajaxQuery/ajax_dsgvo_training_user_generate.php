@@ -82,6 +82,7 @@ if ($test) {
     );
     showError($conn->error);
     while ($row = $result->fetch_assoc()) {
+        echo "<script>console.debug(`%c available training: ",print_r($row),"`, 'color: purple')</script>";
         $questionArray = array();
         $trainingID = $row["id"];
         $random = $row["random"];
@@ -120,6 +121,7 @@ if ($test) {
 showError($conn->error);
 $trainingArray = array(); // those are the survey pages
 while ($row_question = $result_question->fetch_assoc()) {
+    echo "<script>console.debug(`%c available question: ",print_r($row_question),"`, 'color: green')</script>";    
     $trainingArray[] = array(
         "name" => $trainingID,
         "title" => str_ellipsis($row_question["title"], 30) . ($row_question["survey"] == 'TRUE'?" (Umfrage)":""),
@@ -137,6 +139,20 @@ while ($row_question = $result_question->fetch_assoc()) {
 }
 
 ?>
+    <style>
+    div.stretchy-wrapper {
+        width: 100%;
+        padding-bottom: 56.25%; /* 16:9 */
+        position: relative;
+        background-color: black;
+    }
+
+    div.stretchy-wrapper > iframe {
+        position: absolute;
+        top: 0; bottom: 0; left: 0; right: 0;
+        width: 100%; height: 100%;
+    }
+    </style>
     <script src='../plugins/node_modules/survey-jquery/survey.jquery.min.js'></script>
     <div class="modal fade survey-modal">
         <div class="modal-dialog modal-content modal-md">
