@@ -25,6 +25,9 @@ if(!empty($_POST['openChat'])){
 			$conn->query("INSERT INTO messenger_messages(message, participantID, vKey) SELECT '$message_encrypt', id, '$v2Key'
 			FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' AND conversationID = $openChatID");
 
+			if(!$conn->error) { //5b6a830d05c7e
+				$conn->query("UPDATE relationship_conversation_participant SET archive = NULL WHERE conversationID = $openChatID");
+			}
 			//TODO: how do i reply from team, when sent from team and not as user?
 			// $result = $conn->query("SELECT partID FROM relationship_conversation_participant WHERE status != 'exited' AND conversationID = $openChatID AND partType = 'contact' OR partType = 'client'");
 			// if($result && $result->num_rows){
