@@ -20,7 +20,7 @@ $routes = [ // each route has a path and an optional permission
     'social/profile' => ["path" => 'social/user_profile.php', "permission" => "SOCIAL.PROFILE"],
 
     'setup/run' => ["path" => 'core/setup/setup.php'],
-    'setup/wizard' => ["path" => 'core/setup/install_wizard.php'], 
+    'setup/wizard' => ["path" => 'core/setup/install_wizard.php'],
     'setup/keys' => ["path" => 'core/setup/download_keys.php'], // not sure
 
     'system/users' => ["path" => 'core/system/editUsers.php', "permission" => "CORE.USERS"],
@@ -66,7 +66,7 @@ $routes = [ // each route has a path and an optional permission
     'report/editTemp' => ["path" => 'report/templateEdit.php', "permission" => "CORE.TEMPLATES"],
     'report/previewTem' => ["path" => 'report/templatePreview.php', "permission" => "CORE.TEMPLATES"],
 
-    'dynamic-projects/view' => ["path" => 'project/dynamicProjects.php', "permission" => "PROJECTS.USE"],
+    'dynamic-projects/view' => ["path" => 'project/dynamicProjects.php', "permission" => "TASKS.READ"],
 
     'tasks/icalDownload' => ["path" => 'project/download_ical.php', "permission" => "PROJECTS.USE"],
 
@@ -140,7 +140,7 @@ if($l > 1){
             header('HTTP/1.0 401 Unauthorized');
             $error_message = "Unauthorized";
             $permission_name = $this_route["permission"];
-            $error_explanation =  "You or your team doesn't have the permission $permission_name."; 
+            $error_explanation =  "You or your team doesn't have the permission $permission_name.";
             $error_code = "401";
 		    include 'error.php';
 			die();
@@ -157,7 +157,7 @@ if($l > 1){
         header('HTTP/1.0 404 Not Found');
         $error_message = "SOMETHING JUST WENT WRONG!";
         $permission_name = $this_route["permission"];
-        $error_explanation =  "The page you requested could not be found on our servers."; 
+        $error_explanation =  "The page you requested could not be found on our servers.";
         $error_code = "404";
         include 'error.php';
 	}
