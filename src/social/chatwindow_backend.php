@@ -76,7 +76,7 @@ if(!empty($_POST['openChat'])){
 }
 if(!empty($_POST['chat_archive'])){ //5b680295a634f
 	$val = intval($_POST['chat_archive']);
-	$conn->query("UPDATE messenger_conversations SET category = CONCAT('archive_', category) WHERE id = $val");
+	$conn->query("UPDATE relationship_conversation_participant SET archive = '".getCurrentTimestamp()."' WHERE conversationID = $val AND partType = 'USER' AND partID = '$userID'");
 	if ($conn->error) {
 		showError($conn->error);
 	} else {

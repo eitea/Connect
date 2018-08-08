@@ -3505,7 +3505,14 @@ if($row['version'] < 168){
 	)");
 }
 
-// if($row['version'] < 169){}
+if($row['version'] < 169){
+	$date = getCurrentTimestamp();
+	$conn->query("ALTER TABLE relationship_conversation_participant ADD COLUMN archive VARCHAR(45)");
+	$conn->query("UPDATE relationship_conversation_participant SET archive = '$date'
+		WHERE conversationID IN (SELECT id FROM messenger_conversations WHERE category LIKE 'archive_%')");
+	$conn->query("UPDATE messenger_conversations SET category = SUBSTRING(category, 9) WHERE category LIKE 'archive_%'");
+}
+
 // if($row['version'] < 170){}
 // if($row['version'] < 171){}
 // if($row['version'] < 172){}
