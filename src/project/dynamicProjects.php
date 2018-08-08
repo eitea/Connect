@@ -710,7 +710,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
     </tbody>
 </table>
 </form>
-<div id="new-message-modal" class="modal fade" tabindex="-1" role="dialog">
+<div id="new-message-modal" class="modal fade">
 	<form method="post">
 		<div class="modal-dialog modal-content modal-md">
 			<div class="modal-header h4">Neue Nachricht</div>
@@ -731,7 +731,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 	</form>
 </div>
 
-<div id="add-note-modal" class="modal fade" tabindex="-1" role="dialog">
+<div id="add-note-modal" class="modal fade">
 	<form method="post">
 		<div class="modal-dialog modal-content modal-md">
 			<div class="modal-header h4">Notiz hinzufügen</div>
@@ -747,7 +747,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 	</form>
 </div>
 
-<div id="change-status-modal" class="modal fade" tabindex="-1" role="dialog">
+<div id="change-status-modal" class="modal fade">
 	<form method="post">
 		<div class="modal-dialog modal-content modal-md">
 			<div class="modal-header h4">Statuswechsel</div>
@@ -760,16 +760,15 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 					<option value="COMPLETED">Finished</option>
 				</select><br>
 				<br>
-				<div id="change-status-assigned-user">
-					<label>Zugewiesener Benutzer</label>
-		 			<select class="js-example-basic-single" name="change-status-assigned-user">
-		 				<?php
-						foreach($userID_toName as $id => $name){
-							echo '<option value="',$id,'">',$name,'</option>';
-						}
-						?>
-		 			</select>
-				</div><br>
+				<label>Zugewiesener Benutzer</label>
+	 			<select class="js-example-basic-single" name="change-status-assigned-user">
+	 				<?php
+					foreach($userID_toName as $id => $name){
+						echo '<option value="',$id,'">',$name,'</option>';
+					}
+					?>
+	 			</select><br>
+				<br>
 				<label>Notiz</label>
 				<textarea name="change-status-note" rows="3" class="form-control"></textarea>
 			</div>
