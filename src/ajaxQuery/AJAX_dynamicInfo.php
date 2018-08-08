@@ -133,6 +133,7 @@ if (sizeof($missingBookingsArray) == 0) {
 
 $archiveResult = $conn->query("SELECT uniqID, name, uploadDate, type FROM archive WHERE category = 'TASK' AND categoryID = '$x'");
 $messageResult = $conn->query("SELECT id FROM messenger_conversations WHERE category='task' AND categoryID='$x'");
+$notesResult = $conn->query("SELECT userID, notedate, notetext, firstname, lastname FROM dynamicprojectsnotes LEFT JOIN UserData ON UserData.id = userID WHERE taskID = '$x'");
 ?>
 
 <div id="infoModal-<?php echo $x; ?>" class="modal fade">
@@ -141,6 +142,12 @@ $messageResult = $conn->query("SELECT id FROM messenger_conversations WHERE cate
         <div class="modal-body">
             <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#projectDescription<?php echo $x; ?>">Beschreibung</a></li>
+				<?php if($notesResult->num_rows > 0): ?>
+					<li><a data-toggle="tab" href="#projectNotes<?php echo $x; ?>">Notizen
+						<?php echo '<span class="badge badge-alert">'.$notesResult->num_rows.'</span>'; //5b2b907550d12 ?>
+					</a></li>
+				<?php endif; ?>
+
                 <li><a data-toggle="tab" href="#projectInfoBookings<?php echo $x; ?>">Buchungen</a></li>
                 <li><a data-toggle="tab" href="#projectInfoLogs<?php echo $x; ?>">Logs</a></li>
 				<?php if($archiveResult && $archiveResult->num_rows > 0): ?>
@@ -219,36 +226,32 @@ $messageResult = $conn->query("SELECT id FROM messenger_conversations WHERE cate
 					</table>
 				</div>
                 <div id="projectDescription<?php echo $x; ?>" class="tab-pane fade in active"><br>
-                    <?php
-                    echo $description;
-					$result = $conn->query("SELECT userID, notedate, notetext, firstname, lastname FROM dynamicprojectsnotes
-						LEFT JOIN UserData ON UserData.id = userID WHERE taskID = '$x'"); echo $conn->error;
-					if($result && $result->num_rows > 0):
-                    ?>
-					<hr>
-					<h4>Notizen</h4>
-					<table class="table table-striped">
-						<thead>
-							<tr>
-								<th>Benutzer</th>
-								<th>Datum</th>
-								<th>Notiz</th>
-							</tr>
-						</thead>
-						<tbody>
-							<?php
-							while($row = $result->fetch_assoc()){
-								echo '<tr>';
-								echo '<td>',$row['firstname'],' ',$row['lastname'],'</td>';
-								echo '<td>',date('d.m.Y H:i', strtotime(carryOverAdder_Hours($row['notedate'], $timeToUTC))),'</td>';
-								echo '<td>',$row['notetext'],'</td>';
-								echo '</tr>';
-							}
-							?>
-						</tbody>
-					</table>
-					<?php endif; ?>
+                    <?php echo $description; ?>
                 </div>
+				<?php if($notesResult->num_rows > 0): ?>
+					<div id="projectNotes<?php echo $x; ?>" class="tab-pane fade"><br>
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th>Benutzer</th>
+									<th>Datum</th>
+									<th>Notiz</th>
+								</tr>
+							</thead>
+							<tbody>
+								<?php
+								while($row = $notesResult->fetch_assoc()){
+									echo '<tr>';
+									echo '<td>',$row['firstname'],' ',$row['lastname'],'</td>';
+									echo '<td>',date('d.m.Y H:i', strtotime(carryOverAdder_Hours($row['notedate'], $timeToUTC))),'</td>';
+									echo '<td>',$row['notetext'],'</td>';
+									echo '</tr>';
+								}
+								?>
+							</tbody>
+						</table>
+					</div>
+				<?php endif; ?>
                 <div id="projectInfoBookings<?php echo $x; ?>" class="tab-pane fade"><br>
                     <table class="table table-hover">
                         <thead><tr>

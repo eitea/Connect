@@ -80,8 +80,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 					echo '</div>';
 				}
 			}
-			$conn->query("UPDATE relationship_conversation_participant SET lastCheck = UTC_TIMESTAMP
-				WHERE conversationID = $conversationID AND partType = 'USER' AND partID = $userID");
+			// 5b6aa7855a90e - this shall not mark things as "read"
+			// $conn->query("UPDATE relationship_conversation_participant SET lastCheck = UTC_TIMESTAMP
+			// 	WHERE conversationID = $conversationID AND partType = 'USER' AND partID = $userID");
 			break;
 
 	}
