@@ -31,7 +31,6 @@ while($result && $row = $result->fetch_assoc()){
     $relationship_team_user[$row["teamID"]][] = $row["userID"];
 }
 
-
 //echo '<pre>', print_r($grantable_modules, 1),'</pre>';
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
@@ -67,9 +66,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 $permissionID = intval($arr[2]);
                 $stmt_insert_permission_relationship->execute();
                 echo $stmt_insert_permission_relationship->error;
-            }        
+            }
         }
-        $stmt_insert_permission_relationship->close();    
+        $stmt_insert_permission_relationship->close();
         Permissions::update_cache_team($x);
     }
 
@@ -345,7 +344,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     if(!empty($_POST['saveRoles'])){
         $activeTab = $x = intval($_POST['saveRoles']);
-        
+
         $inherit_team_permissions = isset($_POST['inherit_team_permissions']) ? 'TRUE' : 'FALSE';
         $conn->query("UPDATE UserData SET inherit_team_permissions = '$inherit_team_permissions' WHERE id = $x");
         Permissions::update_cache_relationship_user_team();
@@ -366,7 +365,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     if(!empty($_POST['saveRoles']) || !empty($_POST['saveTeamRoles'])){
         if(!empty($_POST['saveRoles'])){
-            $x = intval($_POST['saveRoles']);            
+            $x = intval($_POST['saveRoles']);
             $remove_permission_stmt = $conn->prepare("DELETE FROM relationship_access_permissions WHERE userID = $x AND permissionID IN (SELECT permission.id FROM access_permissions permission INNER JOIN access_permission_groups groups ON groups.id = permission.groupID WHERE groups.name = ?)");
             echo $conn->error;
             $remove_permission_stmt->bind_param('s', $group_to_remove);
@@ -401,18 +400,19 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             } else {
                 $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'ERP' AND userID = $uid");
             }
-    
+
             if(isset($_POST['hasTaskAccess'])){
                 //TODO: see if user has access already, and if not, and you can grant it, grant it.
+				grantAccess('TASK', $uid);
             } else {
                 $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'TASK' AND userID = $uid");
             }
             if(isset($_POST['hasChatAccess'])){
-    
+    			grantAccess('CHAT', $uid);
             } else {
                 $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'CHAT' AND userID = $uid");
             }
-    
+
             if($conn->error){
                 showError($conn->error);
             } else {
@@ -499,11 +499,11 @@ function create_collapse_tree($permission_groups, $name, $x, $children_disabled 
     $child_groups = "";
     $children = "";
     $toolbar_expand = $toolbar = "";
-    if($name == "DSGVO" && /*array_key_exists('DSGVO', $encrypted_modules)&&*/ !array_key_exists('DSGVO', $grantable_modules)){ 
+    if($name == "DSGVO" && /*array_key_exists('DSGVO', $encrypted_modules)&&*/ !array_key_exists('DSGVO', $grantable_modules)){
         $children_disabled = true;
     } else if($name == "ERP" && /*array_key_exists('ERP', $encrypted_modules)&&*/ !array_key_exists('ERP', $grantable_modules)){
         $children_disabled = true;
-    } 
+    }
     foreach ($permission_groups as $key => $value) {
         if(is_array($value)){
             $child_groups .= create_collapse_tree($value, $key, $x, $children_disabled, $mode);
@@ -531,26 +531,26 @@ function create_collapse_tree($permission_groups, $name, $x, $children_disabled 
         }
     }
     if(!($x == 1 && $mode == "USER")){
-        $toolbar .= " <a title='Alles aktivieren' data-toggle='tooltip' data-check-all='#$id' role='button' style='float:right'> <i class='fa fa-fw fa-check-square-o'></i> </a>";             
-        $toolbar .= " <a title='Alles deaktivieren' data-toggle='tooltip' data-uncheck-all='#$id' role='button' style='float:right'> <i class='fa fa-fw fa-square-o'></i> </a>";             
+        $toolbar .= " <a title='Alles aktivieren' data-toggle='tooltip' data-check-all='#$id' role='button' style='float:right'> <i class='fa fa-fw fa-check-square-o'></i> </a>";
+        $toolbar .= " <a title='Alles deaktivieren' data-toggle='tooltip' data-uncheck-all='#$id' role='button' style='float:right'> <i class='fa fa-fw fa-square-o'></i> </a>";
     }
     $display_name = isset($lang[$name])? $lang[$name]:ucwords(strtolower($name));
    return "
-    <div class='panel-group' role='tablist' style='margin:0'> 
-        <div class='panel panel-default'> 
-            <div class='panel-heading' role='tab'> 
-                <h4 class='panel-title'> <a href='#$id' class='' role='button' data-toggle='collapse'> $display_name </a> $toolbar $toolbar_expand </h4> 
-                
-            </div> 
-            <div class='panel-collapse collapse' role='tabpanel' id='$id' style='margin-left: 20px'> 
-                <ul class='list-group'> 
+    <div class='panel-group' role='tablist' style='margin:0'>
+        <div class='panel panel-default'>
+            <div class='panel-heading' role='tab'>
+                <h4 class='panel-title'> <a href='#$id' class='' role='button' data-toggle='collapse'> $display_name </a> $toolbar $toolbar_expand </h4>
+
+            </div>
+            <div class='panel-collapse collapse' role='tabpanel' id='$id' style='margin-left: 20px'>
+                <ul class='list-group'>
                     $children
                 </ul>
                 <div >
-                    $child_groups 
+                    $child_groups
                 </div>
-            </div> 
-        </div> 
+            </div>
+        </div>
     </div>";
 }
 
@@ -599,7 +599,7 @@ function create_collapse_tree($permission_groups, $name, $x, $children_disabled 
                             </div>
                             <br />
                             <br />
-                            <?php 
+                            <?php
                                 echo create_collapse_tree(Permissions::$permission_groups, "PERMISSIONS", $x);
                             ?>
 						<br><h4>Keys</h4>
@@ -650,7 +650,7 @@ function create_collapse_tree($permission_groups, $name, $x, $children_disabled 
                 <div class="panel-body">
                     <form method="POST">
                         <div class="row">
-                        <?php 
+                        <?php
                             foreach ($relationship_team_user[$x] as $uid) {
                                 echo "<div class='col-md-6 col-xs-12' >";
                                 echo $userID_toName[$uid];
@@ -687,7 +687,7 @@ $("[data-permission-name]").change(function(){
                 $(this).prop("checked",true);
             }
             if(currentPermissionName == "BOOK" && otherPermissionName == "STAMP"){
-                $(this).prop("checked",true);                
+                $(this).prop("checked",true);
             }
         }else{
             if(currentPermissionName == "READ" && (otherPermissionName == "ADMIN" || otherPermissionName == 'WRITE')){
@@ -700,7 +700,7 @@ $("[data-permission-name]").change(function(){
                 $(this).prop("checked", false);
             }
             if(currentPermissionName == "STAMP" && otherPermissionName == "BOOK"){
-                $(this).prop("checked", false);                
+                $(this).prop("checked", false);
             }
         }
     });
@@ -708,10 +708,10 @@ $("[data-permission-name]").change(function(){
 })
 
 $('[href*="permissionCollapseListGroup"]').click(function(){
-    $(this).closest(".panel-group").parent().find('[id*="permissionCollapseListGroup"]').not(this).collapse("hide") // closes all sibling collapses 
+    $(this).closest(".panel-group").parent().find('[id*="permissionCollapseListGroup"]').not(this).collapse("hide") // closes all sibling collapses
 })
 $('[data-expand-all*="permissionCollapseListGroup"]').click(function(){
-    $(this).closest(".panel-group").find('[id*="permissionCollapseListGroup"]').not(this).collapse("show") // closes all sibling collapses 
+    $(this).closest(".panel-group").find('[id*="permissionCollapseListGroup"]').not(this).collapse("show") // closes all sibling collapses
 })
 $('[data-check-all*="permissionCollapseListGroup"]').click(function(){
     $(this).closest(".panel-group").find("[data-permission-name]").prop("checked", true);

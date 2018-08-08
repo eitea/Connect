@@ -658,12 +658,11 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                 <?php endif; //endif(GENERAL.STAMP) ?>
                   <?php
                     require __DIR__ . DIRECTORY_SEPARATOR . "misc" . DIRECTORY_SEPARATOR . "create_menu.php";
-                    
+
                     // projects
                     $result = $conn->query("SELECT projectID FROM relationship_project_user WHERE userID = $userID AND (expirationDate = '0000-00-00' OR DATE(expirationDate) > CURRENT_TIMESTAMP )");
                     echo $conn->error;
-                    $show_projects_menu_item = $result && $result->num_rows > 0;
-                    $projects_menu_item_badge = $result->num_rows;       
+                    $show_projects_menu_item = $result->num_rows;
                     // dynamic projects
                     $result = $conn->query("SELECT DISTINCT d.projectid FROM dynamicprojects d
                         LEFT JOIN dynamicprojectsemployees de ON de.projectid = d.projectid AND de.userid = $userID AND de.position != 'owner'
@@ -721,7 +720,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             "href" => "project/public",
                             "icon" => "fa fa-fw fa-tags",
                             "badge" => [
-                                "count" => $projects_menu_item_badge
+                                "count" => $show_projects_menu_item
                             ]
                         ],
                         "BOOK_PROJECTS" => [
@@ -730,8 +729,10 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             "href" => "user/book"
                         ],
                         "DYNAMIC_PROJECTS" => [
+							"show" => $show_dynamic_projects_menu_item,
                             "icon" => "fa fa-fw fa-tasks",
                             "href" => "dynamic-projects/view",
+							"badge" => ["count" => $dynamic_projects_menu_item_badge]
                         ],
                         "ADDRESS_BOOK" => [
                             "show" => Permissions::has("ERP.CLIENTS") || Permissions::has("ERP.SUPPLIERS"),
@@ -790,10 +791,13 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                         "ADMIN_TIME_OPTIONS" => [
                             "icon" => "fa fa-fw fa-history",
                             "children" => [
-                                $lang["TIMES"] . " " . $lang["OVERVIEW"] => ["href" => "time/view", ],
-                                "CORRECTION" => ["href" => "time/corrections", ],
-                                "TRAVEL_FORM" => ["href" => "time/travels", ],
-                                "VACATION" => ["href" => "time/vacations", ],
+                                $lang["TIMES"] . " " . $lang["OVERVIEW"] => ["href" => "time/view" ],
+                                "CORRECTION" => ["href" => "time/corrections" ],
+                                "TRAVEL_FORM" => ["href" => "time/travels" ],
+                                "VACATION" => [
+									"href" => "time/vacations",
+									"show" => Permissions::has("TIMES.READ"),
+								],
                                 "CHECKLIST" => [
                                     "href" => "time/check",
                                     "badge" => [
@@ -806,10 +810,11 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             "icon" => "fa fa-fw fa-tags",
                             "children" => [
                                 "PROJECTS" => [
+									"show" => Permissions::has("PROJECTS.ADMIN") || (Permissions::has("PROJECTS.USE") && $show_projects_menu_item),
                                     "href" => "project/view",
                                     // "active_routes" => ["project/public"],
                                     "badge" => [
-                                        "count" => $projects_menu_item_badge
+                                        "count" => $show_projects_menu_item
                                     ]
                                 ],
                                 "PROJECT_LOGS" => ["href" => "project/log", ],
@@ -874,9 +879,9 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                         "FINANCES" => [
                             "icon" => "fa fa-fw fa-book",
                             "children" => [
-                                "TAX_RATES" => ["href" => "erp/taxes"]
+                                "TAX_RATES" => [ "href" => "finance/taxes" ]
                             ],
-                            "company_children_callback" => $finances_company_children_callback // this function is called for every company separately. it has to return an array one would usually put in company_children 
+                            "company_children_callback" => $finances_company_children_callback // this function is called for every company separately. it has to return an array one would usually put in company_children
                         ],
                         "DSGVO" => [
                             "icon_raw" => "<i class='pull-left fa fa-fw' style='padding: 0px 6px;'><strong>§</strong></i>", // this is not a font awesome icon, but we need fa-fw (fixed width)
@@ -963,10 +968,10 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 					  }, 120000); //120 seconds, should not cause request overflow
 
                       $('[href*="header-collapse"]').click(function(){
-                          $(this).parent().children('[id*="header-collapse"]').not(this).collapse("hide") // closes all sibling collapses 
+                          $(this).parent().children('[id*="header-collapse"]').not(this).collapse("hide") // closes all sibling collapses
                       })
 					  </script>
-             
+
           </ul>
       </div>
     <br><br><br>
@@ -1019,4 +1024,3 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
           showError('Der Browser den Sie verwenden ist veraltet oder unterstützt wichtige Funktionen nicht. Wenn Sie Probleme mit der Anzeige oder beim Interagieren bekommen, versuchen sie einen anderen Browser.');
       }
       ?>
-      
