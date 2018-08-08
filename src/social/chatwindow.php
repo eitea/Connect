@@ -30,7 +30,8 @@
 				WHERE rcp.conversationID = $openChatID ORDER BY m.sentTime DESC LIMIT 20) AS tbl ORDER BY tbl.sentTime ASC");
 			echo $conn->error;
 			if($result_cw->num_rows == 20) echo '<a>Ältere Nachricten laden</a>';
-			while($result_cw && ($row_cw = $result_cw->fetch_assoc())){
+			while($result_cw && ($row_cw_2 = $result_cw->fetch_assoc())){
+				$row_cw = $row_cw_2; //5b6aa6c3ea959 - so we can access the last row outside the loop
 				if($date != substr($row_cw['sentTime'],0, 10)){
 					$date = substr($row_cw['sentTime'],0, 10);
 					echo '<p class="text-center" style="color:grey;font-size:8pt;">- ',$date,' -</p>';

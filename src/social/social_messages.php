@@ -184,9 +184,10 @@ while ($row = $result->fetch_assoc()) {
 <form>
 	<div class="page-header h3">Nachrichten
 	    <div class="page-header-button-group">
-				<a data-toggle="modal" href="#new-message-modal" class="btn btn-default"><i class="fa fa-plus"></i></a>
-				<button type="submit" name="toggleArchive" style="background-color:<?php if($archiveToggle == 'set2') {echo 'violet'; //5b6a9acc84186}?>"
-					 value="<?php echo $archiveToggle; ?>" class="btn btn-default" title="Archivierte Nachrichten anzeigen/ ausblenden"><i class="fa fa-archive"></i></button>
+			<a data-toggle="modal" href="#new-message-modal" class="btn btn-default"><i class="fa fa-plus"></i></a>
+			<button type="submit" name="toggleArchive" style="background-color:<?php if($archiveToggle == 'set2') {echo 'violet'; } //5b6a9acc84186 ?>"
+				 value="<?php echo $archiveToggle; ?>" class="btn btn-default" title="Archivierte Nachrichten anzeigen/ ausblenden"><i class="fa fa-archive"></i>
+			 </button>
 		</div>
 	</div>
 </form>
