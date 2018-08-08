@@ -4,11 +4,12 @@
 		$result_cw = $conn->query("SELECT subject, category  FROM messenger_conversations c WHERE c.id = $openChatID ");
 		$messenger_row = $result_cw->fetch_assoc();
 
-		$participantID = false;
+		$participantID = $archive = false;
 		$participants = array();
-		$result_cw = $conn->query("SELECT id FROM relationship_conversation_participant WHERE conversationID=$openChatID AND partType='USER' AND partID='$userID'");
+		$result_cw = $conn->query("SELECT id, archive FROM relationship_conversation_participant WHERE conversationID=$openChatID AND partType='USER' AND partID='$userID'");
 		while($result_cw && ($row_cw = $result_cw->fetch_assoc())){
 			$participantID = $row_cw['id'];
+			$archive = $row_cw['archive'];
 		}
 		if($participantID) $conn->query("UPDATE relationship_conversation_participant SET lastCheck = UTC_TIMESTAMP WHERE id = $participantID");
 		?>
@@ -41,16 +42,21 @@
 					echo '<p style="font-size:75%;">',$userID_toName[$row_cw['partID']],' - ', substr(carryOverAdder_Hours($row_cw['sentTime'], $timeToUTC),11,5), '</p>';
 					$style = 'float:left;';
 				}
-				echo '<div class="well" style="width:70%;margin-bottom:10px;',$style,'" >';
-				if($row_cw['type'] == 'text') echo asymmetric_encryption('CHAT', $row_cw['message'], $userID, $privateKey, $row_cw['vKey']);
-				if($row_cw['type'] == 'file' && $row_cw['fileName']) {
-					echo '<form method="POST" action="../project/detailDownload" target="_blank">
-					<input type="hidden" name="keyReference" value="CHAT_',$row_cw['messageID'],'" />
-					<button type="submit" class="btn btn-link" name="download-file" value="',$row_cw['message'],'"><i class="fa fa-file-text-o"></i> ',$row_cw['fileName'],'.',$row_cw['fileType'],'</form>';
+				echo '<div class="well" style="width:70%;margin-bottom:10px;',$style,'" ><form method="POST">';
+				if($row_cw['type'] == 'text'){
+					echo $message = asymmetric_encryption('CHAT', $row_cw['message'], $userID, $privateKey, $row_cw['vKey']);
+					if($messenger_row['category'] == 'notification' && preg_match("/Task [0-9a-z]{13} /", $message, $output_array)){ //5b6a838cb4ec2
+						$taskID = substr($output_array[0], -14);
+						echo '<button type="submit" formaction="../dynamic-projects/view" name="open" value="'.$taskID.'" class="btn btn-link"><i class="fa fa-arrow-right"></i> Weiter zum Task</button>';
+					}
+				} elseif($row_cw['type'] == 'file' && $row_cw['fileName']) {
+					echo '<input type="hidden" name="keyReference" value="CHAT_',$row_cw['messageID'],'" />
+					<button formaction="../project/detailDownload" formtarget="_blank type="submit" class="btn btn-link" name="download-file" value="'
+					,$row_cw['message'],'"><i class="fa fa-file-text-o"></i> ',$row_cw['fileName'],'.',$row_cw['fileType'];
 				} elseif($row_cw['type'] == 'file'){
 					$conn->query("DELETE FROM messenger_messages WHERE id = ".$row_cw['messageID']); //remove this after the update.
 				}
-				echo '</div>';
+				echo '</form></div>';
 				echo '</div>';
 			}
 			if($row_cw['partType'] == 'USER' && $row_cw['partID'] == $userID){
@@ -71,7 +77,7 @@
 	</div>
 	<form method="POST" enctype="multipart/form-data">
 		<input type="hidden" readonly value="<?php echo $openChatID; ?>" name="openChat" />
-		<?php if($messenger_row['category'] != 'notification' && substr($messenger_row['category'], 0, 8) != 'archive_' && $participantID): ?>
+		<?php if($messenger_row['category'] != 'notification' && !$archive && $participantID): ?>
 				<textarea id="chat_message_<?php echo $openChatID; ?>" autofocus name="chat_message" rows="3" class="form-control"  placeholder="Deine Nachricht... " style="resize:none"></textarea>
 				<div style="border:1px solid #cccccc;background-color: #eaeaea">
 					<label class="btn btn-empty" title="Datei anhängen">
