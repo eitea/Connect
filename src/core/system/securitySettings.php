@@ -493,15 +493,16 @@ function create_collapse_tree($permission_groups, $name, $x, $children_disabled 
     global $collapse_counter;
     global $permission_name_to_ids;
     global $grantable_modules;
+	global $encrypted_modules; //5b6a879588a8a
     global $lang;
     $collapse_counter ++;
     $id = "permissionCollapseListGroup$collapse_counter";
     $child_groups = "";
     $children = "";
     $toolbar_expand = $toolbar = "";
-    if($name == "DSGVO" && /*array_key_exists('DSGVO', $encrypted_modules)&&*/ !array_key_exists('DSGVO', $grantable_modules)){
+    if($name == "DSGVO" && array_key_exists('DSGVO', $encrypted_modules) && !array_key_exists('DSGVO', $grantable_modules)){
         $children_disabled = true;
-    } else if($name == "ERP" && /*array_key_exists('ERP', $encrypted_modules)&&*/ !array_key_exists('ERP', $grantable_modules)){
+    } else if($name == "ERP" && array_key_exists('ERP', $encrypted_modules) && !array_key_exists('ERP', $grantable_modules)){
         $children_disabled = true;
     }
     foreach ($permission_groups as $key => $value) {
