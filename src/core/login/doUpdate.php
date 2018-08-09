@@ -3525,10 +3525,19 @@ if($row['version'] < 169){
         echo "<br>new_message_notification existing true";
     }
 }
-// if($row['version'] < 170){}
+
+if($row['version'] < 170){
+	setup_permissions();
+}
 // if($row['version'] < 171){}
 // if($row['version'] < 172){}
 // if($row['version'] < 173){}
+// if($row['version'] < 174){}
+// if($row['version'] < 175){}
+// if($row['version'] < 176){}
+// if($row['version'] < 177){}
+// if($row['version'] < 178){}
+// if($row['version'] < 179){}
 
 //cleanups for maintainable db sizes
 $conn->query("DELETE FROM `checkinLogs` WHERE id <= ( SELECT id FROM ( SELECT id FROM `checkinLogs` ORDER BY id DESC LIMIT 1 OFFSET 100 ) foo )");echo $conn->error;

@@ -1,6 +1,10 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; ?>
 <?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php
+//5b6b24500a084
+if(!Permissions::has("CLIENTS.READ") && !Permissions::has("SUPPLIERS.READ")){
+	die('Missing permissions');
+}
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, 'supplier' => 0); //set_filter requirement
 if(isset($_GET['cmp'])){ $filterings['company'] = test_input($_GET['cmp']); }
 if(isset($_GET['custID'])){ $filterings['client'] = test_input($_GET['custID']);}
@@ -372,7 +376,7 @@ WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clie
             echo ($row['isSupplier'] == 'FALSE') ? '<td>'.$lang['CLIENT'].'</td>' : '<td>'.$lang['SUPPLIER'].'</td>';
             echo '<td>'.$row['clientNumber'].'</td>';
             echo '<td>';
-            if(($row['isSupplier'] == 'FALSE' && Permissions::has("ERP.CLIENTS")) || ($row['isSupplier'] == 'TRUE' && Permissions::has("ERP.SUPPLIERS"))){
+            if(($row['isSupplier'] == 'FALSE' && Permissions::has("CLIENTS.WRITE")) || ($row['isSupplier'] == 'TRUE' && Permissions::has("SUPPLIERS.WRITE"))){
                 echo '<button type="button" class="btn btn-default" name="deleteModal" value="'.$row['id'].'" title="'.$lang['DELETE'].'" ><i class="fa fa-trash-o"></i></button>';
                 echo '<button type="button" class="btn btn-default" name="editModal" value="'.$row['id'].'" ><i class="fa fa-pencil"></i></button>';
 
