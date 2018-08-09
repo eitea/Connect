@@ -350,13 +350,23 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <?php include dirname(dirname(__DIR__)) . "/misc/new_client_buttonless.php"; ?>
 
 <?php
-$companyQuery = $clientQuery = "";
-if($filterings['company']){$companyQuery = "AND clientData.companyID = ".$filterings['company']; }
-if($filterings['client']){$clientQuery = "AND clientData.id = ".$filterings['client']; }
-if($filterings['supplier']){$clientQuery .= " OR clientData.id = ".$filterings['client']; }
+if($insert_clientID) $filterings['client'] = $filterings['supplier'] = $insert_clientID; //5b3ef9e59d6ed
+$companyFilter = $clientFilter = "";
+if($filterings['company']){$companyFilter = "AND clientData.companyID = ".$filterings['company']; }
+if($filterings['client']){
+	$clientFilter = "clientData.id = ".$filterings['client'];
+	if($filterings['supplier']){$clientFilter = "($clientFilter OR clientData.id = ".$filterings['supplier'].")"; }
+	$clientFilter = "AND $clientFilter";
+} elseif($filterings['supplier']){$clientFilter = "clientData.id = ".$filterings['supplier']; }
 
-$result = $conn->query("SELECT clientData.*, companyData.name AS companyName FROM clientData INNER JOIN companyData ON clientData.companyID = companyData.id
-WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clientQuery ORDER BY name ASC"); echo $conn->error;
+// echo "<pre>";
+// print_r($filterings);
+// echo '</pre>';
+
+$sql = "SELECT clientData.*, companyData.name AS companyName FROM clientData INNER JOIN companyData ON clientData.companyID = companyData.id
+WHERE companyID IN (".implode(', ', $available_companies).") $companyFilter $clientFilter ORDER BY name ASC";
+$result = $conn->query($sql); echo $conn->error;
+//echo $sql;
 ?>
 <table class="table table-hover">
     <thead><tr>

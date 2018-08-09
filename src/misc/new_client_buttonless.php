@@ -12,22 +12,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $isSupplier = ($_POST['create_client_type'] == 'supplier') ? 'TRUE' : 'FALSE'; //5acb8a41e2d9e
         $filterCompanyID = $companyID = intval($_POST['create_client_company']);
 
-        $sql = "INSERT INTO clientData (name, companyID, clientNumber, isSupplier) VALUES('$name', $companyID, '$clientNum', '$isSupplier')";
-        if($conn->query($sql)){
-            $insert_clientID = $conn->insert_id;
-            if($isSupplier == 'FALSE'){
-                $conn->query("INSERT INTO projectData (clientID, name, status, hours, field_1, field_2, field_3)
-                SELECT '$insert_clientID', name, status, hours, field_1, field_2, field_3 FROM $companyDefaultProjectTable WHERE companyID = $companyID");
-            }
-            $conn->query("INSERT INTO $clientDetailTable (clientID) VALUES($insert_clientID)");
-        }
-        if($conn->error){
-            echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
-        } else {
-            showSuccess($lang['OK_CREATE']);
-            if($_POST['create_client_type'] == 'interest') showError('Interessenten zurzeit noch nicht definiert. Wurde als Kunde angelegt.');
-            //echo '<script>window.location="../system/clientDetail?custID='.$insert_clientID.'";</script>';
-        }
+        $conn->query("INSERT INTO clientData (name, companyID, clientNumber, isSupplier) VALUES('$name', $companyID, '$clientNum', '$isSupplier')");
+        if(!$conn->error){
+			showSuccess($lang['OK_CREATE']);
+			$insert_clientID = $conn->insert_id;
+			if($isSupplier == 'FALSE'){
+				$conn->query("INSERT INTO projectData (clientID, name, status, hours, field_1, field_2, field_3)
+				SELECT '$insert_clientID', name, status, hours, field_1, field_2, field_3 FROM $companyDefaultProjectTable WHERE companyID = $companyID");
+				if($conn->error)showError($conn->error.__LINE__);
+			}
+			$conn->query("INSERT INTO $clientDetailTable (clientID) VALUES($insert_clientID)");
+			if($conn->error)showError($conn->error.__LINE__);
+			if($_POST['create_client_type'] == 'interest') showError('Interessenten zurzeit noch nicht definiert. Wurde als Kunde angelegt.');
+		} else {
+			echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+		}
     } elseif(isset($_POST['create_client'])){
         echo '<div class="alert alert-danger fade in">';
         echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
