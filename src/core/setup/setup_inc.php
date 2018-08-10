@@ -1255,6 +1255,7 @@ function create_tables($conn) {
         taskID VARCHAR(100) NOT NULL,
 		userID INT(6) UNSIGNED,
         notedate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		notesubject VARCHAR(75),
         notetext VARCHAR(1000) NOT NULL,
         FOREIGN KEY (taskID) REFERENCES dynamicprojects(projectid)
         ON UPDATE CASCADE

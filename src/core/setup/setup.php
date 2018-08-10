@@ -186,7 +186,13 @@ ini_set('max_execution_time',999);
 			$conn->query("INSERT INTO folder_default_sturctures(category, categoryID, name) VALUES('ARCHIVE', '1', 'Dokumente')");
 			//insert sub categories
 			$conn->query("INSERT INTO dsgvo_categories (name) VALUES ('Geheimhaltungsvereinbarung'),('Auftragsverarbeitung Art. 28'),('IT-Richtlinien'),('Allgemeine-Richtlinien'),('Datenschutzerklärung'),('Vereinbarung nach Art. 26')");
-            //insert holidays
+			//insert tags
+			$conn->query("INSERT INTO tags (value) VALUES('Anruf'), ('Wichtig'), ('Vertraulich'), ('Frage'), ('Information')");
+			$conn->query("INSERT INTO tags (value, type, extra) VALUES('Angebot', 'date_years', '7'), ('Auftragsbestätigung', 'date_years', '7'),
+			('Lieferschein', 'date_years', '7'), ('Nachrichten', 'date_years', '3'), ('Kunde', 'date_years', '7'), ('Lieferant', 'date_years', '7'),
+			('Bewerbung', 'date_months', '6'), ('Interessent', 'date_months', '6'), ('Rechnung', 'date_years', '7')");
+
+			//insert holidays
             $icsFile = file_get_contents(__DIR__ .'/Feiertage.txt');
             foreach (explode("BEGIN:", $icsFile) as $key => $value) {
               $icsDatesMeta[$key] = explode("\n", $value);
@@ -462,7 +468,7 @@ ini_set('max_execution_time',999);
             require "setup_permissions.php";
             setup_permissions();
             // /security
-            
+
               //-------------------------------- GIT -----------------------------------------
 
               $repositoryPath = dirname(dirname(realpath("setup.php")));
