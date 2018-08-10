@@ -3546,6 +3546,13 @@ if($row['version'] < 171){
 	} else {
 		echo "<br>Notizen: Betreff";
 	}
+
+	$conn->query("ALTER TABLE clientData ADD COLUMN status VARCHAR(25)");
+	if($conn->error){
+		echo '<br>', $conn->error;
+	} else {
+		echo "<br>Kunden: Status";
+	}
 }
 // if($row['version'] < 172){}
 // if($row['version'] < 173){}

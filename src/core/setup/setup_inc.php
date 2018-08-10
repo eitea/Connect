@@ -109,6 +109,7 @@ function create_tables($conn) {
         name VARCHAR(60) NOT NULL,
         companyID INT(6) UNSIGNED,
         clientNumber VARCHAR(15),
+		status VARCHAR(25),
         isSupplier VARCHAR(10) DEFAULT 'FALSE',
         FOREIGN KEY (companyID) REFERENCES companyData(id)
         ON UPDATE CASCADE
