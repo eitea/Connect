@@ -98,6 +98,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && Permissions::has("TIMES.WRITE")) {
             }
             $answerText = test_input($_POST['answerText'. $requestID]); //inputs are always set
             $conn->query("UPDATE userRequestsData SET status = '2', answerText = '$answerText' WHERE id = $requestID");
+			if(!$conn->error){ //5b6553ddc8a67
+				sendNotification($row['userID'], 'Antrag OK', 'Ihr Antrag wurde soeben von einem Admin bestätigt. Gehen Sie unter Ihre Anträge um genaueres zu erfahren.');
+			}
         } else {
             echo $conn->error;
         }
