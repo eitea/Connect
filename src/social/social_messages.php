@@ -89,6 +89,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 						}
 					}
 				}
+			} else {
+				echo "NO EXISTING FILES  TES T";
+				print_r($_FILES);
 			}
             if (Permissions::has("POST.EXTERN")) {
                 if (!empty($_POST['new_message_cc_contacts'])) {
@@ -160,7 +163,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $message_encrypt = asymmetric_encryption('CHAT', $message, $userID, $privateKey, 'encrypt', $err);
             $v2Key = $message_encrypt == $message ? '' : $publicKey;
 
-            $conn->query("INSERT INTO messenger_messages(message, participantID, vKey) VALUES('$message_encrypt', $participantID, '$v2Key')");
+            $conn->query("INSERT INTO messenger_messages(message, participantID, vKey) VALUES('$message_encrypt', $participantID, '$v2Key')
+			ON DUPLICATE KEY UPDATE sentTime = DATE_ADD(UTC_TIMESTAMP, INTERVAL 1 second)");
             if ($conn->error) {
                 showError($conn->error.__LINE__);
             }
@@ -227,17 +231,18 @@ while ($row = $result->fetch_assoc()) {
 				ORDER BY mm.sentTime DESC");
             echo $conn->error;
             while ($result && ($row = $result->fetch_assoc())) {
-				$conversationID = $openChatID == $row['id'] ? '' : $row['id']; //5b6a9bbe461cb
-                echo '<tr class="clicker" data-val="'.$conversationID.'">';
+				$dataRefID = $openChatID == $row['id'] ? '' : $row['id']; //5b6a9bbe461cb
+                echo '<tr class="clicker" data-val="'.$dataRefID.'">';
                 echo '<td>', $row['subject'], '</td>';
                 echo '<td><small>', date('d.m.Y H:i', strtotime(carryOverAdder_Hours($row['sentTime'], $timeToUTC))),'</small>',
 					$row['unreadMessages'] ? '<span class="badge badge-alert" title="Ungelesene Nachrichten">'.$row['unreadMessages'] .'</span>' : '', '</td>';
                 echo '<td>';
-				echo '<form method="POST" id="form_openChat_',$conversationID,'"><input type="hidden" name="openChat" value="', $conversationID, '" ></form>';
+				echo '<form method="POST" id="form_openChat_',$dataRefID,'"><input type="hidden" name="openChat" value="', $dataRefID, '" ></form>';
 				if($row['category'] == 'notification'){
 					echo '<b style="color:blue">- System -</b>';
 				} else {
 	                $participantID = $row['participantID'];
+					$conversationID = $row['id'];
 	                $stmt->execute();
 	                $partres = $stmt->get_result();
 	                if ($partres->num_rows < 1) {
@@ -264,7 +269,7 @@ while ($row = $result->fetch_assoc()) {
 				}
 				echo '</td>';
                 echo '</tr> ';
-                if (!$conversationID) {
+                if (!$dataRefID) {
                     echo '<td colspan="4" style="padding:0">';
                     require __DIR__.'/chatwindow.php';
                     echo '</td>';
@@ -277,9 +282,7 @@ while ($row = $result->fetch_assoc()) {
 		</tbody>
 	</table>
 </div>
-
-
-<form method="post">
+<form method="post" enctype="multipart/form-data">
 	<div id="new-message-modal" class="modal fade" tabindex="-1" role="dialog">
 		<div class="modal-dialog modal-content modal-md">
 			<div class="modal-header"><h4>Neue Nachricht</h4></div>
@@ -355,7 +358,7 @@ while ($row = $result->fetch_assoc()) {
 						</div>
 						<div class="col-md-12">
 							<br>
-							<label class="btn btn-default"><input type="file" name="new_message_files[]" style="display:none" multiple />Dateien Hochladen</label>
+							<label class="btn btn-default"><input type="file" name="new_message_files[]" style="display:none" multiple >Dateien Hochladen</label>
 							<br>
 						</div>
 					</div>
@@ -406,14 +409,19 @@ while ($row = $result->fetch_assoc()) {
 
   <?php if ($openChatID): ?>
   var index = <?php echo $openChatID; ?>;
+  var lastmessage = 0;
   setInterval(function(){
 	  $.ajax({
 		url:'ajaxQuery/AJAX_db_utility.php',
 		data:{function: "getNextMessage", conversationID: index},
 		type: 'post',
 		success : function(resp){
-			$("#panel_openChat_"+index).append(resp);
-			$('.scrollDown').each(function(){$(this).scrollTop($(this)[0].scrollHeight) });
+			values = resp.split('#DIVIDE#');
+			if(lastmessage != values[0]){
+				lastmessage = values[0];
+				$("#panel_openChat_"+index).append(values[1]);
+				$('.scrollDown').each(function(){$(this).scrollTop($(this)[0].scrollHeight) });
+			}
 		},
 		error : function(resp){alert(resp);}
 	  });

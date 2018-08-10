@@ -537,6 +537,7 @@ function create_collapse_tree($permission_groups, $name, $x, $children_disabled 
     global $collapse_counter;
     global $permission_name_to_ids;
     global $grantable_modules;
+    global $encrypted_modules; //5b6a879588a8a
     global $lang;
     $children_checked_count = 0;
     $children_checked_team_count = 0;
@@ -546,9 +547,9 @@ function create_collapse_tree($permission_groups, $name, $x, $children_disabled 
     $child_groups = "";
     $children = "";
     $toolbar_expand = $toolbar = "";
-    if ($name == "DSGVO" && /*array_key_exists('DSGVO', $encrypted_modules)&&*/ !array_key_exists('DSGVO', $grantable_modules)) {
+    if ($name == "DSGVO" && array_key_exists('DSGVO', $encrypted_modules) && !array_key_exists('DSGVO', $grantable_modules)) {
         $children_disabled = true;
-    } else if ($name == "ERP" && /*array_key_exists('ERP', $encrypted_modules)&&*/ !array_key_exists('ERP', $grantable_modules)) {
+    } else if ($name == "ERP" && array_key_exists('ERP', $encrypted_modules) && !array_key_exists('ERP', $grantable_modules)) {
         $children_disabled = true;
     }
     foreach ($permission_groups as $key => $value) {
@@ -588,7 +589,7 @@ function create_collapse_tree($permission_groups, $name, $x, $children_disabled 
         $toolbar .= " <a title='Alles deaktivieren' data-toggle='tooltip' data-uncheck-all='#$id' role='button' style='float:right'> <i class='fa fa-fw fa-square-o'></i> </a>";
     }
     $permission_counter = " <span class='badge' title='Anzahl der Berechtigungen' data-toggle='tooltip' data-count-all='#$id' style='float: left'>$children_checked_count / $children_count</span>&nbsp;";
-    if($children_checked_team_count){
+    if ($children_checked_team_count) {
         $permission_counter .= "<span class='pull-left' >&nbsp;&nbsp;&nbsp;</span> <span class='badge' title='Vom Team geerbte Berechtigungen' data-toggle='tooltip' style='float: left'>$children_checked_team_count</span>&nbsp;";
     }
     $display_name = isset($lang[$name]) ? $lang[$name] : ucwords(strtolower($name));

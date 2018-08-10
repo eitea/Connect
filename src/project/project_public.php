@@ -234,6 +234,20 @@ if(!empty($_SESSION['external_id'])){
 } else {
 	$tableName = 'relationship_project_user';
 }
+?>
+<div class="page-header h3"><?php echo $lang['PROJECTS']; ?>
+	<div class="page-header-button-group">
+		<?php include dirname(__DIR__) . '/misc/set_filter.php'; ?>
+		<?php if(Permissions::has("PROJECTS.ADMIN")): ?>
+			<button type="button" class="btn btn-default" data-toggle="modal" data-target=".add-project" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
+		<?php endif; ?>
+	</div>
+</div>
+<?php
+$filterquery = ''; //5b6ac80a57fee
+if($filterings['company']) $filterquery = 'AND clientData.companyID = '.$filterings['company'];
+if($filterings['client']) $filterquery .= ' AND p.clientID = '.$filterings['client'];
+if($filterings['project']) $filterquery .= ' AND p.id = '.$filterings['project'];
 
 if(Permissions::has("PROJECTS.ADMIN")){
 	$result = $conn->query("SELECT id FROM $clientTable WHERE companyID IN (".implode(', ', $available_companies).")");
@@ -245,24 +259,16 @@ if(Permissions::has("PROJECTS.ADMIN")){
 	}
 	$result_outer = $conn->query("SELECT p.name, p.id, p.status, clientData.companyID, clientData.name AS clientName, companyData.name AS companyName
         FROM projectData p INNER JOIN clientData ON clientData.id = p.clientID INNER JOIN companyData ON companyData.id = clientData.companyID
-		WHERE companyID IN (".implode(', ', $available_companies).")");
+		WHERE companyID IN (".implode(', ', $available_companies).") $filterquery");
 } else {
 	$result_outer = $conn->query("SELECT p.name, p.id, p.status, companyData.name AS companyName, clientData.name AS clientName
 		FROM $tableName t LEFT JOIN projectData p ON p.id = t.projectID
-		INNER JOIN clientData ON clientData.id = p.clientID INNER JOIN companyData ON companyData.id = clientData.companyID WHERE t.userID = $userID");
+		INNER JOIN clientData ON clientData.id = p.clientID INNER JOIN companyData ON companyData.id = clientData.companyID
+		WHERE t.userID = $userID $filterquery");
 }
 
 echo $conn->error
 ?>
-<div class="page-header h3"><?php echo $lang['PROJECTS']; ?>
-	<div class="page-header-button-group">
-		<?php include dirname(__DIR__) . '/misc/set_filter.php'; ?>
-		<?php if(Permissions::has("PROJECTS.ADMIN")): ?>
-			<button type="button" class="btn btn-default" data-toggle="modal" data-target=".add-project" title="<?php echo $lang['ADD']; ?>" ><i class="fa fa-plus"></i></button>
-		<?php endif; ?>
-	</div>
-</div>
-
 <form method="POST">
     <table class="table table-hover">
         <thead>

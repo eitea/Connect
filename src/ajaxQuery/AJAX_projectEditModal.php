@@ -18,7 +18,7 @@ if(!empty($_SESSION['external_id'])){
 
 
 $result = $conn->query("SELECT p.*, c.companyID, s.publicKey, s.symmetricKey, c.name AS clientName FROM projectData p INNER JOIN clientData c ON p.clientID = c.id
-INNER JOIN security_projects s ON s.projectID = p.id AND s.outDated = 'FALSE' WHERE p.id = $projectID LIMIT 1"); echo $conn->error;
+LEFT JOIN security_projects s ON s.projectID = p.id AND s.outDated = 'FALSE' WHERE p.id = $projectID LIMIT 1"); echo $conn->error;
 $projectRow = $result->fetch_assoc();
 if(!$projectRow) { include dirname(__DIR__).DIRECTORY_SEPARATOR.'footer.php'; die($lang['ERROR_UNEXPECTED']); }
 

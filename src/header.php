@@ -166,6 +166,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     if (isset($_SESSION['posttimer']) && (time() - $_SESSION['posttimer']) < 2) {
         $_POST = array();
+		$validation_output = showWarning("Request wurde gestoppt (zu schnell)", 1);
     }
     $_SESSION['posttimer'] = time();
     if(isset($_POST['savePAS']) && !empty($_POST['passwordCurrent']) && !empty($_POST['password']) && !empty($_POST['passwordConfirm']) && crypt($_POST['passwordCurrent'], $userdata['psw']) == $userdata['psw']){
@@ -735,7 +736,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 							"badge" => ["count" => $dynamic_projects_menu_item_badge]
                         ],
                         "ADDRESS_BOOK" => [
-                            "show" => Permissions::has("ERP.CLIENTS") || Permissions::has("ERP.SUPPLIERS"),
+                            "show" => Permissions::has("CLIENTS.READ") || Permissions::has("SUPPLIERS.READ"),
                             "href" => "system/clients",
                             "icon" => "fa fa-fw fa-file-text-o",
                         ],
@@ -951,7 +952,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                                 requireInteraction: true
                             })
                             unreadMessageNotification.onclick = function(event){
-                                window.location.href = "../social/post" 
+                                window.location.href = "../social/post"
                                 window.focus();
                                 this.close();
                             }

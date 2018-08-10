@@ -187,8 +187,10 @@ $notesResult = $conn->query("SELECT userID, notedate, notetext, firstname, lastn
 							}
 							if($dynrow['v2']){
 								$description = asymmetric_encryption('TASK', $dynrow['projectdescription'], $userID, $privateKey, $dynrow['v2']);
-							} else {
+							} elseif(timeDiff_Hours($dynrow['projectstart'], '2018-05-27') < 0) {
 								$description = asymmetric_seal('TASK', $dynrow['projectdescription'], 'decrypt', $userID, $privateKey);
+							} else {
+								$description = $dynrow['projectdescription'];
 							}
 
 							if($archiveResult && $archiveResult->num_rows > 0){
@@ -207,7 +209,6 @@ $notesResult = $conn->query("SELECT userID, notedate, notetext, firstname, lastn
 							            'Bucket' => $bucket,
 							            'Key' => $row['uniqID']
 							        ));
-
 									if($dynrow['v2']){
 										$objectBody = asymmetric_encryption('TASK', $object[ 'Body' ], $userID, $privateKey, $dynrow['v2']);
 									} else {
@@ -235,16 +236,19 @@ $notesResult = $conn->query("SELECT userID, notedate, notetext, firstname, lastn
 								<tr>
 									<th>Benutzer</th>
 									<th>Datum</th>
-									<th>Notiz</th>
+									<th>Betreff</th>
 								</tr>
 							</thead>
 							<tbody>
 								<?php
 								while($row = $notesResult->fetch_assoc()){
-									echo '<tr>';
+									echo '<tr class="clicker">'; //5b6ab9c6b0609
 									echo '<td>',$row['firstname'],' ',$row['lastname'],'</td>';
 									echo '<td>',date('d.m.Y H:i', strtotime(carryOverAdder_Hours($row['notedate'], $timeToUTC))),'</td>';
-									echo '<td>',$row['notetext'],'</td>';
+									echo '<td>',$row['notesubject'],'</td>';
+									echo '</tr>';
+									echo '<tr style="display:none">';
+									echo '<td colspan="3">',$row['notetext'],'</td>';
 									echo '</tr>';
 								}
 								?>

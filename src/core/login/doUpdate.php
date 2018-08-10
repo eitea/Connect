@@ -3514,19 +3514,48 @@ if($row['version'] < 169){
 
     $conn->query("ALTER TABLE socialprofile MODIFY COLUMN new_message_notification ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'");
     if($conn->error){
-        echo $conn->error;
+        echo '<br>', $conn->error;
     }else{
         echo "<br>new_message_notification default true";
     }
     $conn->query("UPDATE socialprofile SET new_message_notification = 'TRUE'");
     if($conn->error){
-        echo $conn->error;
+        echo '<br>', $conn->error;
     }else{
         echo "<br>new_message_notification existing true";
     }
 }
 
 if($row['version'] < 170){
+	setup_permissions();
+}
+if($row['version'] < 171){
+	//5b6d28165191c
+	$conn->query("INSERT INTO tags (value, type, extra) VALUES('Angebot', 'date_years', '7'), ('Auftragsbestätigung', 'date_years', '7'),
+	('Lieferschein', 'date_years', '7'), ('Nachrichten', 'date_years', '3'), ('Kunde', 'date_years', '7'), ('Lieferant', 'date_years', '7'),
+	('Bewerbung', 'date_months', '6'), ('Interessent', 'date_months', '6'), ('Rechnung', 'date_years', '7')");
+	if($conn->error){
+		echo '<br>', $conn->error;
+	} else {
+		echo "<br>Tags: Weitere default Tags hinzugefügt";
+	}
+
+	$conn->query("ALTER TABLE dynamicprojectsnotes ADD COLUMN notesubject VARCHAR(75)");
+	if($conn->error){
+		echo '<br>', $conn->error;
+	} else {
+		echo "<br>Notizen: Betreff";
+	}
+
+	$conn->query("ALTER TABLE clientData ADD COLUMN status VARCHAR(25)");
+	if($conn->error){
+		echo '<br>', $conn->error;
+	} else {
+		echo "<br>Kunden: Status";
+	}
+}
+
+if($row['version'] < 172){
     $sql = "CREATE TABLE default_access_permissions (
         permissionID INT(10) UNSIGNED NOT NULL,
         PRIMARY KEY (permissionID),
@@ -3538,10 +3567,13 @@ if($row['version'] < 170){
         echo "Permissions: defaults";
     }
 }
-
-// if($row['version'] < 171){}
-// if($row['version'] < 172){}
 // if($row['version'] < 173){}
+// if($row['version'] < 174){}
+// if($row['version'] < 175){}
+// if($row['version'] < 176){}
+// if($row['version'] < 177){}
+// if($row['version'] < 178){}
+// if($row['version'] < 179){}
 
 //cleanups for maintainable db sizes
 $conn->query("DELETE FROM `checkinLogs` WHERE id <= ( SELECT id FROM ( SELECT id FROM `checkinLogs` ORDER BY id DESC LIMIT 1 OFFSET 100 ) foo )");echo $conn->error;

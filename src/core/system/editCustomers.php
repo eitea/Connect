@@ -1,6 +1,10 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; ?>
 <?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php
+//5b6b24500a084
+if(!Permissions::has("CLIENTS.READ") && !Permissions::has("SUPPLIERS.READ")){
+	die('Missing permissions');
+}
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, 'supplier' => 0); //set_filter requirement
 if(isset($_GET['cmp'])){ $filterings['company'] = test_input($_GET['cmp']); }
 if(isset($_GET['custID'])){ $filterings['client'] = test_input($_GET['custID']);}
@@ -346,13 +350,23 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <?php include dirname(dirname(__DIR__)) . "/misc/new_client_buttonless.php"; ?>
 
 <?php
-$companyQuery = $clientQuery = "";
-if($filterings['company']){$companyQuery = "AND clientData.companyID = ".$filterings['company']; }
-if($filterings['client']){$clientQuery = "AND clientData.id = ".$filterings['client']; }
-if($filterings['supplier']){$clientQuery .= " OR clientData.id = ".$filterings['client']; }
+if(!empty($insert_clientID)) $filterings['client'] = $filterings['supplier'] = $insert_clientID; //5b3ef9e59d6ed
+$companyFilter = $clientFilter = "";
+if($filterings['company']){$companyFilter = "AND clientData.companyID = ".$filterings['company']; }
+if($filterings['client']){
+	$clientFilter = "clientData.id = ".$filterings['client'];
+	if($filterings['supplier']){$clientFilter = "($clientFilter OR clientData.id = ".$filterings['supplier'].")"; }
+	$clientFilter = "AND $clientFilter";
+} elseif($filterings['supplier']){$clientFilter = "clientData.id = ".$filterings['supplier']; }
 
-$result = $conn->query("SELECT clientData.*, companyData.name AS companyName FROM clientData INNER JOIN companyData ON clientData.companyID = companyData.id
-WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clientQuery ORDER BY name ASC"); echo $conn->error;
+// echo "<pre>";
+// print_r($filterings);
+// echo '</pre>';
+
+$sql = "SELECT clientData.*, companyData.name AS companyName FROM clientData INNER JOIN companyData ON clientData.companyID = companyData.id
+WHERE companyID IN (".implode(', ', $available_companies).") $companyFilter $clientFilter ORDER BY name ASC";
+$result = $conn->query($sql); echo $conn->error;
+//echo $sql;
 ?>
 <table class="table table-hover">
     <thead><tr>
@@ -372,7 +386,7 @@ WHERE companyID IN (".implode(', ', $available_companies).") $companyQuery $clie
             echo ($row['isSupplier'] == 'FALSE') ? '<td>'.$lang['CLIENT'].'</td>' : '<td>'.$lang['SUPPLIER'].'</td>';
             echo '<td>'.$row['clientNumber'].'</td>';
             echo '<td>';
-            if(($row['isSupplier'] == 'FALSE' && Permissions::has("ERP.CLIENTS")) || ($row['isSupplier'] == 'TRUE' && Permissions::has("ERP.SUPPLIERS"))){
+            if(($row['isSupplier'] == 'FALSE' && Permissions::has("CLIENTS.WRITE")) || ($row['isSupplier'] == 'TRUE' && Permissions::has("SUPPLIERS.WRITE"))){
                 echo '<button type="button" class="btn btn-default" name="deleteModal" value="'.$row['id'].'" title="'.$lang['DELETE'].'" ><i class="fa fa-trash-o"></i></button>';
                 echo '<button type="button" class="btn btn-default" name="editModal" value="'.$row['id'].'" ><i class="fa fa-pencil"></i></button>';
 

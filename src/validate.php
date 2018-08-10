@@ -1,8 +1,8 @@
 <?php
 
 
-/** 
- * Usage: 
+/**
+ * Usage:
  * Permissions::has("CORE"); // any core permission
  * Permissions::has("WRITE:CORE"); // any write core permission
  * Permissions::has("WRITE:CORE.SETTINGS"); // CORE.SETTINGS permission
@@ -34,7 +34,15 @@ class Permissions
       'COMPANIES',
       'TEAMS',
       'SETTINGS',
-      'TEMPLATES'
+      'TEMPLATES',
+	  'CLIENTS' => [
+		  'READ',
+		  'WRITE'
+	  ],
+	  'SUPPLIERS' => [
+		  'READ',
+		  'WRITE'
+	  ]
     ],
     'TIMES' => [
       'READ',
@@ -56,8 +64,6 @@ class Permissions
     ],
     'ERP' => [
       'PROCESS',
-      'CLIENTS',
-      'SUPPLIERS',
       'ARTICLE',
       'RECEIPT_BOOK',
       'VACANT_POSITIONS',
@@ -99,7 +105,7 @@ class Permissions
 
   /**
    * Tests if a user has a permission (either directly or inherited from team)
-   * 
+   *
    * @param string $permission
    * @param int|false $userID User ID; uses $_SESSION if false
    * @return boolean
@@ -182,7 +188,7 @@ class Permissions
   /**
    * Tests if the team has the permission
    * @param string $permission A permission string eg "CORE.SETTINGS"
-   * @param int $teamID 
+   * @param int $teamID
    */
   public static function has_team($permission, $teamID) : bool
   {
@@ -219,7 +225,7 @@ class Permissions
   }
 
   /**
-   * Does nothing when user has permission. When the user doesn't have permission, 
+   * Does nothing when user has permission. When the user doesn't have permission,
    * a message and the footer are displayed and the script execution stops
    * @param string $permission A permission string eg "CORE.SETTINGS"
    * @param int|false $userID User ID (uses $_SESSION if false)
@@ -236,8 +242,8 @@ class Permissions
 
   /**
    * Called when Permission::has() is called and the permission isn't in the cache
-   * Needs to be called after a permission change (in security settings) 
-   * 
+   * Needs to be called after a permission change (in security settings)
+   *
    * Caches every permission since create_menu tests permissions for every leaf.
    * 
    * @return void
@@ -260,8 +266,8 @@ class Permissions
 
   /**
    * Called when Permission::has() is called and the permission isn't in the cache
-   * Needs to be called after a permission change (in security settings) 
-   * 
+   * Needs to be called after a permission change (in security settings)
+   *
    * Caches every permission since create_menu tests permissions for every leaf.
    * 
    * @return void
@@ -346,8 +352,8 @@ class Permissions
     $table = $mode == "USER" ? "relationship_access_permissions" : ($mode == "TEAM" ? "relationship_team_access_permissions" : "default_access_permissions");
     $additional_query = $mode == "USER" ? "AND rel.userID = $id" : ($mode == "TEAM" ? "AND rel.teamID = $id" : "");
     $result = $conn->query("SELECT groups.name g_name, perm.name p_name, rel.permissionID perm_id
-                            FROM access_permission_groups groups 
-                            LEFT JOIN access_permissions perm ON perm.groupID = groups.id 
+                            FROM access_permission_groups groups
+                            LEFT JOIN access_permissions perm ON perm.groupID = groups.id
                             LEFT JOIN $table rel ON rel.permissionID = perm.id
                             $additional_query");
     echo $conn->error;
@@ -407,7 +413,7 @@ class Permissions
   }
 
   /**
-   * This function takes a permission string ("WRITE:CORE.SETTINGS" or "CORE.SETTINGS") and 
+   * This function takes a permission string ("WRITE:CORE.SETTINGS" or "CORE.SETTINGS") and
    * returns the full permission
    */
   protected static function parse($str)

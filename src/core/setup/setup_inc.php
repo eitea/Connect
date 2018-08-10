@@ -109,6 +109,7 @@ function create_tables($conn) {
         name VARCHAR(60) NOT NULL,
         companyID INT(6) UNSIGNED,
         clientNumber VARCHAR(15),
+		status VARCHAR(25),
         isSupplier VARCHAR(10) DEFAULT 'FALSE',
         FOREIGN KEY (companyID) REFERENCES companyData(id)
         ON UPDATE CASCADE
@@ -1255,6 +1256,7 @@ function create_tables($conn) {
         taskID VARCHAR(100) NOT NULL,
 		userID INT(6) UNSIGNED,
         notedate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		notesubject VARCHAR(75),
         notetext VARCHAR(1000) NOT NULL,
         FOREIGN KEY (taskID) REFERENCES dynamicprojects(projectid)
         ON UPDATE CASCADE

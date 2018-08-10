@@ -37,7 +37,7 @@ $routes = [ // each route has a path and an optional permission
     'system/tasks' => ["path" => 'core/system/taskScheduler.php', "permission" => "CORE.SETTINGS"],
     'system/backup' => ["path" => 'core/system/system_backup.php', "permission" => "CORE.SETTINGS"],
     'system/restore' => ["path" => 'core/system/system_restore.php', "permission" => "CORE.SETTINGS"],
-    'system/clients' => ["path" => 'core/system/editCustomers.php', "permission" => "ERP.CLIENTS"],
+    'system/clients' => ["path" => 'core/system/editCustomers.php'],
     'system/archive' => ["path" => 'core/system/options_archive.php', "permission" => "CORE.SETTINGS"],
     'system/security' => ["path" => 'core/system/securitySettings.php', "permission" => "CORE.SECURITY"],
     'system/restic' => ["path" => 'core/system/resticBackup.php', "permission" => "CORE.SETTINGS"],
@@ -116,8 +116,7 @@ $mime_types = array(
 	'.gif' => "image/gif",                '.woff' => "application/font-woff",       '.ttf' => "font/opentype"
 );
 
-function has_permission_for_route($route)
-{
+function has_permission_for_route($route) {
     if (isset($route["permission"]) && $route["permission"]) {
         require_once "src" . DIRECTORY_SEPARATOR . "validate.php";
         return Permissions::has($route["permission"]);
@@ -136,8 +135,7 @@ if($l > 1){
 		$this_page = basename($routes[$route]["path"]);
 		$this_route = $routes[$route];
 		$this_url = $route;
-		$has_permission_to_view_page = has_permission_for_route($this_route);
-		if(!$has_permission_to_view_page){
+		if(!has_permission_for_route($this_route)){
             header('HTTP/1.0 401 Unauthorized');
             $error_message = "Unauthorized";
             $permission_name = $this_route["permission"];
