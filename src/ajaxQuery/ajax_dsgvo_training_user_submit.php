@@ -134,9 +134,9 @@ foreach ($result as $formVal => $answer) {
                 ON DUPLICATE KEY UPDATE correct = '$questionRightQuery', version = $version, tries = tries + 1, duration = $time, lastAnswered = CURRENT_TIMESTAMP");
             showError($conn->error);
             if ($survey) {
+                $delete_survey_answers->execute();
+                showError($delete_survey_answers->error);
                 foreach ($answers as $identifier) {
-                    $delete_survey_answers->execute();
-                    showError($delete_survey_answers->error);
                     $insert_survey_answers->execute();
                     showError($insert_survey_answers->error);
                 }

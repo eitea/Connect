@@ -1,12 +1,13 @@
 <?php
 session_start();
-if (!isset($_REQUEST["trainingID"])){
+if (!isset($_REQUEST["trainingID"])) {
     echo "error";
     die();
 }
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "connection.php";
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "language.php";
 require dirname(__DIR__) . DIRECTORY_SEPARATOR . "dsgvo" . DIRECTORY_SEPARATOR . "dsgvo_training_common.php";
+require dirname(__DIR__) . DIRECTORY_SEPARATOR . "utilities.php";
 
 function formatPercent($num)
 {
@@ -49,8 +50,8 @@ $result = $conn->query(
      INNER JOIN UserData ON UserData.id = relationship_company_client.userID
      WHERE dsgvo_training_company_relations.trainingID = $trainingID"
 );
-while($row = $result->fetch_assoc()){
-    $userArray[] = array("id"=>$row["userID"],"name"=>$row["firstname"]." ".$row["lastname"]);
+while ($row = $result->fetch_assoc()) {
+    $userArray[] = array("id" => $row["userID"], "name" => $row["firstname"] . " " . $row["lastname"]);
 }
 $nameArray = array();
 foreach ($userArray as $user) {
@@ -99,14 +100,14 @@ foreach ($userArray as $user) {
     $dataSet["count"]["wrong"][] = $wrong;
     $dataSet["count"]["unanswered"][] = $unanswered;
     $dataSet["count"]["survey"][] = $survey;
-    $dataSet["outline"]["right"][] ="rgb(50, 173, 22)";
-    $dataSet["outline"]["wrong"][] ="rgb(244, 92, 65)";
-    $dataSet["outline"]["unanswered"][] ="rgb(153, 153, 153)";
-    $dataSet["outline"]["survey"][] ="rgb(22, 77, 173)";
-    $dataSet["color"]["right"][] ="rgba(50, 173, 22, 0.2)";
-    $dataSet["color"]["wrong"][] ="rgba(244, 92, 65, 0.2)";
-    $dataSet["color"]["unanswered"][] ="rgba(153, 153, 153, 0.2)";
-    $dataSet["color"]["survey"][] ="rgba(22, 77, 173, 0.2)";
+    $dataSet["outline"]["right"][] = "rgb(50, 173, 22)";
+    $dataSet["outline"]["wrong"][] = "rgb(244, 92, 65)";
+    $dataSet["outline"]["unanswered"][] = "rgb(153, 153, 153)";
+    $dataSet["outline"]["survey"][] = "rgb(22, 77, 173)";
+    $dataSet["color"]["right"][] = "rgba(50, 173, 22, 0.2)";
+    $dataSet["color"]["wrong"][] = "rgba(244, 92, 65, 0.2)";
+    $dataSet["color"]["unanswered"][] = "rgba(153, 153, 153, 0.2)";
+    $dataSet["color"]["survey"][] = "rgba(22, 77, 173, 0.2)";
 }
 ?>
 <script src="plugins/chartsjs/Chart.min.js"></script>
@@ -118,7 +119,8 @@ foreach ($userArray as $user) {
         <ul class="nav nav-tabs nav-justified">
    <li class="active"><a href="#training-results" data-toggle="tab">Zusammenfassung</a></li>
    <li><a href="#training-table" data-toggle="tab">Tabelle</a></li>
-   <li><a href="#training-questions" data-toggle="tab">Beantwortete Fragen</a></li>
+   <li><a href="#training-questions" data-toggle="tab">Anzahl der Antworten pro Frage</a></li>
+   <li><a href="#training-matrix-questions" data-toggle="tab">Matrix</a></li>
 </ul>
 
 <div class="tab-content">
@@ -161,8 +163,8 @@ foreach ($userArray as $user) {
                         $survey = intval($result->fetch_assoc()["count"]);
                         $unanswered = $numberOfQuestions - $right - $wrong - $survey;
                         $base = ($numberOfQuestions - $survey);
-                        $percentRight = ($right / ($base?$base:1));
-                        $percentWrong = ($wrong / ($base?$base:1));
+                        $percentRight = ($right / ($base ? $base : 1));
+                        $percentWrong = ($wrong / ($base ? $base : 1));
                         $percentUnanswered = ($unanswered / $numberOfQuestions);
                         $result = $conn->query("SELECT sum(duration) duration
                         FROM dsgvo_training_questions
@@ -178,16 +180,16 @@ foreach ($userArray as $user) {
                             $noAnswers = false;
                         }
                         echo "<tr>";
-                        if($survey_are_suspended && $unanswered != 0){
-                            echo "<td><i title='Aufgeschoben' data-container='body' data-toggle='tooltip' class='fa fa-fw fa-hourglass-half'><i></td>";
-                        }else{
+                        if ($survey_are_suspended && $unanswered != 0) {
+                            echo "<td><i title='Aufgeschoben' data-container='body' data-toggle='tooltip' class='fa fa-hourglass-half'><i></td>";
+                        } else {
                             echo "<td></td>";
                         }
                         // echo "<td>$id</td>";
                         echo "<td>$name</td>";
-                        echo "<td style='background-color:" . percentage_to_color($percentRight, false, $noAnswers || $base == 0) . ";'>$right (".formatPercent($percentRight). ")</td>";
-                        echo "<td style='background-color:" . percentage_to_color($percentWrong, true, $noAnswers || $base == 0) . ";'>$wrong (".formatPercent($percentWrong). ")</td>";
-                        echo "<td style='background-color:" . percentage_to_color($percentUnanswered, true, $noAnswers) . ";'>$unanswered (".formatPercent($percentUnanswered). ")</td>";
+                        echo "<td style='background-color:" . percentage_to_color($percentRight, false, $noAnswers || $base == 0) . ";'>$right (" . formatPercent($percentRight) . ")</td>";
+                        echo "<td style='background-color:" . percentage_to_color($percentWrong, true, $noAnswers || $base == 0) . ";'>$wrong (" . formatPercent($percentWrong) . ")</td>";
+                        echo "<td style='background-color:" . percentage_to_color($percentUnanswered, true, $noAnswers) . ";'>$unanswered (" . formatPercent($percentUnanswered) . ")</td>";
                         echo "<td style='background-color:#5086e5;'>" . $survey . "</td>";
                         echo "<td>" . formatTime($time, $noAnswers) . "</td>";
                         echo "<td>" . formatTime($timePerQuestion, $noAnswers) . "</td>";
@@ -201,9 +203,10 @@ foreach ($userArray as $user) {
             <?php endif; ?></div>
             <div class="tab-pane fade" id="training-questions">
                 <?php 
-                    $result = $conn->query("SELECT title, survey, id, version FROM dsgvo_training_questions WHERE trainingID = $trainingID");
-                    if($result){
-                        ?>
+                $result = $conn->query("SELECT title, survey, id, version FROM dsgvo_training_questions WHERE trainingID = $trainingID");
+                $question_array = [];
+                if ($result) {
+                    ?>
                             <table class="table table-hover vertical-align" >
                                 <thead>
                                     <tr>
@@ -215,19 +218,20 @@ foreach ($userArray as $user) {
                                 </thead>
                                 <tbody>
                                 <?php
-                                while($result && ($row = $result->fetch_assoc())){
+                                while ($result && ($row = $result->fetch_assoc())) {
                                     $title = $row["title"];
-                                    $survey = $lang[$row["survey"] == 'TRUE'?'YES':'NO'];
+                                    $survey = $lang[$row["survey"] == 'TRUE' ? 'YES' : 'NO'];
                                     $version = $row["version"];
                                     $questionID = $row["id"];
                                     $total = count($userArray);
-                                    $percentage = $total != 0? "(".formatPercent($answers/$total).")":"";
-                                    
+                                    $percentage = $total != 0 ? "(" . formatPercent($answers / $total) . ")" : "";
+                                    $question_array[] = ["id" => $questionID, "title" => $title, "survey" => $row["survey"]];
+
                                     $answer_result = $conn->query("SELECT count(*) answers FROM dsgvo_training_completed_questions WHERE questionID = $questionID");
                                     echo $conn->error;
-                                    $answers =$answer_result?$answer_result->fetch_assoc()["answers"]:0;
+                                    $answers = $answer_result ? $answer_result->fetch_assoc()["answers"] : 0;
 
-                                    echo "<tr style='background-color:" . percentage_to_color($answers/($total?$total:1)) . "'>";
+                                    echo "<tr style='background-color:" . percentage_to_color($answers / ($total ? $total : 1)) . "'>";
                                     echo "<td>$title</td>";
                                     echo "<td>$answers/$total $percentage</td>";
                                     echo "<td>$version</td>";
@@ -238,10 +242,85 @@ foreach ($userArray as $user) {
                                 </tbody>
                             </table>
                         <?php
-                    }else{
+
+                    } else {
                         echo "No data";
                     }
-                ?>
+                    ?>
+            </div>
+            <div class="tab-pane fade" id="training-matrix-questions">
+            <?php if ($numberOfQuestions != 0) : ?>
+            <table class="table table-hover text-center vertical-align" >
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <?php
+                        foreach ($question_array as $question) {
+                            $question_title = $question["title"];
+                            $question_id = $question["id"];
+                            // echo "<th style='background-color: " . str_to_hsl_color($question_id, "80%", "80%") . "'>$question_title</th>";
+                            echo "<th>$question_title</th>";
+                        }
+                        ?>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $select_survey_answers_stmt = $conn->prepare("SELECT identifier from dsgvo_training_completed_questions_survey_answers WHERE questionID = ? AND userID = ?");
+                    $select_survey_answers_stmt->bind_param("ii", $question_id, $id);
+
+                    foreach ($userArray as $user) {
+                        $id = $user["id"];
+                        list($sql_error, $survey_are_suspended) = surveys_are_suspended_query($id, true);
+                        $name = $user["name"];
+                        echo "<tr>";
+                        if ($survey_are_suspended && $unanswered != 0) {
+                            echo "<td><i title='Aufgeschoben' data-container='body' data-toggle='tooltip' class='fa fa-hourglass-half'><i></td>";
+                        } else {
+                            echo "<td></td>";
+                        }
+                        echo "<td>$name</td>";
+                        foreach ($question_array as $question) {
+                            $question_title = $question["title"];
+                            $question_id = $question["id"];
+
+                            $result = $conn->query("SELECT survey, correct FROM dsgvo_training_questions
+                                                    INNER JOIN dsgvo_training_completed_questions 
+                                                    ON dsgvo_training_completed_questions.questionID = dsgvo_training_questions.id
+                                                    WHERE userID = $id AND dsgvo_training_questions.id = $question_id");
+                            echo $conn->error;
+                            if ($result && $row = $result->fetch_assoc()) {
+                                $survey = $row["survey"] == "TRUE";
+                                if ($survey) {
+                                    $user_survey_answers = [];
+                                    $select_survey_answers_stmt->execute();
+                                    showError($select_survey_answers_stmt->error);
+                                    $answer_result = $select_survey_answers_stmt->get_result();
+                                    while ($answer_row = $answer_result->fetch_assoc()) {
+                                        $user_survey_answers[] = $answer_row["identifier"];
+                                    }
+                                    $answer_result->free();
+                                    $answer = implode(", ", $user_survey_answers);
+                                    $bg_color = '#5ec0e8';
+                                } else {
+                                    $answer = $row['correct'] == "TRUE" ? '<i class="fa fa-check" aria-hidden="true"></i>' : '<i class="fa fa-times" aria-hidden="true"></i>';
+                                    $bg_color = $row['correct'] == "TRUE" ? '#bae85f' : '#e8815e';
+                                }
+                                echo "<td style='background-color: $bg_color;'>$answer</td>";
+                            } else {
+                                echo "<td style='background-color: #eaeaea'>-</td>";
+                            }
+
+                        }
+                        echo "</tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
+            <?php else : ?>
+                Noch keine Daten vorhanden
+            <?php endif; ?>
             </div>
 </div>
         
@@ -253,25 +332,25 @@ var myChart = new Chart(ctx, {
     data: {
         labels: <?php echo json_encode($nameArray) ?>,
         datasets: [{
-            label: "<?=$lang['TRAINING_QUESTION_CORRECT']['TRUE']?>",
+            label: "<?= $lang['TRAINING_QUESTION_CORRECT']['TRUE'] ?>",
             data: <?php echo json_encode($dataSet["count"]["right"]) ?>,
             backgroundColor: <?php echo json_encode($dataSet["color"]["right"]) ?>,
             borderColor: <?php echo json_encode($dataSet["outline"]["right"]) ?>,
             borderWidth: 1
         },{
-            label: "<?=$lang['TRAINING_QUESTION_CORRECT']['FALSE']?>",
+            label: "<?= $lang['TRAINING_QUESTION_CORRECT']['FALSE'] ?>",
             data: <?php echo json_encode($dataSet["count"]["wrong"]) ?>,
             backgroundColor: <?php echo json_encode($dataSet["color"]["wrong"]) ?>,
             borderColor: <?php echo json_encode($dataSet["outline"]["wrong"]) ?>,
             borderWidth: 1
         },{
-            label: "<?=$lang['TRAINING_QUESTION_CORRECT']['SURVEY']?>",
+            label: "<?= $lang['TRAINING_QUESTION_CORRECT']['SURVEY'] ?>",
             data: <?php echo json_encode($dataSet["count"]["survey"]) ?>,
             backgroundColor: <?php echo json_encode($dataSet["color"]["survey"]) ?>,
             borderColor: <?php echo json_encode($dataSet["outline"]["survey"]) ?>,
             borderWidth: 1
         },{
-            label: "<?=$lang['TRAINING_QUESTION_CORRECT']['UNANSWERED']?>",
+            label: "<?= $lang['TRAINING_QUESTION_CORRECT']['UNANSWERED'] ?>",
             data: <?php echo json_encode($dataSet["count"]["unanswered"]) ?>,
             backgroundColor: <?php echo json_encode($dataSet["color"]["unanswered"]) ?>,
             borderColor: <?php echo json_encode($dataSet["outline"]["unanswered"]) ?>,
