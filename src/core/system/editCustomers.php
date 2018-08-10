@@ -350,7 +350,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <?php include dirname(dirname(__DIR__)) . "/misc/new_client_buttonless.php"; ?>
 
 <?php
-if($insert_clientID) $filterings['client'] = $filterings['supplier'] = $insert_clientID; //5b3ef9e59d6ed
+if(!empty($insert_clientID)) $filterings['client'] = $filterings['supplier'] = $insert_clientID; //5b3ef9e59d6ed
 $companyFilter = $clientFilter = "";
 if($filterings['company']){$companyFilter = "AND clientData.companyID = ".$filterings['company']; }
 if($filterings['client']){

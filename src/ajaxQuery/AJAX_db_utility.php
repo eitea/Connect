@@ -63,28 +63,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 				AND rcp2.status != 'exited' AND rcp2.partType = 'USER' AND rcp2.partID = '$userID')
 				ORDER BY m.sentTime DESC) AS tbl ORDER BY tbl.sentTime ASC");
 				echo $conn->error;
+			$lastmessage = $response = '';
 			while($result && ($row_cw = $result->fetch_assoc())){
 				if($row_cw['partType'] == 'USER' && $row_cw['partID'] != $userID){
-					echo '<div style="display:table;width:100%;">';
-					echo '<p style="font-size:75%;">', substr(carryOverAdder_Hours($row_cw['sentTime'], $timeToUTC),11,5), '</p>';
-					echo '<div class="well" style="width:70%;margin-bottom:10px;float:left;" >';
-					if($row_cw['type'] == 'text') echo asymmetric_encryption('CHAT', $row_cw['message'], $userID, $privateKey, $row_cw['vKey']);
+					$lastmessage = $row_cw['messageID'];
+					$response .= '<div style="display:table;width:100%;">';
+					$response .= '<p style="font-size:75%;">'. substr(carryOverAdder_Hours($row_cw['sentTime'], $timeToUTC),11,5). '</p>';
+					$response .= '<div class="well" style="width:70%;margin-bottom:10px;float:left;" >';
+					if($row_cw['type'] == 'text') $response .= asymmetric_encryption('CHAT', $row_cw['message'], $userID, $privateKey, $row_cw['vKey']);
 					if($row_cw['type'] == 'file' && $row_cw['fileName']) {
-						echo '<form method="POST" action="../project/detailDownload" target="_blank">
-						<input type="hidden" name="keyReference" value="CHAT_',$row_cw['messageID'],'" />
-						<button type="submit" class="btn btn-link" name="download-file" value="',$row_cw['message'],'"><i class="fa fa-file-text-o"></i> ',$row_cw['fileName'],'.',$row_cw['fileType'],'</form>';
-					} elseif($row_cw['type'] == 'file'){
-						$conn->query("DELETE FROM messenger_messages WHERE id = ".$row_cw['messageID']); //remove this after the update.
+						$response .= '<form method="POST" action="../project/detailDownload" target="_blank">
+						<input type="hidden" name="keyReference" value="CHAT_'.$row_cw['messageID'].'" />
+						<button type="submit" class="btn btn-link" name="download-file" value="'.$row_cw['message'].'">
+						<i class="fa fa-file-text-o"></i> '.$row_cw['fileName'].'.'.$row_cw['fileType'].'</form>';
 					}
-					echo '</div>';
-					echo '</div>';
+					$response .= '</div></div>';
 				}
 			}
-			// 5b6aa7855a90e - this shall not mark things as "read"
+			// 5b6aa7855a90e - this shall not mark things as "read" but if this is not set, it will fetch the same message over and over again
 			// $conn->query("UPDATE relationship_conversation_participant SET lastCheck = UTC_TIMESTAMP
 			// 	WHERE conversationID = $conversationID AND partType = 'USER' AND partID = $userID");
+			if($lastmessage) echo $lastmessage,'#DIVIDE#',$response;
 			break;
-
 	}
 
 }
