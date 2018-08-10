@@ -187,8 +187,10 @@ $notesResult = $conn->query("SELECT userID, notedate, notetext, firstname, lastn
 							}
 							if($dynrow['v2']){
 								$description = asymmetric_encryption('TASK', $dynrow['projectdescription'], $userID, $privateKey, $dynrow['v2']);
-							} else {
+							} elseif(timeDiff_Hours($dynrow['projectstart'], '2018-05-27') < 0) {
 								$description = asymmetric_seal('TASK', $dynrow['projectdescription'], 'decrypt', $userID, $privateKey);
+							} else {
+								$description = $dynrow['projectdescription'];
 							}
 
 							if($archiveResult && $archiveResult->num_rows > 0){
