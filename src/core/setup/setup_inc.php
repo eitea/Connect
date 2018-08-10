@@ -1770,6 +1770,15 @@ function create_tables($conn) {
         echo mysqli_error($conn);
     }
 
+    $sql = "CREATE TABLE default_access_permissions (
+        permissionID INT(10) UNSIGNED NOT NULL,
+        PRIMARY KEY (permissionID),
+        FOREIGN KEY (permissionID) REFERENCES access_permissions(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
+
 	$sql = "CREATE TABLE tags(
 		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 		value VARCHAR(50) NOT NULL,

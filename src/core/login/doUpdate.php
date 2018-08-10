@@ -3525,7 +3525,20 @@ if($row['version'] < 169){
         echo "<br>new_message_notification existing true";
     }
 }
-// if($row['version'] < 170){}
+
+if($row['version'] < 170){
+    $sql = "CREATE TABLE default_access_permissions (
+        permissionID INT(10) UNSIGNED NOT NULL,
+        PRIMARY KEY (permissionID),
+        FOREIGN KEY (permissionID) REFERENCES access_permissions(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }else{
+        echo "Permissions: defaults";
+    }
+}
+
 // if($row['version'] < 171){}
 // if($row['version'] < 172){}
 // if($row['version'] < 173){}

@@ -92,6 +92,8 @@ class Permissions
 
   protected static $permission_cache = null;
   protected static $permission_cache_team = null;
+  protected static $permission_cache_default = null;
+
   protected static $relationship_user_team = null;
   protected static $inherit_team_permissions = null;
 
@@ -136,7 +138,7 @@ class Permissions
    * @param int $userID
    * @return boolean
    */
-  public static function user_inherits_team_permissions($userID): bool
+  public static function user_inherits_team_permissions($userID) : bool
   {
     if (intval($userID) === 1) return true;
     if (self::$inherit_team_permissions == null) {
@@ -197,6 +199,26 @@ class Permissions
   }
 
   /**
+   * Tests if a permission should be applied to newly created users
+   *
+   * @param string $permission
+   * @return boolean
+   */
+  public static function has_default($permission) : bool
+  {
+    $parsed = self::parse($permission);
+    if (isset(self::$permission_cache_default[$parsed["group"]][$parsed["permission"]])) {
+      return self::$permission_cache_default[$parsed["group"]][$parsed["permission"]];
+    }
+    self::update_cache_default();
+    if (isset(self::$permission_cache_default[$parsed["group"]][$parsed["permission"]])) {
+      return self::$permission_cache_default[$parsed["group"]][$parsed["permission"]];
+    }
+    echo "$permission doesn't exist";
+    return false;
+  }
+
+  /**
    * Does nothing when user has permission. When the user doesn't have permission, 
    * a message and the footer are displayed and the script execution stops
    * @param string $permission A permission string eg "CORE.SETTINGS"
@@ -217,6 +239,8 @@ class Permissions
    * Needs to be called after a permission change (in security settings) 
    * 
    * Caches every permission since create_menu tests permissions for every leaf.
+   * 
+   * @return void
    */
   public static function update_cache_user($userID = false)
   {
@@ -234,11 +258,13 @@ class Permissions
     self::update_cache($userID, "USER");
   }
 
-    /**
+  /**
    * Called when Permission::has() is called and the permission isn't in the cache
    * Needs to be called after a permission change (in security settings) 
    * 
    * Caches every permission since create_menu tests permissions for every leaf.
+   * 
+   * @return void
    */
   public static function update_cache_team($teamID)
   {
@@ -246,8 +272,19 @@ class Permissions
   }
 
   /**
-   * Updates user-team relationship and inherited team permissions
+   * Updates the cache for default permissions. This will only be used in system/security
+   * or when creating new users.
    *
+   * @return void
+   */
+  public static function update_cache_default()
+  {
+    self::update_cache(false, "DEFAULT");
+  }
+
+  /**
+   * Updates user-team relationship and inherited team permissions
+   * 
    * @return void
    */
   public static function update_cache_relationship_user_team()
@@ -266,36 +303,70 @@ class Permissions
   }
 
   /**
-   * Updates user or team cache
+   * Adds all default permissions to a user and optionally deletes other permissions.
+   * Also updates the user cache automatically.
    *
-   * @param int $id userID or teamID
-   * @param "USER"|"TEAM" $mode
+   * @param int $userID
+   * @param boolean $also_delete_previous_permissions
    * @return void
    */
-  private static function update_cache($id, $mode)
+  public static function apply_defaults($userID, $also_delete_previous_permissions = false)
+  {
+    if (!$userID) {
+      echo "no user id";
+      return;
+    }
+    if ($also_delete_previous_permissions) {
+      $conn->query("DELETE FROM relationship_access_permissions WHERE userID = $userID");
+      echo $conn->error;
+    }
+    global $conn;
+    if (!$conn) require 'connection.php';
+    
+    // copy all default permissions without ignoring errors
+    $conn->query("INSERT INTO relationship_access_permissions (userID, permissionID)
+                  SELECT $userID, permissionID
+                  FROM default_access_permissions
+                  ON DUPLICATE KEY UPDATE relationship_access_permissions.permissionID = relationship_access_permissions.permissionID");
+    echo $conn->error;
+    self::update_cache_user($userID);
+  }
+
+  /**
+   * Updates user or team cache
+   *
+   * @param int|false $id userID, teamID or neither
+   * @param "USER"|"TEAM"|"DEFAULT" $mode
+   * @return void
+   */
+  protected static function update_cache($id, $mode)
   {
     global $conn;
     if (!$conn) require 'connection.php';
-    $table = $mode == "USER" ? "relationship_access_permissions" : "relationship_team_access_permissions";
-    $id_attribute = $mode == "USER" ? "userID" : "teamID";
+    $table = $mode == "USER" ? "relationship_access_permissions" : ($mode == "TEAM" ? "relationship_team_access_permissions" : "default_access_permissions");
+    $additional_query = $mode == "USER" ? "AND rel.userID = $id" : ($mode == "TEAM" ? "AND rel.teamID = $id" : "");
     $result = $conn->query("SELECT groups.name g_name, perm.name p_name, rel.permissionID perm_id
                             FROM access_permission_groups groups 
                             LEFT JOIN access_permissions perm ON perm.groupID = groups.id 
                             LEFT JOIN $table rel ON rel.permissionID = perm.id
-                            AND rel.$id_attribute = $id");
+                            $additional_query");
     echo $conn->error;
     while ($result && $row = $result->fetch_assoc()) {
       if ($row["perm_id"]) {
         if ($mode == "USER") {
           self::$permission_cache[$row["g_name"]][$row["p_name"]][$id] = true;
-        } else {
+        } else if ($mode == "TEAM") {
           self::$permission_cache_team[$row["g_name"]][$row["p_name"]][$id] = true;
+        } else {
+          self::$permission_cache_default[$row["g_name"]][$row["p_name"]] = true;
         }
       } else {
         if ($mode == "USER") {
           self::$permission_cache[$row["g_name"]][$row["p_name"]][$id] = false;
-        } else {
+        } else if ($mode == "TEAM") {
           self::$permission_cache_team[$row["g_name"]][$row["p_name"]][$id] = false;
+        } else {
+          self::$permission_cache_default[$row["g_name"]][$row["p_name"]] = false;
         }
       }
     }

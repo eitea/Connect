@@ -118,6 +118,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               $conn->query($sql);
             }
           }
+          // add permissions
+          Permissions::apply_defaults($curID);
 		  //add keys
 		  $keyPair = sodium_crypto_box_keypair();
 		  $private = base64_encode(sodium_crypto_box_secretkey($keyPair));
