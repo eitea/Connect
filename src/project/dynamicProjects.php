@@ -1,6 +1,6 @@
 <?php
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    if(!empty($_POST['play']) || !empty($_POSt['play-take'])){ //5b03f7a9d151a
+    if(!empty($_POST['play']) || !empty($_POST['play-take'])){ //5b03f7a9d151a
         $ckIn_disabled = 'disabled';
     }
 }
@@ -98,7 +98,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $x = test_input($_POST['play'], true);
         } else {
             $x = test_input($_POST['play-take'], true);
-            $conn->query("UPDATE dynamicprojectsemployees SET position = IF(position = 'owner', 'master', 'leader') WHERE userid = $userID AND projectid = '$x'");
+            $conn->query("INSERT INTO dynamicprojectsemployees(projectid, userid, position) VALUES('$x', $userID, 'leader')
+				DUPLICATE KEY UPDATE position = IF(position = 'owner', 'master', 'leader')");
+			echo $conn->error;
             $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$x', 'DUTY', $userID)");
         }
         $result = $conn->query("SELECT id FROM projectBookingData WHERE `end` = '0000-00-00 00:00:00' AND dynamicID = '$x'");
@@ -137,10 +139,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         } else {
             showError('Datum ungültig. Format YYYY-MM-DD HH:mm');
         }
-    } elseif(!empty($_POST['add-note']) && !empty($_POST['add-note-text'])){
+    } elseif(!empty($_POST['add-note']) && !empty($_POST['add-note-text']) && !empty($_POST['add-note-subject'])){
 		$x = test_input($_POST['add-note'], true);
 		$val = test_input($_POST['add-note-text']);
-		$conn->query("INSERT INTO dynamicprojectsnotes(taskID, userID, notetext) VALUES('$x', '$userID', '$val')");
+		$subject = test_input($_POST['add-note-subject']); //5b6ab8f42621b
+		$conn->query("INSERT INTO dynamicprojectsnotes(taskID, userID, notetext, notesubject) VALUES('$x', '$userID', '$val', '$subject')");
 		if($conn->error){
 			showError($conn->error.__LINE__);
 		} else {
@@ -486,7 +489,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 				} else {
 					showError($stmt->error);
 				}
-				$stmt->close();
+				@$stmt->close();
 			} else {
 				showError($lang['ERROR_MISSING_FIELDS']);
 				if(empty($_POST['owner'])) showError('Fehlend: Projektbesitzer');
@@ -758,7 +761,11 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 		<div class="modal-dialog modal-content modal-md">
 			<div class="modal-header h4">Notiz hinzufügen</div>
 			<div class="modal-body">
+				<label>Betreff</label>
+				<input type="text" name="add-note-subject" class="form-control"><br>
+				<label>Notiz</label>
 				<textarea name="add-note-text" rows="8" style="resize:none" class="form-control"></textarea>
+				<small>Alle Felder müssen ausgefüllt werden</small>
 				<br>
 			</div>
 			<div class="modal-footer">
@@ -1019,6 +1026,9 @@ function dynamicOnLoad(modID){
         tags: true,
         tokenSeparators: [',', ' ']
     });
+	$('.clicker').click(function(){
+		$(this).nextUntil('tr.clicker').slideToggle(1);
+	});
     $('[data-toggle="tooltip"]').tooltip();
     tinymce.init({
         selector: '.projectDescriptionEditor',
