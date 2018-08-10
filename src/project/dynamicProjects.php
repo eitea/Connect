@@ -99,7 +99,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         } else {
             $x = test_input($_POST['play-take'], true);
             $conn->query("INSERT INTO dynamicprojectsemployees(projectid, userid, position) VALUES('$x', $userID, 'leader')
-				DUPLICATE KEY UPDATE position = IF(position = 'owner', 'master', 'leader')");
+				ON DUPLICATE KEY UPDATE position = IF(position = 'owner', 'master', 'leader')");
 			echo $conn->error;
             $conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID) VALUES ('$x', 'DUTY', $userID)");
         }
