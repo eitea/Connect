@@ -719,7 +719,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
         <?php endif;
         if($userHasSurveys): ?>
             <tr>
-                <td><i style="color: #efefef" class="fa fa-circle"></i>Bereits beantwortete Schulungen erneut ansehen<div></div></td>
+                <td><i style="color: #efefef" class="fa fa-circle"></i>Beantwortete Schulungen erneut ansehen<div></div></td>
                 <td><a type="button" class="btn btn-default openDoneSurvey">View</a></td>
                 <td>-</td>
                 <td><?=date("Y-m-d")?></td>

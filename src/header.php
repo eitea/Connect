@@ -234,6 +234,7 @@ if ($_SESSION['color'] == 'light') {
     <script src="plugins/jQuery/jquery.min.js"></script>
     <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
     <script src="plugins/bootstrap-notify/bootstrap-notify.min.js"></script>
+    <script src='plugins/node_modules/survey-jquery/survey.jquery.min.js'></script>
 
     <link rel="stylesheet" type="text/css" href="plugins/select2/css/select2.min.css">
     <script src='plugins/select2/js/select2.min.js'></script>
