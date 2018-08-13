@@ -3554,7 +3554,16 @@ if($row['version'] < 171){
 		echo "<br>Kunden: Status";
 	}
 }
-// if($row['version'] < 172){}
+
+if($row['version'] < 172){
+	$conn->query("ALTER TABLE account_journal ADD COLUMN status VARCHAR(10) DEFAULT 'account' NOT NULL");
+	if($conn->error){
+		echo '<br>', $conn->error;
+	} else {
+		echo "<br>Finanzen: Umbuchung";
+	}
+}
+
 // if($row['version'] < 173){}
 // if($row['version'] < 174){}
 // if($row['version'] < 175){}

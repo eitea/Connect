@@ -116,6 +116,7 @@ function onPageLoad(){
   });
 
   $('.datepicker').click(function() {
+	$( this ).attr( 'autocomplete', 'off' );
     $(this).datetimepicker({
       weekStart: 1,
       todayBtn:  1,

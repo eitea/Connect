@@ -1013,6 +1013,9 @@ $lang_ger['MESSAGE'] = 'Nachricht';
 $lang_eng['MESSAGES'] = 'Messages';
 $lang_ger['MESSAGES'] = 'Nachrichten';
 
+$lang_eng['REBOOKING'] = 'Rebooking';
+$lang_ger['REBOOKING'] = 'Umbuchung';
+
 $lang_eng['RECEIVER'] = 'Receiver';
 $lang_ger['RECEIVER'] = 'Empfänger';
 

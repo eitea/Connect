@@ -284,7 +284,7 @@ while ($result && ($row = $result->fetch_assoc())) {
         FROM account_balance INNER JOIN account_journal ON account_journal.id = account_balance.journalID
         INNER JOIN accounts ON account_journal.account = accounts.id
         LEFT JOIN receiptBook r1 ON r1.journalID = account_balance.journalID
-        WHERE account_balance.accountID = $id $dateQuery ORDER BY docNum, payDate, inDate ");
+        WHERE account_balance.accountID = $id AND account_journal.status = 'account' $dateQuery ORDER BY docNum, payDate, inDate ");
         echo $conn->error;
         $lockedMonths = $conn->query("SELECT lockDate FROM accountingLocks WHERE companyID = $cmpID");
         $lockedMonths = array_column($lockedMonths->fetch_all(), 0);

@@ -85,9 +85,10 @@ $routes = [ // each route has a path and an optional permission
     'erp/edit' => ["path" => 'erp/erp_process.php', "permission" => "ERP.PROCESS"],
     'erp/receipts' => ["path" => 'erp/receiptBook.php', "permission" => "ERP.RECEIPT_BOOK"],
 
-    'finance/account' => ["path" => 'finance/accounting.php', "permission" => "FINANCES.ACCOUNTING_PLAN"],
+    'finance/account' => ["path" => 'finance/accounting.php', "permission" => "FINANCES.ACCOUNTING_JOURNAL"],
+	'finance/rebook' => ["path" => 'finance/rebooking.php', "permission" => "FINANCES.ACCOUNTING_JOURNAL"],
     'finance/plan' => ["path" => 'finance/accountPlan.php', "permission" => "FINANCES.ACCOUNTING_PLAN"],
-    'finance/journal' => ["path" => 'finance/accountJournal.php', "permission" => "FINANCES.ACCOUNTING_PLAN"],
+    'finance/journal' => ["path" => 'finance/accountJournal.php', "permission" => "FINANCES.ACCOUNTING_JOURNAL"],
 	'finance/taxes' => ["path" => 'erp/editTaxes.php', "permission" => "FINANCES.TAX_RATES"],
 
     'dsgvo/documents' => ["path" => 'dsgvo/dsgvo_view.php', "permission" => "AGREEMENTS.READ"],

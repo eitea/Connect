@@ -676,8 +676,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     $finances_company_children_callback = function ($company /* has [id] and [name] */ ) use (&$conn) {
                         $company_children = [
                             "ACCOUNT_PLAN" => [
-                                "href" => "finance/plan",
-                                "active_routes" => ["finance/account"]
+                                "href" => "finance/plan"
                             ],
                             "ACCOUNT_JOURNAL" => [
                                 "href" => "finance/journal"
@@ -692,6 +691,9 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                                 "get_params" => ["v" => "$acc_id"]
                             ];
                         }
+						$company_children['REBOOKING'] = [
+								'href' => 'finance/rebook'
+						];
                         return $company_children;
                     };
 
