@@ -222,6 +222,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           echo print_r($pp);
       }
   }
+
+  if(!empty($_POST["removeFromTeam"])){
+    $user_id = intval($_POST["uid"]);
+    $team_id = intval($_POST["tid"]);
+    $activeTab = $user_id;
+    $conn->query("DELETE FROM relationship_team_user WHERE userID = $user_id AND teamID = $team_id");
+    if($conn->error){
+      showError($conn->error);
+    }else{
+      showSuccess($lang["OK_DELETE"]);
+    }
+  }
+  if(!empty($_POST["saveTeam"])){
+    $user_id = intval($_POST["uid"]);
+    $team_id = intval($_POST["tid"]);
+    $activeTab = $user_id;
+    $skill = intval($_POST["teamSkill"]);
+    $conn->query("UPDATE relationship_team_user SET skill = $skill WHERE teamID = $team_id AND userID = $user_id");
+    if($conn->error){
+      showError($conn->error);
+    }else{
+      showSuccess($lang["OK_DELETE"]);
+    }
+  }
+  if(!empty($_POST["addTeam"]) && !empty($_POST["team_id"])){
+    $user_id = intval($_POST["addTeam"]);
+    $team_id = intval($_POST["team_id"]);
+    $activeTab = $user_id;
+    $skill = intval($_POST["teamSkill"]);
+    $conn->query("INSERT INTO relationship_team_user (teamID, userID, skill) VALUES ($team_id, $user_id, $skill)");
+    if($conn->error){
+      showError($conn->error);
+    }else{
+      showSuccess($lang["OK_DELETE"]);
+    }
+  }
 } //end POST
 
 if(isset($_SESSION["LAST_ERRORS"])){
@@ -237,6 +273,18 @@ while($row = $result->fetch_assoc()){
 }
 $stmt_company_relationship = $conn->prepare("SELECT companyID FROM relationship_company_client WHERE userID = ?");
 $stmt_company_relationship->bind_param('i', $x);
+
+$percentage_select = '';
+for($i = 0; $i < 11; $i++){
+    $percentage_select .= '<option value="'.($i*10).'">'.($i*10).'%</option>';
+}
+
+$team_id_to_name = [];
+$result = $conn->query("SELECT id, name FROM teamData");
+while($row = $result->fetch_assoc()){
+  $team_id_to_name[$row["id"]] = $row["name"];
+}
+
 ?>
 <br>
 
@@ -250,6 +298,8 @@ $stmt_company_relationship->bind_param('i', $x);
     while ($row = $result->fetch_assoc()):
       $x = $row['user_id'];
       $profilePicture = $row['picture'] ? "data:image/jpeg;base64,".base64_encode($row['picture']) : "images/defaultProfilePicture.png";
+      $team_result = $conn->query("SELECT team.id, rel.skill, team.leader, team.leaderreplacement, team.isDepartment, team.name FROM relationship_team_user rel INNER JOIN teamData team ON rel.teamID = team.id WHERE rel.userID = $x");
+      $user_in_team = [];
       ?>
 
       <div class="panel panel-default">
@@ -480,6 +530,69 @@ $stmt_company_relationship->bind_param('i', $x);
                     <button type="submit" class="btn btn-default" name="addNewInterval" value="<?php echo $x; ?>"> <?php echo $lang['CLOSE_INTERVAL']; ?></button>
                   </div>
                 </div>
+              </div>
+              <div class="container-fluid well">
+                <div class="row">
+                  <div class="col-xs-12">
+                    Teams und Abteilungen
+                  </div>
+                </div>
+                <div class="row">
+                  <?php 
+                  while($team_result && $team_row = $team_result->fetch_assoc()):
+                    $team_name = $team_row["name"];
+                    $team_id = $team_row["id"];
+                    $team_skill = $team_row["skill"];
+                    $user_in_team[$team_row["id"]] = true;
+                  ?>
+                    <form method="POST">
+                      <input type="hidden" name="uid" value="<?php echo $x ?>" />
+                      <input type="hidden" name="tid" value="<?php echo $team_id ?>" />
+                      <div class="col-xs-12" style="display: flex; margin-bottom: 16px;">
+                        <button type="submit" class="btn btn-danger" name="removeFromTeam" value="<?php echo $team_id ?>"><i class="fa fa-times"></i></button>
+                        <span style="white-space:nowrap;margin-right: 16px; margin-left: 16px;" > <?php echo $team_name ?> </span>
+                        <select name="teamSkill" class="form-control">
+                          <?php echo str_replace('value="'.$team_skill.'">', 'value="'.$team_skill.'" selected>', $percentage_select) ?>
+                        </select>
+                        <button style="margin-left: 16px; " type="submit" class="btn btn-default" name="saveTeam" value="<?php echo $team_id ?>"><i class="fa fa-save"></i></button>
+                      </div>
+                    </form>
+                  <?php endwhile; ?>
+                </div>
+                <div class="row">
+                  <div class="col-xs-12">
+                    <div class="pull-right">
+                      <button class="btn btn-default" type="button" data-toggle="modal" data-target=".addTeam<?php echo $x; ?>">Zu Team hinzufügen</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal fade addTeam<?php echo $x; ?>">
+                <div class="modal-dialog modal-content modal-md">
+                  <form method="POST">
+                      <div class="modal-header"></div>
+                      <div class="modal-body">
+                        <label>Team</label>
+                          <select name="team_id" class="js-example-basic-single">
+                              <option value="">...</option>
+                              <?php
+                              foreach($team_id_to_name as $team_id=>$team_name){
+                                  if(!empty($user_in_team[$team_id])) continue;
+                                  echo "<option value='$team_id'>$team_name</option>";
+                              }
+                              ?>
+                          </select>
+                          <label>Skill</label>
+                          <select name="teamSkill" class="form-control">
+                            <?php echo $percentage_select ?>
+                          </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang["CANCEL"] ?></button>
+                        <button type="submit" class="btn btn-warning" name="addTeam" value="<?php echo $x; ?>"><?php echo $lang["ADD"] ?></button>
+                    </div>
+                  </form>
+                </div>
+              </div>
               </div>
 
               <div class="container">

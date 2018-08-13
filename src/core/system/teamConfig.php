@@ -227,8 +227,8 @@ for($i = 0; $i < 11; $i++){
                         </table>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-warning" name="hire" value="<?php echo $teamID; ?>">Benutzer einstellen</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang["CANCEL"] ?></button>
+                        <button type="submit" class="btn btn-warning" name="hire" value="<?php echo $teamID; ?>"><?php echo $lang["HIRE_USER"] ?></button>
                     </div>
                 </form>
             </div>
