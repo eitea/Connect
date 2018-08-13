@@ -1195,6 +1195,7 @@ function create_tables($conn) {
         estimatedHours VARCHAR(100) DEFAULT 0 NOT NULL,
         needsreview ENUM('TRUE','FALSE') DEFAULT 'TRUE',
         level INT(3) DEFAULT 0 NOT NULL,
+        levelmax INT(3) DEFAULT 100 NOT NULL,
         projecttags VARCHAR(250) DEFAULT '' NOT NULL,
         isTemplate ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL,
 		projectmailheader TEXT NOT NULL DEFAULT '',
@@ -1767,6 +1768,15 @@ function create_tables($conn) {
         PRIMARY KEY (teamID, permissionID),
         FOREIGN KEY (permissionID) REFERENCES access_permissions(id) ON UPDATE CASCADE ON DELETE CASCADE,
         FOREIGN KEY (teamID) REFERENCES teamData(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }
+
+    $sql = "CREATE TABLE default_access_permissions (
+        permissionID INT(10) UNSIGNED NOT NULL,
+        PRIMARY KEY (permissionID),
+        FOREIGN KEY (permissionID) REFERENCES access_permissions(id) ON UPDATE CASCADE ON DELETE CASCADE
     )";
     if (!$conn->query($sql)) {
         echo mysqli_error($conn);

@@ -406,6 +406,11 @@ showError($conn->error);
                 </span>
                 <div class="col-xs-6 text-right" style="padding-right: 30px">
                     <form method="post">
+                        <!-- <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['STATS_GRAPH'] ?>">
+                            <button type="button" style="background:none;border:none;" name="infoModule" value="<?php echo $moduleID; ?>">
+                                <i class="fa fa-fw fa-area-chart"></i>
+                            </button>
+                        </span> -->
                         <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['EXPORT_SET'] ?>">
                             <button type="button" style="background:none;border:none;" name="export" value="<?php echo $moduleID; ?>">
                                 <i class="fa fa-fw fa-download"></i>
@@ -451,7 +456,6 @@ showError($conn->error);
                                     </div>
                                 </span>
                                 <div class="col-xs-6 text-right">
-
                                     <span data-container="body" data-toggle="tooltip" title="<?php echo $lang['TRAINING_BUTTON_DESCRIPTIONS']['STATS_GRAPH'] ?>">
                                         <button type="button" style="background:none;border:none;" name="infoTraining" value="<?php echo $trainingID; ?>">
                                             <i class="fa fa-fw fa-bar-chart-o"></i>
@@ -699,7 +703,10 @@ showError($conn->error);
         })
         $("button[name=suspendedSurveys]").click(function () {
             setCurrentModal({}, 'post', 'ajaxQuery/ajax_dsgvo_training_suspended_surveys.php')
-        })
+        }) 
+        // $("button[name=infoModule]").click(function () {
+        //     setCurrentModal({ moduleID: $(this).val() }, 'get', 'ajaxQuery/ajax_dsgvo_training_module_info.php')
+        // })
     </script>
 
     <script>

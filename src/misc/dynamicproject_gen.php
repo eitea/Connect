@@ -21,7 +21,8 @@ if($x){
     $dynrow['companyid'] = $_SESSION['filterings']['company'] ?? 0; //isset, or 0
     $dynrow['clientid'] = $_SESSION['filterings']['client'] ?? 0;
     $dynrow['clientprojectid'] = $_SESSION['filterings']['project'] ?? 0;
-    $dynrow['level'] = 0;
+	$dynrow['level'] = 0;
+	$dynrow['levelmax'] = 100;
 	if($isTempalte){
 		$dynrow['projectstart'] = '0000-00-00';
 		$dynrow['isTemplate'] = 'TRUE';
@@ -199,14 +200,32 @@ if(strtotime($dynrow['projectstart']) < strtotime('2018-08-07')) $dynrow['projec
 			<div class="col-md-6">
 				<div class="col-md-6">
 					<?php if($isDynamicProjectsAdmin == 'TRUE'): ?>
-						<label>Skill Minimum</label>
-						<input type="range" step="10" value="<?php echo $dynrow['level']; ?>" oninput="document.getElementById('projectskill-<?php echo $x; ?>').value = this.value;"><br>
+						<label>Skill Bereich</label>
+						<div id="projectskill-slider-<?php echo $x; ?>"></div>
 					<?php endif; ?>
 				</div>
 				<div class="col-md-6">
 					<?php  if($isDynamicProjectsAdmin == 'TRUE'): ?>
 						<label>Level</label>
-						<input id="projectskill-<?php echo $x; ?>" type="number" class="form-control" name="projectskill" value="<?php echo $dynrow['level']; ?>"><br>
+						<input id="projectskill-<?php echo $x; ?>" readonly type="text" class="form-control" value="<?php echo $dynrow['level'] == $dynrow['levelmax'] ? $dynrow['level'] : $dynrow['level'] . ' - ' . $dynrow['levelmax'] ?>"><br>
+						<input id="projectskillmin-<?php echo $x; ?>" type="hidden" class="form-control" name="projectskill" value="<?php echo $dynrow['level']; ?>"><br>
+						<input id="projectskillmax-<?php echo $x; ?>" type="hidden" class="form-control" name="projectskillmax" value="<?php echo $dynrow['levelmax']; ?>"><br>
+						<script>
+							$(function() {
+								$( "#projectskill-slider-<?php echo $x; ?>" ).slider({
+									range: true,
+									min: 0,
+									max: 100,
+									step: 10,
+									values: [ <?php echo $dynrow['level']; ?>, <?php echo $dynrow['levelmax']; ?> ],
+									slide: function( event, ui ) {
+										$( "#projectskill-<?php echo $x; ?>" ).val(ui.values[ 0 ] == ui.values[ 1 ] ? ui.values[ 0 ] : ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+										$( "#projectskillmin-<?php echo $x; ?>" ).val(ui.values[ 0 ]);
+										$( "#projectskillmax-<?php echo $x; ?>" ).val(ui.values[ 1 ]);
+									}
+								});
+							});
+						</script>
 					<?php endif; ?>
 				</div>
 			</div>

@@ -441,3 +441,9 @@ span.select2.select2-container.select2-container--default {
   /* max-height: max-content; */
   height: auto;
 }
+
+/* 5b642eecca5a1 */
+.progress-bar {
+  margin-right: 0;
+  margin-left: 0;
+}

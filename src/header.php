@@ -229,11 +229,14 @@ if ($_SESSION['color'] == 'light') {
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="plugins/font-awesome/css/font-awesome.min.css"/>
 
     <script src="plugins/jQuery/jquery.min.js"></script>
     <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
     <script src="plugins/bootstrap-notify/bootstrap-notify.min.js"></script>
+    <script src='plugins/node_modules/survey-jquery/survey.jquery.min.js'></script>
+    <script src='plugins/jquery-ui/jquery-ui.min.js'></script>
 
     <link rel="stylesheet" type="text/css" href="plugins/select2/css/select2.min.css">
     <script src='plugins/select2/js/select2.min.js'></script>

@@ -72,12 +72,12 @@ if ($test) {
          ON tr.id = ttr.trainingID
          WHERE trd.userID = $userID
          UNION
-         SELECT ttr.trainingID id, tr.name, tr.random
-         FROM dsgvo_training_company_relations ttr
+         SELECT tcr.trainingID id, tr.name, tr.random
+         FROM dsgvo_training_company_relations tcr
          INNER JOIN relationship_company_client trd
-         ON trd.companyID = ttr.companyID
+         ON trd.companyID = tcr.companyID
          INNER JOIN dsgvo_training tr
-         ON tr.id = ttr.trainingID
+         ON tr.id = tcr.trainingID
          WHERE trd.userID = $userID"
     );
     showError($conn->error);
@@ -153,7 +153,6 @@ while ($row_question = $result_question->fetch_assoc()) {
         width: 100%; height: 100%;
     }
     </style>
-    <script src='../plugins/node_modules/survey-jquery/survey.jquery.min.js'></script>
     <div class="modal fade survey-modal">
         <div class="modal-dialog modal-content modal-md">
             <div class="modal-header"><?php echo $lang['PLEASE_ANSWER_QUESTIONS'] ?> 

@@ -3554,8 +3554,29 @@ if($row['version'] < 171){
 		echo "<br>Kunden: Status";
 	}
 }
-// if($row['version'] < 172){}
-// if($row['version'] < 173){}
+
+if($row['version'] < 172){
+    $sql = "CREATE TABLE default_access_permissions (
+        permissionID INT(10) UNSIGNED NOT NULL,
+        PRIMARY KEY (permissionID),
+        FOREIGN KEY (permissionID) REFERENCES access_permissions(id) ON UPDATE CASCADE ON DELETE CASCADE
+    )";
+    if (!$conn->query($sql)) {
+        echo mysqli_error($conn);
+    }else{
+        echo "Permissions: defaults";
+    }
+}
+
+if($row['version'] < 173){
+    $conn->query("ALTER TABLE dynamicprojects ADD COLUMN levelmax INT(3) DEFAULT 100 NOT NULL");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Tasks: Skill-Level max';
+    }
+}
+
 // if($row['version'] < 174){}
 // if($row['version'] < 175){}
 // if($row['version'] < 176){}
