@@ -3563,7 +3563,7 @@ if($row['version'] < 172){
 		echo "<br>Finanzen: Umbuchung";
 	}
 
-// if($row['version'] < 173){}
+
     $sql = "CREATE TABLE default_access_permissions (
         permissionID INT(10) UNSIGNED NOT NULL,
         PRIMARY KEY (permissionID),
@@ -3583,6 +3583,7 @@ if($row['version'] < 172){
     }
 }
 
+// if($row['version'] < 173){}
 // if($row['version'] < 174){}
 // if($row['version'] < 175){}
 // if($row['version'] < 176){}
