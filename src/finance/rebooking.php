@@ -255,7 +255,6 @@ while ($result && ($row = $result->fetch_assoc())) {
 	        <th>Nr.</th>
 	        <th><?php echo $lang['DATE']; ?></th>
 	        <th><?php echo $lang['ACCOUNT']; ?></th>
-			<th><?php echo $lang['OFFSET_ACCOUNT']; ?></th>
 	        <th>Text</th>
 	        <th>Steuer Nr.</th>
 	        <th style="text-align:right"><?php echo $lang['FINANCE_DEBIT']; ?></th>
@@ -273,11 +272,10 @@ while ($result && ($row = $result->fetch_assoc())) {
 	        $docDate = getCurrentTimestamp();
 	        $modals = '';
 	        $docNum = 1;
-	        $result = $conn->query("SELECT account_journal.*, accounts.num, a2.num AS offNum, account_balance.have AS netto_have,
+	        $result = $conn->query("SELECT account_journal.*, accounts.num, account_balance.have AS netto_have, accountID,
 				account_balance.should AS netto_should, r1.id AS receiptID
 		        FROM account_balance INNER JOIN account_journal ON account_journal.id = account_balance.journalID
-		        INNER JOIN accounts ON account_journal.account = accounts.id
-				INNER JOIN accounts a2 ON account_journal.offAccount = a2.id
+		        INNER JOIN accounts ON account_balance.accountID = accounts.id
 		        LEFT JOIN receiptBook r1 ON r1.journalID = account_balance.journalID
 		        WHERE account_journal.status = 'rebooking' $dateQuery ORDER BY docNum, payDate, inDate ");
 	        echo $conn->error;
@@ -287,8 +285,7 @@ while ($result && ($row = $result->fetch_assoc())) {
 	            echo '<tr>';
 	            echo '<td>' . $row['docNum'] . '</td>';
 	            echo '<td>' . substr($row['payDate'], 0, 10) . '</td>';
-	            echo '<td><a href="account?v=' . $row['account'] . '" class="btn btn-link" >' . $row['num'] . '</a></td>';
-				echo '<td><a href="account?v=' . $row['offAccount'] . '" class="btn btn-link" >' . $row['offNum'] . '</a></td>';
+	            echo '<td><a href="account?v=' . $row['accountID'] . '" class="btn btn-link" >' . $row['num'] . '</a></td>';
 	            echo '<td>' . $row['info'] . '</td>';
 	            echo '<td>' . sprintf('%02d', $row['taxID']) . '</td>';
 	            echo '<td style="text-align:right">' . number_format($row['netto_should'], 2, ',', '.') . '</td>';
