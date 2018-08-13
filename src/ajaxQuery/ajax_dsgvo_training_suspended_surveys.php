@@ -46,11 +46,14 @@ echo $conn->error;
                 echo "<td><span><i title='$message' data-container='body' data-toggle='tooltip' class='fa fa-fw fa-$icon'></i></span> $name</td>";
             }
             echo "<td style='white-space: nowrap; width: 1%;'>";
+            $disabled = "";
+            // $disabled = $count?"":"disabled";
             echo "<span data-container='body' data-toggle='tooltip' title='Zurücksetzen (Der User kann wieder 3 mal aufschieben)'>";
-            echo "<button type='submit' style='background:none;border:none;' name='undoSuspension' value='$id'><i class='fa fa-fw fa-undo'></i></button>";
+            echo "<button $disabled type='submit' style='background:none;border:none;' name='undoSuspension' value='$id'><i class='fa fa-fw fa-undo'></i></button>";
             echo "</span>";
+            // $disabled = $count >= 3?"disabled":"";
             echo "<span data-container='body' data-toggle='tooltip' title='Aufschiebung überspringen (Der User kann kein weiteres mal aufschieben)'>";
-            echo "<button type='submit' style='background:none;border:none;' name='fastForwardSuspension' value='$id'><i class='fa fa-fw fa-fast-forward'></i></button>";
+            echo "<button $disabled type='submit' style='background:none;border:none;' name='fastForwardSuspension' value='$id'><i class='fa fa-fw fa-fast-forward'></i></button>";
             echo "</span>";
             echo "</td>";
             echo "</tr>";

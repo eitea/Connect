@@ -396,9 +396,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 				$isTemplate = isset($_POST['isTemplate']) ? 'TRUE' : 'FALSE';
 				if(Permissions::has("TASKS.ADMIN")){
 					$skill = intval($_POST['projectskill']);
+					$skillMax = intval($_POST['projectskillmax']);
 					$parent = test_input($_POST["parent"]); //dynamproject id
 				} else {
-					$skill = 0;
+                    $skill = 0;
+                    $skillMax = 100;
 					$parent = null;
 				}
 				if($status == 'COMPLETED') $percentage = 100;
@@ -409,9 +411,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 				}
 				// PROJECT
 				$stmt = $conn->prepare("INSERT INTO dynamicprojects(projectid, projectname, projectdescription, companyid, clientid, clientprojectid, projectcolor, projectstart,
-					projectend, projectstatus, projectpriority, projectparent, projectpercentage, estimatedHours, level, projecttags, isTemplate)
-					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); echo $conn->error;
-				$stmt->bind_param("ssbiiissssissisis", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $percentage, $estimate, $skill, $tags, $isTemplate);
+					projectend, projectstatus, projectpriority, projectparent, projectpercentage, estimatedHours, level, projecttags, isTemplate, levelmax)
+					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); echo $conn->error;
+				$stmt->bind_param("ssbiiissssissisisi", $id, $name, $null, $company, $client, $project, $color, $start, $end, $status, $priority, $parent, $percentage, $estimate, $skill, $tags, $isTemplate, $skillMax);
 				$stmt->send_long_data(2, $description);
 				$stmt->execute();
 				if(!$stmt->error){
@@ -719,7 +721,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
         <?php endif;
         if($userHasSurveys): ?>
             <tr>
-                <td><i style="color: #efefef" class="fa fa-circle"></i>Bereits beantwortete Schulungen erneut ansehen<div></div></td>
+                <td><i style="color: #efefef" class="fa fa-circle"></i>Beantwortete Schulungen erneut ansehen<div></div></td>
                 <td><a type="button" class="btn btn-default openDoneSurvey">View</a></td>
                 <td>-</td>
                 <td><?=date("Y-m-d")?></td>

@@ -6,6 +6,7 @@ if(!empty($_POST['captcha'])){
   require dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'language.php';
   require dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'connection.php';
   include dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'utilities.php';
+  include dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'validate.php';
 }
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -95,6 +96,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
         //create request
         $conn->query("INSERT INTO $userRequests(userID, fromDate, status, requestType) VALUES($curID, UTC_TIMESTAMP, '0', 'acc')");
+        // add permissions
+        Permissions::apply_defaults($curID);
 
         //send accessdata
         require dirname(dirname(dirname(__DIR__))).'/plugins/phpMailer/autoload.php';
