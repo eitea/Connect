@@ -1195,6 +1195,7 @@ function create_tables($conn) {
         estimatedHours VARCHAR(100) DEFAULT 0 NOT NULL,
         needsreview ENUM('TRUE','FALSE') DEFAULT 'TRUE',
         level INT(3) DEFAULT 0 NOT NULL,
+        levelmax INT(3) DEFAULT 100 NOT NULL,
         projecttags VARCHAR(250) DEFAULT '' NOT NULL,
         isTemplate ENUM('TRUE','FALSE') DEFAULT 'FALSE' NOT NULL,
 		projectmailheader TEXT NOT NULL DEFAULT '',
