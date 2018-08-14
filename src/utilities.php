@@ -862,11 +862,12 @@ function showSuccess($message, $toString = false){
 
 function validate_file(&$err, $extension, $filesize, $mime = ''){
 	$err = '';
-	if(!in_array($extension, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'zip', 'msg','jpg', 'jpeg', 'png', 'gif'])){ $err = "Invalid File extension $extension"; }
-	if($filesize > 15000000){ $err = "File too big, $filesize bytes detected"; }
+	if(!$extension) { $err = 'No file extension!'; }
+	if(!in_array($extension, ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt', 'zip', 'msg','jpg', 'jpeg', 'png', 'gif'])){ $err .= "Invalid File extension $extension"; }
+	if($filesize > 15000000){ $err .= "File too big, $filesize bytes detected"; }
 	if($mime && !in_array($mime, ['application/msword', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'text/plain', 'application/pdf', 'application/zip',
 	'application/x-zip-compressed', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'multipart/x-zip',
-	'application/x-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-outlook'])){ $err = "Invalid filetype $mime"; }
+	'application/x-compressed', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-outlook'])){ $err .= "Invalid filetype $mime"; }
 
 	return empty($err);
 }
