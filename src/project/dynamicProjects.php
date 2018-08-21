@@ -312,23 +312,27 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             showError('<strong>Project not Available.</strong> '.$lang['ERROR_STRIKE']);
         }
     }
-	if(!empty($_POST['change-status']) && !empty($_POST['change-status-assigned-user']) && !empty($_POST['change-status-status']) && !empty($_POST['change-status-note'])){
+	if(!empty($_POST['change-status']) && !empty($_POST['change-status-status']) && !empty($_POST['change-status-note'])){
 		$val = test_input($_POST['change-status']);
 		$note = test_input($_POST['change-status-note']);
-		$newUser = intval($_POST['change-status-assigned-user']);
 		$status = test_input($_POST['change-status-status'], 1);
 
-		$conn->query("DELETE FROM dynamicprojectsemployees WHERE position = 'leader' AND projectid = '$val'");
-		$err = $conn->error;
-		$conn->query("UPDATE dynamicprojectsemployees SET position = 'owner' AND WHERE position = 'master' AND projectid = '$val'");
-		$err .= $conn->error;
-		$conn->query("INSERT INTO dynamicprojectsemployees (position, userid, projectid) VALUES('leader', $newUser, '$val')
-			ON DUPLICATE KEY UPDATE position = IF(position = 'owner', 'master', 'leader')");
-		$err .= $conn->error;
-		$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID, extra1, extra2) VALUES('$val', 'STATECHANGE', $userID, '".$userID_toName[$newUser]."', '$note')");
+		if(!empty($_POST['change-status-assigned-user'])){
+			$newUser = intval($_POST['change-status-assigned-user']);
+			$conn->query("DELETE FROM dynamicprojectsemployees WHERE position = 'leader' AND projectid = '$val'");
+			$err = $conn->error;
+			$conn->query("UPDATE dynamicprojectsemployees SET position = 'owner' WHERE position = 'master' AND projectid = '$val'");
+			$err .= $conn->error;
+			$conn->query("INSERT INTO dynamicprojectsemployees (position, userid, projectid) VALUES('leader', $newUser, '$val')
+				ON DUPLICATE KEY UPDATE position = IF(position = 'owner', 'master', 'leader')");
+			$err .= $conn->error;
+		}
+
+		$conn->query("INSERT INTO dynamicprojectslogs (projectid, activity, userID, extra1, extra2)
+			VALUES('$val', 'STATECHANGE', $userID, '".$userID_toName[$newUser]."', '$note')");
 		$err .= $conn->error;
 		if($status == 'COMPLETED'){
-			$conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED' AND projectpercentage = '100' WHERE projectid = '$val'");
+			$conn->query("UPDATE dynamicprojects SET projectstatus = 'COMPLETED', projectpercentage = '100' WHERE projectid = '$val'");
 		} else {
 			$conn->query("UPDATE dynamicprojects SET projectstatus = '$status' WHERE projectid = '$val'");
 		}
@@ -801,7 +805,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
 	 			</select><br>
 				<br>
 				<label>Notiz</label>
-				<textarea name="change-status-note" rows="3" class="form-control"></textarea>
+				<textarea name="change-status-note" rows="3" class="form-control required" required></textarea>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

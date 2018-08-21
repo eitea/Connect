@@ -179,11 +179,11 @@ if($result && $result->num_rows > 0): ?>
     <div class="row">
     <div class="col-sm-3 col-sm-offset-1">
       <div class="input-group input-daterange">
-        <span class="input-group-addon"> <?php echo $lang['FROM'];?> </span><input type="text" class="form-control datepicker" id="from" name="start"></div>
+        <span class="input-group-addon"> <?php echo $lang['FROM'];?> </span><input type="text" class="form-control datepicker" autocomplete="off" id="from" name="start"></div>
     </div>
     <div class="col-sm-3">
       <div class="input-group input-daterange">
-        <span class="input-group-addon"> <?php echo $lang['TO'];?> </span><input type="text" class="form-control datepicker" id="to" name="end"></div>
+        <span class="input-group-addon"> <?php echo $lang['TO'];?> </span><input type="text" class="form-control datepicker" autocomplete="off" id="to" name="end"></div>
     </div>
     <div class="col-sm-3"><button class="btn btn-warning" type="submit" name="makeRequest"><?php echo $lang['MAKE_REQUEST']; ?></button><br></div>
   </div>
@@ -310,7 +310,7 @@ if($result && ($row = $result->fetch_assoc())): ?>
 <form method="POST" autocomplete="off">
   <div class="row">
     <div class="col-md-3">
-      <input type="text" class="form-control required-field datepicker" placeholder="YYYY-MM-DD" onkeydown='if (event.keyCode == 13) return false;' name="addDate" value="<?php echo substr(getCurrentTimestamp(),0,10); ?>">
+      <input type="text" class="form-control required-field datepicker" autocomplete="off" placeholder="YYYY-MM-DD" onkeydown='if (event.keyCode == 13) return false;' name="addDate" value="<?php echo substr(getCurrentTimestamp(),0,10); ?>">
     </div>
     <div class="col-md-3">
       <div class="input-group">

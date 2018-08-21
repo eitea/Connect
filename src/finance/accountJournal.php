@@ -58,18 +58,18 @@ while($result && ($row = $result->fetch_assoc())){
         if($row['should'] != 0) {$t = $row['should'] - (100 * $row['should']) / (100 + $row['percentage']); $row['should'] -= $t; }
         if($row['have'] != 0) {$t = $row['have'] - (100 * $row['have']) / (100 + $row['percentage']); $row['have'] -= $t; }
     }
+	$status = $row['status'] == 'rebooking' ? 'UB' : '';
     echo '<tr>';
     echo '<td>'.$row['docNum'].'</td>';
     echo '<td>'.$row['firstname'].' '.$row['lastname'].'</td>';
     echo '<td>'.substr($row['inDate'], 0, 16).'</td>';
     echo '<td>'.substr($row['payDate'], 0, 10).'</td>';
-    echo '<td><a title="Zum Konto" href="account?v='.$row['account'].'" >'.$row['accNum'].' '.$row['accName'].'</a></td>';
-    echo '<td><a title="Zum Konto" href="account?v='.$row['offAccount'].'" >'.$row['offNum'].' '.$row['offName'].'</a></td>';
+    echo '<td><a title="Zum Konto" href="account?v='.$row['account'].'" >'.$row['accNum'].' '.$row['accName']."</a> <b>$status</b></td>";
+    echo '<td><a title="Zum Konto" href="account?v='.$row['offAccount'].'" >'.$row['offNum'].' '.$row['offName']."</a> <b>$status</b></td>";
     echo '<td>'.$row['info'].'</td>';
     echo '<td style="text-align:right">'.number_format($row['should'],2,',','.').'</td>';
     echo '<td style="text-align:right">'.number_format($row['have'],2,',','.').'</td>';
     echo '<td>'.$row['percentage'].'% '.$row['description'].'</td>';
-
     echo '<td style="text-align:right">'.number_format($t,2,',','.').'</td>';
     if($row['receiptID']){ echo '<td>'.$lang['YES'].'</td>'; } else { echo '<td>'.$lang['NO'].'</td>'; }
     echo '</tr>';

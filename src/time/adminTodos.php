@@ -372,23 +372,20 @@ if ($result && $result->num_rows > 0):
     <br><hr><br>
   <?php endif;  ?>
 
-
 <!--ILLEGAL LUNCHBREAK -------------------------------------------------------------------------->
   <?php
   //5b643388a5bc2 - tolerate up to 1 minute
   $sql = "SELECT l1.*, pauseAfterHours, hoursOfRest FROM logs l1
-  INNER JOIN intervalData ON l1.userID = intervalData.userID
-  WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) > (pauseAfterHours * 60)
-  AND hoursOfRest * 60 -1 > (SELECT IFNULL(SUM(TIMESTAMPDIFF(MINUTE, start, end)),0) as breakCredit FROM projectBookingData WHERE bookingType = 'break' AND timestampID = l1.indexIM)";
-
+	  INNER JOIN intervalData ON l1.userID = intervalData.userID
+	  WHERE (status = '0' OR status ='5') AND endDate IS NULL AND timeEnd != '0000-00-00 00:00:00' AND TIMESTAMPDIFF(MINUTE, time, timeEnd) > (pauseAfterHours * 60)
+	  AND hoursOfRest * 60 -1 >= (SELECT IFNULL(SUM(TIMESTAMPDIFF(MINUTE, start, end)),0) AS breakCredit
+	  	FROM projectBookingData WHERE bookingType = 'break' AND timestampID = l1.indexIM)";
   $result = $conn->query($sql);
   if ($result && $result->num_rows > 0):
   ?>
     <h4> <?php echo $lang['ILLEGAL_LUNCHBREAK']; ?>:</h4>
     <div class="h4 text-right">
-      <a role="button" data-toggle="collapse" href="#illegal_lunchbreak_info" aria-expanded="false" aria-controls="illegal_lunchbreak_info">
-        <i class="fa fa-info-circle"></i>
-      </a>
+      <a role="button" data-toggle="collapse" href="#illegal_lunchbreak_info"> <i class="fa fa-info-circle"></i> </a>
     </div>
     <div class="collapse" id="illegal_lunchbreak_info">
       <div class="well">

@@ -3556,6 +3556,14 @@ if($row['version'] < 171){
 }
 
 if($row['version'] < 172){
+	$conn->query("ALTER TABLE account_journal ADD COLUMN status VARCHAR(10) DEFAULT 'account' NOT NULL");
+	if($conn->error){
+		echo '<br>', $conn->error;
+	} else {
+		echo "<br>Finanzen: Umbuchung";
+	}
+
+
     $sql = "CREATE TABLE default_access_permissions (
         permissionID INT(10) UNSIGNED NOT NULL,
         PRIMARY KEY (permissionID),
@@ -3566,9 +3574,7 @@ if($row['version'] < 172){
     }else{
         echo "Permissions: defaults";
     }
-}
 
-if($row['version'] < 173){
     $conn->query("ALTER TABLE dynamicprojects ADD COLUMN levelmax INT(3) DEFAULT 100 NOT NULL");
     if ($conn->error) {
         echo $conn->error;
@@ -3577,7 +3583,7 @@ if($row['version'] < 173){
     }
 }
 
-if($row['version'] < 174){
+if($row['version'] < 173){
     $sql = "CREATE TABLE gpg_keys (
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         userID INT(6) UNSIGNED UNIQUE,
@@ -3597,6 +3603,7 @@ if($row['version'] < 174){
     }
 }
 
+// if($row['version'] < 174){}
 // if($row['version'] < 175){}
 // if($row['version'] < 176){}
 // if($row['version'] < 177){}

@@ -181,6 +181,36 @@ if (isset($_POST['addFinance']) || isset($_POST['editJournalEntry'])) {
 
             $show_undo = true;
         }
+
+		if($accept && isset($_FILES['add_receipt'])){ //5b6d6adf012ca
+			$file_info = pathinfo($_FILES['add_receipt']['name']);
+			$ext = strtolower($file_info['extension']);
+			$filetype = $_FILES['add_receipt']['type'];
+			if (!validate_file($err, $ext, $_FILES['add_receipt']['size'])){
+				showError($err);
+			} elseif (empty($s3)) {
+				showError("Es konnte keine S3 Verbindung hergestellt werden. Stellen Sie sicher, dass unter den Archiv Optionen eine gültige Verbindung gespeichert wurde.");
+			} else {
+				try{
+					$hashkey = uniqid('', true); //23 chars
+					$file_encrypt = secure_data('FINANCE', file_get_contents($_FILES['add_receipt']['tmp_name']), 'encrypt', $userID, $privateKey);
+					$s3->putObject(array(
+						'Bucket' => $bucket,
+						'Key' => $hashkey,
+						'Body' => $file_encrypt
+					));
+
+					$filename = test_input($file_info['filename']);
+					$conn->query("INSERT INTO archive (category, categoryID, name, type, uniqID, uploadUser)
+						VALUES ('ACCOUNTING', '$journalID', '$filename', '$ext', '$hashkey', $userID)");
+					if($conn->error){ showError($conn->error); } else { showSuccess($lang['OK_UPLOAD']); }
+				} catch(Exception $e){
+					echo $e->getTraceAsString();
+					echo '<br><hr><br>';
+					echo $e->getMessage();
+				}
+			}
+		}
     } else {
         $accept = false;
         echo '<div class="alert alert-danger" class="close"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $lang['ERROR_INVALID_DATA'] . '</div>';
@@ -284,7 +314,7 @@ while ($result && ($row = $result->fetch_assoc())) {
         FROM account_balance INNER JOIN account_journal ON account_journal.id = account_balance.journalID
         INNER JOIN accounts ON account_journal.account = accounts.id
         LEFT JOIN receiptBook r1 ON r1.journalID = account_balance.journalID
-        WHERE account_balance.accountID = $id $dateQuery ORDER BY docNum, payDate, inDate ");
+        WHERE account_balance.accountID = $id AND account_journal.status = 'account' $dateQuery ORDER BY docNum, payDate, inDate ");
         echo $conn->error;
         $lockedMonths = $conn->query("SELECT lockDate FROM accountingLocks WHERE companyID = $cmpID");
         $lockedMonths = array_column($lockedMonths->fetch_all(), 0);
@@ -323,25 +353,39 @@ while ($result && ($row = $result->fetch_assoc())) {
 </table>
 <hr><br><br>
 <?php if($account_row['manualBooking'] == 'TRUE'): ?>
-    <form method="POST" class="well">
+    <form method="POST" class="well" enctype="multipart/form-data">
         <div class="row form-group">
             <div id="openWebButton" class="col-sm-2"><button type="button" class="btn btn-warning btn-block" data-toggle="modal" data-target="#openWEB" title="Wareneingangsbuch"><?php echo $lang['FROM'] . ' WEB'; ?></button></div>
         </div>
         <div class="row">
             <div class="col-md-2"><label>Nr.</label><input type="number" class="form-control" step="1" min="1" name="add_nr" value="<?php echo $docNum; ?>" autofocus/></div>
-            <div class="col-md-2"><label><?php echo $lang['DATE']; ?></label><input type="text" class="form-control datepicker" name="add_date" value="<?php echo substr($docDate, 0, 10); ?>" /></div>
+            <div class="col-md-2"><label><?php echo $lang['DATE']; ?></label>
+				<input type="text" class="form-control datepicker" name="add_date" value="<?php echo substr($docDate, 0, 10); ?>" />
+			</div>
             <div class="col-md-4"><label><?php echo $lang['ACCOUNT']; ?></label>
                 <select id="account" class="js-example-basic-single" name="add_account" ><option>...</otpion><?php echo $account_select; ?></select>
                     <small><a href="plan?cmp=<?php echo $account_row['companyID']; ?>" tabindex="-1" ><?php echo $lang['ACCOUNT_PLAN']; ?></a></small>
                 </div>
-                <div class="col-md-4"><label><?php echo $lang['VAT']; ?></label><select id="tax" class="js-example-basic-single" name="add_tax" ><?php echo $tax_select; ?></select></div>
+                <div class="col-md-4"><label><?php echo $lang['VAT']; ?></label>
+					<select id="tax" class="js-example-basic-single" name="add_tax" ><?php echo $tax_select; ?></select>
+				</div>
             </div>
             <div class="row form-group">
                 <div class="col-md-3"><label>Text</label><input id="infoText" type="text" class="form-control" name="add_text" maxlength="64" placeholder="Optional" /></div>
-                <div class="col-md-2"><label><?php echo $lang['FINANCE_DEBIT']; ?> <small>(Brutto)</small></label><input id="should" type="number" step="0.01" class="form-control money" name="add_should" placeholder="0,00"/></div>
-                <div class="col-md-2"><label><?php echo $lang['FINANCE_CREDIT']; ?> <small>(Brutto)</small></label><input id="have" type="number" step="0.01" class="form-control money" name="add_have" placeholder="0,00"/></div>
-                <div class="col-md-2"><label style="color:transparent">O.K.</label><button id="addFinance" type="submit" class="btn btn-warning btn-block" name="addFinance"><?php echo $lang['ADD']; ?></button></div>
-                <div class="col-md-3"><label id="transferToWEB" style="display:none;padding-top:28px;"><input type="checkbox" id="transferToWEBc" name="transferToWEB" value="1" />Ins WEB</label></div>
+                <div class="col-md-2"><label><?php echo $lang['FINANCE_DEBIT']; ?> <small>(Brutto)</small></label>
+					<input id="should" type="number" step="0.01" class="form-control money" name="add_should" placeholder="0,00"/>
+				</div>
+                <div class="col-md-2"><label><?php echo $lang['FINANCE_CREDIT']; ?> <small>(Brutto)</small></label>
+					<input id="have" type="number" step="0.01" class="form-control money" name="add_have" placeholder="0,00"/>
+				</div>
+                <div class="col-md-2"><label style="color:transparent">O.K.</label>
+					<button id="addFinance" type="submit" class="btn btn-warning btn-block" name="addFinance"><?php echo $lang['ADD']; ?></button>
+				</div>
+                <div class="col-md-3">
+					<label style="color:transparent">O.K.</label><br>
+					<label class="btn btn-default"><input type="file" style="display:none" name="add_receipt">Beleg Anhängen</label><br>
+					<label id="transferToWEB" style="display:none;padding-top:28px;"><input type="checkbox" id="transferToWEBc" name="transferToWEB" value="1" />Ins WEB</label>
+				</div>
             </div>
             <div class="row">
                 <span id="transferToWebInputs" style="display:none">

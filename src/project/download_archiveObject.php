@@ -41,7 +41,7 @@ try{
 
 $result = $conn->query("SELECT name, type FROM archive WHERE uniqID = '$fileKey' LIMIT 1");
 $row = $result->fetch_assoc();
-
+$row['name'] = test_input($row['name'], 1); //5b71af919315d
 if(isset($object)){
     header( "Cache-Control: public" );
     header( "Content-Description: File Transfer" );

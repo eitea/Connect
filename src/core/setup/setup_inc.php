@@ -874,6 +874,7 @@ function create_tables($conn) {
         info VARCHAR(70),
         should DECIMAL(18,2),
         have DECIMAL(18,2),
+		status VARCHAR(10) DEFAULT 'account' NOT NULL,
         FOREIGN KEY (account) REFERENCES accounts(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE,

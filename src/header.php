@@ -245,14 +245,14 @@ if ($_SESSION['color'] == 'light') {
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
-    <link href="plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet"/>
+    <link href="plugins/jQuery/jquery-ui/jquery-ui.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="plugins/font-awesome/css/font-awesome.min.css"/>
 
     <script src="plugins/jQuery/jquery.min.js"></script>
     <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
     <script src="plugins/bootstrap-notify/bootstrap-notify.min.js"></script>
     <script src='plugins/node_modules/survey-jquery/survey.jquery.min.js'></script>
-    <script src='plugins/jquery-ui/jquery-ui.min.js'></script>
+    <script src='plugins/jQuery/jquery-ui/jquery-ui.min.js'></script>
 
     <link rel="stylesheet" type="text/css" href="plugins/select2/css/select2.min.css">
     <script src='plugins/select2/js/select2.min.js'></script>
@@ -697,8 +697,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                     $finances_company_children_callback = function ($company /* has [id] and [name] */ ) use (&$conn) {
                         $company_children = [
                             "ACCOUNT_PLAN" => [
-                                "href" => "finance/plan",
-                                "active_routes" => ["finance/account"]
+                                "href" => "finance/plan"
                             ],
                             "ACCOUNT_JOURNAL" => [
                                 "href" => "finance/journal"
@@ -713,6 +712,9 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                                 "get_params" => ["v" => "$acc_id"]
                             ];
                         }
+						$company_children['REBOOKING'] = [
+								'href' => 'finance/rebook'
+						];
                         return $company_children;
                     };
 
