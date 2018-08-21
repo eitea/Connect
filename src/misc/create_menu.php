@@ -60,7 +60,8 @@ function transform_company_children_to_real_children(&$options)
                         // parent
                         // |-company_child1
                         //  \company_child2
-                        $options["children"] =  $children_with_query_parameters;
+                        if(isset($options["children"])) $options["children"] = array_merge($options["children"], $children_with_query_parameters);
+                        else $options["children"] = $children_with_query_parameters;
                     }else{
                         $options["children"][$cmpName] = ["children" => $children_with_query_parameters];
                     }
