@@ -10,3 +10,5 @@ plugins/dompdf/dompdf/dompdf/lib/fonts/*
 /nbproject/*
 run.ps1
 src/development_debug.php
+gpg/*
+!gpg/.gitkeep

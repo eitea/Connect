@@ -1,5 +1,7 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; ?>
-<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
+<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php";
+require_once dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . "dsgvo" . DIRECTORY_SEPARATOR . "gpg.php";
+?>
 <!-- BODY -->
 
 <?php
@@ -397,6 +399,7 @@ if(isset($_FILES['csvUpload']) && !$_FILES['csvUpload']['error']){
     }
 }
 } //end POST
+
 
 $result = $conn->query("SELECT c.*, s.publicKey FROM companyData c LEFT JOIN security_company s ON (s.companyID = c.id AND s.outDated = 'FALSE') WHERE c.id = $cmpID");
 echo $conn->error;
@@ -1344,6 +1347,9 @@ $row = $result->fetch_assoc();
         </div>
     </div>
 </div>
+
+<br />
+<?php GPGMixins::show_public_key_list("SELECT userID, companyID, teamID, public_key, fingerprint, private_key FROM gpg_keys WHERE companyID = $cmpID", false, false, $cmpID, "page-seperated-section") ?>
 
 <br><br>
 <script>

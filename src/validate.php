@@ -25,7 +25,9 @@ class Permissions
       'POST' => [
         'READ',
         'WRITE',
-        'EXTERN'
+        'EXTERN_PERSONAL',
+        'EXTERN_TEAM',
+        'EXTERN_COMPANY'
       ],
     ],
     'CORE' => [
@@ -89,6 +91,10 @@ class Permissions
         'READ',
         'WRITE'
       ],
+      'GPG' => [
+        'USE',
+        'ADMIN'
+      ]
     ],
     'ARCHIVE' => [
       'SHARE',

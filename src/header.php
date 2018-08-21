@@ -1,7 +1,13 @@
 <?php
 session_start();
 if (empty($_SESSION['userid'])) {
-    die('Please <a href="../login/auth">login</a> first.');
+    header('HTTP/1.0 401 Unauthorized');
+    $error_message = "Unauthorized";
+    $permission_name = $this_route["permission"];
+    $error_explanation =  "You need to be logged in to view this page.";
+    $error_code = "401";
+    include dirname(__DIR__) . DIRECTORY_SEPARATOR . 'error.php';
+    die();
 }
 $userID = $_SESSION['userid'];
 $timeToUTC = $_SESSION['timeToUTC'];
@@ -16,6 +22,7 @@ require_once __DIR__ . DIRECTORY_SEPARATOR . "validate.php";
 require __DIR__ . DIRECTORY_SEPARATOR . "language.php";
 require __DIR__ . DIRECTORY_SEPARATOR . "dsgvo" . DIRECTORY_SEPARATOR . "dsgvo_training_common.php";
 include 'version_number.php';
+require __DIR__ . DIRECTORY_SEPARATOR . "dsgvo" . DIRECTORY_SEPARATOR . "gpg.php";
 
 if (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])){
 	ini_set('display_errors', 1);
@@ -87,6 +94,17 @@ $available_users = array('-1');
 while ($result && ($row = $result->fetch_assoc())) {
     $available_users[] = $row['userID'];
 }
+$company_id_to_name = [];
+$result_company_id_to_name = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (" . implode(', ', $available_companies) . ")");
+while ($result_company_id_to_name && $row_company_id_to_name = $result_company_id_to_name->fetch_assoc()) {
+    $company_id_to_name[$row_company_id_to_name["id"]] = $row_company_id_to_name["name"];
+}
+$team_id_to_name = [];
+$result = $conn->query("SELECT id, name FROM teamData");
+while ($row = $result->fetch_assoc()) {
+    $team_id_to_name[$row["id"]] = $row["name"];
+}
+
 $validation_output = $error_output = '';
 
 list($sql_error, $userHasSurveys) = user_has_surveys_query($userID);
@@ -206,8 +224,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['color'] = $txt = test_input($_POST['set_skin']);
         $conn->query("UPDATE UserData SET color = '$txt' WHERE id = $userID");
     }
-
-
 } //endif POST
 
 if ($_SESSION['color'] == 'light') {
@@ -259,6 +275,7 @@ if ($_SESSION['color'] == 'light') {
     <title>Connect</title>
 </head>
 <body id="body_container" class="is-table-row">
+    <?php GPGMixins::form_handling() ?>
     <div id="loader"></div>
     <!-- navbar -->
     <nav id="fixed-navbar-header" class="navbar navbar-default navbar-fixed-top">
@@ -412,6 +429,7 @@ if ($_SESSION['color'] == 'light') {
                   </div>
                   <div id="header_keys" class="tab-pane fade"><br>
                       <form method="POST">
+                          <?php GPGMixins::show_public_key_list("SELECT userID, companyID, teamID, public_key, fingerprint, private_key FROM gpg_keys WHERE userID = $userID", $userID) ?>
                           <div class="col-md-12">
                               <label>Public Key</label>
                               <br><?php echo $publicKey; ?><br><br>
@@ -901,6 +919,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
                             ],
                             "children" => [
                                 "Logs" => ["href" => "dsgvo/log"],
+                                "GPG" => ["href" => "dsgvo/gpg"]
                             ]
                         ],
                         "ARCHIVE" => [

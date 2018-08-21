@@ -101,6 +101,7 @@ $routes = [ // each route has a path and an optional permission
     'dsgvo/training' => ["path" => 'dsgvo/dsgvo_training.php', "permission" => "TRAINING.READ"],
     'dsgvo/data-matrix' => ["path" => 'dsgvo/dsgvo_data_matrix.php', "permission" => "DSGVO.PROCEDURE_DIRECTORY"],
     'dsgvo/pdfDownload' => ["path" => 'dsgvo/dsgvo_vv_pdfDownload.php', "permission" => "DSGVO.PROCEDURE_DIRECTORY"],
+    'dsgvo/gpg' => ["path" => 'dsgvo/dsgvo_gpg.php', "permission" => "GPG.USE"],
 
     'archive/share' => ["path" => 'archive/archive_share.php', "permission" => "ARCHIVE.SHARE"],
     // 'archive/files' => ["path" => 'archive/archive_files.php', "permission" => "CORE.SETTINGS"], // doesn't exist

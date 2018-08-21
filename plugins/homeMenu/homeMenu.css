@@ -447,3 +447,7 @@ span.select2.select2-container.select2-container--default {
   margin-right: 0;
   margin-left: 0;
 }
+
+.monospace-font {
+  font-family: Consolas, "Lucida Console", Monaco, "Courier New", Courier, monospace;
+}

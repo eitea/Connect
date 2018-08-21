@@ -1,5 +1,7 @@
-<?php include dirname(dirname(__DIR__)) . '/header.php'; ?>
-<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
+<?php require dirname(dirname(__DIR__)) . '/header.php'; ?>
+<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; 
+require_once dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . "dsgvo" . DIRECTORY_SEPARATOR . "gpg.php";
+?>
 <!-- BODY -->
 <div class="page-header-fixed">
     <div class="page-header">
@@ -287,7 +289,6 @@ while($row = $result->fetch_assoc()){
 
 ?>
 <br>
-
 <div class="container-fluid panel-group" id="accordion">
   <?php
   $result = $conn->query("SELECT *, UserData.id AS user_id FROM UserData
@@ -594,6 +595,7 @@ while($row = $result->fetch_assoc()){
                 </div>
               </div>
               </div>
+              <?php GPGMixins::show_public_key_list("SELECT userID, companyID, teamID, public_key, fingerprint, private_key FROM gpg_keys WHERE userID = $x", $x) ?>
 
               <div class="container">
                 <a data-toggle="collapse" href="#intervalCollapse<?php echo $x; ?>" aria-expanded="false" aria-controls="collapseExample">Show all intervals</a>

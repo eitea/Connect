@@ -656,6 +656,15 @@ $lang_ger['EXPIRED'] = 'Abgelaufen';
 $lang_eng['EXPORT_ALL_SETS'] = 'Export all sets';
 $lang_ger['EXPORT_ALL_SETS'] = 'Exportieren aller Sets';
 
+$lang_eng['EXTERN_PERSONAL'] = 'Personal emails to external';
+$lang_ger['EXTERN_PERSONAL'] = 'Persönliche E-Mails nach Extern';
+
+$lang_eng['EXTERN_TEAM'] = 'Team emails to external';
+$lang_ger['EXTERN_TEAM'] = 'Team E-Mails nach Extern';
+
+$lang_eng['EXTERN_COMPANY'] = 'Company emails to external';
+$lang_ger['EXTERN_COMPANY'] = 'Firmen E-Mails nach Extern';
+
 $lang_eng['FEEDBACK_PROBLEM'] = 'I have a problem';
 $lang_ger['FEEDBACK_PROBLEM'] = 'Ich habe ein Problem';
 

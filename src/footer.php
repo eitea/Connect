@@ -7,6 +7,8 @@ if(!isset($userHasUnansweredOnLoginSurveys)){
 </div>
 <div id="currentSurveyModal"></div>
 <button type='button' class='btn btn-primary feedback-button'>Feedback</button>
+<?php GPGMixins::show_output_modal(); ?>
+<?php GPGMixins::show_scripts() ?>
 <script>
 $(".openSurvey").click(function(){
     openSurveyModal()

@@ -1,5 +1,7 @@
 <?php include dirname(dirname(__DIR__)) . '/header.php'; ?>
-<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
+<?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; 
+require_once dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . "dsgvo" . DIRECTORY_SEPARATOR . "gpg.php";
+?>
 <?php
 $teamID = 0;
 if(isset($_POST['createTeam']) && !empty($_POST['createTeam_name'])){
@@ -95,6 +97,7 @@ $percentage_select = '';
 for($i = 0; $i < 11; $i++){
     $percentage_select .= '<option value="'.($i*10).'">'.($i*10).'%</option>';
 }
+
 ?>
 
 <div class="page-header">
@@ -171,7 +174,9 @@ for($i = 0; $i < 11; $i++){
 									</select><br>
 								</div>
 							</div>
-						<?php endif; ?>
+                        <?php endif; ?>
+                        <?php GPGMixins::show_public_key_list("SELECT userID, companyID, teamID, public_key, fingerprint, private_key FROM gpg_keys WHERE teamID = $teamID", false, $teamID, false, "col-xs-12") ?>
+						<br> 
 						<br> <!-- MEMBERS -->
                         <?php
                         $userResult = $conn->query("SELECT userID, skill FROM relationship_team_user WHERE teamID = $teamID");
@@ -187,6 +192,7 @@ for($i = 0; $i < 11; $i++){
                         }
                         echo mysqli_error($conn);
                         ?>
+
                         <div class="col-md-12 text-right"><br>
 							<a class="btn btn-default" data-toggle="modal" data-target=".addTeamMember_<?php echo $teamID; ?>" title="Add Team Member">Mitglied Hinzufügen</a>
 						</div>
