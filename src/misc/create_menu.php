@@ -55,7 +55,15 @@ function transform_company_children_to_real_children(&$options)
                         $children_with_query_parameters[$company_child_name]["href"] .= $href; // the href can change
                         $children_with_query_parameters[$company_child_name]["get_params"]["cmp"] = $cmpID; // for only setting one item active
                     }
-                    $options["children"][$cmpName] = ["children" => $children_with_query_parameters];
+                    if(count($available_companies) == 2){
+                        // if there is only one company, generate
+                        // parent
+                        // |-company_child1
+                        //  \company_child2
+                        $options["children"] =  $children_with_query_parameters;
+                    }else{
+                        $options["children"][$cmpName] = ["children" => $children_with_query_parameters];
+                    }
                 }
             }
         }
