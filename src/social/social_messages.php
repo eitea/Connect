@@ -62,15 +62,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			if($is_email && !empty($_POST["email_from"])){
 				$arr = explode(";",$_POST["email_from"]);
 				$gpg_sign = isset($_POST["email_sign_gpg"]);
+				$send_gpg_public_keys = isset($_POST["email_send_gpg_public_keys"]);
 				if($arr[0] == "user" && Permissions::has("POST.EXTERN_PERSONAL") && $arr[1] == $userID){
 					$options['senderid'] = intval($arr[1]);
 					if($gpg_sign) $options['sender_gpg_private_key'] = GPGMixins::get_gpg_key("user",intval($arr[1]));
+					if($send_gpg_public_keys) $options['attachments'] = ["PGP Key.txt" => GPGMixins::get_gpg_key("user",intval($arr[1]))["public_key"]];
 				}elseif($arr[0] == "team" && Permissions::has("POST.EXTERN_TEAM") && !empty($teamID_toName[$arr[1]])){
 					$options['teamid'] = intval($arr[1]);
 					if($gpg_sign) $options['sender_gpg_private_key'] = GPGMixins::get_gpg_key("team",intval($arr[1]));
+					if($send_gpg_public_keys) $options['attachments'] = ["PGP Key.txt" => GPGMixins::get_gpg_key("team",intval($arr[1]))["public_key"]];
 				}elseif($arr[0] == "company" && Permissions::has("POST.EXTERN_COMPANY") && in_array($arr[1], $available_companies)){
 					$options['companyid'] = intval($arr[1]);
 					if($gpg_sign) $options['sender_gpg_private_key'] = GPGMixins::get_gpg_key("company",intval($arr[1]));
+					if($send_gpg_public_keys) $options['attachments'] = ["PGP Key.txt" => GPGMixins::get_gpg_key("company",intval($arr[1]))["public_key"]];
 				}else{
 					showError("You don't have permission to send as this user/team/company");
 					break;
@@ -365,29 +369,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 									$has_gpg_keys = GPGMixins::get_has_gpg_keys_list();
 									if(Permissions::has("POST.EXTERN_PERSONAL")){
 										$has_private_key = (isset($has_gpg_keys["user"][$userID]["private"]) && $has_gpg_keys["user"][$userID]["private"]);
-										echo '<option data-has-private-key="'.($has_private_key?"true":"false").'" title="Benutzer" value="user;' . $userID . '" data-icon="user">' . $userID_toName[$userID] . '</option>';
+										$has_public_key = (isset($has_gpg_keys["user"][$userID]["public"]) && $has_gpg_keys["user"][$userID]["public"]);
+										echo '<option data-has-public-key="'.($has_public_key?"true":"false").'" data-has-private-key="'.($has_private_key?"true":"false").'" title="Benutzer" value="user;' . $userID . '" data-icon="user">' . $userID_toName[$userID] . '</option>';
 									}
 									if(Permissions::has("POST.EXTERN_TEAM")){
 										foreach ($teamID_toName as $id => $name) {
 											$icon = $team_is_department[$id] ? "share-alt" : "group";
 											$type = $team_is_department[$id] ? "Abteilung" : "Team";
 											$has_private_key = (isset($has_gpg_keys["team"][$id]["private"]) && $has_gpg_keys["team"][$id]["private"]);
-											echo '<option data-has-private-key="'.($has_private_key?"true":"false").'" title="' . $type . '" value="team;' . $id . '" data-icon="' . $icon . '">' . $name . '</option>';
+											$has_public_key = (isset($has_gpg_keys["team"][$id]["public"]) && $has_gpg_keys["team"][$id]["public"]);
+											echo '<option data-has-public-key="'.($has_public_key?"true":"false").'" data-has-private-key="'.($has_private_key?"true":"false").'" title="' . $type . '" value="team;' . $id . '" data-icon="' . $icon . '">' . $name . '</option>';
 										}
 									}
 									if(Permissions::has("POST.EXTERN_COMPANY")){
 										foreach($available_companies as $id){
 											if($id > 0){
 												$has_private_key = (isset($has_gpg_keys["company"][$id]["private"]) && $has_gpg_keys["company"][$id]["private"]);
-												echo '<option data-has-private-key="'.($has_private_key?"true":"false").'" title="Mandant" value="company;' . $id . '" data-icon="building">' . $company_id_to_name[$id] . '</option>';
+												$has_public_key = (isset($has_gpg_keys["company"][$id]["public"]) && $has_gpg_keys["company"][$id]["public"]);
+												echo '<option data-has-public-key="'.($has_public_key?"true":"false").'" data-has-private-key="'.($has_private_key?"true":"false").'" title="Mandant" value="company;' . $id . '" data-icon="building">' . $company_id_to_name[$id] . '</option>';
 											}
 										}
 									}
 									?>
 								</select>
 								<div class="checkbox">
-									<label>
+								<label>
 										<input type="checkbox" id="email_sign_gpg_checkbox" name="email_sign_gpg" value="true"> GPG Signatur
+									</label>
+									&NonBreakingSpace;
+									<label>
+										<input type="checkbox" id="email_send_gpg_public_keys_checkbox" name="email_send_gpg_public_keys" value="true"> Öffentlichen GPG Schlüssel mitsenden
 									</label>
 								</div>
 							</div>
@@ -476,11 +487,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 					
 					function changeSenderGpgSignature(){
 						var hasPrivateKey = $("[name='email_from']").find(':selected').data("has-private-key")
+						var hasPublicKey = $("[name='email_from']").find(':selected').data("has-public-key")
 						if(hasPrivateKey){
 							$("#email_sign_gpg_checkbox").prop("disabled", false);
 						}else{
 							$("#email_sign_gpg_checkbox").prop("disabled", true);
 							$("#email_sign_gpg_checkbox").prop("checked", false);
+						}
+						if(hasPublicKey){
+							$("#email_send_gpg_public_keys_checkbox").prop("disabled", false);
+						}else{
+							$("#email_send_gpg_public_keys_checkbox").prop("disabled", true);
+							$("#email_send_gpg_public_keys_checkbox").prop("checked", false);
 						}
 					}
 					$("[name='email_from']").change(changeSenderGpgSignature)
