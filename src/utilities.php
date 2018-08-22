@@ -906,12 +906,12 @@ function getUnreadMessages($conversationID = 0){
 		INNER JOIN relationship_conversation_participant rcp ON (rcp.id = m.participantID AND (partType != 'USER' OR partID != '$userID'))
 		WHERE rcp.conversationID = $conversationID
 		AND m.sentTime >= (SELECT lastCheck FROM relationship_conversation_participant rcp2 WHERE rcp2.conversationID = rcp.conversationID
-		AND rcp2.status != 'exited' AND ((rcp2.partType = 'USER' AND rcp2.partID = '$userID') OR ( rcp2.partType = 'team' AND rcp2.partID IN (SELECT teamID FROM relationship_team_user WHERE userID = $userID AND NOT EXISTS (SELECT * FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' AND conversationID = rcp2.id)))) LIMIT 1)");
+		AND rcp2.status != 'exited' AND rcp2.partType = 'USER' AND rcp2.partID = '$userID')");
 	} else {
 		$result = $conn->query("SELECT COUNT(*) AS unreadMessages FROM messenger_messages m
 		INNER JOIN relationship_conversation_participant rcp ON (rcp.id = m.participantID AND (partType != 'USER' OR partID != '$userID'))
 		WHERE m.sentTime >= (SELECT lastCheck FROM relationship_conversation_participant rcp2 WHERE rcp2.conversationID = rcp.conversationID
-		AND rcp2.status != 'exited' AND ((rcp2.partType = 'USER' AND rcp2.partID = '$userID') OR ( rcp2.partType = 'team' AND rcp2.partID IN (SELECT teamID FROM relationship_team_user WHERE userID = $userID AND NOT EXISTS (SELECT * FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' AND conversationID = rcp2.id)))) LIMIT 1)");
+		AND rcp2.status != 'exited' AND rcp2.partType = 'USER' AND rcp2.partID = '$userID')"); // TODO: add team chat unread 
 	}
 
 	if($result && ($row = $result->fetch_assoc())){
