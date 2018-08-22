@@ -37,7 +37,7 @@ $routes = [ // each route has a path and an optional permission
     'system/tasks' => ["path" => 'core/system/taskScheduler.php', "permission" => "CORE.SETTINGS"],
     'system/backup' => ["path" => 'core/system/system_backup.php', "permission" => "CORE.SETTINGS"],
     'system/restore' => ["path" => 'core/system/system_restore.php', "permission" => "CORE.SETTINGS"],
-    'system/clients' => ["path" => 'core/system/editCustomers.php'],
+    'system/clients' => ["path" => 'core/system/editCustomers.php'], // Permissions handled separately
     'system/archive' => ["path" => 'core/system/options_archive.php', "permission" => "CORE.SETTINGS"],
     'system/security' => ["path" => 'core/system/securitySettings.php', "permission" => "CORE.SECURITY"],
     'system/restic' => ["path" => 'core/system/resticBackup.php', "permission" => "CORE.SETTINGS"],

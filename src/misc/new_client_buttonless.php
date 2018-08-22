@@ -12,21 +12,26 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $isSupplier = ($_POST['create_client_type'] == 'supplier') ? 'TRUE' : 'FALSE'; //5acb8a41e2d9e
         $filterCompanyID = $companyID = intval($_POST['create_client_company']);
 
-        $conn->query("INSERT INTO clientData (name, companyID, clientNumber, isSupplier) VALUES('$name', $companyID, '$clientNum', '$isSupplier')");
-        if(!$conn->error){
-			showSuccess($lang['OK_CREATE']);
-			$insert_clientID = $conn->insert_id;
-			if($isSupplier == 'FALSE'){
-				$conn->query("INSERT INTO projectData (clientID, name, status, hours, field_1, field_2, field_3)
-				SELECT '$insert_clientID', name, status, hours, field_1, field_2, field_3 FROM $companyDefaultProjectTable WHERE companyID = $companyID");
-				if($conn->error)showError($conn->error.__LINE__);
-			}
-			$conn->query("INSERT INTO $clientDetailTable (clientID) VALUES($insert_clientID)");
-			if($conn->error)showError($conn->error.__LINE__);
-			if($_POST['create_client_type'] == 'interest') showError('Interessenten zurzeit noch nicht definiert. Wurde als Kunde angelegt.');
-		} else {
-			echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
-		}
+        // TODO: test interest (INTERESTED.WRITE)
+        if(($isSupplier == 'TRUE' && Permissions::has("SUPPLIERS.WRITE")) || ($isSupplier == 'FALSE' && Permissions::has("CLIENTS.WRITE"))){
+            $conn->query("INSERT INTO clientData (name, companyID, clientNumber, isSupplier) VALUES('$name', $companyID, '$clientNum', '$isSupplier')");
+            if(!$conn->error){
+                showSuccess($lang['OK_CREATE']);
+                $insert_clientID = $conn->insert_id;
+                if($isSupplier == 'FALSE'){
+                    $conn->query("INSERT INTO projectData (clientID, name, status, hours, field_1, field_2, field_3)
+                    SELECT '$insert_clientID', name, status, hours, field_1, field_2, field_3 FROM $companyDefaultProjectTable WHERE companyID = $companyID");
+                    if($conn->error)showError($conn->error.__LINE__);
+                }
+                $conn->query("INSERT INTO $clientDetailTable (clientID) VALUES($insert_clientID)");
+                if($conn->error)showError($conn->error.__LINE__);
+                if($_POST['create_client_type'] == 'interest') showError('Interessenten zurzeit noch nicht definiert. Wurde als Kunde angelegt.');
+            } else {
+                echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$conn->error.'</div>';
+            }
+        }else{
+            showError("Ihnen fehlt die Berechtigung, ". ($isSupplier == 'TRUE'?'Lieferanten':'Kunden') ." zu erstellen");
+        }
     } elseif(isset($_POST['create_client'])){
         echo '<div class="alert alert-danger fade in">';
         echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -51,9 +56,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <div class="col-md-4">
                     <label>Typ</label>
                     <select id="changeClientType" name="create_client_type" class="js-example-basic-single">
+                        <?php if (Permissions::has("CLIENTS.WRITE")): ?>
                         <option value="client" selected><?php echo $lang['CLIENT']; ?></option>
+                        <?php endif ?>
+                        <?php if (Permissions::has("SUPPLIERS.WRITE")): ?>
                         <option value="supplier"><?php echo $lang['SUPPLIER']; ?></option>
+                        <?php endif ?>
+                        <?php if (Permissions::has("INTERESTED.WRITE")): ?>
                         <option value="interest">Interessenten</option>
+                        <?php endif ?>
                     </select>
                 </div>
                 <div class="col-md-6">

@@ -761,7 +761,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 							"badge" => ["count" => $dynamic_projects_menu_item_badge]
                         ],
                         "ADDRESS_BOOK" => [
-                            "show" => Permissions::has("CLIENTS.READ") || Permissions::has("SUPPLIERS.READ"),
+                            "show" => Permissions::has("CLIENTS.READ") || Permissions::has("SUPPLIERS.READ") || Permissions::has("INTERESTED.READ"),
                             "href" => "system/clients",
                             "icon" => "fa fa-fw fa-file-text-o",
                         ],

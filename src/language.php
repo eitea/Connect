@@ -895,6 +895,9 @@ $lang_ger['INSERT_CUSTOM_QUESTION'] = 'Benutzerdefinierte Frage einfügen';
 $lang_eng['INTERVAL'] = 'Interval';
 $lang_ger['INTERVAL'] = 'Intervall';
 
+$lang_eng['INTERESTED'] = 'Interested person';
+$lang_ger['INTERESTED'] = 'Interessenten';
+
 $lang_eng['INVALID_LOGIN'] = 'Invalid e-mail or password';
 $lang_ger['INVALID_LOGIN'] = 'Ungültige e-mail oder falsches Passwort';
 

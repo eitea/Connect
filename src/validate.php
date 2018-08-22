@@ -37,14 +37,18 @@ class Permissions
       'TEAMS',
       'SETTINGS',
       'TEMPLATES',
-	  'CLIENTS' => [
-		  'READ',
-		  'WRITE'
-	  ],
-	  'SUPPLIERS' => [
-		  'READ',
-		  'WRITE'
-	  ]
+      'CLIENTS' => [
+        'READ',
+        'WRITE'
+      ],
+      'SUPPLIERS' => [
+        'READ',
+        'WRITE'
+      ],
+      'INTERESTED' => [
+        'READ',
+        'WRITE'
+      ]
     ],
     'TIMES' => [
       'READ',

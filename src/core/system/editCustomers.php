@@ -2,7 +2,7 @@
 <?php require dirname(dirname(__DIR__)) . "/misc/helpcenter.php"; ?>
 <?php
 //5b6b24500a084
-if(!Permissions::has("CLIENTS.READ") && !Permissions::has("SUPPLIERS.READ")){
+if(!Permissions::has("CLIENTS.READ") && !Permissions::has("SUPPLIERS.READ") && !Permissions::has("INTERESTED.READ")){
 	die('Missing permissions');
 }
 $filterings = array("savePage" => $this_page, "company" => 0, "client" => 0, 'supplier' => 0); //set_filter requirement
@@ -10,7 +10,7 @@ if(isset($_GET['cmp'])){ $filterings['company'] = test_input($_GET['cmp']); }
 if(isset($_GET['custID'])){ $filterings['client'] = test_input($_GET['custID']);}
 if(isset($_GET['supID'])){ $filterings['supplier'] = test_input($_GET['supID']);}
 
-if($_SERVER["REQUEST_METHOD"] == "POST"){
+if($_SERVER["REQUEST_METHOD"] == "POST" && (Permissions::has("CLIENTS.WRITE") || Permissions::has("SUPPLIERS.WRITE") || Permissions::has("INTERESTED.WRITE"))){
     if(!empty($_POST['saveID'])){
         $filterClient = intval($_POST['saveID']);
         $activeTab = 'home';
@@ -342,7 +342,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <h3><?php echo $lang['ADDRESS_BOOK']; ?>
         <div class="page-header-button-group">
             <?php include dirname(dirname(__DIR__)) . '/misc/set_filter.php'; ?>
+            <?php if(Permissions::has("CLIENTS.WRITE") || Permissions::has("SUPPLIERS.WRITE") || Permissions::has("INTERESTED.WRITE")): ?>
             <button type="button" class="btn btn-default" data-toggle="modal" data-target="#create_client" title="<?php echo $lang['ADD']; ?>"><i class="fa fa-plus"></i></button>
+            <?php endif; ?>
         </div>
     </h3>
 </div>
