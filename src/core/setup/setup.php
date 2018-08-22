@@ -145,6 +145,7 @@ ini_set('max_execution_time',999);
             create_tables($conn);
 
             require_once dirname(dirname(__DIR__)) . "/version_number.php";
+            require_once dirname(dirname(__DIR__)) . "/validate.php";
 
             //------------------------------ INSERTS ---------------------------------------
             //insert identification

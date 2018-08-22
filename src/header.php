@@ -22,7 +22,7 @@ require_once __DIR__ . DIRECTORY_SEPARATOR . "validate.php";
 require __DIR__ . DIRECTORY_SEPARATOR . "language.php";
 require __DIR__ . DIRECTORY_SEPARATOR . "dsgvo" . DIRECTORY_SEPARATOR . "dsgvo_training_common.php";
 include 'version_number.php';
-require __DIR__ . DIRECTORY_SEPARATOR . "dsgvo" . DIRECTORY_SEPARATOR . "gpg.php";
+require_once __DIR__ . DIRECTORY_SEPARATOR . "dsgvo" . DIRECTORY_SEPARATOR . "gpg.php";
 
 if (!getenv('IS_CONTAINER') && !isset($_SERVER['IS_CONTAINER'])){
 	ini_set('display_errors', 1);
@@ -100,9 +100,11 @@ while ($result_company_id_to_name && $row_company_id_to_name = $result_company_i
     $company_id_to_name[$row_company_id_to_name["id"]] = $row_company_id_to_name["name"];
 }
 $team_id_to_name = [];
-$result = $conn->query("SELECT id, name FROM teamData");
+$team_is_department = [];
+$result = $conn->query("SELECT id, name, isDepartment FROM teamData");
 while ($row = $result->fetch_assoc()) {
     $team_id_to_name[$row["id"]] = $row["name"];
+    $team_is_department[$row["id"]] = $row["isDepartment"] == 'TRUE';
 }
 
 $validation_output = $error_output = '';
@@ -988,6 +990,7 @@ $checkInButton = "<button $ckIn_disabled type='submit' class='btn btn-warning bt
 							  type: 'POST',
 							  data: {function: 'getUnreadMessages', userid: <?php echo $userID; ?> },
 							  success: function (response) {
+                                  console.info(response);
 								  $('#chat_unread_message').html(response);
 								  if(response){ //annoy
 									  showInfo('Sie haben eine neue Nachricht erhalten. Sie finden Sie in Ihrer Post.',110000);

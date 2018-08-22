@@ -733,6 +733,7 @@ function getS3Object($bucket = ''){
 	return $s3;
 }
 
+require_once __DIR__ . DIRECTORY_SEPARATOR . "dsgvo" . DIRECTORY_SEPARATOR . "gpg.php";
 use PHPMailer\PHPMailer\PHPMailer;
 /*
 $options [
@@ -779,16 +780,32 @@ function send_standard_email($recipient, $content, Array $options = ['subject' =
 			echo 'Could not find teamid ', $conn->error;
 		}
 	} elseif(isset($options['senderid'])){
-		$result = $conn->query("SELECT firstname, lastname, real_email, emailSignature, u.companyID FROM UserData u
+		$result = $conn->query("SELECT firstname, lastname, real_email, emailSignature, u.companyID, u.email as fallback_email FROM UserData u
 			LEFT JOIN socialprofile ON u.id = UserID WHERE u.id = ".$options['senderid']);
 		if($teamRow = $result->fetch_assoc()){
-			$mail->setFrom($teamRow['real_email'], $teamRow['firstname'].' '.$teamRow['lastname']);
+            if(!empty($teamRow['real_email'])){
+                $mail->setFrom($teamRow['real_email'], $teamRow['firstname'].' '.$teamRow['lastname']);
+            }else{
+                $mail->setFrom($teamRow['fallback_email'], $teamRow['firstname'].' '.$teamRow['lastname']);
+            }
 			$signature = $teamRow['emailSignature'];
 			$companyID = $teamRow['companyID'];
 		} else {
 			echo 'Could not find senderid: ', $conn->error;
 		}
-	} else {
+    } elseif(isset($options['companyid'])){
+        $result = $conn->query("SELECT cmpDescription, name, mail, emailSignature FROM companyData WHERE id = ${options['companyid']}");
+        echo $conn->error;
+        if($result && $companyRow = $result->fetch_assoc()){
+            if(!empty($companyRow["cmpDescription"])){
+                $mail->setFrom($companyRow['mail'], $companyRow['cmpDescription']);
+            }else{
+                $mail->setFrom($companyRow['mail'], $companyRow['name']);
+            }
+            $signature = $companyRow["emailSignature"];
+            $companyID = $options["companyid"];
+        }
+    } else {
 		$mail->setFrom($row['sender'], $row['senderName']);
 	}
 	if(isset($options['attachments'])){
@@ -819,7 +836,16 @@ function send_standard_email($recipient, $content, Array $options = ['subject' =
 		$mail->Subject = $options['subject'];
 	} else {
 		$mail->Subject = 'Connect';
-	}
+    }
+    
+    $gpg = new gpg();
+    if(!empty($options["recipient_gpg_public_key"]) && !empty($options["sender_gpg_private_key"])){
+        $content = $gpg->encrypt($content, ["public_key" => $options["recipient_gpg_public_key"], "fingerprint" => $gpg->get_fingerprint($options["recipient_gpg_public_key"])],$options["sender_gpg_private_key"]);
+    }elseif(!empty($options["recipient_gpg_public_key"])){
+        $content = $gpg->encrypt($content, ["public_key" => $options["recipient_gpg_public_key"], "fingerprint" => $gpg->get_fingerprint($options["recipient_gpg_public_key"])]);
+    }elseif(!empty($options["sender_gpg_private_key"])){
+        $content = $gpg->sign($content, $options["sender_gpg_private_key"]);
+    }
 
 	$mail->Body    =  $content .'<br><br>'. $signature;
 	$mail->AltBody = 'Your e-mail provider does not support HTML. Use an Html Viewer to format this email. '. $content;
@@ -880,12 +906,12 @@ function getUnreadMessages($conversationID = 0){
 		INNER JOIN relationship_conversation_participant rcp ON (rcp.id = m.participantID AND (partType != 'USER' OR partID != '$userID'))
 		WHERE rcp.conversationID = $conversationID
 		AND m.sentTime >= (SELECT lastCheck FROM relationship_conversation_participant rcp2 WHERE rcp2.conversationID = rcp.conversationID
-		AND rcp2.status != 'exited' AND rcp2.partType = 'USER' AND rcp2.partID = '$userID')");
+		AND rcp2.status != 'exited' AND ((rcp2.partType = 'USER' AND rcp2.partID = '$userID') OR ( rcp2.partType = 'team' AND rcp2.partID IN (SELECT teamID FROM relationship_team_user WHERE userID = $userID AND NOT EXISTS (SELECT * FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' AND conversationID = rcp2.id)))) LIMIT 1)");
 	} else {
 		$result = $conn->query("SELECT COUNT(*) AS unreadMessages FROM messenger_messages m
 		INNER JOIN relationship_conversation_participant rcp ON (rcp.id = m.participantID AND (partType != 'USER' OR partID != '$userID'))
 		WHERE m.sentTime >= (SELECT lastCheck FROM relationship_conversation_participant rcp2 WHERE rcp2.conversationID = rcp.conversationID
-		AND rcp2.status != 'exited' AND rcp2.partType = 'USER' AND rcp2.partID = '$userID')");
+		AND rcp2.status != 'exited' AND ((rcp2.partType = 'USER' AND rcp2.partID = '$userID') OR ( rcp2.partType = 'team' AND rcp2.partID IN (SELECT teamID FROM relationship_team_user WHERE userID = $userID AND NOT EXISTS (SELECT * FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' AND conversationID = rcp2.id)))) LIMIT 1)");
 	}
 
 	if($result && ($row = $result->fetch_assoc())){

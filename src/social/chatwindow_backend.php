@@ -1,7 +1,8 @@
 <?php
 if(!empty($_POST['leave_conversation'])){
 	$conversationID = intval($_POST['leave_conversation']);
-	$conn->query("UPDATE relationship_conversation_participant SET status = 'exited' WHERE partType='USER' AND partID = $userID AND conversationID = $conversationID");
+	// insert user relationship so other team members don't leave
+	$conn->query("INSERT INTO relationship_conversation_participant(partType, partID, conversationID, status) VALUES ('USER', '$userID', $conversationID, 'exited') ON DUPLICATE KEY UPDATE status = 'exited'");
 	if($conn->error) showError($conn->error.__LINE__);
 	//delete conversations which have no participants
 	$conn->query("DELETE FROM messenger_conversations WHERE NOT EXISTS(SELECT id FROM relationship_conversation_participant WHERE conversationID = messenger_conversations.id)");
@@ -79,7 +80,8 @@ if(!empty($_POST['openChat'])){
 }
 if(!empty($_POST['chat_archive'])){ //5b680295a634f
 	$val = intval($_POST['chat_archive']);
-	$conn->query("UPDATE relationship_conversation_participant SET archive = '".getCurrentTimestamp()."' WHERE conversationID = $val AND partType = 'USER' AND partID = '$userID'");
+	// insert user relationship so other team members don't see the chat as archived
+	$conn->query("INSERT INTO relationship_conversation_participant(partType, partID, conversationID, status, archive) VALUES ('USER', '$userID', $val, 'open', '".getCurrentTimestamp()."') ON DUPLICATE KEY UPDATE archive = '".getCurrentTimestamp()."'");
 	if ($conn->error) {
 		showError($conn->error);
 	} else {

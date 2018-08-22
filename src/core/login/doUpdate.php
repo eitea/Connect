@@ -3603,7 +3603,10 @@ if($row['version'] < 173){
     }
 }
 
-// if($row['version'] < 174){}
+if($row['version'] < 174){
+    setup_permissions();
+}
+
 // if($row['version'] < 175){}
 // if($row['version'] < 176){}
 // if($row['version'] < 177){}

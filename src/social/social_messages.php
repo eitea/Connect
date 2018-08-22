@@ -6,17 +6,27 @@ $archiveToggle = 'set2';
 if(isset($_GET['toggleArchive'])){
 	if($_GET['toggleArchive'] == 'set2') $archiveToggle = 'set1';
 }
+
+$teamID_toName = []; // TODO: better name
+$result = $conn->query("SELECT teamData.name, teamID FROM relationship_team_user INNER JOIN teamData ON teamData.id = teamID WHERE userID = $userID");
+while ($row = $result->fetch_assoc()) {
+    $teamID_toName[$row['teamID']] = $row['name'];
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     require __DIR__.'/chatwindow_backend.php'; //sets openChatID and takes care of chatwindow.php default operations
-    if (isset($_POST['send_new_message']) && !empty($_POST['new_message_subject']) && !empty($_POST['new_message_body'])) {
+    if (isset($_POST['send_new_message']) && !empty($_POST['new_message_subject']) && !empty($_POST['new_message_body']) && Permissions::has("POST.WRITE")) {
         $subject = test_input($_POST['new_message_subject']);
-        $message =  test_input($_POST['new_message_body']);
+		$message =  test_input($_POST['new_message_body']);
+		$message_type = $_POST["message_type"];
+		$is_pm = $message_type == "pm";
+		$is_email = $message_type == "email";
 
         $stmt_participant = $conn->prepare("INSERT INTO relationship_conversation_participant(conversationID, partType, partID, status) VALUES (?, ?, ?, ?)");
         $stmt_participant->bind_param('isss', $conversationID, $partType, $partID, $status);
         $count = 1;
-        if (!empty($_POST['new_message_contacts'])) {
-            $count = count($_POST['new_message_contacts']);
+        if (!empty($_POST['email_recipients']) && $is_email) {
+            $count = count($_POST['email_recipients']);
         }
         for ($i = 0; $i < $count; $i++) {
             $identifier = uniqid();
@@ -34,36 +44,54 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 showError($conn->error.__LINE__);
             }
             $participantID = $conn->insert_id;
-            //participants
-            if (!empty($_POST['new_message_user'])) {
-                foreach ($_POST['new_message_user'] as $val) {
-                    $partType = 'USER';
-                    $partID = intval($val);
+            //participants (team(s) or user(s))
+            if (!empty($_POST['pm_recipients']) && $is_pm) {
+                foreach ($_POST['pm_recipients'] as $val) {
+					$arr = explode(";", $val);
+					if($arr[0] == "user"){
+						$partType = 'USER';
+					}else{
+						$partType = 'team';
+					}
+					// showInfo(str_replace("\n", "<br>", print_r($arr, true)));
+                    $partID = intval($arr[1]);
                     $status = 'normal';
                     $stmt_participant->execute();
                 }
-            }
-            if ($_POST['new_message_sender'] == 2 && !empty($_POST['new_message_sender_team'])) {
-                $partType = 'team';
-                $partID = intval($_POST['new_message_sender_team']);
-                $status = 'sender';
-                $stmt_participant->execute();
-                $options['teamid'] = $partID;
-            } else {
-                $options['userid'] = $userID;
-            }
+			}
+			if($is_email && !empty($_POST["email_from"])){
+				$arr = explode(";",$_POST["email_from"]);
+				$gpg_sign = isset($_POST["email_sign_gpg"]);
+				if($arr[0] == "user" && Permissions::has("POST.EXTERN_PERSONAL") && $arr[1] == $userID){
+					$options['senderid'] = intval($arr[1]);
+					if($gpg_sign) $options['sender_gpg_private_key'] = GPGMixins::get_gpg_key("user",intval($arr[1]));
+				}elseif($arr[0] == "team" && Permissions::has("POST.EXTERN_TEAM") && !empty($teamID_toName[$arr[1]])){
+					$options['teamid'] = intval($arr[1]);
+					if($gpg_sign) $options['sender_gpg_private_key'] = GPGMixins::get_gpg_key("team",intval($arr[1]));
+				}elseif($arr[0] == "company" && Permissions::has("POST.EXTERN_COMPANY") && in_array($arr[1], $available_companies)){
+					$options['companyid'] = intval($arr[1]);
+					if($gpg_sign) $options['sender_gpg_private_key'] = GPGMixins::get_gpg_key("company",intval($arr[1]));
+				}else{
+					showError("You don't have permission to send as this user/team/company");
+					break;
+				}
+				if($gpg_sign && empty($options['sender_gpg_private_key'])){
+					showError("No GPG private key found");
+				}
+			}
+
 			if(isset($_FILES['new_message_files'])){ //5b45f089288db
 				$s3 = getS3Object($bucket);
-				for ($i = 0; $i < count($_FILES['new_message_files']['name']); $i++) {
-					if($s3 && file_exists($_FILES['new_message_files']['tmp_name'][$i]) && is_uploaded_file($_FILES['new_message_files']['tmp_name'][$i])){
-						$file_info = pathinfo($_FILES['new_message_files']['name'][$i]);
+				for ($j = 0; $j < count($_FILES['new_message_files']['name']); $j++) {
+					if($s3 && file_exists($_FILES['new_message_files']['tmp_name'][$j]) && is_uploaded_file($_FILES['new_message_files']['tmp_name'][$j])){
+						$file_info = pathinfo($_FILES['new_message_files']['name'][$j]);
 						$ext = test_input(strtolower($file_info['extension']));
-						if (!validate_file($err, $ext, $_FILES['new_message_files']['size'][$i])){
+						if (!validate_file($err, $ext, $_FILES['new_message_files']['size'][$j])){
 							showError($err);
 						} else {
 							try{
 								$hashkey = uniqid('', true); //23 chars
-								$file = file_get_contents($_FILES['new_message_files']['tmp_name'][$i]);
+								$file = file_get_contents($_FILES['new_message_files']['tmp_name'][$j]);
 								$file_encrypt = asymmetric_encryption('CHAT', $file, $userID, $privateKey);
 								$s3->putObject(array(
 									'Bucket' => $bucket,
@@ -93,9 +121,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 				echo "NO EXISTING FILES  TES T";
 				print_r($_FILES);
 			}
-            if (Permissions::has("POST.EXTERN")) {
-                if (!empty($_POST['new_message_cc_contacts'])) {
-                    foreach ($_POST['new_message_cc_contacts'] as $val) {
+
+            if ($is_email && Permissions::has("POST.EXTERN_PERSONAL") || Permissions::has("POST.EXTERN_TEAM") || Permissions::has("POST.EXTERN_COMPANY")){
+				$gpg_encrypt = isset($_POST["email_encrypt_gpg"]);
+                if (!empty($_POST['email_cc'])) {
+                    foreach ($_POST['email_cc'] as $val) {
                         $arr = explode('_', $val);
                         $val = intval($arr[1]);
                         if ($arr[0] == 'client') {
@@ -111,8 +141,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         }
                     }
                 }
-                if (!empty($_POST['new_message_bcc_contacts'])) {
-                    foreach ($_POST['new_message_bcc_contacts'] as $val) {
+                if (!empty($_POST['email_bcc'])) {
+                    foreach ($_POST['email_bcc'] as $val) {
                         $arr = explode('_', $val);
                         $val = intval($arr[1]);
                         if ($arr[0] == 'client') {
@@ -129,8 +159,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         }
                     }
                 }
-                if (!empty($_POST['new_message_contacts'])) {
-                    $val = $_POST['new_message_contacts'][$i];
+                if (!empty($_POST['email_recipients'])) {
+                    $val = $_POST['email_recipients'][$i];
                     $arr = explode('_', $val);
                     $val = intval($arr[1]);
                     $status = 'normal';
@@ -140,7 +170,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $result = $conn->query("SELECT mail AS email, name AS lastname, firstname, title, gender FROM clientInfoData WHERE clientID = $val LIMIT 1");
                     } else {
                         $partType = 'contact';
-                        $result = $conn->query("SELECT email, firstname, lastname, gender, title FROM contactPersons WHERE id = $val LIMIT 1");
+                        $result = $conn->query("SELECT email, firstname, lastname, gender, title, pgpKey FROM contactPersons WHERE id = $val LIMIT 1");
                     }
                     if ($result && ($row = $result->fetch_assoc())) {
                         $partID = $row['email'];
@@ -155,7 +185,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             }
                             $intro .= $row['title'].' '.$row['firstname'].' '.$row['lastname'];
                             $message = str_replace('[ANREDE]', $intro, $message);
-                        }
+						}
+						if($gpg_encrypt && $row['pgpKey']) $options['recipient_gpg_public_key'] = $row['pgpKey'];
                         echo send_standard_email($partID, $message, $options);
                     }
                 }
@@ -179,16 +210,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         showError("Missing Subject or Message");
     }
 }
-$teamID_toName = [];
-$result = $conn->query("SELECT teamData.name, teamID FROM relationship_team_user INNER JOIN teamData ON teamData.id = teamID WHERE userID = $userID");
-while ($row = $result->fetch_assoc()) {
-    $teamID_toName[$row['teamID']] = $row['name'];
-}
+
 ?>
 <form>
 	<div class="page-header h3">Nachrichten
 	    <div class="page-header-button-group">
+			<?php if(Permissions::has("POST.WRITE")): ?>
 			<a data-toggle="modal" href="#new-message-modal" class="btn btn-default"><i class="fa fa-plus"></i></a>
+			<?php endif; ?>
 			<button type="submit" name="toggleArchive" style="background-color:<?php if($archiveToggle == 'set1') {echo 'violet'; } //5b6a9acc84186 ?>"
 				 value="<?php echo $archiveToggle; ?>" class="btn btn-default" title="Archivierte Nachrichten anzeigen/ ausblenden"><i class="fa fa-archive"></i>
 			 </button>
@@ -217,11 +246,11 @@ while ($row = $result->fetch_assoc()) {
             $stmt->bind_param('i', $conversationID);
             $result = $conn->query("SELECT c.id, c.category, subject, rcp.lastCheck, rcp.id AS participantID, rcp.archive, tbl.unreadMessages, mm.sentTime FROM messenger_conversations c
 				INNER JOIN relationship_conversation_participant rcp
-				ON (rcp.status != 'exited' AND rcp.conversationID = c.id AND rcp.partType = 'USER' AND rcp.partID = '$userID')
+				ON (rcp.status != 'exited' AND rcp.conversationID = c.id AND ((rcp.partType = 'USER' AND rcp.partID = '$userID') OR ( rcp.partType = 'team' AND rcp.partID IN (SELECT teamID FROM relationship_team_user WHERE userID = $userID) AND NOT EXISTS (SELECT * FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' AND conversationID = c.id))))
 				LEFT JOIN (SELECT COUNT(*) AS unreadMessages, rcp1.conversationID FROM messenger_messages m
 					INNER JOIN relationship_conversation_participant rcp1 ON (rcp1.id = m.participantID AND (partType != 'USER' OR partID != '$userID'))
-					WHERE m.sentTime >= (SELECT lastCheck FROM relationship_conversation_participant rcp2 WHERE rcp2.conversationID = rcp1.conversationID
-					AND rcp2.status != 'exited' AND rcp2.partType = 'USER' AND rcp2.partID = '$userID')
+					WHERE m.sentTime >= ALL (SELECT lastCheck FROM relationship_conversation_participant rcp2 WHERE rcp2.conversationID = rcp1.conversationID
+					AND rcp2.status != 'exited' AND ((rcp2.partType = 'USER' AND rcp2.partID = '$userID') OR ( rcp2.partType = 'team' AND rcp2.partID IN (SELECT teamID FROM relationship_team_user WHERE userID = $userID AND NOT EXISTS (SELECT * FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' AND conversationID = rcp2.id)))))
 					GROUP BY conversationID) tbl
 				ON tbl.conversationID = c.id
 				LEFT JOIN messenger_messages mm ON mm.id = (SELECT mm2.id FROM messenger_messages mm2
@@ -252,7 +281,11 @@ while ($row = $result->fetch_assoc()) {
 	                    if ($partrow['partType'] == 'USER') {
 	                        echo $userID_toName[$partrow['partID']];
 	                    } elseif ($partrow['partType'] == 'team') {
-	                        echo $teamID_toName[$partrow['partID']];
+							if(isset($teamID_toName[$partrow['partID']])){
+								echo $teamID_toName[$partrow['partID']]; // contains team names for teams the user is part of
+							}else{
+								echo $team_id_to_name[$partrow['partID']]; // contains all team names
+							}
 	                    } else { //show client and contact with email
 	                        echo $partrow['partID'];
 	                    }
@@ -282,12 +315,180 @@ while ($row = $result->fetch_assoc()) {
 		</tbody>
 	</table>
 </div>
+
 <form method="post" enctype="multipart/form-data">
 	<div id="new-message-modal" class="modal fade" tabindex="-1" role="dialog">
-		<div class="modal-dialog modal-content modal-md">
+		<div id="new-message-modal-content" class="modal-dialog modal-content">
 			<div class="modal-header"><h4>Neue Nachricht</h4></div>
 			<div class="modal-body">
-				<div class="row">
+
+				<input type="hidden" name="message_type" value="pm" id="message-type-input" />
+				<?php if (Permissions::has("POST.EXTERN_PERSONAL") || Permissions::has("POST.EXTERN_TEAM") || Permissions::has("POST.EXTERN_COMPANY")): ?>
+				<ul class="nav nav-tabs nav-justified">
+					<li class="active">
+						<a href="#new-message-tab-pm" data-toggle="tab" onclick="$('#message-type-input').val('pm'); $('#new-message-modal-content').removeClass('modal-lg')">PM</a>
+					</li>
+					<li>
+						<a href="#new-message-tab-email" data-toggle="tab" onclick="$('#message-type-input').val('email'); $('#new-message-modal-content').addClass('modal-lg')">E-Mail</a>
+					</li>
+				</ul>
+				<?php endif; ?>
+
+				<div class="tab-content">
+					<div class="tab-pane  in active" id="new-message-tab-pm">
+						<div class="row">
+							<div class="col-xs-12">
+								<label>An</label>
+								<select class="select2-team-icons form-control" multiple name="pm_recipients[]">
+									<?php
+									foreach ($available_users as $val) {
+										if ($val > 0) {
+											echo '<option title="Benutzer" value="user;' . $val . '" data-icon="user">' . $userID_toName[$val] . '</option>';
+										}
+									}
+									foreach ($team_id_to_name as $id => $name){
+										$icon = $team_is_department[$id] ? "share-alt" : "group";
+										$type = $team_is_department[$id] ? "Abteilung" : "Team";
+										echo '<option title="' . $type . '" value="team;' . $id . '" data-icon="' . $icon . '">' . $name . '</option>';
+									}
+									?>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane " id="new-message-tab-email">
+						<div class="row">
+							<div class="col-xs-12">
+								<label>Von</label>
+								<select class="select2-team-icons form-control" name="email_from">
+									<?php
+									$has_gpg_keys = GPGMixins::get_has_gpg_keys_list();
+									if(Permissions::has("POST.EXTERN_PERSONAL")){
+										$has_private_key = (isset($has_gpg_keys["user"][$userID]["private"]) && $has_gpg_keys["user"][$userID]["private"]);
+										echo '<option data-has-private-key="'.($has_private_key?"true":"false").'" title="Benutzer" value="user;' . $userID . '" data-icon="user">' . $userID_toName[$userID] . '</option>';
+									}
+									if(Permissions::has("POST.EXTERN_TEAM")){
+										foreach ($teamID_toName as $id => $name) {
+											$icon = $team_is_department[$id] ? "share-alt" : "group";
+											$type = $team_is_department[$id] ? "Abteilung" : "Team";
+											$has_private_key = (isset($has_gpg_keys["team"][$id]["private"]) && $has_gpg_keys["team"][$id]["private"]);
+											echo '<option data-has-private-key="'.($has_private_key?"true":"false").'" title="' . $type . '" value="team;' . $id . '" data-icon="' . $icon . '">' . $name . '</option>';
+										}
+									}
+									if(Permissions::has("POST.EXTERN_COMPANY")){
+										foreach($available_companies as $id){
+											if($id > 0){
+												$has_private_key = (isset($has_gpg_keys["company"][$id]["private"]) && $has_gpg_keys["company"][$id]["private"]);
+												echo '<option data-has-private-key="'.($has_private_key?"true":"false").'" title="Mandant" value="company;' . $id . '" data-icon="building">' . $company_id_to_name[$id] . '</option>';
+											}
+										}
+									}
+									?>
+								</select>
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" id="email_sign_gpg_checkbox" name="email_sign_gpg" value="true"> GPG Signatur
+									</label>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-12">
+								<label>An</label>
+								<select class="select2-team-icons" name="email_recipients[]" multiple>
+									<?php
+									$options_message_contacts = '';
+									$result = $conn->query("SELECT cp.id, cp.firstname, cp.lastname, cp.email, clientData.name AS clientName, companyData.name AS companyName, cp.pgpKey
+										FROM contactPersons cp INNER JOIN clientData ON clientData.id = clientID INNER JOIN companyData ON companyData.id = companyID
+										WHERE cp.email IS NOT NULL AND clientData.companyID IN (".implode(', ', $available_companies).")");
+									while ($result && ($row = $result->fetch_assoc())) {
+										$options_message_contacts .= '<option '.($row['pgpKey']?"data-icon='lock'":"data-icon='unlock'").' data-has-gpg-key="'.($row['pgpKey']?"true":"false").'" value="contact_'.$row['id'].'">'. $row['companyName'].' - '.$row ['clientName'].' - '.
+										$row['firstname'].' '.$row['lastname']. ' ('.$row['email']. ')</option>';
+									}
+									$result = $conn->query("SELECT clientID, clientInfoData.mail, clientData.name AS clientName, companyData.name AS companyName
+										FROM clientInfoData INNER JOIN clientData ON clientData.id = clientID INNER JOIN companyData ON companyData.id = companyID
+										WHERE clientInfoData.mail IS NOT NULL AND clientData.companyID IN (".implode(', ', $available_companies).")");
+										while ($result && ($row = $result->fetch_assoc())) {
+											$options_message_contacts .=  '<option data-icon="unlock" data-has-gpg-key="false" value="client_'.$row['clientID'].'">'.$row['companyName'].' - '.$row ['clientName'].' ('.$row['mail'].')</option>';
+										}
+										echo $options_message_contacts;
+									?>
+								</select>
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" id="email_encrypt_gpg_checkbox" disabled name="email_encrypt_gpg" value="true"> GPG Verschlüsselung
+									</label>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-12">
+								<label>CC</label>
+								<select class="select2-team-icons" name="email_cc[]" multiple>
+									<?php
+										echo $options_message_contacts;
+									?>
+								</select>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-12">
+								<label>BCC</label>
+								<select class="select2-team-icons" name="email_bcc[]" multiple>
+									<?php
+										echo $options_message_contacts;
+									?>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+				<script>
+					function changeRecipientGpgEncryption(){
+						var everyRecipientHasGpgKeys = true;
+						// var recipients = $("[name='email_recipients[]']").find(':selected').toArray().concat(
+						// 	$("[name='email_cc[]']").find(':selected').toArray().concat(
+						// 		$("[name='email_bcc[]']").find(':selected').toArray()
+						// 	)
+						// );
+						var recipients = $("[name='email_recipients[]']").find(':selected').toArray()
+						if(!recipients.length) everyRecipientHasGpgKeys = false;
+						recipients.forEach(function(elem){
+							if(!$(elem).data("has-gpg-key")){
+								everyRecipientHasGpgKeys = false;
+							}
+						})
+
+						var otherRecipients = $("[name='email_cc[]']").find(':selected').toArray().concat(
+							$("[name='email_bcc[]']").find(':selected').toArray()
+						)
+						
+						if(everyRecipientHasGpgKeys && otherRecipients.length == 0){
+							$("#email_encrypt_gpg_checkbox").prop("disabled", false);
+						}else{
+							$("#email_encrypt_gpg_checkbox").prop("disabled", true);
+							$("#email_encrypt_gpg_checkbox").prop("checked", false);
+						}
+					}
+					$("[name='email_recipients[]']").change(changeRecipientGpgEncryption)
+					$("[name='email_cc[]']").change(changeRecipientGpgEncryption)
+					$("[name='email_bcc[]']").change(changeRecipientGpgEncryption)
+					
+					function changeSenderGpgSignature(){
+						var hasPrivateKey = $("[name='email_from']").find(':selected').data("has-private-key")
+						if(hasPrivateKey){
+							$("#email_sign_gpg_checkbox").prop("disabled", false);
+						}else{
+							$("#email_sign_gpg_checkbox").prop("disabled", true);
+							$("#email_sign_gpg_checkbox").prop("checked", false);
+						}
+					}
+					$("[name='email_from']").change(changeSenderGpgSignature)
+					changeSenderGpgSignature();
+				</script>
+
+
+				<!-- <div class="row">
 					<div class="col-sm-6"><label><input type="radio" name="new_message_sender" value="2" id="sender_team_radio" checked> Von Team
 						<a title="Die Absender Einstellungen werden unter den Team Einstellungen gesetzt"><i class="fa fa-info-circle"></i></a>
 					</label></div>
@@ -320,30 +521,7 @@ while ($row = $result->fetch_assoc()) {
                         echo $options_message_user;
                         ?>
 					</select>
-				</div>
-				<div class="col-md-6 enable-personal-role">
-					<label>An externen Kontakt <a title="Öffnet für jeden Kontakt eine eigene Konversation"><i class="fa fa-info-circle"></i></a></label>
-					<select class="js-example-basic-single" name="new_message_contacts[]" multiple>
-						<?php
-                        $options_message_contacts = '';
-                        $result = $conn->query("SELECT cp.id, cp.firstname, cp.lastname, cp.email, clientData.name AS clientName, companyData.name AS companyName
-							FROM contactPersons cp INNER JOIN clientData ON clientData.id = clientID INNER JOIN companyData ON companyData.id = companyID
-							WHERE cp.email IS NOT NULL AND clientData.companyID IN (".implode(', ', $available_companies).")");
-                        while ($result && ($row = $result->fetch_assoc())) {
-                            $options_message_contacts .= '<option value="contact_'.$row['id'].'">'. $row['companyName'].' - '.$row ['clientName'].' - '.
-                            $row['firstname'].' '.$row['lastname']. ' ('.$row['email']. ')</option>';
-                        }
-                        $result = $conn->query("SELECT clientID, clientInfoData.mail, clientData.name AS clientName, companyData.name AS companyName
-							FROM clientInfoData INNER JOIN clientData ON clientData.id = clientID INNER JOIN companyData ON companyData.id = companyID
-							WHERE clientInfoData.mail IS NOT NULL AND clientData.companyID IN (".implode(', ', $available_companies).")");
-                            while ($result && ($row = $result->fetch_assoc())) {
-                                $options_message_contacts .=  '<option value="client_'.$row['clientID'].'">'.$row['companyName'].' - '.$row ['clientName'].' ('.$row['mail'].')</option>';
-                            }
-                            echo $options_message_contacts;
-                            ?>
-						</select>
-					</div>
-					</div>
+				</div> -->
 					<div class="row">
 						<div class="col-md-12">
 							<label>Betreff*</label>
@@ -362,20 +540,6 @@ while ($row = $result->fetch_assoc()) {
 							<br>
 						</div>
 					</div>
-					<div class="row enable-personal-role">
-						<div class="col-md-6">
-							<label>CC externen Kontakt</label>
-							<select class="js-example-basic-single" name="new_message_cc_contacts[]" multiple>
-								<?php echo $options_message_contacts; ?>
-							</select>
-						</div>
-						<div class="col-md-6">
-							<label>BCC externen Kontakt</label>
-							<select class="js-example-basic-single" name="new_message_bcc_contacts[]" multiple>
-								<?php echo $options_message_contacts; ?>
-							</select>
-						</div>
-					</div>
 				</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -384,24 +548,8 @@ while ($row = $result->fetch_assoc()) {
 		</div>
 	</div>
 </form>
-<script type="text/javascript">
-<?php if (!Permissions::has("POST.EXTERN")): ?>
-	$("input[name='new_message_sender']").change(function(){
-		if($('#sender_personal_radio').is(':checked')){
-			$('.enable-personal-role').hide();
-		} else {
-			$('.enable-personal-role').show();
-		}
-	});
-<?php endif; ?>
-	$('input[name="new_message_sender"]').on('click', function(){
-		if($('#sender_team_radio').is(':checked')){
-			$('#sender_team_box').show();
-		} else {
-			$('#sender_team_box').hide();
-		}
-	});
 
+<script type="text/javascript">
   $('.clicker').click(function(){
 	  var index = $(this).data('val');
 	  $("#form_openChat_"+index).submit();

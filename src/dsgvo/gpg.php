@@ -5,8 +5,9 @@ class GPG
     private $gpg;
     private $home_dir;
 
-    function __construct($gpg_dir)
+    function __construct($gpg_dir = "")
     {
+        if(!$gpg_dir) $gpg_dir = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . "gpg";
         $this->set_home_dir($gpg_dir . DIRECTORY_SEPARATOR . uniqid("", true) . str_replace("/", "", base64_encode(random_bytes(24))));
         $this->gpg = new gnupg();
     }
@@ -119,6 +120,13 @@ class GPG
         return $result;
     }
 
+    function get_fingerprint(string $public_key){
+        $this->set_home_dir($this->home_dir);
+        $info = $this->gpg->import($public_key);
+        $fingerprint = $info["fingerprint"];
+        return "$fingerprint";
+    }
+
     private function show_key_info($fingerprint)
     {
         $key_info = $this->gpg->keyinfo($fingerprint);
@@ -222,7 +230,7 @@ class GPG
 class GPGMixins
 {
     /**
-     * Returns the gpg keys from the database. TODO: decrypt private key
+     * Returns the gpg keys (public and private) from the database. TODO: decrypt private key
      *
      * @param "user"|"team"|"company" $type
      * @param int $id
@@ -245,11 +253,45 @@ class GPGMixins
         return [];
     }
 
+    static function get_gpg_public_key($type, $id){
+        global $conn;
+        if ($type == "user") {
+            $result = $conn->query("SELECT public_key, fingerprint FROM gpg_keys WHERE userID = $id");
+        } else if ($type == "team") {
+            $result = $conn->query("SELECT public_key, fingerprint FROM gpg_keys WHERE teamID = $id");
+        } else {
+            $result = $conn->query("SELECT public_key, fingerprint FROM gpg_keys WHERE companyID = $id");
+        }
+        showError($conn->error);
+        if ($result && $row = $result->fetch_assoc()) {
+            return $row;
+        }
+        return [];
+    }
+
+    static function get_has_gpg_keys_list(){
+        global $conn;
+        $has_gpg_keys = [];
+        $result = $conn->query("SELECT private_key, public_key, userID, teamID, companyID FROM gpg_keys");
+        while($result && $row = $result->fetch_assoc()){
+            if($row["userID"]){
+                $has_gpg_keys["user"][$row["userID"]] = ["public" => !empty($row["public_key"]), "private" => !empty($row["private_key"])];
+            }
+            if($row["teamID"]){
+                $has_gpg_keys["team"][$row["teamID"]] = ["public" => !empty($row["public_key"]), "private" => !empty($row["private_key"])];
+            }
+            if($row["companyID"]){
+                $has_gpg_keys["company"][$row["companyID"]] = ["public" => !empty($row["public_key"]), "private" => !empty($row["private_key"])];
+            }
+        }
+        return $has_gpg_keys;
+    }
+
     static function get_select_options($user_query, $team_query, $company_query)
     {
         global $conn;
         $output = "";
-        var_dump($user_query);
+        // var_dump($user_query);
         $result = $conn->query($user_query);
         while ($result && ($row = $result->fetch_assoc())) {
             $output .= '<option title="Benutzer" value="user;' . $row['id'] . '" data-icon="user">' . $row['firstname'] . ' ' . $row['lastname'] . '</option>';
