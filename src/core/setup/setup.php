@@ -188,10 +188,10 @@ ini_set('max_execution_time',999);
 			//insert sub categories
 			$conn->query("INSERT INTO dsgvo_categories (name) VALUES ('Geheimhaltungsvereinbarung'),('Auftragsverarbeitung Art. 28'),('IT-Richtlinien'),('Allgemeine-Richtlinien'),('Datenschutzerklärung'),('Vereinbarung nach Art. 26')");
 			//insert tags
-			$conn->query("INSERT INTO tags (value) VALUES('Anruf'), ('Wichtig'), ('Vertraulich'), ('Frage'), ('Information')");
-			$conn->query("INSERT INTO tags (value, type, extra) VALUES('Angebot', 'date_years', '7'), ('Auftragsbestätigung', 'date_years', '7'),
-			('Lieferschein', 'date_years', '7'), ('Nachrichten', 'date_years', '3'), ('Kunde', 'date_years', '7'), ('Lieferant', 'date_years', '7'),
-			('Bewerbung', 'date_months', '6'), ('Interessent', 'date_months', '6'), ('Rechnung', 'date_years', '7')");
+			$conn->query("INSERT INTO tags (value, is_default) VALUES('Anruf', 'TRUE'), ('Wichtig', 'TRUE'), ('Vertraulich', 'TRUE'), ('Frage', 'TRUE'), ('Information', 'TRUE')");
+			$conn->query("INSERT INTO tags (value, type, extra, is_default) VALUES('Angebot', 'date_years', '7', 'TRUE'), ('Auftragsbestätigung', 'date_years', '7', 'TRUE'),
+			('Lieferschein', 'date_years', '7', 'TRUE'), ('Nachrichten', 'date_years', '3', 'TRUE'), ('Kunde', 'date_years', '7', 'TRUE'), ('Lieferant', 'date_years', '7', 'TRUE'),
+			('Bewerbung', 'date_months', '6', 'TRUE'), ('Interessent', 'date_months', '6', 'TRUE'), ('Rechnung', 'date_years', '7', 'TRUE')");
 
 			//insert holidays
             $icsFile = file_get_contents(__DIR__ .'/Feiertage.txt');

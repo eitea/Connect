@@ -1787,7 +1787,8 @@ function create_tables($conn) {
 		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 		value VARCHAR(50) NOT NULL,
 		type VARCHAR(20) NOT NULL DEFAULT 'text',
-		extra VARCHAR(80)
+		extra VARCHAR(80),
+        is_default ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE'
 	)";
 	if (!$conn->query($sql)) {
         echo mysqli_error($conn);

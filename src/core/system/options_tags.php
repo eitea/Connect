@@ -3,7 +3,7 @@
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
 	if(!empty($_POST['delete_tag'])){
 		$val = intval($_POST['delete_tag']);
-		$conn->query("DELETE FROM tags WHERE id = $val");
+		$conn->query("DELETE FROM tags WHERE id = $val and is_default = 'FALSE'");
 		if($conn->error){
 			showError($conn->error);
 		} else {
@@ -53,10 +53,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 		</thead>
 		<tbody>
 			<?php
-			$result = $conn->query("SELECT id, value FROM tags");
+			$result = $conn->query("SELECT id, value, is_default FROM tags");
 			while($row = $result->fetch_assoc()){
 				echo '<tr><td>',$row['value'],'</td><td>';
-				echo '<button type="submit" name="delete_tag" value="', $row['id'] ,'" class="btn btn-default"><i class="fa fa-trash-o"></i></button>';
+				$attr = $row["is_default"] == 'TRUE'?'disabled title="Standard Tags können nicht gelöscht werden"':'';
+				echo '<button type="submit" '.$attr.' name="delete_tag" value="', $row['id'] ,'" class="btn btn-default"><i class="fa fa-trash-o"></i></button>';
 				echo '<a href="#edit-tag-modal"  data-toggle="modal" data-value="', $row['value'] ,'" data-valid="', $row['id'] ,'" class="btn btn-default"><i class="fa fa-pencil"></i></button>';
 				echo '</td><tr>';
 			}

@@ -3605,6 +3605,13 @@ if($row['version'] < 173){
 
 if($row['version'] < 174){
     setup_permissions();
+    $conn->query("ALTER TABLE tags ADD COLUMN is_default ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE'");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>Tags: default';
+    }
+    $conn->query("UPDATE tags SET is_default = 'TRUE' WHERE value IN ('Anruf', 'Wichtig', 'Vertraulich', 'Frage', 'Information', 'Angebot', 'Auftragsbestätigung', 'Lieferschein', 'Nachrichten', 'Kunde', 'Lieferant', 'Bewerbung', 'Interessent', 'Rechnung')");
 }
 
 // if($row['version'] < 175){}
