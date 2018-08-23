@@ -94,18 +94,112 @@ $available_users = array('-1');
 while ($result && ($row = $result->fetch_assoc())) {
     $available_users[] = $row['userID'];
 }
-$company_id_to_name = [];
-$result_company_id_to_name = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (" . implode(', ', $available_companies) . ")");
-while ($result_company_id_to_name && $row_company_id_to_name = $result_company_id_to_name->fetch_assoc()) {
-    $company_id_to_name[$row_company_id_to_name["id"]] = $row_company_id_to_name["name"];
+
+/**
+ * This class aims to replace $available_companies, $company_id_to_name, etc. and 
+ * make things clearer without the need to create a new variable at the start of
+ * every page.
+ * 
+ * TODO: maybe don't init in header and let the page init if it needs the variables. 
+ * 
+ * TODO: maybe move this to utilities
+ * 
+ * TODO: maybe make the names shorter
+ */
+class CommonVariables
+{
+    // id => name
+    public static $all_user_ids_to_name = []; 
+    public static $all_team_ids_to_name = [];
+    public static $all_company_ids_to_name = [];
+
+    // id
+    public static $available_user_ids = [];     // = Users in the same company as the current user
+    public static $available_team_ids = [];     // = Teams the current user is assigned to
+    public static $available_company_ids = [];  // = Companies the current user is assigned to
+
+    // id => name
+    public static $available_user_ids_to_name = [];     // = Users in the same company as the current user
+    public static $available_team_ids_to_name = [];     // = Teams the current user is assigned to
+    public static $available_company_ids_to_name = [];  // = Companies the current user is assigned to
+
+    // id => bool
+    public static $team_is_department = [];
+
+    public static function is_current_user_in_team($tid){
+        return in_array($tid, self::$available_team_ids);
+    }
+    public static function is_current_user_in_company($cid){
+        return in_array($cid, self::$available_company_ids);
+    }
+
+    public static function init()
+    {
+        self::init_available();
+        self::init_names();
+
+        self::init_available_names();
+    }
+
+    private static function init_available_names()
+    {
+        foreach (self::$available_user_ids as $uid) {
+            self::$available_user_ids_to_name[$uid] = self::$all_user_ids_to_name[$uid];
+        }
+        foreach (self::$available_team_ids as $tid) {
+            self::$available_team_ids_to_name[$tid] = self::$all_team_ids_to_name[$tid];
+        }
+        foreach (self::$available_company_ids as $cid) {
+            self::$available_company_ids_to_name[$cid] = self::$all_company_ids_to_name[$cid];
+        }
+    }
+
+    private static function init_names()
+    {
+        global $conn;
+        global $userID;
+
+        $result = $conn->query("SELECT id, CONCAT(firstname,' ', lastname) AS name FROM UserData");
+        echo $conn->error;
+        while ($row = $result->fetch_assoc()) {
+            self::$all_user_ids_to_name[$row['id']] = $row['name'];
+        }
+        $result = $conn->query("SELECT id, name FROM companyData");
+        echo $conn->error;
+        while ($row = $result->fetch_assoc()) {
+            self::$all_company_ids_to_name[$row['id']] = $row['name'];
+        }
+        $result = $conn->query("SELECT id, name, isDepartment FROM teamData");
+        echo $conn->error;
+        while ($row = $result->fetch_assoc()) {
+            self::$all_team_ids_to_name[$row['id']] = $row['name'];
+            self::$team_is_department[$row['id']] = $row['isDepartment'] == 'TRUE';
+        }
+    }
+
+    private static function init_available()
+    {
+        global $conn;
+        global $userID;
+
+        $result = $conn->query("SELECT DISTINCT companyID FROM relationship_company_client WHERE userID = $userID OR $userID = 1");
+        echo $conn->error;
+        while ($result && $row = $result->fetch_assoc()) {
+            self::$available_company_ids[] = $row['companyID'];
+        }
+        $result = $conn->query("SELECT DISTINCT userID FROM relationship_company_client WHERE companyID IN(" . implode(', ', self::$available_company_ids) . ") OR $userID = 1");
+        echo $conn->error;
+        while ($result && $row = $result->fetch_assoc()) {
+            self::$available_user_ids[] = $row['userID'];
+        }
+        $result = $conn->query("SELECT DISTINCT teamID FROM relationship_team_user WHERE userID = $userID OR $userID = 1");
+        echo $conn->error;
+        while ($row = $result->fetch_assoc()) {
+            self::$available_team_ids[] = $row['teamID'];
+        }
+    }
 }
-$team_id_to_name = [];
-$team_is_department = [];
-$result = $conn->query("SELECT id, name, isDepartment FROM teamData");
-while ($row = $result->fetch_assoc()) {
-    $team_id_to_name[$row["id"]] = $row["name"];
-    $team_is_department[$row["id"]] = $row["isDepartment"] == 'TRUE';
-}
+CommonVariables::init();
 
 $validation_output = $error_output = '';
 

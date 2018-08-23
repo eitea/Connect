@@ -48,6 +48,9 @@ if(isset($_POST['sendEmail']) && !empty($_POST['sendEmail_recipient'])){
 	echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>E-Mail konnte nicht gesendet werden: '.$error.'</div>';
   }
 }
+if(isset($_POST['resetPassword'])){
+	$conn->query("UPDATE mailingOptions SET password = ''");
+}
 
 $result = $conn->query("SELECT * FROM mailingOptions");
 $row = $result->fetch_assoc();
@@ -92,13 +95,19 @@ if($row['isDefault'] ){
 			<div class="col-md-4">Username</div>
 			<div class="col-md-8"><input type="text" autocomplete="new-user" class="form-control" name="mail_username" value="<?php echo $row['username']; ?>" /><br></div>
 			<div class="col-md-4">Passwort</div>
-			<div class="col-md-8"><input type="text" autocomplete="new-password" class="form-control password" name="mail_password" /><br></div>
+			<div class="col-md-8">
+				<div class="input-group">
+					<input type="text" autocomplete="new-password" class="form-control password" name="mail_password" />
+					<span class="input-group-btn"><button type="submit" class="btn btn-info" name="resetPassword" title="Passwort zurücksetzen"><i class="fa fa-fw fa-minus"></i></button></span>
+				</div>
+				<br />
+			</div>
 		</div>
 		<div class="col-md-4">Speichern und Test E-Mail verschicken</div>
 		<div class="col-md-8">
 			<div class="input-group">
 				<input type="text" class="form-control" name="sendEmail_recipient" placeholder="empfaenger@test.com" />
-				<span class="input-group-btn"><button type="submit" class="btn btn-info" name="sendEmail" title="Speichern und Test E-Mail schicken"><i class="fa fa-envelope-o"></i></button></span>
+				<span class="input-group-btn"><button type="submit" class="btn btn-info" name="sendEmail" title="Speichern und Test E-Mail schicken"><i class="fa fa-fw fa-envelope-o"></i></button></span>
 			</div>
 		</div>
 	</div>

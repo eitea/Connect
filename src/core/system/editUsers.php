@@ -281,12 +281,6 @@ for($i = 0; $i < 11; $i++){
     $percentage_select .= '<option value="'.($i*10).'">'.($i*10).'%</option>';
 }
 
-$team_id_to_name = [];
-$result = $conn->query("SELECT id, name FROM teamData");
-while($row = $result->fetch_assoc()){
-  $team_id_to_name[$row["id"]] = $row["name"];
-}
-
 ?>
 <br>
 <div class="container-fluid panel-group" id="accordion">
@@ -576,7 +570,7 @@ while($row = $result->fetch_assoc()){
                           <select name="team_id" class="js-example-basic-single">
                               <option value="">...</option>
                               <?php
-                              foreach($team_id_to_name as $team_id=>$team_name){
+                              foreach(CommonVariables::$all_team_ids_to_name as $team_id=>$team_name){
                                   if(!empty($user_in_team[$team_id])) continue;
                                   echo "<option value='$team_id'>$team_name</option>";
                               }

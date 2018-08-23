@@ -1694,7 +1694,9 @@ function create_tables($conn) {
 		identifier VARCHAR(13) UNIQUE NOT NULL,
 		subject VARCHAR(550) NOT NULL,
 		category VARCHAR(25),
-		categoryID VARCHAR(20)
+		categoryID VARCHAR(20),
+        gpg_encryption ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE',
+        gpg_signature ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE'
 	)");
 	if($conn->error){
 		echo $conn->error;

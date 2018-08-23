@@ -751,7 +751,8 @@ function send_standard_email($recipient, $content, Array $options = ['subject' =
 	$mail = new PHPMailer();
 	$mail->CharSet = 'UTF-8';
 	$mail->Encoding = "base64";
-	$mail->IsSMTP();
+    $mail->IsSMTP();
+    // $mail->SMTPDebug = 4;
 
 	$result = $conn->query("SELECT host, username, password, port, smtpSecure, sender, senderName FROM mailingOptions LIMIT 1");
 	if(!$result || $result->num_rows < 1) return 'Keine E-Mail Einstellungen hinterlegt'; //5ac712bc31939
@@ -764,8 +765,11 @@ function send_standard_email($recipient, $content, Array $options = ['subject' =
 	} else {
 		$mail->SMTPAuth   = false;
 	}
-	if(empty($row['smptSecure'])){
-		$mail->SMTPSecure = $row['smtpSecure'];
+	if(empty($row['smptSecure'])){ // FIXME: shouldn't that be !empty?
+        $mail->SMTPSecure = $row['smtpSecure'];
+    }
+    if(empty($row['smptSecure'])){
+        $mail->SMTPAutoTLS = false;
 	}
 	$signature = $companyID = '';
 	$mail->Host       = $row['host'];

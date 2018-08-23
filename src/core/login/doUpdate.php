@@ -3612,6 +3612,18 @@ if($row['version'] < 174){
         echo '<br>Tags: default';
     }
     $conn->query("UPDATE tags SET is_default = 'TRUE' WHERE value IN ('Anruf', 'Wichtig', 'Vertraulich', 'Frage', 'Information', 'Angebot', 'Auftragsbestätigung', 'Lieferschein', 'Nachrichten', 'Kunde', 'Lieferant', 'Bewerbung', 'Interessent', 'Rechnung')");
+    $conn->query("ALTER TABLE messenger_conversations ADD COLUMN gpg_encryption ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE'");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>messenger_conversations: gpg_encryption';
+    }
+    $conn->query("ALTER TABLE messenger_conversations ADD COLUMN gpg_signature ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE'");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>messenger_conversations: gpg_signature';
+    }
 }
 
 // if($row['version'] < 175){}

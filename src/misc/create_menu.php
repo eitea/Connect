@@ -1,11 +1,5 @@
 <?php
 
-$company_id_to_name = [];
-$result_company_id_to_name = $conn->query("SELECT id, name FROM $companyTable WHERE id IN (" . implode(', ', $available_companies) . ")");
-while ($result_company_id_to_name && $row_company_id_to_name = $result_company_id_to_name->fetch_assoc()) {
-    $company_id_to_name[$row_company_id_to_name["id"]] = $row_company_id_to_name["name"];
-}
-
 /**
  * It's easier to not have special cases for company children.
  * This function adds companies to the current menu item's children
@@ -14,12 +8,11 @@ while ($result_company_id_to_name && $row_company_id_to_name = $result_company_i
 function transform_company_children_to_real_children(&$options)
 {
     global $available_companies;
-    global $company_id_to_name;
     if (isset($options["company_children"]) || isset($options["company_children_callback"])) {
         if (!isset($options["children"])) $options["children"] = []; // existing children can stay (e.g. for different companies with shared logs)
         foreach ($available_companies as $cmpID) {
-            if (isset($company_id_to_name[$cmpID])) {
-                $cmpName = $company_id_to_name[$cmpID];
+            if (isset(CommonVariables::$available_company_ids_to_name[$cmpID])) {
+                $cmpName = CommonVariables::$available_company_ids_to_name[$cmpID];
                 if (isset($options["company_children_callback"])) {
                     $options["company_children"] = $options["company_children_callback"](["id" => $cmpID, "name" => $cmpName]); // let the callback overwrite company_children for every company
                 }

@@ -513,8 +513,6 @@ class GPGMixins
     {
         global $conn;
         global $userID_toName;
-        global $team_id_to_name;
-        global $company_id_to_name;
         $result = $conn->query($query);
         if ($result && $result->num_rows > 0) {
             while ($result && $row = $result->fetch_assoc()) {
@@ -524,11 +522,11 @@ class GPGMixins
                     $delete_key_value = "user;" . $row["userID"];
                 } else if ($row["teamID"]) {
                     $icon = "<i class='fa fa-fw fa-group'></i>";
-                    $title = $team_id_to_name[$row["teamID"]];
+                    $title = CommonVariables::$all_team_ids_to_name[$row["teamID"]];
                     $delete_key_value = "team;" . $row["teamID"];
                 } else if ($row["companyID"]) {
                     $icon = "<i class='fa fa-fw fa-building'></i>";
-                    $title = $company_id_to_name[$row["companyID"]];
+                    $title = CommonVariables::$all_company_ids_to_name[$row["companyID"]];
                     $delete_key_value = "company;" . $row["companyID"];
                 } else {
                     continue;

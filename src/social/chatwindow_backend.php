@@ -17,31 +17,11 @@ if(!empty($_POST['openChat'])){
 	if(isset($_POST['chat_join_conversation'])){
 		$conn->query("INSERT INTO relationship_conversation_participant(partType, partID, conversationID, status) VALUES ('USER', '$userID', $openChatID, 'open')");
 	}
+	
 	if(isset($_POST['chat_send'])){
-		$v2Key = $publicKey;
-		if(!empty($_POST['chat_message'])){
-			$message = test_input($_POST['chat_message']);
-			$message_encrypt = asymmetric_encryption('CHAT', $message, $userID, $privateKey);
-			if($message == $message_encrypt) $v2Key = '';
-			$conn->query("INSERT INTO messenger_messages(message, participantID, vKey) SELECT '$message_encrypt', id, '$v2Key'
-			FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' AND conversationID = $openChatID");
-
-			if(!$conn->error) { //5b6a830d05c7e
-				$conn->query("UPDATE relationship_conversation_participant SET archive = NULL WHERE conversationID = $openChatID");
-			}
-			//TODO: how do i reply from team, when sent from team and not as user?
-			// $result = $conn->query("SELECT partID FROM relationship_conversation_participant WHERE status != 'exited' AND conversationID = $openChatID AND partType = 'contact' OR partType = 'client'");
-			// if($result && $result->num_rows){
-			// 	$result_temp = $conn->query("SELECT subject, identifier FROM messenger_conversations WHERE id = $openChatID LIMIT 1");
-			// 	$row = $result_temp->fetch_assoc();
-			// 	$subject = $row['subject'];
-			// 	$identifier = $row['identifier'];
-			// 	while($row_part = $result->fetch_assoc()){
-			// 		//TODO: check the recipients for email notifications (users, clients, contacts, teams..)
-			// 		//$options = ['subject' => "$subject - [CON - $identifier]", 'userid' => $userID];
-			// 	}
-			// }
-		}
+		$message = test_input($_POST['chat_message']);
+		send_chat_message($message, $openChatID);
+		// TODO: move file handling to send_chat_message
 		if(file_exists($_FILES['chat_newfile']['tmp_name']) && is_uploaded_file($_FILES['chat_newfile']['tmp_name'])){
 			$s3 = getS3Object($bucket);
 			$file_info = pathinfo($_FILES['chat_newfile']['name']);
