@@ -16,70 +16,85 @@ while ($row = $result->fetch_assoc()) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     require __DIR__.'/chatwindow_backend.php'; //sets openChatID and takes care of chatwindow.php default operations
     if (isset($_POST['send_new_message']) && !empty($_POST['new_message_subject']) && !empty($_POST['new_message_body']) && Permissions::has("POST.WRITE")) {
-        $subject = test_input($_POST['new_message_subject']);
-		$message =  test_input($_POST['new_message_body']);
-		$message_type = $_POST["message_type"];
-		$is_pm = $message_type == "pm";
-		$is_email = $message_type == "email";
+		$subject = test_input($_POST['new_message_subject']);
+		$message = test_input($_POST['new_message_body']);
+		$is_pm = $_POST["message_type"] == "pm";
+		$is_email = $_POST["message_type"] == "email";
+		$pm_additional_email = !empty($_POST["pm_additional_email"]) && $is_pm;
+		$pm_additional_email_sent = []; // to prevent sending the same message to the same recipient multiple times
 
-        $stmt_participant = $conn->prepare("INSERT INTO relationship_conversation_participant(conversationID, partType, partID, status) VALUES (?, ?, ?, ?)");
-        $stmt_participant->bind_param('isss', $conversationID, $partType, $partID, $status);
-        $count = 1;
-        if (!empty($_POST['email_recipients']) && $is_email) {
-            $count = count($_POST['email_recipients']);
-        }
-        for ($i = 0; $i < $count; $i++) {
-            $identifier = uniqid();
-            $conn->query("INSERT INTO messenger_conversations(identifier, subject, category) VALUES('$identifier', '$subject', 'direct')");
-            if ($conn->error) {
-                showError($conn->error.__LINE__);
-            }
-            $conversationID = $openChatID = $conn->insert_id;
-            $partType = 'USER';
-            $partID = $userID;
-            $status = 'creator';
-            $stmt_participant->execute();
-            $options = ['subject' => "$subject - [CON - $identifier]"];
-            if ($conn->error) {
-                showError($conn->error.__LINE__);
-            }
-            $participantID = $conn->insert_id;
+		$stmt_participant = $conn->prepare("INSERT INTO relationship_conversation_participant(conversationID, partType, partID, status) VALUES (?, ?, ?, ?)");
+		$stmt_participant->bind_param('isss', $conversationID, $partType, $partID, $status);
+		$count = 1;
+		if (!empty($_POST['email_recipients']) && $is_email) {
+			$count = count($_POST['email_recipients']);
+		}
+		for ($i = 0; $i < $count; $i++) {
+			$identifier = uniqid();
+			$conn->query("INSERT INTO messenger_conversations(identifier, subject, category) VALUES('$identifier', '$subject', 'direct')");
+			if ($conn->error) {
+				showError($conn->error . __LINE__);
+			}
+			$conversationID = $openChatID = $conn->insert_id;
+			$partType = 'USER';
+			$partID = $userID;
+			$status = 'creator';
+			$stmt_participant->execute();
+			$options = ['subject' => "$subject - [CON - $identifier]"];
+			if ($conn->error) {
+				showError($conn->error . __LINE__);
+			}
+			$participantID = $conn->insert_id;
             //participants (team(s) or user(s))
-            if (!empty($_POST['pm_recipients']) && $is_pm) {
-                foreach ($_POST['pm_recipients'] as $val) {
+			if (!empty($_POST['pm_recipients']) && $is_pm) {
+				foreach ($_POST['pm_recipients'] as $val) {
 					$arr = explode(";", $val);
-					if($arr[0] == "user"){
+					if ($arr[0] == "user") {
 						$partType = 'USER';
-					}else{
+					} else {
 						$partType = 'team';
 					}
 					// showInfo(str_replace("\n", "<br>", print_r($arr, true)));
-                    $partID = intval($arr[1]);
-                    $status = 'normal';
-                    $stmt_participant->execute();
-                }
+					$partID = intval($arr[1]);
+					$status = 'normal';
+					$stmt_participant->execute();
+					if ($pm_additional_email) {
+						$options['senderid'] = $userID;
+						if ($arr[0] == "user") {
+							$result = $conn->query("SELECT email FROM UserData WHERE id = $partID");
+						} else {
+							$result = $conn->query("SELECT email FROM UserData WHERE id IN (SELECT userID FROM relationship_team_user WHERE teamID = $partID)");
+						}
+						showError($conn->error);
+						while ($result && $row = $result->fetch_assoc()) {
+							if (isset($pm_additional_email_sent[$row["email"]]) && $pm_additional_email_sent[$row["email"]]) continue;
+							$pm_additional_email_sent[$row["email"]] = true;
+							send_standard_email($row["email"], $message, $options);
+						}
+					}
+				}
 			}
-			if($is_email && !empty($_POST["email_from"])){
-				$arr = explode(";",$_POST["email_from"]);
+			if ($is_email && !empty($_POST["email_from"])) {
+				$arr = explode(";", $_POST["email_from"]);
 				$gpg_sign = isset($_POST["email_sign_gpg"]);
 				$send_gpg_public_keys = isset($_POST["email_send_gpg_public_keys"]);
-				if($arr[0] == "user" && Permissions::has("POST.EXTERN_PERSONAL") && $arr[1] == $userID){
+				if ($arr[0] == "user" && Permissions::has("POST.EXTERN_PERSONAL") && $arr[1] == $userID) {
 					$options['senderid'] = intval($arr[1]);
-					if($gpg_sign) $options['sender_gpg_private_key'] = GPGMixins::get_gpg_key("user",intval($arr[1]));
-					if($send_gpg_public_keys) $options['attachments'] = ["PGP Key.txt" => GPGMixins::get_gpg_key("user",intval($arr[1]))["public_key"]];
-				}elseif($arr[0] == "team" && Permissions::has("POST.EXTERN_TEAM") && !empty($teamID_toName[$arr[1]])){
+					if ($gpg_sign) $options['sender_gpg_private_key'] = GPGMixins::get_gpg_key("user", intval($arr[1]));
+					if ($send_gpg_public_keys) $options['attachments'] = ["PGP Key.txt" => GPGMixins::get_gpg_key("user", intval($arr[1]))["public_key"]];
+				} elseif ($arr[0] == "team" && Permissions::has("POST.EXTERN_TEAM") && !empty($teamID_toName[$arr[1]])) {
 					$options['teamid'] = intval($arr[1]);
-					if($gpg_sign) $options['sender_gpg_private_key'] = GPGMixins::get_gpg_key("team",intval($arr[1]));
-					if($send_gpg_public_keys) $options['attachments'] = ["PGP Key.txt" => GPGMixins::get_gpg_key("team",intval($arr[1]))["public_key"]];
-				}elseif($arr[0] == "company" && Permissions::has("POST.EXTERN_COMPANY") && in_array($arr[1], $available_companies)){
+					if ($gpg_sign) $options['sender_gpg_private_key'] = GPGMixins::get_gpg_key("team", intval($arr[1]));
+					if ($send_gpg_public_keys) $options['attachments'] = ["PGP Key.txt" => GPGMixins::get_gpg_key("team", intval($arr[1]))["public_key"]];
+				} elseif ($arr[0] == "company" && Permissions::has("POST.EXTERN_COMPANY") && in_array($arr[1], $available_companies)) {
 					$options['companyid'] = intval($arr[1]);
-					if($gpg_sign) $options['sender_gpg_private_key'] = GPGMixins::get_gpg_key("company",intval($arr[1]));
-					if($send_gpg_public_keys) $options['attachments'] = ["PGP Key.txt" => GPGMixins::get_gpg_key("company",intval($arr[1]))["public_key"]];
-				}else{
+					if ($gpg_sign) $options['sender_gpg_private_key'] = GPGMixins::get_gpg_key("company", intval($arr[1]));
+					if ($send_gpg_public_keys) $options['attachments'] = ["PGP Key.txt" => GPGMixins::get_gpg_key("company", intval($arr[1]))["public_key"]];
+				} else {
 					showError("You don't have permission to send as this user/team/company");
 					break;
 				}
-				if($gpg_sign && empty($options['sender_gpg_private_key'])){
+				if ($gpg_sign && empty($options['sender_gpg_private_key'])) {
 					showError("No GPG private key found");
 				}
 			}
@@ -333,7 +348,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 						<a href="#new-message-tab-pm" data-toggle="tab" onclick="$('#message-type-input').val('pm'); $('#new-message-modal-content').removeClass('modal-lg')">PM</a>
 					</li>
 					<li>
-						<a href="#new-message-tab-email" data-toggle="tab" onclick="$('#message-type-input').val('email'); $('#new-message-modal-content').addClass('modal-lg')">E-Mail</a>
+						<a href="#new-message-tab-email" data-toggle="tab" onclick="$('#message-type-input').val('email'); $('#new-message-modal-content').addClass('modal-lg')">E-Mail an externe Kontakte</a>
 					</li>
 				</ul>
 				<?php endif; ?>
@@ -357,6 +372,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 									}
 									?>
 								</select>
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" id="pm_additional_email_checkbox" name="pm_additional_email" value="true"> Zusätzlich Email senden (Sendet jedem Benutzer im Team eine eigene Email)
+									</label>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -393,7 +413,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 									?>
 								</select>
 								<div class="checkbox">
-								<label>
+									<label>
 										<input type="checkbox" id="email_sign_gpg_checkbox" name="email_sign_gpg" value="true"> GPG Signatur
 									</label>
 									&NonBreakingSpace;

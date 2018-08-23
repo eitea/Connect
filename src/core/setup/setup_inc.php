@@ -1320,6 +1320,7 @@ function create_tables($conn) {
 		fromAddress VARCHAR(100),
 		toAddress VARCHAR(100),
 		autoResponse TEXT,
+        isActive ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'TRUE',
 		FOREIGN KEY (templateID) REFERENCES dynamicprojects(projectid)
 		ON UPDATE CASCADE
 		ON DELETE SET NULL,
