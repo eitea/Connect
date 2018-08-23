@@ -51,8 +51,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 					$arr = explode(";", $val);
 					if ($arr[0] == "user") {
 						$partType = 'USER';
-					} else {
+					} elseif ($arr[0] == "team") {
 						$partType = 'team';
+					} else {
+						$partType = 'company';
 					}
 					// showInfo(str_replace("\n", "<br>", print_r($arr, true)));
 					$partID = intval($arr[1]);
@@ -62,8 +64,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 						$options['senderid'] = $userID;
 						if ($arr[0] == "user") {
 							$result = $conn->query("SELECT email FROM UserData WHERE id = $partID");
-						} else {
+						} elseif ($arr[0] == "team") {
 							$result = $conn->query("SELECT email FROM UserData WHERE id IN (SELECT userID FROM relationship_team_user WHERE teamID = $partID)");
+						}else{
+							$result = $conn->query("SELECT email FROM UserData WHERE id IN (SELECT userID FROM relationship_company_client WHERE companyID = $partID)");
 						}
 						showError($conn->error);
 						while ($result && $row = $result->fetch_assoc()) {
@@ -265,11 +269,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bind_param('i', $conversationID);
             $result = $conn->query("SELECT c.id, c.category, subject, rcp.lastCheck, rcp.id AS participantID, rcp.archive, tbl.unreadMessages, mm.sentTime FROM messenger_conversations c
 				INNER JOIN relationship_conversation_participant rcp
-				ON (rcp.status != 'exited' AND rcp.conversationID = c.id AND ((rcp.partType = 'USER' AND rcp.partID = '$userID') OR ( rcp.partType = 'team' AND rcp.partID IN (SELECT teamID FROM relationship_team_user WHERE userID = $userID) AND NOT EXISTS (SELECT * FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' AND conversationID = c.id))))
+				ON (rcp.status != 'exited' AND rcp.conversationID = c.id AND ((rcp.partType = 'USER' AND rcp.partID = '$userID') OR ( ((rcp.partType = 'team' AND rcp.partID IN (SELECT teamID FROM relationship_team_user WHERE userID = $userID)) OR (rcp.partType = 'company' AND rcp.partID IN (SELECT companyID FROM relationship_company_client WHERE userID = $userID))) AND NOT EXISTS (SELECT * FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' AND conversationID = c.id))))
 				LEFT JOIN (SELECT COUNT(*) AS unreadMessages, rcp1.conversationID FROM messenger_messages m
 					INNER JOIN relationship_conversation_participant rcp1 ON (rcp1.id = m.participantID AND (partType != 'USER' OR partID != '$userID'))
 					WHERE m.sentTime >= ALL (SELECT lastCheck FROM relationship_conversation_participant rcp2 WHERE rcp2.conversationID = rcp1.conversationID
-					AND rcp2.status != 'exited' AND ((rcp2.partType = 'USER' AND rcp2.partID = '$userID') OR ( rcp2.partType = 'team' AND rcp2.partID IN (SELECT teamID FROM relationship_team_user WHERE userID = $userID AND NOT EXISTS (SELECT * FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' AND conversationID = rcp2.id)))))
+					AND rcp2.status != 'exited' AND ((rcp2.partType = 'USER' AND rcp2.partID = '$userID') OR ( ((rcp2.partType = 'team' AND rcp2.partID IN (SELECT teamID FROM relationship_team_user WHERE userID = $userID)) OR ( rcp2.partType = 'company' AND rcp2.partID IN (SELECT companyID FROM relationship_company_client WHERE userID = $userID) )) AND NOT EXISTS (SELECT * FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' AND conversationID = rcp2.id))))
 					GROUP BY conversationID) tbl
 				ON tbl.conversationID = c.id
 				LEFT JOIN messenger_messages mm ON mm.id = (SELECT mm2.id FROM messenger_messages mm2
@@ -300,12 +304,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	                    if ($partrow['partType'] == 'USER') {
 	                        echo $userID_toName[$partrow['partID']];
 	                    } elseif ($partrow['partType'] == 'team') {
-							if(isset($teamID_toName[$partrow['partID']])){
-								echo $teamID_toName[$partrow['partID']]; // contains team names for teams the user is part of
-							}else{
-								echo $team_id_to_name[$partrow['partID']]; // contains all team names
-							}
-	                    } else { //show client and contact with email
+							echo $team_id_to_name[$partrow['partID']]; // contains all team names
+	                    } elseif($partrow['partType'] == 'company'){
+							echo $company_id_to_name[$partrow['partID']];						
+						} else { //show client and contact with email
 	                        echo $partrow['partID'];
 	                    }
 	                    echo '<br>';
@@ -369,6 +371,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 										$icon = $team_is_department[$id] ? "share-alt" : "group";
 										$type = $team_is_department[$id] ? "Abteilung" : "Team";
 										echo '<option title="' . $type . '" value="team;' . $id . '" data-icon="' . $icon . '">' . $name . '</option>';
+									}
+									foreach($available_companies as $id){
+										if($id > 0){
+											echo '<option title="Mandant" value="company;' . $id . '" data-icon="building">' . $company_id_to_name[$id] . '</option>';
+										}
 									}
 									?>
 								</select>

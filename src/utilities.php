@@ -911,7 +911,7 @@ function getUnreadMessages($conversationID = 0){
 		$result = $conn->query("SELECT COUNT(*) AS unreadMessages FROM messenger_messages m
 		INNER JOIN relationship_conversation_participant rcp ON (rcp.id = m.participantID AND (partType != 'USER' OR partID != '$userID'))
 		WHERE m.sentTime >= (SELECT lastCheck FROM relationship_conversation_participant rcp2 WHERE rcp2.conversationID = rcp.conversationID
-		AND rcp2.status != 'exited' AND rcp2.partType = 'USER' AND rcp2.partID = '$userID')"); // TODO: add team chat unread 
+		AND rcp2.status != 'exited' AND rcp2.partType = 'USER' AND rcp2.partID = '$userID')"); // TODO: add team and company chat unread 
 	}
 
 	if($result && ($row = $result->fetch_assoc())){
