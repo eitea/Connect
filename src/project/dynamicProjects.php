@@ -115,6 +115,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 if($conn->error){
                     showError($conn->error);
                 } else {
+					$hasActiveBooking = true; //5b7a9c25a2032
                     showSuccess('Task wurde gestartet. Solange dieser läuft, ist Ausstempeln nicht möglich.');
                 }
             } else {

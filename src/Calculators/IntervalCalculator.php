@@ -124,31 +124,33 @@ class Interval_Calculator{
         $this->absolvedTime[$this->days] = 0;
       }
       //mixed
-      if($this->activity[$this->days] == 5){
-        $absolved_bonus = 0;
-        //in case of splitted break: remove it from bonus (just like lunchbreak removes from abolved hours)
-        $splits_result = $conn->query("SELECT SUM(TIMESTAMPDIFF(MINUTE, start, end)) AS split_absolved FROM projectBookingData WHERE bookingType = 'mixed' AND timestampID = ".$this->indecesIM[$this->days]);
-        if($splits_result && ($splits_row = $splits_result->fetch_assoc())){
-          $absolved_bonus -= $splits_row['split_absolved'];
-        }
-        $mixed_result = $conn->query("SELECT * FROM mixedInfoData WHERE status != 6 AND timestampID = ".$this->indecesIM[$this->days]);
-        if($mixed_result && ($mixed_row = $mixed_result->fetch_assoc())){
-          $absolved_bonus += timeDiff_Hours($mixed_row['timeStart'], $mixed_row['timeEnd']);
-        }
-        if($absolved_bonus > 0 && $mixed_row['status'] == 1){
-          //do I have to check here if it was in core time or not?
-          $this->absolvedTime[$this->days] += $absolved_bonus;
-          $this->availableVacation -= 0.5;
-        } else {
-          //if hours are missing (any breaks will cause a minus)
-          if($absolved_bonus > 0 && $this->absolvedTime[$this->days] < $this->shouldTime[$this->days]){
-            $this->absolvedTime[$this->days] += $absolved_bonus; //fill up
-            if($this->absolvedTime[$this->days] > $this->shouldTime[$this->days]){ //if too much: reduce
-              $this->absolvedTime[$this->days] = $this->shouldTime[$this->days];
-            }
-          }
-        }
-      }
+	  if($this->activity[$this->days] == 5){
+		  $absolved_bonus = 0;
+		  //in case of splitted break: remove it from bonus (just like lunchbreak removes from abolved hours)
+		  $splits_result = $conn->query("SELECT SUM(TIMESTAMPDIFF(MINUTE, start, end)) AS split_absolved FROM projectBookingData WHERE bookingType = 'mixed' AND timestampID = ".$this->indecesIM[$this->days]);
+		  if($splits_result && ($splits_row = $splits_result->fetch_assoc())){
+			  $absolved_bonus -= $splits_row['split_absolved'];
+		  }
+		  $mixed_result = $conn->query("SELECT timeStart, timeEnd, status FROM mixedInfoData WHERE status != 6 AND timestampID = ".$this->indecesIM[$this->days]);
+		  if($mixed_result && ($mixed_row = $mixed_result->fetch_assoc())){
+			  $absolved_bonus += timeDiff_Hours($mixed_row['timeStart'], $mixed_row['timeEnd']);
+		  }
+		  if($absolved_bonus > 0){
+			  if($mixed_row['status'] == 1){
+				  //vacation can only be consumed in days.
+				  $this->absolvedTime[$this->days] += $absolved_bonus;
+				  $this->availableVacation --; //5b76985c1295f
+			  } else {
+				  //if hours are missing (any breaks will cause a minus)
+				  if($this->absolvedTime[$this->days] < $this->shouldTime[$this->days]){
+					  $this->absolvedTime[$this->days] += $absolved_bonus; //fill up
+					  if($this->absolvedTime[$this->days] > $this->shouldTime[$this->days]){ //if too much: reduce
+						  $this->absolvedTime[$this->days] = $this->shouldTime[$this->days];
+					  }
+				  }
+			  }
+		  }
+	  }
       //ZA
       if($this->activity[$this->days] == 6){
         $this->absolvedTime[$this->days] = 0;

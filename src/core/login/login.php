@@ -1,9 +1,6 @@
 <?php
 if(getenv('IS_CONTAINER') || isset($_SERVER['IS_CONTAINER'])) header("Location: /login");
-
-if(file_exists(dirname(dirname(__DIR__)).'/connection_config.php')){
-    session_start();
-} else {
+if(!file_exists(dirname(dirname(__DIR__)).'/connection_config.php')){
     header("Location: ../setup/run");
 }
 

@@ -33,13 +33,11 @@ if(!Permissions::has("TIMES.READ")){
       <select id="filterUserID" name="filterUserID" class="js-example-basic-single btn-block">
         <option value='0'>Benutzer ... </option>
         <?php
-        $result = mysqli_query($conn, "SELECT * FROM $userTable WHERE id IN (".implode(', ', $available_users).");");
-        while($row = $result->fetch_assoc()){
-          $i = $row['id'];
+        foreach($available_users as $i){
           if ($curID == $i) {
-            echo "<option value='$i' selected>".$row['firstname'] . " " . $row['lastname']."</option>";
+            echo "<option value='$i' selected>".$userID_toName[$i]."</option>";
           } else {
-            echo "<option value='$i'>".$row['firstname'] . " " . $row['lastname']."</option>";
+            echo "<option value='$i'>".$userID_toName[$i]."</option>";
           }
         }
         ?>
@@ -69,7 +67,8 @@ if(!Permissions::has("TIMES.READ")){
   <tbody>
     <?php
     $usedDays = 0;
-    $result = $conn->query("SELECT time FROM $logTable WHERE userID = $curID AND status='1' AND DATE(time) <= DATE('$currentDate')");
+    $result = $conn->query("SELECT logs.time FROM logs LEFT JOIN mixedInfoData m ON m.timestampID = logs.indexIM WHERE logs.userID = $curID
+		AND (logs.status='1' OR (logs.status='5' AND m.status='1')) AND DATE(logs.time) <= DATE('$currentDate') ORDER BY logs.time DESC"); //5b7512e22f18e
     while($result && ($row = $result->fetch_assoc())){
       echo '<tr>';
       echo '<td>'.$lang['WEEKDAY_TOSTRING'][strtolower(date('D', strtotime($row['time'])))].'</td>';
@@ -91,7 +90,7 @@ if(!Permissions::has("TIMES.READ")){
       <?php
       //t returns the number of days in the month of a given date
       $gatheredDays = 0;
-      $result_I = $conn->query("SELECT $intervalTable.*, $userTable.exitDate FROM $intervalTable INNER JOIN $userTable ON userID = $userTable.id
+      $result_I = $conn->query("SELECT intervalData.*, UserData.exitDate FROM intervalData INNER JOIN UserData ON userID = UserData.id
         WHERE userID = $curID AND (DATE(endDate) <= DATE('$currentDate') OR endDate IS NULL)"); //select all intervals until this date
         while($result_I && ($iRow = $result_I->fetch_assoc())){ //foreach interval
           $i = substr($iRow['startDate'],0,10).' 05:00:00';

@@ -13,7 +13,7 @@ require dirname(__DIR__) . '/utilities.php';
 '5' => 'every Five Minutes'
 */
 
-$result = $conn->query("SELECT * FROM $taskTable WHERE repeatPattern != '-1'"); //grab all active tasks
+$result = $conn->query("SELECT id, repeatPattern, lastRuntime, runtime, callee FROM taskData WHERE repeatPattern != '-1'"); //grab all active tasks
 while($result && ($row = $result->fetch_assoc())){
   //needed task data
   //echo json_encode($row);
@@ -27,7 +27,7 @@ while($result && ($row = $result->fetch_assoc())){
     $expiryDate = new DateTime($lastRuntime);
     if($pattern === '0'){
       include $row['callee'];
-      $conn->query("UPDATE $taskTable SET lastRuntime = UTC_TIMESTAMP, repeatPattern = '-1' WHERE id = $task_id");
+      $conn->query("UPDATE taskData SET lastRuntime = UTC_TIMESTAMP, repeatPattern = '-1' WHERE id = $task_id");
     } elseif($pattern === '1') {
       $expiryDate->add(new DateInterval('P1D'));
     } elseif($pattern === '2') {
@@ -50,7 +50,7 @@ while($result && ($row = $result->fetch_assoc())){
       }
       //5. update last runtime
       if($task_id < 3){
-        $conn->query("UPDATE $taskTable SET lastRuntime = UTC_TIMESTAMP WHERE id = $task_id");
+        $conn->query("UPDATE taskData SET lastRuntime = UTC_TIMESTAMP WHERE id = $task_id");
       }
     }
   }

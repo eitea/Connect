@@ -20,7 +20,6 @@ if(isset($_GET['gate']) && crypt($_GET['gate'], $tok) == $tok){
 		if(isset($row['canLogin']) && $row['canLogin'] == 'FALSE'){ // 5b2931a15ad87
 			die('Login gesperrt');
 		}
-        session_start();
         echo '<p style="color:white">';
         var_dump($row); //the if below will sometimes not work without this, do not ask why
         echo '</p>';
