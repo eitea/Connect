@@ -3624,6 +3624,19 @@ if($row['version'] < 174){
     } else {
         echo '<br>messenger_conversations: gpg_signature';
     }
+    $conn->query("ALTER TABLE messenger_conversations ADD COLUMN email_to_all_participants ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE'");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>messenger_conversations: email_to_all_participants';
+    }
+    $conn->query("ALTER TABLE messenger_messages ADD COLUMN gpg_signature_valid ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE'");
+    if ($conn->error) {
+        echo $conn->error;
+    } else {
+        echo '<br>messenger_messages: gpg_signature_valid';
+    }
+    
 }
 
 // if($row['version'] < 175){}

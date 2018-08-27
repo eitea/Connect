@@ -1696,7 +1696,8 @@ function create_tables($conn) {
 		category VARCHAR(25),
 		categoryID VARCHAR(20),
         gpg_encryption ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE',
-        gpg_signature ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE'
+        gpg_signature ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE',
+        email_to_all_participants ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE'
 	)");
 	if($conn->error){
 		echo $conn->error;
@@ -1726,6 +1727,7 @@ function create_tables($conn) {
 		sentTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		type VARCHAR(15) NOT NULL DEFAULT 'text',
 		vKey VARCHAR(150),
+        gpg_signature_valid ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'FALSE',
 		FOREIGN KEY (participantID) REFERENCES relationship_conversation_participant(id)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE,

@@ -2,6 +2,7 @@
 <?php //5b0b943ebb59d
 require_once dirname(__DIR__)."/connection.php";
 require_once dirname(__DIR__)."/utilities.php";
+require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . "dsgvo" . DIRECTORY_SEPARATOR . "gpg.php";
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -32,6 +33,8 @@ while($result_serv && $row = $result_serv->fetch_assoc()){
     @imap_createmailbox($imap, imap_utf7_encode($mailbox.$archive));
 	imap_reopen($imap, $mailbox.'INBOX');
 
+	// var_dump(imap_getmailboxes($imap, $mailbox, "*"));
+
     $result_rul = $conn->query("SELECT fromAddress, toAddress, subject, templateID, workflowID, autoResponse FROM workflowRules
 		WHERE isActive = 'TRUE' AND workflowID = ".$row['id']." ORDER BY templateID, position ASC");
 	if($conn->error) echo $conn->error.__LINE__;
@@ -45,7 +48,7 @@ while($result_serv && $row = $result_serv->fetch_assoc()){
 			$bucket = $identifier.'-uploads';
 		}
 		$email_counter = 0; //fun fact: naming this $i will break it
-		foreach(imap_search($imap, 'ALL') as $mail_number){
+		foreach(imap_search($imap, 'UNSEEN') as $mail_number){
 			if($email_counter < 5){
 				$email_counter++;
 				$header = imap_headerinfo($imap, $mail_number);
@@ -117,28 +120,110 @@ while($result_serv && $row = $result_serv->fetch_assoc()){
 						$conn->query("INSERT INTO dynamicprojectsteams (projectid, teamid) SELECT '$projectid', teamid FROM dynamicprojectsteams WHERE projectid = '{$rule['templateID']}'");
 						if($conn->error) echo $conn->error.__LINE__;
 					} else { //message
-						echo 'Message Detected';
+						echo 'Message Detected ';
 						$result = $conn->query("SELECT id FROM messenger_conversations WHERE identifier = '$projectid'");
 						if($row = $result->fetch_assoc()){
 							$conversationID = $row['id'];
-							$result = $conn->query("SELECT id FROM relationship_conversation_participant WHERE conversationID = $conversationID AND partID = '$sender' ");
-							if($row = $result->fetch_assoc()){
+
+							$gpg_signature_valid = 'FALSE';
+							// get the client or contact
+							$sql = "SELECT clientID AS partID, 'client' AS partType, '' AS pgpKey FROM clientInfoData WHERE mail = '$sender'
+									UNION 
+									SELECT id AS partID, 'contact' AS partType, pgpKey FROM contactPersons WHERE email = '$sender'";
+							$result = $conn->query($sql);
+							// echo "<br>$sql";
+							$sender_public_gpg_key = "";
+							if ($result && $row_existing_sender = $result->fetch_assoc()) {
+								$partID = $row_existing_sender["partID"];
+								$partType = $row_existing_sender["partType"];
+								$sender_public_gpg_key = $row_existing_sender["pgpKey"];
+								$result = $conn->query("SELECT id FROM relationship_conversation_participant WHERE conversationID = $conversationID AND partID = '$partID' AND partType = '$partType'");
+							} else {
+								$result = $conn->query("SELECT id FROM relationship_conversation_participant WHERE conversationID = $conversationID AND partID = '$sender' ");
+							}
+
+							$gpg_signed_message_regex = '/-----BEGIN PGP SIGNED MESSAGE-----.*-----BEGIN PGP SIGNATURE-----.*-----END PGP SIGNATURE-----/s'; // this message is only signed, not encrypted
+							$gpg_encrypted_message_regex = '/-----BEGIN PGP MESSAGE-----.*-----END PGP MESSAGE-----/s'; // this message could also be signed
+							$gpg = new GPG();
+							try {
+								if (preg_match($gpg_signed_message_regex, $html, $gpg_match)) {
+									$gpg->import_key($sender_public_gpg_key);
+									$fingerprint_mail = $gpg->verify($gpg_match[0]);
+									$fingerprint_should_be = $gpg->get_fingerprint($sender_public_gpg_key);
+									if ($fingerprint_mail == $fingerprint_should_be) {
+										echo "found valid gpg signature";
+										$gpg_signature_valid = 'TRUE';
+									}
+								} elseif (preg_match($gpg_encrypted_message_regex, $html, $gpg_match)) {
+									// $gpg->import_key($sender_public_gpg_key);
+									$result_external_from = $conn->query("SELECT * FROM (
+										SELECT partID, partType FROM relationship_conversation_participant WHERE conversationID = $conversationID AND status = 'external_from'
+										UNION
+										SELECT partID, partType FROM relationship_conversation_participant WHERE conversationID = $conversationID AND partType = 'USER' AND status = 'creator'
+									) temp LIMIT 1");
+									if ($result_external_from && $row_external_from = $result_external_from->fetch_assoc()) {
+										$partType = $row_external_from['partType'];
+										$partID = $row_external_from['partID'];
+										if ($partType == "USER") {
+											$private_key = GPGMixins::get_gpg_key("user", $partID);
+										} elseif ($partType == "team") {
+											$private_key = GPGMixins::get_gpg_key("team", $partID);
+										} elseif ($partType == "company") {
+											$private_key = GPGMixins::get_gpg_key("company", $partID);
+										} else {
+											echo "Unknown partType";
+										}
+									} else {
+										echo "found encrypted message but can't determine the private key";
+									}
+									if ($private_key) {
+										$gpg->import_key($sender_public_gpg_key);
+										$decrypted = $gpg->decrypt($gpg_match[0], $private_key, true, $verified_fingerprint);
+										if ($verified_fingerprint) {
+											$fingerprint_should_be = $gpg->get_fingerprint($sender_public_gpg_key);
+											if ($fingerprint_mail == $fingerprint_should_be) {
+												echo "found valid gpg signature";
+												$gpg_signature_valid = 'TRUE';
+											}
+										}
+										if ($decrypted) {
+											$html = "DECRYPTED: $decrypted<br /><br />" . $html;
+										}
+									}
+								}
+							} catch (Exception $e) {
+								echo $e->getMessage();
+							}
+
+							if ($row = $result->fetch_assoc()) {
 								$participantID = $row['id'];
 							} else {
 								echo "Adding new participant... ";
 								$conn->query("INSERT INTO relationship_conversation_participant(conversationID, partType, partID, status)
 									VALUES ($conversationID, 'unknown', '$sender', 'normal')");
 								$participantID = $conn->insert_id;
-								if($conn->error) echo $conn->error.__LINE__;
+								if ($conn->error) echo $conn->error . __LINE__;
 							}
 							$result->free();
 							$message = asymmetric_seal('CHAT', $html);
-							$conn->query("INSERT INTO messenger_messages(message, participantID) VALUES ('$message', $participantID)");
+							$tries = 0;
+							while (++$tries < 10) {
+								// try to insert this message. If the insertion fails, try with a different timestamp (Unique key on sentTime)
+								$conn->query("INSERT INTO messenger_messages(message, participantID, gpg_signature_valid, sentTime) VALUES ('$message', $participantID, '$gpg_signature_valid', DATE_ADD(UTC_TIMESTAMP, INTERVAL $tries second))");
+								if ($conn->error) {
+									echo $conn->error;
+									break;
+								}
+							}
+							// unarchive the conversation
+							$conn->query("UPDATE relationship_conversation_participant SET archive = NULL WHERE conversationID = $conversationID");
 							if($conn->error) echo $conn->error.__LINE__;
+
 						} else {
 							echo "Error: No Message found with identifier $projectid";
 						}
 					}
+					echo "\n";
 					$move_sequence[] = $mail_number;
 				}
 			} //endif mail exists

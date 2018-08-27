@@ -34,8 +34,7 @@ while ($result && ($row = $result->fetch_assoc())) {
 function send_chat_message($message, $conversationID, $send_gpg_public_keys = false)
 {
 	// TODO: handle files
-	// TODO: handle emails to users
-	// TODO: handle incoming emails
+	
 	global $userID, $privateKey, $publicKey, $conn, $lang;
 	$v2Key = $publicKey;
 	$message_encrypt = asymmetric_encryption('CHAT', $message, $userID, $privateKey);
@@ -50,7 +49,42 @@ function send_chat_message($message, $conversationID, $send_gpg_public_keys = fa
 	}else{
 		showError($conn->error);
 	}
-	$result = $conn->query("SELECT partID, partType, status FROM relationship_conversation_participant WHERE status != 'exited' AND conversationID = $conversationID AND partType = 'contact' OR partType = 'client'");
+
+	// emails to all users 
+	// TODO: check the recipients for email notifications (users, clients, contacts, teams..)
+	$result = $conn->query("SELECT partID, partType, status FROM relationship_conversation_participant WHERE status != 'exited' AND conversationID = $conversationID AND (partType = 'USER' OR partType = 'team' OR partType = 'company')");
+	if ($result && $result->num_rows) {
+		$result_temp = $conn->query("SELECT subject, identifier, email_to_all_participants FROM messenger_conversations WHERE id = $conversationID LIMIT 1");
+		$row = $result_temp->fetch_assoc();
+		$subject = $row['subject'];
+		$identifier = $row['identifier'];
+		$email_to_all_participants = $row['email_to_all_participants'] == 'TRUE';
+		if ($email_to_all_participants) {
+			$email_options = ['subject' => "$subject - [CON - $identifier]"];
+			$email_options['senderid'] = $userID;
+			$pm_additional_email_sent = [];
+			while ($row_part = $result->fetch_assoc()) {
+				$partType = $row_part['partType'];
+				$partID = $row_part['partID'];
+				if ($partType == "USER") {
+					$result = $conn->query("SELECT email FROM UserData WHERE id = $partID");
+				} elseif ($partType == "team") {
+					$result = $conn->query("SELECT email FROM UserData WHERE id IN (SELECT userID FROM relationship_team_user WHERE teamID = $partID)");
+				} else {
+					$result = $conn->query("SELECT email FROM UserData WHERE id IN (SELECT userID FROM relationship_company_client WHERE companyID = $partID)");
+				}
+				showError($conn->error);
+				while ($result && $row = $result->fetch_assoc()) {
+					if (isset($pm_additional_email_sent[$row["email"]]) && $pm_additional_email_sent[$row["email"]]) continue;
+					$pm_additional_email_sent[$row["email"]] = true;
+					send_standard_email($row["email"], $message, $email_options);
+				}
+			}
+		}
+	}
+
+	// emails to external contacts
+	$result = $conn->query("SELECT partID, partType, status FROM relationship_conversation_participant WHERE status != 'exited' AND conversationID = $conversationID AND (partType = 'contact' OR partType = 'client')");
 	if ($result && $result->num_rows) {
 		$result_temp = $conn->query("SELECT subject, identifier, gpg_signature, gpg_encryption FROM messenger_conversations WHERE id = $conversationID LIMIT 1");
 		$row = $result_temp->fetch_assoc();
@@ -58,7 +92,7 @@ function send_chat_message($message, $conversationID, $send_gpg_public_keys = fa
 		$identifier = $row['identifier'];
 		$gpg_sign = $row['gpg_signature'] == 'TRUE';
 		$gpg_encrypt = $row['gpg_encryption'] == 'TRUE';
-		$email_options = ['subject' => "$subject - [CON - $identifier]"]; // TODO: also make sending from team/company possible
+		$email_options = ['subject' => "$subject - [CON - $identifier]"];
 		$result_external_from = $conn->query("SELECT partID, partType FROM relationship_conversation_participant WHERE status = 'external_from' AND conversationID = $conversationID");
 		if($result_external_from && $row_external_from = $result_external_from->fetch_assoc()){
 			showInfo(str_replace(["\n", " "], ["<br>", "&nbsp;"], print_r($row_external_from, true)));
@@ -86,7 +120,6 @@ function send_chat_message($message, $conversationID, $send_gpg_public_keys = fa
 		}
 		$email_recipient = "";
 		while ($row_part = $result->fetch_assoc()) {
-			//TODO: check the recipients for email notifications (users, clients, contacts, teams..)
 			$partType = $row_part['partType'];
 			$partID = $row_part['partID'];
 			$status = $row_part['status']; // normal, cc, bcc
@@ -143,7 +176,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			$identifier = uniqid();
 			$gpg_signature_str = $gpg_encrypt ? "TRUE" : "FALSE";
 			$gpg_encryption_str = $gpg_sign ? "TRUE" : "FALSE";
-			$conn->query("INSERT INTO messenger_conversations(identifier, subject, category, gpg_encryption, gpg_signature) VALUES('$identifier', '$subject', 'direct', '$gpg_encryption_str', '$gpg_signature_str')");
+			$email_to_all_participants = $pm_additional_email ? "TRUE" : "FALSE";
+			$conn->query("INSERT INTO messenger_conversations(identifier, subject, category, gpg_encryption, gpg_signature, email_to_all_participants) VALUES('$identifier', '$subject', 'direct', '$gpg_encryption_str', '$gpg_signature_str', '$email_to_all_participants')");
 			if ($conn->error) {
 				showError($conn->error . __LINE__);
 			}
@@ -185,7 +219,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 						while ($result && $row = $result->fetch_assoc()) {
 							if (isset($pm_additional_email_sent[$row["email"]]) && $pm_additional_email_sent[$row["email"]]) continue;
 							$pm_additional_email_sent[$row["email"]] = true;
-							send_standard_email($row["email"], $message, $options);
+							// send_standard_email($row["email"], $message, $options);
 						}
 					}
 				}
@@ -393,14 +427,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			if($archiveToggle == 'set1') $showArchive = '';
             $stmt = $conn->prepare("SELECT partType, partID, status FROM relationship_conversation_participant
 				WHERE conversationID = ? AND status != 'exited' AND (partType != 'USER' OR partID != '$userID')"); echo $conn->error;
-            $stmt->bind_param('i', $conversationID);
+			$stmt->bind_param('i', $conversationID);
+			// users can see all conversation that they are part of, their team is part of or their company is part of (except when the company is used to send to external) 
             $result = $conn->query("SELECT c.id, c.category, subject, rcp.lastCheck, rcp.id AS participantID, rcp.archive, tbl.unreadMessages, mm.sentTime FROM messenger_conversations c
 				INNER JOIN relationship_conversation_participant rcp
-				ON (rcp.status != 'exited' AND rcp.conversationID = c.id AND ((rcp.partType = 'USER' AND rcp.partID = '$userID') OR ( ((rcp.partType = 'team' AND rcp.partID IN (SELECT teamID FROM relationship_team_user WHERE userID = $userID)) OR (rcp.partType = 'company' AND rcp.partID IN (SELECT companyID FROM relationship_company_client WHERE userID = $userID))) AND NOT EXISTS (SELECT * FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' AND conversationID = c.id))))
+				ON (rcp.status != 'exited' AND rcp.conversationID = c.id AND ((rcp.partType = 'USER' AND rcp.partID = '$userID') OR ( ((rcp.partType = 'team' AND rcp.partID IN (SELECT teamID FROM relationship_team_user WHERE userID = $userID)) OR (rcp.partType = 'company' AND rcp.partID IN (SELECT companyID FROM relationship_company_client WHERE userID = $userID) AND rcp.status != 'external_from')) AND NOT EXISTS (SELECT * FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' AND conversationID = c.id))))
 				LEFT JOIN (SELECT COUNT(*) AS unreadMessages, rcp1.conversationID FROM messenger_messages m
 					INNER JOIN relationship_conversation_participant rcp1 ON (rcp1.id = m.participantID AND (partType != 'USER' OR partID != '$userID'))
 					WHERE m.sentTime >= ALL (SELECT lastCheck FROM relationship_conversation_participant rcp2 WHERE rcp2.conversationID = rcp1.conversationID
-					AND rcp2.status != 'exited' AND ((rcp2.partType = 'USER' AND rcp2.partID = '$userID') OR ( ((rcp2.partType = 'team' AND rcp2.partID IN (SELECT teamID FROM relationship_team_user WHERE userID = $userID)) OR ( rcp2.partType = 'company' AND rcp2.partID IN (SELECT companyID FROM relationship_company_client WHERE userID = $userID) )) AND NOT EXISTS (SELECT * FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' AND conversationID = rcp2.id))))
+					AND rcp2.status != 'exited' AND ((rcp2.partType = 'USER' AND rcp2.partID = '$userID') OR ( ((rcp2.partType = 'team' AND rcp2.partID IN (SELECT teamID FROM relationship_team_user WHERE userID = $userID)) OR ( rcp2.partType = 'company' AND rcp2.partID IN (SELECT companyID FROM relationship_company_client WHERE userID = $userID) AND rcp2.status != 'external_from')) AND NOT EXISTS (SELECT * FROM relationship_conversation_participant WHERE partType = 'USER' AND partID = '$userID' AND conversationID = rcp2.id))))
 					GROUP BY conversationID) tbl
 				ON tbl.conversationID = c.id
 				LEFT JOIN messenger_messages mm ON mm.id = (SELECT mm2.id FROM messenger_messages mm2
@@ -523,7 +558,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 								</select>
 								<div class="checkbox">
 									<label>
-										<input type="checkbox" id="pm_additional_email_checkbox" name="pm_additional_email" value="true"> Zusätzlich Email senden (Sendet jedem Benutzer im Team eine eigene Email)
+										<input type="checkbox" id="pm_additional_email_checkbox" name="pm_additional_email" value="true"> Zusätzlich Email senden <a title="Sendet jedem Benutzer im Team bzw. Mandanten eine eigene Email"><i class="fa fa-info-circle"></i></a>
 									</label>
 								</div>
 							</div>
@@ -532,7 +567,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 					<div class="tab-pane " id="new-message-tab-email">
 						<div class="row">
 							<div class="col-xs-12">
-								<label>Von</label>
+								<label>Von <a title="Wenn die Email vom Team aus gesendet wird, hat das gesamte Team zugriff auf die Konversation"><i class="fa fa-info-circle"></i></a></label>
 								<select class="select2-team-icons form-control" name="email_from">
 									<?php
 									$has_gpg_keys = GPGMixins::get_has_gpg_keys_list();
@@ -563,7 +598,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 								</select>
 								<div class="checkbox">
 									<label>
-										<input type="checkbox" id="email_sign_gpg_checkbox" name="email_sign_gpg" value="true"> GPG Signatur
+										<input type="checkbox" id="email_sign_gpg_checkbox" name="email_sign_gpg" value="true"> GPG Signatur <a title="Kann nur verwendet werden, wenn zuvor ein GPG Schlüsselpaar erstellt wurde."><i class="fa fa-info-circle"></i></a>
 									</label>
 									&NonBreakingSpace;
 									<label>
@@ -582,7 +617,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 								</select>
 								<div class="checkbox">
 									<label>
-										<input type="checkbox" id="email_encrypt_gpg_checkbox" disabled name="email_encrypt_gpg" value="true"> GPG Verschlüsselung
+										<input type="checkbox" id="email_encrypt_gpg_checkbox" disabled name="email_encrypt_gpg" value="true"> GPG Verschlüsselung <a title="Jeder der Empfänger braucht einen ein GPG Schlüsselpaar"><i class="fa fa-info-circle"></i></a>
 									</label>
 								</div>
 							</div>
@@ -665,8 +700,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 							<input type="text" maxlength="50" name="new_message_subject" class="form-control required-field" required>
 							<br>
 							<label><?php echo $conn->error; echo mc_status(); ?> Nachricht* <a title="Um die automatisierte Anrede hinzuzufügen, verwenden Sie [ANREDE] um den Text
-								(Sehr geehrter Herr/ Frau [titel] [vorname] [nachname]) an dessen Stelle einzufügen.
-								Achten Sie bitte darauf, dass diese Einstellung vorher im Adressbuch definiert werden muss."><i class="fa fa-info-circle"></i>
+(Sehr geehrter Herr/ Frau [titel] [vorname] [nachname]) an dessen Stelle einzufügen.
+Achten Sie bitte darauf, dass diese Einstellung vorher im Adressbuch definiert werden muss."><i class="fa fa-info-circle"></i>
 							</a></label>
 							<textarea name="new_message_body" rows="8" style="resize:none" class="form-control"></textarea>
 							<small>*Felder werden benötigt</small>

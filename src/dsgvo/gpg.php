@@ -7,7 +7,7 @@ class GPG
 
     function __construct($gpg_dir = "")
     {
-        if(!$gpg_dir) $gpg_dir = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . "gpg";
+        if (!$gpg_dir) $gpg_dir = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . "gpg";
         $this->set_home_dir($gpg_dir . DIRECTORY_SEPARATOR . uniqid("", true) . str_replace("/", "", base64_encode(random_bytes(24))));
         $this->gpg = new gnupg();
     }
@@ -68,8 +68,7 @@ class GPG
             $name_rows[] = " Name-Email: $name_email";
         }
         if (!count($name_rows)) {
-            showError("Either name, comment or email has to be present");
-            return ["public_key" => null, "private_key" => null, "fingerprint" => null];
+            throw new Exception("Either name, comment or email has to be present");
         }
         $name_rows = implode("\n", $name_rows);
 
@@ -120,7 +119,8 @@ class GPG
         return $result;
     }
 
-    function get_fingerprint(string $public_key){
+    function get_fingerprint(string $public_key)
+    {
         $this->set_home_dir($this->home_dir);
         $info = $this->gpg->import($public_key);
         $fingerprint = $info["fingerprint"];
@@ -131,14 +131,13 @@ class GPG
     {
         $key_info = $this->gpg->keyinfo($fingerprint);
         $output = [];
-        if ($key_info) {
-            foreach ($key_info[0]["uids"] as $info) {
-                $output[] = $info["name"] . " (" . $info["comment"] . ") " . $info["email"];
-            }
-            showInfo("Key info: " . htmlspecialchars(implode(", ", $output)));
-        } else {
-            showWarning("Can't get key info");
+        if (!$key_info) {
+            throw new Exception("Can't get key info (" . $this->gpg->geterror() . ")");
         }
+        foreach ($key_info[0]["uids"] as $info) {
+            $output[] = $info["name"] . " (" . $info["comment"] . ") " . $info["email"];
+        }
+        showInfo("Key info: " . htmlspecialchars(implode(", ", $output)));
     }
 
     function encrypt($message, $encrypt_key, $sign_key = false)
@@ -146,15 +145,15 @@ class GPG
         $this->set_home_dir($this->home_dir);
         $this->gpg->import($encrypt_key["public_key"]);
         $success = $this->gpg->addencryptkey($encrypt_key["fingerprint"]);
-        if (!$success) return $this->gpg->geterror();
+        if (!$success) throw new Exception($this->gpg->geterror());
         if (!$sign_key) {
             $encrypted = $this->gpg->encrypt($message);
-            if (!$encrypted) return $this->gpg->geterror();
+            if (!$encrypted) throw new Exception($this->gpg->geterror());
             return $encrypted;
         }
         $this->gpg->import($sign_key["private_key"]);
         $success = $this->gpg->addsignkey($sign_key["fingerprint"]);
-        if (!$success) return $this->gpg->geterror();
+        if (!$success) throw new Exception($this->gpg->geterror());
         return $this->gpg->encryptsign($message);
     }
 
@@ -163,14 +162,18 @@ class GPG
         $this->set_home_dir($this->home_dir);
         $this->gpg->import($decrypt_key["private_key"]);
         $success = $this->gpg->addencryptkey($decrypt_key["fingerprint"]);
-        if (!$success) return $this->gpg->geterror();
+        if (!$success) throw new Exception($this->gpg->geterror());
         if (!$verify) {
             $decrypted = $this->gpg->decrypt($message);
-            if (!$decrypted) return $this->gpg->geterror();
+            if (!$decrypted) throw new Exception($this->gpg->geterror());
             return $decrypted;
         }
         $info = $this->gpg->decryptverify($message, $decrypted);
-        if (!$info) return $this->gpg->geterror();
+        if (!$info) {
+            $decrypted_only = $this->gpg->decrypt($message);
+            if (!$decrypted_only) throw new Exception($this->gpg->geterror());
+            return $decrypted_only;
+        }
         $fingerprint = $info[0]["fingerprint"];
         return $decrypted;
     }
@@ -180,10 +183,10 @@ class GPG
         $this->set_home_dir($this->home_dir);
         $this->gpg->import($sign_key["private_key"]);
         $success = $this->gpg->addsignkey($sign_key["fingerprint"]);
-        if (!$success) return $this->gpg->geterror();
+        if (!$success) throw new Exception($this->gpg->geterror());
         $this->gpg->setsignmode(gnupg::SIG_MODE_CLEAR); // SIG_MODE_NORMAL, SIG_MODE_DETACH, SIG_MODE_CLEAR
         $signed = $this->gpg->sign($message);
-        if (!$signed) return $this->gpg->geterror();
+        if (!$signed) throw new Exception($this->gpg->geterror());
         return $signed;
     }
 
@@ -191,38 +194,39 @@ class GPG
     {
         $this->set_home_dir($this->home_dir);
         $result = $this->gpg->verify($message, false);
+        // print_r($result);
         if ($result && isset($result[0]["fingerprint"])) return $result[0]["fingerprint"];
-        return $this->gpg->geterror();
+        throw new Exception($this->gpg->geterror());
     }
 
-    // function import_key($key, &$exec_output = "")
-    // {
-    //     $descriptorspec = array(
-    //         0 => array("pipe", "r"),
-    //         1 => array("pipe", "w"),
-    //     );
-    //     $env = ["GNUPGHOME" => $this->home_dir];
-    //     $success = false;
-    //     $process = proc_open("gpg --homedir '$this->home_dir' --import 2>&1", $descriptorspec, $pipes, $this->home_dir, $env);
-    //     if (is_resource($process)) {
-    //         fwrite($pipes[0], $key); 
-    //         fclose($pipes[0]);
+    function import_key($key, &$exec_output = "")
+    {
+        $descriptorspec = array(
+            0 => array("pipe", "r"),
+            1 => array("pipe", "w"),
+        );
+        $env = ["GNUPGHOME" => $this->home_dir];
+        $success = false;
+        $process = proc_open("gpg --homedir '$this->home_dir' --import 2>&1", $descriptorspec, $pipes, $this->home_dir, $env);
+        if (is_resource($process)) {
+            fwrite($pipes[0], $key);
+            fclose($pipes[0]);
 
-    //         $exec_output = stream_get_contents($pipes[1]);
-    //         fclose($pipes[1]);
+            $exec_output = stream_get_contents($pipes[1]);
+            fclose($pipes[1]);
 
-    //         $return_value = proc_close($process);
-    //         $success = $return_value == 0;
-    //     }
-    //     return $success;
-    // }
+            $return_value = proc_close($process);
+            $success = $return_value == 0;
+        }
+        return $success;
+    }
 
     protected static function parse_fingerprint($gpg_output)
     {
         preg_match('/fpr:+([A-Za-z0-9]+):/', $gpg_output, $match);
         if (isset($match[1]))
             return $match[1];
-        showError("Can't parse fingerprint");
+        throw new Exception("Can't parse fingerprint");
         return "";
     }
 }
@@ -253,7 +257,8 @@ class GPGMixins
         return [];
     }
 
-    static function get_gpg_public_key($type, $id){
+    static function get_gpg_public_key($type, $id)
+    {
         global $conn;
         if ($type == "user") {
             $result = $conn->query("SELECT public_key, fingerprint FROM gpg_keys WHERE userID = $id");
@@ -269,18 +274,19 @@ class GPGMixins
         return [];
     }
 
-    static function get_has_gpg_keys_list(){
+    static function get_has_gpg_keys_list()
+    {
         global $conn;
         $has_gpg_keys = [];
         $result = $conn->query("SELECT private_key, public_key, userID, teamID, companyID FROM gpg_keys");
-        while($result && $row = $result->fetch_assoc()){
-            if($row["userID"]){
+        while ($result && $row = $result->fetch_assoc()) {
+            if ($row["userID"]) {
                 $has_gpg_keys["user"][$row["userID"]] = ["public" => !empty($row["public_key"]), "private" => !empty($row["private_key"])];
             }
-            if($row["teamID"]){
+            if ($row["teamID"]) {
                 $has_gpg_keys["team"][$row["teamID"]] = ["public" => !empty($row["public_key"]), "private" => !empty($row["private_key"])];
             }
-            if($row["companyID"]){
+            if ($row["companyID"]) {
                 $has_gpg_keys["company"][$row["companyID"]] = ["public" => !empty($row["public_key"]), "private" => !empty($row["private_key"])];
             }
         }
@@ -319,108 +325,137 @@ class GPGMixins
         $gpg_dir = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . "gpg";
 
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            if (isset($_POST["createKeypair"])) {
-                $target = explode(";", $_POST["userOrTeamOrCompany"]);
-                $gpg = new GPG($gpg_dir);
+            try {
+                if (isset($_POST["createKeypair"])) {
+                    $target = explode(";", $_POST["userOrTeamOrCompany"]);
+                    $gpg = new GPG($gpg_dir);
 
-                $allowed = false;
-                if ($target[0] == "user") {
-                    $uid = intval($target[1]);
-                    if($_SESSION["userid"] == $uid || Permissions::has("GPG.ADMIN") || Permissions::has("CORE.USERS"))
-                        $allowed = true;
-                } else if ($target[0] == "team") {
-                    $tid = intval($target[1]);
-                    if(Permissions::has("GPG.ADMIN") || Permissions::has("CORE.TEAMS"))
-                        $allowed = true;
-                } else {
-                    $cid = intval($target[1]);
-                    if(Permissions::has("GPG.ADMIN") || Permissions::has("CORE.COMPANIES"))
-                        $allowed = true;
-                }
-                if($allowed){
-
-                    if ($_POST["operation"] == "new") {
-                        $name_real = test_input($_POST["nameReal"]);
-                        $name_comment = test_input($_POST["nameComment"]);
-                        $name_email = test_input($_POST["nameEmail"]);
-                        $key_length = intval($_POST["keyLength"]);
-    
-                        $key_pair = $gpg->create_key_pair([
-                            "name" => $name_real,
-                            "comment" => $name_comment,
-                            "email" => $name_email,
-                            "key_length" => $key_length
-                        ]);
-                    } else { // import
-                        $key_pair = $gpg->get_key_pair($_POST["keyImport"]);
-                    }
-                    $stmt_insert = $conn->prepare("INSERT INTO gpg_keys (public_key, private_key, fingerprint, userID, companyID, teamID) VALUES (?,?,?,?,?,?)");
-                    showError($conn->error);
-                    $stmt_insert->bind_param("sssiii", $public_key, $private_key, $fingerprint, $uid, $cid, $tid);
-                    $public_key = $key_pair["public_key"];
-                    $fingerprint = $key_pair["fingerprint"];
-                    $uid = $cid = $tid = null;
-                    $private_key = $key_pair["private_key"]; // TODO: REMOVE
+                    $allowed = false;
                     if ($target[0] == "user") {
                         $uid = intval($target[1]);
-                        if ($key_pair["private_key"]) {
-                            $result = $conn->query("SELECT publicKey FROM security_users WHERE userID = $uid");
-                            if ($result && $row = $result->fetch_assoc()) {
-                        // $private_key = simple_encryption($key_pair["private_key"], $row["publicKey"]); // TODO: don't use symmetric encryption
-                            }
-                        }
+                        if ($_SESSION["userid"] == $uid || Permissions::has("GPG.ADMIN") || Permissions::has("CORE.USERS"))
+                            $allowed = true;
                     } else if ($target[0] == "team") {
                         $tid = intval($target[1]);
-                        if ($key_pair["private_key"]) {
-    
-                    // TODO: encrypt
-                        }
+                        if (Permissions::has("GPG.ADMIN") || Permissions::has("CORE.TEAMS"))
+                            $allowed = true;
                     } else {
                         $cid = intval($target[1]);
-                        if ($key_pair["private_key"]) {
-    
-                            $result = $conn->query("SELECT publicKey FROM security_company WHERE companyID = $cid");
-                            if ($result && $row = $result->fetch_assoc()) {
-                        // $private_key = simple_encryption($key_pair["private_key"], $row["publicKey"]); // TODO: don't use symmetric encryption
+                        if (Permissions::has("GPG.ADMIN") || Permissions::has("CORE.COMPANIES"))
+                            $allowed = true;
+                    }
+                    if ($allowed) {
+
+                        if ($_POST["operation"] == "new") {
+                            $name_real = test_input($_POST["nameReal"]);
+                            $name_comment = test_input($_POST["nameComment"]);
+                            $name_email = test_input($_POST["nameEmail"]);
+                            $key_length = intval($_POST["keyLength"]);
+
+                            $key_pair = $gpg->create_key_pair([
+                                "name" => $name_real,
+                                "comment" => $name_comment,
+                                "email" => $name_email,
+                                "key_length" => $key_length
+                            ]);
+                        } else { // import
+                            $key_pair = $gpg->get_key_pair($_POST["keyImport"]);
+                        }
+                        $stmt_insert = $conn->prepare("INSERT INTO gpg_keys (public_key, private_key, fingerprint, userID, companyID, teamID) VALUES (?,?,?,?,?,?)");
+                        showError($conn->error);
+                        $stmt_insert->bind_param("sssiii", $public_key, $private_key, $fingerprint, $uid, $cid, $tid);
+                        $public_key = $key_pair["public_key"];
+                        $fingerprint = $key_pair["fingerprint"];
+                        $uid = $cid = $tid = null;
+                        $private_key = $key_pair["private_key"]; // TODO: REMOVE
+                        if ($target[0] == "user") {
+                            $uid = intval($target[1]);
+                            if ($key_pair["private_key"]) {
+                                $result = $conn->query("SELECT publicKey FROM security_users WHERE userID = $uid");
+                                if ($result && $row = $result->fetch_assoc()) {
+                            // $private_key = simple_encryption($key_pair["private_key"], $row["publicKey"]); // TODO: don't use symmetric encryption
+                                }
+                            }
+                        } else if ($target[0] == "team") {
+                            $tid = intval($target[1]);
+                            if ($key_pair["private_key"]) {
+        
+                        // TODO: encrypt
+                            }
+                        } else {
+                            $cid = intval($target[1]);
+                            if ($key_pair["private_key"]) {
+
+                                $result = $conn->query("SELECT publicKey FROM security_company WHERE companyID = $cid");
+                                if ($result && $row = $result->fetch_assoc()) {
+                            // $private_key = simple_encryption($key_pair["private_key"], $row["publicKey"]); // TODO: don't use symmetric encryption
+                                }
                             }
                         }
-                    }
-                    if ($public_key && $fingerprint) {
-                        if (!$private_key) {
-                            showWarning("No valid private key found. The key can not be used to decrypt messages.");
-                        }
-                        if ($cid || $tid || $uid) {
-                            $stmt_insert->execute();
-                            showError($stmt_insert->error);
+                        if ($public_key && $fingerprint) {
+                            if (!$private_key) {
+                                showWarning("No valid private key found. The key can not be used to decrypt messages.");
+                            }
+                            if ($cid || $tid || $uid) {
+                                $stmt_insert->execute();
+                                showError($stmt_insert->error);
+                            } else {
+                                showError("Aborting. No target selected");
+                            }
                         } else {
-                            showError("Aborting. No target selected");
+                            showError("Aborting. No valid public key or fingerprint found.");
                         }
                     } else {
-                        showError("Aborting. No valid public key or fingerprint found.");
+                        showError("You are not allowed to create keys for this target");
                     }
-                }else{
-                    showError("You are not allowed to create keys for this target");
-                }
-            } elseif (isset($_POST["encryptOrDecrypt"]) && Permissions::has("GPG.USE")) {
-                $operation = $_POST["operation"];
-                $message = $_POST["message"];
-                $sign = $verify = $sign_key = false;
-                $gpg = new GPG($gpg_dir);
-                self::$output_modal = "";
-                if ($operation == "encrypt") {
-                    $target = explode(";", $_POST["target"]);
-                    $encrypt_key = self::get_gpg_key($target[0], intval($target[1]));
-                    if (!(!isset($_POST["sign"]) || $_POST["sign"] == "false")) {
-                        $sign = explode(";", $_POST["sign"]);
-                        $sign_key = self::get_gpg_key($sign[0], intval($sign[1]));
-                    }
-                    self::$output_modal = $gpg->encrypt($message, $encrypt_key, $sign_key);
-                } elseif ($operation == "decrypt" && Permissions::has("GPG.USE")) {
-                    $target = explode(";", $_POST["decrypt"]);
-                    $verify = isset($_POST["verify"]) && $_POST["verify"] == "true";
-                    $decrypt_key = self::get_gpg_key($target[0], intval($target[1]));
-                    self::$output_modal = $gpg->decrypt($message, $decrypt_key, $verify, $fingerprint);
-                    if ($verify && $fingerprint) {
+                } elseif (isset($_POST["encryptOrDecrypt"]) && Permissions::has("GPG.USE")) {
+                    $operation = $_POST["operation"];
+                    $message = $_POST["message"];
+                    $sign = $verify = $sign_key = false;
+                    $gpg = new GPG($gpg_dir);
+                    self::$output_modal = "";
+                    if ($operation == "encrypt") {
+                        $target = explode(";", $_POST["target"]);
+                        $encrypt_key = self::get_gpg_key($target[0], intval($target[1]));
+                        if (!(!isset($_POST["sign"]) || $_POST["sign"] == "false")) {
+                            $sign = explode(";", $_POST["sign"]);
+                            $sign_key = self::get_gpg_key($sign[0], intval($sign[1]));
+                        }
+                        self::$output_modal = $gpg->encrypt($message, $encrypt_key, $sign_key);
+                    } elseif ($operation == "decrypt" && Permissions::has("GPG.USE")) {
+                        $target = explode(";", $_POST["decrypt"]);
+                        $verify = isset($_POST["verify"]) && $_POST["verify"] == "true";
+                        $decrypt_key = self::get_gpg_key($target[0], intval($target[1]));
+                        self::$output_modal = $gpg->decrypt($message, $decrypt_key, $verify, $fingerprint);
+                        if ($verify && $fingerprint) {
+                            $result = $conn->query("SELECT gpg.userID, gpg.teamID, gpg.companyID, ud.firstname, ud.lastname, td.name team_name, cd.name company_name FROM gpg_keys gpg 
+                                            LEFT JOIN UserData ud ON ud.id = gpg.userID 
+                                            LEFT JOIN teamData td ON td.id = gpg.teamID 
+                                            LEFT JOIN companyData cd ON cd.id = gpg.companyID 
+                                            WHERE fingerprint LIKE '%$fingerprint'");
+                            if ($result && $row = $result->fetch_assoc()) {
+                                if ($row["userID"]) {
+                                    $firstname = $row["firstname"];
+                                    $lastname = $row["lastname"];
+                                    $from = "user $firstname $lastname";
+                                } elseif ($row["teamID"]) {
+                                    $name = $row["team_name"];
+                                    $from = "team $name";
+                                } else {
+                                    $name = $row["company_name"];
+                                    $from = "company $name";
+                                }
+                                showInfo("Message came from $from (fingerprint: $fingerprint)");
+                            } else {
+                                showWarning("Unknown fingerprint $fingerprint");
+                            }
+                        }
+                    } elseif ($operation == "sign" && Permissions::has("GPG.USE")) {
+                        $target = explode(";", $_POST["signOnly"]);
+                        $sign_key = self::get_gpg_key($target[0], intval($target[1]));
+                        self::$output_modal = $gpg->sign($message, $sign_key);
+                    } elseif ($operation == "verify" && Permissions::has("GPG.USE")) {
+                        $fingerprint = $gpg->verify($message);
                         $result = $conn->query("SELECT gpg.userID, gpg.teamID, gpg.companyID, ud.firstname, ud.lastname, td.name team_name, cd.name company_name FROM gpg_keys gpg 
                                         LEFT JOIN UserData ud ON ud.id = gpg.userID 
                                         LEFT JOIN teamData td ON td.id = gpg.teamID 
@@ -442,69 +477,45 @@ class GPGMixins
                         } else {
                             showWarning("Unknown fingerprint $fingerprint");
                         }
+                        self::$output_modal = "";
                     }
-                } elseif ($operation == "sign" && Permissions::has("GPG.USE")) {
-                    $target = explode(";", $_POST["signOnly"]);
-                    $sign_key = self::get_gpg_key($target[0], intval($target[1]));
-                    self::$output_modal = $gpg->sign($message, $sign_key);
-                } elseif ($operation == "verify" && Permissions::has("GPG.USE")) {
-                    $fingerprint = $gpg->verify($message);
-                    $result = $conn->query("SELECT gpg.userID, gpg.teamID, gpg.companyID, ud.firstname, ud.lastname, td.name team_name, cd.name company_name FROM gpg_keys gpg 
-                                    LEFT JOIN UserData ud ON ud.id = gpg.userID 
-                                    LEFT JOIN teamData td ON td.id = gpg.teamID 
-                                    LEFT JOIN companyData cd ON cd.id = gpg.companyID 
-                                    WHERE fingerprint LIKE '%$fingerprint'");
-                    if ($result && $row = $result->fetch_assoc()) {
-                        if ($row["userID"]) {
-                            $firstname = $row["firstname"];
-                            $lastname = $row["lastname"];
-                            $from = "user $firstname $lastname";
-                        } elseif ($row["teamID"]) {
-                            $name = $row["team_name"];
-                            $from = "team $name";
-                        } else {
-                            $name = $row["company_name"];
-                            $from = "company $name";
-                        }
-                        showInfo("Message came from $from (fingerprint: $fingerprint)");
-                    } else {
-                        showWarning("Unknown fingerprint $fingerprint");
-                    }
-                    self::$output_modal = "";
                 }
-            }
-            if (isset($_POST["deleteGpgKeys"])) {
-                $allowed = false;
-                $target = explode(";", $_POST["deleteGpgKeys"]);
-                if ($target[0] == "user") {
-                    $uid = intval($target[1]);
-                    if($_SESSION["userid"] == $uid || Permissions::has("GPG.ADMIN") || Permissions::has("CORE.USERS"))
-                        $allowed = true;
-                } else if ($target[0] == "team") {
-                    $tid = intval($target[1]);
-                    if(Permissions::has("GPG.ADMIN") || Permissions::has("CORE.TEAMS"))
-                        $allowed = true;
-                } else {
-                    $cid = intval($target[1]);
-                    if(Permissions::has("GPG.ADMIN") || Permissions::has("CORE.COMPANIES"))
-                        $allowed = true;
-                }
-                if($allowed){
+                if (isset($_POST["deleteGpgKeys"])) {
+                    $allowed = false;
+                    $target = explode(";", $_POST["deleteGpgKeys"]);
                     if ($target[0] == "user") {
                         $uid = intval($target[1]);
-                        $result = $conn->query("DELETE FROM gpg_keys WHERE userID = $uid");
+                        if ($_SESSION["userid"] == $uid || Permissions::has("GPG.ADMIN") || Permissions::has("CORE.USERS"))
+                            $allowed = true;
                     } else if ($target[0] == "team") {
                         $tid = intval($target[1]);
-                        $result = $conn->query("DELETE FROM gpg_keys WHERE teamID = $tid");
+                        if (Permissions::has("GPG.ADMIN") || Permissions::has("CORE.TEAMS"))
+                            $allowed = true;
                     } else {
                         $cid = intval($target[1]);
-                        $result = $conn->query("DELETE FROM gpg_keys WHERE companyID = $cid");
+                        if (Permissions::has("GPG.ADMIN") || Permissions::has("CORE.COMPANIES"))
+                            $allowed = true;
                     }
-                    if($conn->error) showError($conn->error);
-                    else showSuccess($lang["OK_DELETE"]);
-                }else{
-                    showError("You are not allowed to delete this key pair");
+                    if ($allowed) {
+                        if ($target[0] == "user") {
+                            $uid = intval($target[1]);
+                            $result = $conn->query("DELETE FROM gpg_keys WHERE userID = $uid");
+                        } else if ($target[0] == "team") {
+                            $tid = intval($target[1]);
+                            $result = $conn->query("DELETE FROM gpg_keys WHERE teamID = $tid");
+                        } else {
+                            $cid = intval($target[1]);
+                            $result = $conn->query("DELETE FROM gpg_keys WHERE companyID = $cid");
+                        }
+                        if ($conn->error) showError($conn->error);
+                        else showSuccess($lang["OK_DELETE"]);
+                    } else {
+                        showError("You are not allowed to delete this key pair");
+                    }
                 }
+
+            } catch (Exception $e) {
+                showError($e->getMessage());
             }
         }
     }
@@ -564,13 +575,13 @@ class GPGMixins
 
     private static $modal_id = 0;
 
-static function show_encrypt_decrypt_modal()
-{
-    if (!Permissions::has("GPG.USE")) return;
-    global $lang;
-    global $available_companies;
-    self::$modal_id++;
-    ?>
+    static function show_encrypt_decrypt_modal()
+    {
+        if (!Permissions::has("GPG.USE")) return;
+        global $lang;
+        global $available_companies;
+        self::$modal_id++;
+        ?>
 
          <button type="button" data-toggle="modal" data-target="#encryptDecryptModal<?php echo self::$modal_id ?>" class="btn btn-default pull-left">
             GPG Operationen

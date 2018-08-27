@@ -843,12 +843,22 @@ function send_standard_email($recipient, $content, Array $options = ['subject' =
     }
     
     $gpg = new gpg();
-    if(!empty($options["recipient_gpg_public_key"]) && !empty($options["sender_gpg_private_key"])){
-        $content = $gpg->encrypt($content, ["public_key" => $options["recipient_gpg_public_key"], "fingerprint" => $gpg->get_fingerprint($options["recipient_gpg_public_key"])],$options["sender_gpg_private_key"]);
-    }elseif(!empty($options["recipient_gpg_public_key"])){
-        $content = $gpg->encrypt($content, ["public_key" => $options["recipient_gpg_public_key"], "fingerprint" => $gpg->get_fingerprint($options["recipient_gpg_public_key"])]);
-    }elseif(!empty($options["sender_gpg_private_key"])){
-        $content = $gpg->sign($content, $options["sender_gpg_private_key"]);
+    try{
+        if(!empty($options["recipient_gpg_public_key"]) && !empty($options["sender_gpg_private_key"])){
+            $content = $gpg->encrypt($content, ["public_key" => $options["recipient_gpg_public_key"], "fingerprint" => $gpg->get_fingerprint($options["recipient_gpg_public_key"])],$options["sender_gpg_private_key"]);
+        }elseif(!empty($options["recipient_gpg_public_key"])){
+            $content = $gpg->encrypt($content, ["public_key" => $options["recipient_gpg_public_key"], "fingerprint" => $gpg->get_fingerprint($options["recipient_gpg_public_key"])]);
+        }elseif(!empty($options["sender_gpg_private_key"])){
+            $content = $gpg->sign($content, $options["sender_gpg_private_key"]);
+        }
+    }catch(Exception $e){
+        // TODO: should I stop the email from being sent or send without encryption?
+        if(function_exists("showError")){
+            // this is not autoTask
+            showError($e->getMessage());
+        }else{
+            echo $e->getMessage();
+        }
     }
 
 	$mail->Body    =  $content .'<br><br>'. $signature;

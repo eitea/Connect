@@ -24,7 +24,7 @@
 			<?php
 			$date = '';
 			$result_cw = $conn->query("SELECT * FROM (SELECT message, vKey, sentTime, m.type, rcp.partType, rcp.partID, rcp.status, rcp.lastCheck,
-				archive.name AS fileName, archive.type AS fileType, m.id AS messageID
+				archive.name AS fileName, archive.type AS fileType, m.id AS messageID, m.gpg_signature_valid
 				FROM messenger_messages m LEFT JOIN relationship_conversation_participant rcp ON rcp.id = m.participantID
 				LEFT JOIN archive ON m.message = archive.uniqID
 				WHERE rcp.conversationID = $openChatID ORDER BY m.sentTime DESC LIMIT 20) AS tbl ORDER BY tbl.sentTime ASC");
@@ -37,13 +37,33 @@
 					echo '<p class="text-center" style="color:grey;font-size:8pt;">- ',$date,' -</p>';
 				}
 				echo '<div style="display:table;width:100%;">';
+				echo '<div>';
+				if($row_cw["gpg_signature_valid"] == 'TRUE'){
+					echo "<span class='label label-success' style='margin-bottom: 10px; display: inline-block;'>Signatur gültig</span> ";
+				}
+				$style = 'float:left;';
 				if($row_cw['partType'] == 'USER' && $row_cw['partID'] == $userID){
 					$style = 'background-color:#caf9b3; float:right;';
 				} elseif($row_cw['partType'] == 'USER'){
 					echo '<p style="font-size:75%;">',$userID_toName[$row_cw['partID']],' - ', substr(carryOverAdder_Hours($row_cw['sentTime'], $timeToUTC),11,5), '</p>';
-					$style = 'float:left;';
+				} elseif($row_cw['partType'] == 'contact'){
+					if (!empty($contact_id_to_name[$row_cw['partID']])) {
+						echo $contact_id_to_name[$row_cw['partID']];
+					} else {
+						echo "Unknown contact (" . $row_cw['partID'] . ")";
+					}
+				} elseif($row_cw['partType'] == 'client'){
+					if (!empty($client_id_to_name[$row_cw['partID']])) {
+						echo $client_id_to_name[$row_cw['partID']];
+					} else {
+						echo "Unknown client (" . $row_cw['partID'] . ")";
+					}
+				} elseif($row_cw['partType'] == 'unknown'){
+					echo "<span class='label label-danger' style='margin-bottom: 10px; display: inline-block;'>Unbekannt</span> ";
+					echo $row_cw['partID'];
 				}
-				echo '<div class="well" style="width:70%;margin-bottom:10px;',$style,'" ><form method="POST">';
+				echo '</div>';
+				echo '<div class="well" style="width:70%;margin-bottom:10px;white-space: pre-wrap;',$style,'" ><form method="POST">';
 				if($row_cw['type'] == 'text'){
 					//echo '&#x1F601';
 					// function decodeEmoticons($src) {

@@ -40,7 +40,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && Permissions::has("WORKFLOW.WRITE")){
 			$conn->query("INSERT INTO emailprojects(server,port,service,smtpSecure,username,password,logEnabled)
 			VALUES('$server','$port','$service','$security','$username','$password','$logging') ");
 			$workflowID = $conn->insert_id;
-			$conn->query("INSERT INTO workflowRules(workflowRules) VALUES($workflowID)");
+			$conn->query("INSERT INTO workflowRules(workflowID) VALUES($workflowID)");
 		}
         if ($conn->error) {
             echo '<div class="alert alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>' . $conn->error . '</div>';

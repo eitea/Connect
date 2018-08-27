@@ -3,6 +3,8 @@
 require dirname(__DIR__) . '/connection.php';
 require dirname(__DIR__) . '/utilities.php';
 
+$development = true; // FIXME: set to false
+
 /* repeat pattern identifiers
 '-1' => 'Inactive',
 '0' => 'Once',
@@ -41,7 +43,7 @@ while($result && ($row = $result->fetch_assoc())){
     }
 
     $expiryDate = $expiryDate->format('Y-m-d H:i:s');
-    if($pattern && timeDiff_Hours($now, $expiryDate) < 0){ //execute if schedule has expired
+    if(($pattern && timeDiff_Hours($now, $expiryDate) < 0)||$development){ //execute if schedule has expired
       //4. execute task
       try{
       require $row['callee'];

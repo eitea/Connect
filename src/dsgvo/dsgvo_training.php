@@ -354,7 +354,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && Permissions::has("TRAINING.WRITE")) 
 }
 $activeTab = $trainingID;
 $activeModule = $moduleID;
-//todo select module where trainingid and make that active
 showError($conn->error);
 ?>
 <div class="page-header-fixed">
