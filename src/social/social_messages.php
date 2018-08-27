@@ -50,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $stmt_participant->execute();
                 $options['teamid'] = $partID;
             } else {
-                $options['userid'] = $userID;
+                $options['senderid'] = $userID;
             }
 			if(isset($_FILES['new_message_files'])){ //5b45f089288db
 				$s3 = getS3Object($bucket);
