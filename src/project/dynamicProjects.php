@@ -874,7 +874,7 @@ if($filterings['tasks'] == 'ACTIVE_PLANNED'){
             <form method="POST">
                 <div class="modal-header h4"><button type="button" class="close"><span>&times;</span></button><?php echo $lang["DYNAMIC_PROJECTS_BOOKING_PROMPT"]; ?></div>
                 <div class="modal-body">
-					<? if(!$occupation['noBooking']): ?>
+					<?php if(!$occupation['noBooking']): ?>
 	                    <div class="row" id="occupation_booking_fields">
 	                        <?php if(!$occupation['companyid'] && count($available_companies) > 2): ?>
 	                            <div class="col-md-4">
