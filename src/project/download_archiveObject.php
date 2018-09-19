@@ -3,7 +3,6 @@ require dirname(dirname(__DIR__)) . '/plugins/aws/autoload.php';
 require dirname(__DIR__).DIRECTORY_SEPARATOR.'connection.php';
 require dirname(__DIR__).DIRECTORY_SEPARATOR.'utilities.php';
 
-session_start();
 if(empty($_SESSION['userid'])) die();
 
 $fileKey = test_input($_POST['download-file']);
