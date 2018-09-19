@@ -1,5 +1,4 @@
 <?php
-session_start();
 if(empty($_SESSION['userid'])){
   die('Please <a href="login.php">login</a> first.');
 }
