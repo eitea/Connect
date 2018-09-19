@@ -1286,12 +1286,12 @@ function create_tables($conn) {
         echo $conn->error;
     }
     $sql = "CREATE TABLE archiveconfig(
-		id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-		name VARCHAR(150) NOT NULL,
+	id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+	name VARCHAR(150) NOT NULL,
         endpoint VARCHAR(50),
         awskey VARCHAR(50),
         secret VARCHAR(50),
-		isActive ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
+	isActive ENUM('TRUE', 'FALSE') DEFAULT 'TRUE'
     )";
     if (!$conn->query($sql)) {
         echo $conn->error;
@@ -1320,6 +1320,7 @@ function create_tables($conn) {
 		fromAddress VARCHAR(100),
 		toAddress VARCHAR(100),
 		autoResponse TEXT,
+		isActive ENUM('TRUE', 'FALSE') NOT NULL DEFAULT 'TRUE',
 		FOREIGN KEY (templateID) REFERENCES dynamicprojects(projectid)
 		ON UPDATE CASCADE
 		ON DELETE SET NULL,
