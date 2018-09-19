@@ -5,7 +5,6 @@ if(isset($_GET['proc'])){
   die("Access denied.");
 }
 
-session_start();
 $userID = $_SESSION['userid'];
 $privateKey = $_SESSION['privateKey'];
 
