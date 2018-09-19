@@ -6,7 +6,6 @@ require dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARA
 
 $companyID = intval($_POST['downloadVVs']) or die();
 
-session_start();
 if (empty($_SESSION['userid'])) {
 	die('Please <a href="../login/auth">login</a> first.');
 }
