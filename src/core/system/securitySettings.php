@@ -435,7 +435,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             }
 
             if(isset($_POST['hasTaskAccess'])){
-                //TODO: see if user has access already, and if not, and you can grant it, grant it.
 				grantAccess('TASK', $uid);
             } else {
                 $conn->query("UPDATE security_access SET outDated = 'TRUE' WHERE module = 'TASK' AND userID = $uid");
@@ -812,7 +811,7 @@ $('[data-count-all*="permissionCollapseListGroup"]').each(function(){
             $badge.html(checkedCount + " / " + totalCount);
         }, 10)
     })
-}) 
+})
 
 $(function () {
   $('[data-toggle="tooltip"]').tooltip()
