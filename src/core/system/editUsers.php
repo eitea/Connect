@@ -538,25 +538,23 @@ while($row = $result->fetch_assoc()){
                   </div>
                 </div>
                 <div class="row">
-                  <?php 
+                  <?php
                   while($team_result && $team_row = $team_result->fetch_assoc()):
                     $team_name = $team_row["name"];
                     $team_id = $team_row["id"];
                     $team_skill = $team_row["skill"];
                     $user_in_team[$team_row["id"]] = true;
                   ?>
-                    <form method="POST">
-                      <input type="hidden" name="uid" value="<?php echo $x ?>" />
-                      <input type="hidden" name="tid" value="<?php echo $team_id ?>" />
-                      <div class="col-xs-12" style="display: flex; margin-bottom: 16px;">
-                        <button type="submit" class="btn btn-danger" name="removeFromTeam" value="<?php echo $team_id ?>"><i class="fa fa-times"></i></button>
-                        <span style="white-space:nowrap;margin-right: 16px; margin-left: 16px;" > <?php echo $team_name ?> </span>
-                        <select name="teamSkill" class="form-control">
-                          <?php echo str_replace('value="'.$team_skill.'">', 'value="'.$team_skill.'" selected>', $percentage_select) ?>
-                        </select>
-                        <button style="margin-left: 16px; " type="submit" class="btn btn-default" name="saveTeam" value="<?php echo $team_id ?>"><i class="fa fa-save"></i></button>
-                      </div>
-                    </form>
+                  <input type="hidden" name="uid" value="<?php echo $x ?>" />
+                  <input type="hidden" name="tid" value="<?php echo $team_id ?>" />
+                  <div class="col-xs-12" style="display: flex; margin-bottom: 16px;">
+                    <button type="submit" class="btn btn-danger" name="removeFromTeam" value="<?php echo $team_id ?>"><i class="fa fa-times"></i></button>
+                    <span style="white-space:nowrap;margin-right: 16px; margin-left: 16px;" > <?php echo $team_name ?> </span>
+                    <select name="teamSkill" class="form-control">
+                      <?php echo str_replace('value="'.$team_skill.'">', 'value="'.$team_skill.'" selected>', $percentage_select) ?>
+                    </select>
+                    <button style="margin-left: 16px; " type="submit" class="btn btn-default" name="saveTeam" value="<?php echo $team_id ?>"><i class="fa fa-save"></i></button>
+                  </div>
                   <?php endwhile; ?>
                 </div>
                 <div class="row">
@@ -568,7 +566,6 @@ while($row = $result->fetch_assoc()){
                 </div>
                 <div class="modal fade addTeam<?php echo $x; ?>">
                 <div class="modal-dialog modal-content modal-md">
-                  <form method="POST">
                       <div class="modal-header"></div>
                       <div class="modal-body">
                         <label>Team</label>
@@ -590,7 +587,6 @@ while($row = $result->fetch_assoc()){
                         <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $lang["CANCEL"] ?></button>
                         <button type="submit" class="btn btn-warning" name="addTeam" value="<?php echo $x; ?>"><?php echo $lang["ADD"] ?></button>
                     </div>
-                  </form>
                 </div>
               </div>
               </div>
@@ -642,7 +638,7 @@ while($row = $result->fetch_assoc()){
               <div class="container-fluid">
                 <div class="text-right">
                   <button type="button" class="btn btn-danger" data-toggle="modal" data-target=".bs-example-modal-sm<?php echo $x; ?>"><?php echo $lang['REMOVE_USER']; ?></button>
-                  <button class="btn btn-warning" type="submit" name="submitUser" value="<?php echo $x; ?>" ><?php echo $lang['SAVE']; ?> </button>
+                  <button type="submit" class="btn btn-warning" name="submitUser" value="<?php echo $x; ?>" ><?php echo $lang['SAVE']; ?> </button>
                 </div>
               </div>
               <br><br>
