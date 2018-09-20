@@ -41,7 +41,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       if($stmt->errno){ echo $stmt->error;} else { echo '<div class="alert alert-over alert-success"><a href="#" data-dismiss="alert" class="close">&times;</a>'.$lang['OK_SAVE'].'</div>'; }
       $stmt->close();
     } else {
-      echo '<div class="alert alert-over alert-danger"><a href="#" data-dismiss="alert" class="close">&times;</a>'.print_r($logo).'</div>';
+      showError(print_r($logo, 1));
     }
   } elseif(isset($_POST['general_save'])){
     function max4Lines($str){

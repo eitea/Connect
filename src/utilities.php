@@ -515,7 +515,7 @@ function getFilledOutTemplate($templateID, $bookingQuery = "") {
 function uploadImage($file_field, $crop_square = false, $resize = true) {
     $max_size = 5000000; //5mb
     $whitelist_ext = array('jpeg', 'jpg', 'png', 'gif');
-    $whitelist_type = array('image/jpeg', 'image/jpg', 'image/png');
+    $whitelist_type = array('image/jpeg', 'image/jpg', 'image/png', 'image/gif');
 
     //Validation
     $out = array('error' => array());
