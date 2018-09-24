@@ -61,7 +61,7 @@ class Interval_Calculator{
     if(timeDiff_hours($this->startCalculation, $this->endCalculation) > 0){
       $this->calculateValues();
     } else {
-      echo "ERROR";
+     	//ignore
     }
   }
 

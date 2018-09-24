@@ -139,7 +139,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && Permissions::has("WORKFLOW.WRITE")){
 		if($conn->error){
 			showError($conn->error . __LINE__);
 		} else {
-			showSuccess('Messenger: '.$subject.$lang['OK_SAVE']);
+			showSuccess($lang['OK_SAVE']);
 		}
 	} elseif(!empty($_POST['rule_deactivate'])){
 		$val = intval($_POST['rule_deactivate']);
